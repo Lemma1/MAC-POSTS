@@ -1,0 +1,2 @@
+/home/weima/MINAMI/src/CMakeFiles/helloDemo.dir
+/home/weima/MINAMI/src/3rdparty/g3log/CMakeFiles/g3log.dir

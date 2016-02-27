@@ -1,0 +1,2 @@
+/usr/bin/ar cq libg3log.a  CMakeFiles/g3log.dir/loglevels.cpp.o CMakeFiles/g3log.dir/crashhandler_unix.cpp.o CMakeFiles/g3log.dir/logworker.cpp.o CMakeFiles/g3log.dir/g3log.cpp.o CMakeFiles/g3log.dir/logcapture.cpp.o CMakeFiles/g3log.dir/filesink.cpp.o CMakeFiles/g3log.dir/logmessage.cpp.o CMakeFiles/g3log.dir/time.cpp.o
+/usr/bin/ranlib libg3log.a

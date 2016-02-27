@@ -1,0 +1,16 @@
+cmake_minimum_required (VERSION 3.2.2)
+project (MINAMI CXX)
+
+find_package(Threads)
+set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_COMPILER g++)
+set (CMAKE_CXX_FLAGS "-std=c++11 -m64 -Wall -pthread")
+#set (CMAKE_EXE_LIKKER_FLAGS "-pthread")
+
+
+#add_subdirectory (glib-core)
+#add_subdirectory (snap-core)
+add_subdirectory (3rdparty)
+
+add_executable (helloDemo main.cpp)
+target_link_libraries (helloDemo LINK_PUBLIC g3log ${CMAKE_THREAD_INIT})
