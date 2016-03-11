@@ -53,38 +53,103 @@ CMAKE_SOURCE_DIR = /home/weima/MINAMI/src
 CMAKE_BINARY_DIR = /home/weima/MINAMI/src
 
 #=============================================================================
-# Target rules for target CMakeFiles/helloDemo.dir
+# Directory level rules for directory glib-core
+
+# Convenience name for "all" pass in the directory.
+glib-core/all: glib-core/CMakeFiles/Glib.dir/all
+.PHONY : glib-core/all
+
+# Convenience name for "clean" pass in the directory.
+glib-core/clean: glib-core/CMakeFiles/Glib.dir/clean
+.PHONY : glib-core/clean
+
+# Convenience name for "preinstall" pass in the directory.
+glib-core/preinstall:
+.PHONY : glib-core/preinstall
+
+#=============================================================================
+# Target rules for target glib-core/CMakeFiles/Glib.dir
 
 # All Build rule for target.
-CMakeFiles/helloDemo.dir/all: 3rdparty/g3log/CMakeFiles/g3log.dir/all
-	$(MAKE) -f CMakeFiles/helloDemo.dir/build.make CMakeFiles/helloDemo.dir/depend
-	$(MAKE) -f CMakeFiles/helloDemo.dir/build.make CMakeFiles/helloDemo.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles  9
-	@echo "Built target helloDemo"
-.PHONY : CMakeFiles/helloDemo.dir/all
+glib-core/CMakeFiles/Glib.dir/all:
+	$(MAKE) -f glib-core/CMakeFiles/Glib.dir/build.make glib-core/CMakeFiles/Glib.dir/depend
+	$(MAKE) -f glib-core/CMakeFiles/Glib.dir/build.make glib-core/CMakeFiles/Glib.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles  1
+	@echo "Built target Glib"
+.PHONY : glib-core/CMakeFiles/Glib.dir/all
 
 # Include target in all.
-all: CMakeFiles/helloDemo.dir/all
+all: glib-core/CMakeFiles/Glib.dir/all
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/helloDemo.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/weima/MINAMI/src/CMakeFiles 9
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/helloDemo.dir/all
+glib-core/CMakeFiles/Glib.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/weima/MINAMI/src/CMakeFiles 1
+	$(MAKE) -f CMakeFiles/Makefile2 glib-core/CMakeFiles/Glib.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/weima/MINAMI/src/CMakeFiles 0
-.PHONY : CMakeFiles/helloDemo.dir/rule
+.PHONY : glib-core/CMakeFiles/Glib.dir/rule
 
 # Convenience name for target.
-helloDemo: CMakeFiles/helloDemo.dir/rule
-.PHONY : helloDemo
+Glib: glib-core/CMakeFiles/Glib.dir/rule
+.PHONY : Glib
 
 # clean rule for target.
-CMakeFiles/helloDemo.dir/clean:
-	$(MAKE) -f CMakeFiles/helloDemo.dir/build.make CMakeFiles/helloDemo.dir/clean
-.PHONY : CMakeFiles/helloDemo.dir/clean
+glib-core/CMakeFiles/Glib.dir/clean:
+	$(MAKE) -f glib-core/CMakeFiles/Glib.dir/build.make glib-core/CMakeFiles/Glib.dir/clean
+.PHONY : glib-core/CMakeFiles/Glib.dir/clean
 
 # clean rule for target.
-clean: CMakeFiles/helloDemo.dir/clean
+clean: glib-core/CMakeFiles/Glib.dir/clean
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory snap-core
+
+# Convenience name for "all" pass in the directory.
+snap-core/all: snap-core/CMakeFiles/Snap.dir/all
+.PHONY : snap-core/all
+
+# Convenience name for "clean" pass in the directory.
+snap-core/clean: snap-core/CMakeFiles/Snap.dir/clean
+.PHONY : snap-core/clean
+
+# Convenience name for "preinstall" pass in the directory.
+snap-core/preinstall:
+.PHONY : snap-core/preinstall
+
+#=============================================================================
+# Target rules for target snap-core/CMakeFiles/Snap.dir
+
+# All Build rule for target.
+snap-core/CMakeFiles/Snap.dir/all: glib-core/CMakeFiles/Glib.dir/all
+	$(MAKE) -f snap-core/CMakeFiles/Snap.dir/build.make snap-core/CMakeFiles/Snap.dir/depend
+	$(MAKE) -f snap-core/CMakeFiles/Snap.dir/build.make snap-core/CMakeFiles/Snap.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles  2
+	@echo "Built target Snap"
+.PHONY : snap-core/CMakeFiles/Snap.dir/all
+
+# Include target in all.
+all: snap-core/CMakeFiles/Snap.dir/all
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+snap-core/CMakeFiles/Snap.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/weima/MINAMI/src/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 snap-core/CMakeFiles/Snap.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/weima/MINAMI/src/CMakeFiles 0
+.PHONY : snap-core/CMakeFiles/Snap.dir/rule
+
+# Convenience name for target.
+Snap: snap-core/CMakeFiles/Snap.dir/rule
+.PHONY : Snap
+
+# clean rule for target.
+snap-core/CMakeFiles/Snap.dir/clean:
+	$(MAKE) -f snap-core/CMakeFiles/Snap.dir/build.make snap-core/CMakeFiles/Snap.dir/clean
+.PHONY : snap-core/CMakeFiles/Snap.dir/clean
+
+# clean rule for target.
+clean: snap-core/CMakeFiles/Snap.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -124,7 +189,7 @@ clean: CMakeFiles/helloDemo.dir/clean
 3rdparty/g3log/CMakeFiles/g3log.dir/all:
 	$(MAKE) -f 3rdparty/g3log/CMakeFiles/g3log.dir/build.make 3rdparty/g3log/CMakeFiles/g3log.dir/depend
 	$(MAKE) -f 3rdparty/g3log/CMakeFiles/g3log.dir/build.make 3rdparty/g3log/CMakeFiles/g3log.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles  1 2 3 4 5 6 7 8
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles  3 4 5 6 7 8 9 10
 	@echo "Built target g3log"
 .PHONY : 3rdparty/g3log/CMakeFiles/g3log.dir/all
 
@@ -150,6 +215,98 @@ g3log: 3rdparty/g3log/CMakeFiles/g3log.dir/rule
 
 # clean rule for target.
 clean: 3rdparty/g3log/CMakeFiles/g3log.dir/clean
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory minami
+
+# Convenience name for "all" pass in the directory.
+minami/all: minami/CMakeFiles/minami.dir/all
+minami/all: minami/CMakeFiles/pathDemo.dir/all
+.PHONY : minami/all
+
+# Convenience name for "clean" pass in the directory.
+minami/clean: minami/CMakeFiles/minami.dir/clean
+minami/clean: minami/CMakeFiles/pathDemo.dir/clean
+.PHONY : minami/clean
+
+# Convenience name for "preinstall" pass in the directory.
+minami/preinstall:
+.PHONY : minami/preinstall
+
+#=============================================================================
+# Target rules for target minami/CMakeFiles/minami.dir
+
+# All Build rule for target.
+minami/CMakeFiles/minami.dir/all: glib-core/CMakeFiles/Glib.dir/all
+minami/CMakeFiles/minami.dir/all: snap-core/CMakeFiles/Snap.dir/all
+minami/CMakeFiles/minami.dir/all: 3rdparty/g3log/CMakeFiles/g3log.dir/all
+	$(MAKE) -f minami/CMakeFiles/minami.dir/build.make minami/CMakeFiles/minami.dir/depend
+	$(MAKE) -f minami/CMakeFiles/minami.dir/build.make minami/CMakeFiles/minami.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles  11
+	@echo "Built target minami"
+.PHONY : minami/CMakeFiles/minami.dir/all
+
+# Include target in all.
+all: minami/CMakeFiles/minami.dir/all
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+minami/CMakeFiles/minami.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/weima/MINAMI/src/CMakeFiles 11
+	$(MAKE) -f CMakeFiles/Makefile2 minami/CMakeFiles/minami.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/weima/MINAMI/src/CMakeFiles 0
+.PHONY : minami/CMakeFiles/minami.dir/rule
+
+# Convenience name for target.
+minami: minami/CMakeFiles/minami.dir/rule
+.PHONY : minami
+
+# clean rule for target.
+minami/CMakeFiles/minami.dir/clean:
+	$(MAKE) -f minami/CMakeFiles/minami.dir/build.make minami/CMakeFiles/minami.dir/clean
+.PHONY : minami/CMakeFiles/minami.dir/clean
+
+# clean rule for target.
+clean: minami/CMakeFiles/minami.dir/clean
+.PHONY : clean
+
+#=============================================================================
+# Target rules for target minami/CMakeFiles/pathDemo.dir
+
+# All Build rule for target.
+minami/CMakeFiles/pathDemo.dir/all: glib-core/CMakeFiles/Glib.dir/all
+minami/CMakeFiles/pathDemo.dir/all: snap-core/CMakeFiles/Snap.dir/all
+minami/CMakeFiles/pathDemo.dir/all: 3rdparty/g3log/CMakeFiles/g3log.dir/all
+minami/CMakeFiles/pathDemo.dir/all: minami/CMakeFiles/minami.dir/all
+	$(MAKE) -f minami/CMakeFiles/pathDemo.dir/build.make minami/CMakeFiles/pathDemo.dir/depend
+	$(MAKE) -f minami/CMakeFiles/pathDemo.dir/build.make minami/CMakeFiles/pathDemo.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles  12
+	@echo "Built target pathDemo"
+.PHONY : minami/CMakeFiles/pathDemo.dir/all
+
+# Include target in all.
+all: minami/CMakeFiles/pathDemo.dir/all
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+minami/CMakeFiles/pathDemo.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/weima/MINAMI/src/CMakeFiles 12
+	$(MAKE) -f CMakeFiles/Makefile2 minami/CMakeFiles/pathDemo.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/weima/MINAMI/src/CMakeFiles 0
+.PHONY : minami/CMakeFiles/pathDemo.dir/rule
+
+# Convenience name for target.
+pathDemo: minami/CMakeFiles/pathDemo.dir/rule
+.PHONY : pathDemo
+
+# clean rule for target.
+minami/CMakeFiles/pathDemo.dir/clean:
+	$(MAKE) -f minami/CMakeFiles/pathDemo.dir/build.make minami/CMakeFiles/pathDemo.dir/clean
+.PHONY : minami/CMakeFiles/pathDemo.dir/clean
+
+# clean rule for target.
+clean: minami/CMakeFiles/pathDemo.dir/clean
 .PHONY : clean
 
 #=============================================================================

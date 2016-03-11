@@ -8,9 +8,9 @@ set (CMAKE_CXX_FLAGS "-std=c++11 -m64 -Wall -pthread")
 #set (CMAKE_EXE_LIKKER_FLAGS "-pthread")
 
 
-#add_subdirectory (glib-core)
-#add_subdirectory (snap-core)
+add_subdirectory (glib-core)
+add_subdirectory (snap-core)
 add_subdirectory (3rdparty)
+add_subdirectory (minami)
 
-add_executable (helloDemo main.cpp)
-target_link_libraries (helloDemo LINK_PUBLIC g3log ${CMAKE_THREAD_INIT})
+

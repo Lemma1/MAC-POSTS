@@ -12,6 +12,9 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.2.2/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.2.2/CMakeSystem.cmake"
   "CMakeLists.txt"
+  "glib-core/CMakeLists.txt"
+  "minami/CMakeLists.txt"
+  "snap-core/CMakeLists.txt"
   "/usr/share/cmake-3.2/Modules/CMakeCXXInformation.cmake"
   "/usr/share/cmake-3.2/Modules/CMakeCommonLanguageInclude.cmake"
   "/usr/share/cmake-3.2/Modules/CMakeGenericSystem.cmake"
@@ -41,12 +44,18 @@ set(CMAKE_MAKEFILE_OUTPUTS
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/CMakeDirectoryInformation.cmake"
+  "glib-core/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "snap-core/CMakeFiles/CMakeDirectoryInformation.cmake"
   "3rdparty/CMakeFiles/CMakeDirectoryInformation.cmake"
   "3rdparty/g3log/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "minami/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/helloDemo.dir/DependInfo.cmake"
+  "glib-core/CMakeFiles/Glib.dir/DependInfo.cmake"
+  "snap-core/CMakeFiles/Snap.dir/DependInfo.cmake"
   "3rdparty/g3log/CMakeFiles/g3log.dir/DependInfo.cmake"
+  "minami/CMakeFiles/minami.dir/DependInfo.cmake"
+  "minami/CMakeFiles/pathDemo.dir/DependInfo.cmake"
   )

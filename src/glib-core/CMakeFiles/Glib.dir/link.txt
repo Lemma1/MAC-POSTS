@@ -1,1 +1,1 @@
-g++  -fPIC -g -Wall  -shared -Wl,-soname,libGlib.so -o libGlib.so CMakeFiles/Glib.dir/base.cpp.o 
+g++  -fPIC -std=c++11 -m64 -Wall -pthread  -shared -Wl,-soname,libGlib.so -o libGlib.so CMakeFiles/Glib.dir/base.cpp.o 

@@ -81,7 +81,9 @@ helloDemo_EXTERNAL_OBJECTS =
 
 helloDemo: CMakeFiles/helloDemo.dir/main.cpp.o
 helloDemo: CMakeFiles/helloDemo.dir/build.make
+helloDemo: snap-core/libSnap.so
 helloDemo: 3rdparty/g3log/libg3log.a
+helloDemo: glib-core/libGlib.so
 helloDemo: CMakeFiles/helloDemo.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX executable helloDemo"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/helloDemo.dir/link.txt --verbose=$(VERBOSE)

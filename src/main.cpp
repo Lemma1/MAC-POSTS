@@ -1,7 +1,7 @@
 // #include "base.h"
 // // #include "spdlog.h"
 
-// #include "Snap.h"
+#include "Snap.h"
 
 #include "g3log/g3log.hpp"
 #include "g3log/logworker.hpp"
@@ -37,32 +37,32 @@ int main(int argc, char **argv)
 
 
 
-  // float d;
-  // int a;
-  //// what type of graph do you want to use?
-  // typedef PUNGraph PGraph; // undirected graph
-  //typedef PNGraph PGraph;  //   directed graph
-  //typedef PNEGraph PGraph;  //   directed multigraph
+  float d;
+  int a;
+  // what type of graph do you want to use?
+  typedef PUNGraph PGraph; // undirected graph
+  // typedef PNGraph PGraph;  //   directed graph
+  // typedef PNEGraph PGraph;  //   directed multigraph
   // typedef TPt<TNodeNet<TInt> > PGraph;
   // typedef TPt<TNodeEdgeNet<TInt, TInt> > PGraph;
 
-  // // this code is independent of what particular graph implementation/type we use
-  // printf("Creating graph:\n");
-  // PGraph G = PGraph::TObj::New();
-  // for (int n = 0; n < 10; n++) {
-  //   G->AddNode(); // if no parameter is given, node ids are 0,1,...,9
-  // }
+  // this code is independent of what particular graph implementation/type we use
+  printf("Creating graph:\n");
+  PGraph G = PGraph::TObj::New();
+  for (int n = 0; n < 10; n++) {
+    G->AddNode(); // if no parameter is given, node ids are 0,1,...,9
+  }
 
 
-  // G->AddEdge(0, 1);
-  // for (int e = 0; e < 10; e++) {
-  //   const int NId1 = G->GetRndNId();
-  //   const int NId2 = G->GetRndNId();
-  //   if (G->AddEdge(NId1, NId2) != -2) {
-  //     printf("  Edge %d -- %d added\n", NId1,  NId2); }
-  //   else {
-  //     printf("  Edge %d -- %d already exists\n", NId1, NId2); }
-  // }
+  G->AddEdge(0, 1);
+  for (int e = 0; e < 10; e++) {
+    const int NId1 = G->GetRndNId();
+    const int NId2 = G->GetRndNId();
+    if (G->AddEdge(NId1, NId2) != -2) {
+      printf("  Edge %d -- %d added\n", NId1,  NId2); }
+    else {
+      printf("  Edge %d -- %d already exists\n", NId1, NId2); }
+  }
 
 
   // IAssert(G->IsOk());

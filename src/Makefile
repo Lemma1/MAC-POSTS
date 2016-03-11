@@ -102,17 +102,30 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named helloDemo
+# Target rules for targets named Glib
 
 # Build rule for target.
-helloDemo: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 helloDemo
-.PHONY : helloDemo
+Glib: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Glib
+.PHONY : Glib
 
 # fast build rule for target.
-helloDemo/fast:
-	$(MAKE) -f CMakeFiles/helloDemo.dir/build.make CMakeFiles/helloDemo.dir/build
-.PHONY : helloDemo/fast
+Glib/fast:
+	$(MAKE) -f glib-core/CMakeFiles/Glib.dir/build.make glib-core/CMakeFiles/Glib.dir/build
+.PHONY : Glib/fast
+
+#=============================================================================
+# Target rules for targets named Snap
+
+# Build rule for target.
+Snap: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Snap
+.PHONY : Snap
+
+# fast build rule for target.
+Snap/fast:
+	$(MAKE) -f snap-core/CMakeFiles/Snap.dir/build.make snap-core/CMakeFiles/Snap.dir/build
+.PHONY : Snap/fast
 
 #=============================================================================
 # Target rules for targets named g3log
@@ -127,29 +140,31 @@ g3log/fast:
 	$(MAKE) -f 3rdparty/g3log/CMakeFiles/g3log.dir/build.make 3rdparty/g3log/CMakeFiles/g3log.dir/build
 .PHONY : g3log/fast
 
-main.o: main.cpp.o
-.PHONY : main.o
+#=============================================================================
+# Target rules for targets named minami
 
-# target to build an object file
-main.cpp.o:
-	$(MAKE) -f CMakeFiles/helloDemo.dir/build.make CMakeFiles/helloDemo.dir/main.cpp.o
-.PHONY : main.cpp.o
+# Build rule for target.
+minami: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 minami
+.PHONY : minami
 
-main.i: main.cpp.i
-.PHONY : main.i
+# fast build rule for target.
+minami/fast:
+	$(MAKE) -f minami/CMakeFiles/minami.dir/build.make minami/CMakeFiles/minami.dir/build
+.PHONY : minami/fast
 
-# target to preprocess a source file
-main.cpp.i:
-	$(MAKE) -f CMakeFiles/helloDemo.dir/build.make CMakeFiles/helloDemo.dir/main.cpp.i
-.PHONY : main.cpp.i
+#=============================================================================
+# Target rules for targets named pathDemo
 
-main.s: main.cpp.s
-.PHONY : main.s
+# Build rule for target.
+pathDemo: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 pathDemo
+.PHONY : pathDemo
 
-# target to generate assembly for a file
-main.cpp.s:
-	$(MAKE) -f CMakeFiles/helloDemo.dir/build.make CMakeFiles/helloDemo.dir/main.cpp.s
-.PHONY : main.cpp.s
+# fast build rule for target.
+pathDemo/fast:
+	$(MAKE) -f minami/CMakeFiles/pathDemo.dir/build.make minami/CMakeFiles/pathDemo.dir/build
+.PHONY : pathDemo/fast
 
 # Help Target
 help:
@@ -159,11 +174,11 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... helloDemo"
+	@echo "... Glib"
+	@echo "... Snap"
 	@echo "... g3log"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
+	@echo "... minami"
+	@echo "... pathDemo"
 .PHONY : help
 
 

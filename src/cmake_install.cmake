@@ -34,7 +34,10 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
+  include("/home/weima/MINAMI/src/glib-core/cmake_install.cmake")
+  include("/home/weima/MINAMI/src/snap-core/cmake_install.cmake")
   include("/home/weima/MINAMI/src/3rdparty/cmake_install.cmake")
+  include("/home/weima/MINAMI/src/minami/cmake_install.cmake")
 
 endif()
 
