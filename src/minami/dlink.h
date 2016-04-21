@@ -19,13 +19,14 @@ public:
              TFlt length,
              TFlt ffs );
   ~MNM_Dlink();
-  void virtual evolve(TInt timestamp){};
-
+  int virtual evolve(TInt timestamp){return 0;};
+  TFlt virtual get_link_supply(){return TFlt(0);};
+  int virtual clear_incoming_array(){return 0;};
   TInt m_number_of_lane;
   TFlt m_length;
   TFlt m_ffs;
 
-  std::map<MNM_Dlink*, std::deque<MNM_Veh*>> m_finished_array;
+  std::map<TInt, std::deque<MNM_Veh*>*> m_finished_array;
   std::deque<MNM_Veh *> m_incoming_array;
 };
 
@@ -41,11 +42,17 @@ public:
                 TFlt unit_time,
                 TFlt flow_scalar);
   ~MNM_Dlink_Ctm();
+  int virtual evolve(TInt timestamp);
+  TFlt virtual get_link_supply();
+  int virtual clear_incoming_array();
+  void print_info();
 
 private:
   class Ctm_Cell;
   int init_cell_array(TFlt unit_time, TFlt std_cell_length, TFlt lane_hold_cap_last_cell);
-  int update_in_out_number();
+  int update_out_veh();
+  int move_last_cell();
+  int move_veh_queue(std::deque<MNM_Veh*> from_queue, std::deque<MNM_Veh*> to_queue, TInt number_tomove);
   TInt m_num_cells;
   TFlt m_lane_hold_cap;
   TFlt m_lane_flow_cap;
@@ -63,6 +70,7 @@ public:
   ~Ctm_Cell();
   TFlt get_demand();
   TFlt get_supply();
+
   TInt m_volume;
   TFlt m_flow_scalar;
   TFlt m_hold_cap;
@@ -78,9 +86,10 @@ class MNM_Veh
 public:
   MNM_Veh();
   ~MNM_Veh();
+  TInt get_next_link();
 private:
   TInt m_ID;
-  MNM_Dlink* m_current_link;
-  std::deque<MNM_Dlink*> m_future_links;
+  TInt m_current_link;
+  std::vector<TInt> m_future_links;
 };
 #endif
