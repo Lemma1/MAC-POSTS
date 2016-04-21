@@ -102,6 +102,20 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
+minami/CMakeFiles/ctm.dir/rule:
+	cd /home/weima/MINAMI/src && $(MAKE) -f CMakeFiles/Makefile2 minami/CMakeFiles/ctm.dir/rule
+.PHONY : minami/CMakeFiles/ctm.dir/rule
+
+# Convenience name for target.
+ctm: minami/CMakeFiles/ctm.dir/rule
+.PHONY : ctm
+
+# fast build rule for target.
+ctm/fast:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/build
+.PHONY : ctm/fast
+
+# Convenience name for target.
 minami/CMakeFiles/minami.dir/rule:
 	cd /home/weima/MINAMI/src && $(MAKE) -f CMakeFiles/Makefile2 minami/CMakeFiles/minami.dir/rule
 .PHONY : minami/CMakeFiles/minami.dir/rule
@@ -115,67 +129,53 @@ minami/fast:
 	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/minami.dir/build.make minami/CMakeFiles/minami.dir/build
 .PHONY : minami/fast
 
-# Convenience name for target.
-minami/CMakeFiles/pathDemo.dir/rule:
-	cd /home/weima/MINAMI/src && $(MAKE) -f CMakeFiles/Makefile2 minami/CMakeFiles/pathDemo.dir/rule
-.PHONY : minami/CMakeFiles/pathDemo.dir/rule
-
-# Convenience name for target.
-pathDemo: minami/CMakeFiles/pathDemo.dir/rule
-.PHONY : pathDemo
-
-# fast build rule for target.
-pathDemo/fast:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/pathDemo.dir/build.make minami/CMakeFiles/pathDemo.dir/build
-.PHONY : pathDemo/fast
-
-path.o: path.cpp.o
-.PHONY : path.o
+dlink.o: dlink.cpp.o
+.PHONY : dlink.o
 
 # target to build an object file
-path.cpp.o:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/minami.dir/build.make minami/CMakeFiles/minami.dir/path.cpp.o
-.PHONY : path.cpp.o
+dlink.cpp.o:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/dlink.cpp.o
+.PHONY : dlink.cpp.o
 
-path.i: path.cpp.i
-.PHONY : path.i
+dlink.i: dlink.cpp.i
+.PHONY : dlink.i
 
 # target to preprocess a source file
-path.cpp.i:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/minami.dir/build.make minami/CMakeFiles/minami.dir/path.cpp.i
-.PHONY : path.cpp.i
+dlink.cpp.i:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/dlink.cpp.i
+.PHONY : dlink.cpp.i
 
-path.s: path.cpp.s
-.PHONY : path.s
+dlink.s: dlink.cpp.s
+.PHONY : dlink.s
 
 # target to generate assembly for a file
-path.cpp.s:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/minami.dir/build.make minami/CMakeFiles/minami.dir/path.cpp.s
-.PHONY : path.cpp.s
+dlink.cpp.s:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/dlink.cpp.s
+.PHONY : dlink.cpp.s
 
-test_path.o: test_path.cpp.o
-.PHONY : test_path.o
+test_ctm.o: test_ctm.cpp.o
+.PHONY : test_ctm.o
 
 # target to build an object file
-test_path.cpp.o:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/pathDemo.dir/build.make minami/CMakeFiles/pathDemo.dir/test_path.cpp.o
-.PHONY : test_path.cpp.o
+test_ctm.cpp.o:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/test_ctm.cpp.o
+.PHONY : test_ctm.cpp.o
 
-test_path.i: test_path.cpp.i
-.PHONY : test_path.i
+test_ctm.i: test_ctm.cpp.i
+.PHONY : test_ctm.i
 
 # target to preprocess a source file
-test_path.cpp.i:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/pathDemo.dir/build.make minami/CMakeFiles/pathDemo.dir/test_path.cpp.i
-.PHONY : test_path.cpp.i
+test_ctm.cpp.i:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/test_ctm.cpp.i
+.PHONY : test_ctm.cpp.i
 
-test_path.s: test_path.cpp.s
-.PHONY : test_path.s
+test_ctm.s: test_ctm.cpp.s
+.PHONY : test_ctm.s
 
 # target to generate assembly for a file
-test_path.cpp.s:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/pathDemo.dir/build.make minami/CMakeFiles/pathDemo.dir/test_path.cpp.s
-.PHONY : test_path.cpp.s
+test_ctm.cpp.s:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/test_ctm.cpp.s
+.PHONY : test_ctm.cpp.s
 
 # Help Target
 help:
@@ -186,13 +186,13 @@ help:
 	@echo "... minami"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... pathDemo"
-	@echo "... path.o"
-	@echo "... path.i"
-	@echo "... path.s"
-	@echo "... test_path.o"
-	@echo "... test_path.i"
-	@echo "... test_path.s"
+	@echo "... ctm"
+	@echo "... dlink.o"
+	@echo "... dlink.i"
+	@echo "... dlink.s"
+	@echo "... test_ctm.o"
+	@echo "... test_ctm.i"
+	@echo "... test_ctm.s"
 .PHONY : help
 
 

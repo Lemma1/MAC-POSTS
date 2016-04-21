@@ -1,0 +1,1 @@
+g++   -std=c++11 -m64 -Wall -pthread   CMakeFiles/ctm.dir/test_ctm.cpp.o CMakeFiles/ctm.dir/dlink.cpp.o  -o ctm -rdynamic ../3rdparty/g3log/libg3log.a libminami.so ../snap-core/libSnap.so ../glib-core/libGlib.so ../3rdparty/g3log/libg3log.a -Wl,-rpath,/home/weima/MINAMI/src/minami:/home/weima/MINAMI/src/snap-core:/home/weima/MINAMI/src/glib-core 

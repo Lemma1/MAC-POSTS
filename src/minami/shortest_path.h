@@ -9,11 +9,12 @@ class MNM_Shortestpath
 {
 public:
   MNM_Shortestpath();
-  ~MNM_Shortestpath();
+  ~MNM_Shortestpath(); 
+  int one2one(const MNM_Path& p, const PNGraph& g, const THash<TInt, TFlt>& c);
+  // int one2all(THash<TInt, MNM_Path> &, PNGraph);
+  // int all2all(THash<TInt, THash<TInt, MNM_Path>> &);
+private:
   int selector();
-  int one2one(MNM_Path &);
-  int one2all(THash<TInt, MNM_Path> &);
-  int all2all(THash<TInt, THash<TInt, MNM_Path>> &);
 };
 
 #endif

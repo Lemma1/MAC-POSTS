@@ -49,37 +49,12 @@ include minami/CMakeFiles/minami.dir/progress.make
 # Include the compile flags for this target's objects.
 include minami/CMakeFiles/minami.dir/flags.make
 
-minami/CMakeFiles/minami.dir/path.cpp.o: minami/CMakeFiles/minami.dir/flags.make
-minami/CMakeFiles/minami.dir/path.cpp.o: minami/path.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_1)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/minami.dir/path.cpp.o"
-	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/minami.dir/path.cpp.o -c /home/weima/MINAMI/src/minami/path.cpp
-
-minami/CMakeFiles/minami.dir/path.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/minami.dir/path.cpp.i"
-	cd /home/weima/MINAMI/src/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/weima/MINAMI/src/minami/path.cpp > CMakeFiles/minami.dir/path.cpp.i
-
-minami/CMakeFiles/minami.dir/path.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/minami.dir/path.cpp.s"
-	cd /home/weima/MINAMI/src/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/weima/MINAMI/src/minami/path.cpp -o CMakeFiles/minami.dir/path.cpp.s
-
-minami/CMakeFiles/minami.dir/path.cpp.o.requires:
-.PHONY : minami/CMakeFiles/minami.dir/path.cpp.o.requires
-
-minami/CMakeFiles/minami.dir/path.cpp.o.provides: minami/CMakeFiles/minami.dir/path.cpp.o.requires
-	$(MAKE) -f minami/CMakeFiles/minami.dir/build.make minami/CMakeFiles/minami.dir/path.cpp.o.provides.build
-.PHONY : minami/CMakeFiles/minami.dir/path.cpp.o.provides
-
-minami/CMakeFiles/minami.dir/path.cpp.o.provides.build: minami/CMakeFiles/minami.dir/path.cpp.o
-
 # Object files for target minami
-minami_OBJECTS = \
-"CMakeFiles/minami.dir/path.cpp.o"
+minami_OBJECTS =
 
 # External object files for target minami
 minami_EXTERNAL_OBJECTS =
 
-minami/libminami.so: minami/CMakeFiles/minami.dir/path.cpp.o
 minami/libminami.so: minami/CMakeFiles/minami.dir/build.make
 minami/libminami.so: snap-core/libSnap.so
 minami/libminami.so: 3rdparty/g3log/libg3log.a
@@ -92,7 +67,7 @@ minami/libminami.so: minami/CMakeFiles/minami.dir/link.txt
 minami/CMakeFiles/minami.dir/build: minami/libminami.so
 .PHONY : minami/CMakeFiles/minami.dir/build
 
-minami/CMakeFiles/minami.dir/requires: minami/CMakeFiles/minami.dir/path.cpp.o.requires
+minami/CMakeFiles/minami.dir/requires:
 .PHONY : minami/CMakeFiles/minami.dir/requires
 
 minami/CMakeFiles/minami.dir/clean:

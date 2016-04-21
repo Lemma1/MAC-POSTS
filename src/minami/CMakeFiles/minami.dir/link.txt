@@ -1,1 +1,1 @@
-g++  -fPIC -std=c++11 -m64 -Wall -pthread  -shared -Wl,-soname,libminami.so -o libminami.so CMakeFiles/minami.dir/path.cpp.o ../snap-core/libSnap.so ../3rdparty/g3log/libg3log.a ../glib-core/libGlib.so -Wl,-rpath,/home/weima/MINAMI/src/snap-core:/home/weima/MINAMI/src/glib-core 
+g++  -fPIC -std=c++11 -m64 -Wall -pthread  -shared -Wl,-soname,libminami.so -o libminami.so  ../snap-core/libSnap.so ../3rdparty/g3log/libg3log.a ../glib-core/libGlib.so -Wl,-rpath,/home/weima/MINAMI/src/snap-core:/home/weima/MINAMI/src/glib-core 

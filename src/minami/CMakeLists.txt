@@ -1,8 +1,8 @@
-add_library (minami SHARED path.cpp)
+add_library (minami SHARED base.h)
 
 target_link_libraries (minami LINK_PUBLIC Snap g3log ${CMAKE_THREAD_INIT})
 
-add_executable (pathDemo test_path.cpp)
+#add_executable (pathDemo test_path.cpp)
 
-
-target_link_libraries (pathDemo LINK_PUBLIC Snap g3log minami ${CMAKE_THREAD_INIT})
+add_executable (ctm test_ctm.cpp dlink.cpp)
+target_link_libraries (ctm LINK_PUBLIC Snap g3log minami ${CMAKE_THREAD_INIT})

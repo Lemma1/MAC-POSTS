@@ -21,8 +21,15 @@ int MNM_Path::AddLinkID(TInt linkID)
 	}
 };
 
-TInt* MNM_Path::BegLinkID() {return m_path_vec.BegI();};
-TInt* MNM_Path::EndLinkID() {return m_path_vec.EndI();};
+TInt* MNM_Path::BegLinkID() 
+{
+  return m_path_vec.BegI();
+};
+
+TInt* MNM_Path::EndLinkID() 
+{
+  return m_path_vec.EndI();
+};
 
 int MNM_Path::GetSize()
 {

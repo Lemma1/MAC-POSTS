@@ -141,6 +141,19 @@ g3log/fast:
 .PHONY : g3log/fast
 
 #=============================================================================
+# Target rules for targets named ctm
+
+# Build rule for target.
+ctm: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ctm
+.PHONY : ctm
+
+# fast build rule for target.
+ctm/fast:
+	$(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/build
+.PHONY : ctm/fast
+
+#=============================================================================
 # Target rules for targets named minami
 
 # Build rule for target.
@@ -152,19 +165,6 @@ minami: cmake_check_build_system
 minami/fast:
 	$(MAKE) -f minami/CMakeFiles/minami.dir/build.make minami/CMakeFiles/minami.dir/build
 .PHONY : minami/fast
-
-#=============================================================================
-# Target rules for targets named pathDemo
-
-# Build rule for target.
-pathDemo: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 pathDemo
-.PHONY : pathDemo
-
-# fast build rule for target.
-pathDemo/fast:
-	$(MAKE) -f minami/CMakeFiles/pathDemo.dir/build.make minami/CMakeFiles/pathDemo.dir/build
-.PHONY : pathDemo/fast
 
 # Help Target
 help:
@@ -178,7 +178,7 @@ help:
 	@echo "... Snap"
 	@echo "... g3log"
 	@echo "... minami"
-	@echo "... pathDemo"
+	@echo "... ctm"
 .PHONY : help
 
 
