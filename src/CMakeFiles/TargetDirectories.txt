@@ -1,4 +1,3 @@
-/home/weima/MINAMI/src/minami/CMakeFiles/minami.dir
 /home/weima/MINAMI/src/snap-core/CMakeFiles/Snap.dir
 /home/weima/MINAMI/src/glib-core/CMakeFiles/Glib.dir
 /home/weima/MINAMI/src/minami/CMakeFiles/ctm.dir

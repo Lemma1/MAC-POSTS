@@ -1,4 +1,3 @@
-#include "base.h"
 #include "dlink.h"
 
 MNM_Dlink::MNM_Dlink( TInt number_of_lane,
@@ -53,30 +52,41 @@ int MNM_Dlink_Ctm::init_cell_array( TFlt unit_time, TFlt std_cell_length, TFlt l
                          m_flow_scalar,
                          m_wave_ratio);
     if(aCell == NULL) {
-      return 1;
+      LOG(WARNING) << "Fail to init the cell.";
+      exit(-1);
     };
     m_cell_array.push_back(aCell);
     aCell = NULL;
   }
   
   //since the last cell is a non-standard cell
-  if(m_length > 0.0)
+  if(m_length > 0.0) {
     aCell = new Ctm_Cell(TFlt(m_number_of_lane) * std_cell_length * lane_hold_cap_last_cell, 
                          TFlt(m_number_of_lane) * m_lane_flow_cap * unit_time,
                          m_flow_scalar,
                          m_last_wave_ratio);
     if(aCell == NULL) {
-      m_cell_array.push_back(aCell);
+      LOG(WARNING) << "Fail to init the cell.";
+      exit(-1);
     }
+    m_cell_array.push_back(aCell);
+  }
 
   //compress the cellArray to reduce space 
   m_cell_array.shrink_to_fit();
+
   return 0;
 }
 
 void MNM_Dlink_Ctm::print_info() {
   printf("Total number of cell: \t%d\t Standard wave ratio: \t%.4f\nLast cell wave ratio: \t%.4f\n", 
           int(m_num_cells), double(m_wave_ratio), double(m_last_wave_ratio));
+  printf("Volume for each cell is:\n");
+  for (int i = 0; i < m_num_cells; ++i)
+  {
+    printf("%d,\n", int(m_cell_array[i] -> m_volume));
+  }
+  printf("\n");
 }
 
 int MNM_Dlink_Ctm::update_out_veh()
@@ -88,7 +98,7 @@ int MNM_Dlink_Ctm::update_out_veh()
     {
       __demand = m_cell_array[i]->get_demand();
       __supply = m_cell_array[i+1]->get_supply();
-      __temp_out_flux = MIN(__demand, __supply) * m_flow_scalar;
+      __temp_out_flux = std::min(__demand, __supply) * m_flow_scalar;
       m_cell_array[i] -> m_out_veh= TInt(std::round(__temp_out_flux)); 
     }
 
@@ -105,8 +115,8 @@ int MNM_Dlink_Ctm::evolve(TInt timestamp)
   if(m_num_cells > 1) {
     for (int i = 0; i < m_num_cells - 1; ++i) {
       __num_veh_tomove = m_cell_array[i] -> m_out_veh;
-      move_veh_queue(m_cell_array[i] -> m_veh_queue,
-                 m_cell_array[i] -> m_veh_queue,
+      move_veh_queue(&(m_cell_array[i] -> m_veh_queue),
+                 &(m_cell_array[i+1] -> m_veh_queue),
                  __num_veh_tomove);
     }
   }
@@ -132,23 +142,25 @@ TFlt MNM_Dlink_Ctm::get_link_supply() {
 }
 
 int MNM_Dlink_Ctm::clear_incoming_array() {
-  if (get_link_supply() > m_incoming_array.size()) {
+  if (get_link_supply() * m_flow_scalar < m_incoming_array.size()) {
     LOG(WARNING) << "Wrong incoming array size";
-    return 1;
+    exit(-1);
   }
-  move_veh_queue(m_incoming_array, m_cell_array[0] -> m_veh_queue, m_incoming_array.size());
+  move_veh_queue(&m_incoming_array, &(m_cell_array[0] -> m_veh_queue), m_incoming_array.size());
+
+  m_cell_array[0] -> m_volume = m_cell_array[0] ->m_veh_queue.size();
   return 0;
 }
 
-int MNM_Dlink_Ctm::move_veh_queue(std::deque<MNM_Veh*> from_queue,
-                                  std::deque<MNM_Veh*> to_queue, 
+int MNM_Dlink_Ctm::move_veh_queue(std::deque<MNM_Veh*> *from_queue,
+                                  std::deque<MNM_Veh*> *to_queue, 
                                   TInt number_tomove)
 {
   MNM_Veh* __veh;
   for (int i=0; i<number_tomove; ++i) {
-    __veh = from_queue.front();
-    from_queue.pop_front();
-    to_queue.push_back(__veh);
+    __veh = from_queue -> front();
+    from_queue -> pop_front();
+    to_queue -> push_back(__veh);
   }
   return 0;
 }
@@ -161,8 +173,13 @@ int MNM_Dlink_Ctm::move_last_cell() {
   for (int i=0; i<__num_veh_tomove; ++i) {
     __veh = m_cell_array[m_num_cells - 1] -> m_veh_queue.front();
     m_cell_array[m_num_cells - 1] -> m_veh_queue.pop_front();
-    __que_it = m_finished_array.find(__veh -> get_next_link());
-    __que_it -> second -> push_back(__veh);
+    if (__veh -> has_next_link()) {
+      __que_it = m_finished_array.find(__veh -> get_next_link());
+      __que_it -> second -> push_back(__veh);
+    }
+    else {
+      __veh -> get_destionation() -> receive_veh(__veh);
+    }
   }
   return 0;
 }
@@ -180,13 +197,12 @@ MNM_Dlink_Ctm::Ctm_Cell::Ctm_Cell(TFlt hold_cap, TFlt flow_cap, TFlt flow_scalar
 TFlt MNM_Dlink_Ctm::Ctm_Cell::get_demand()
 {
   TFlt __real_volume = TFlt(m_volume) / m_flow_scalar;
-  return MIN(__real_volume, m_flow_cap);
+  return std::min(__real_volume, m_flow_cap);
 }
 
 TFlt MNM_Dlink_Ctm::Ctm_Cell::get_supply()
 {
   TFlt __real_volume = TFlt(m_volume) / m_flow_scalar;
-  
   if (__real_volume >= m_hold_cap) 
   {
     __real_volume = m_hold_cap;
@@ -195,10 +211,6 @@ TFlt MNM_Dlink_Ctm::Ctm_Cell::get_supply()
   if(m_wave_ratio <= 1.0) //this one is quite tricky, why not just __min(flwCap, hldCap - curDensity)*wvRatio? 
     return m_flow_cap > __real_volume ? m_flow_cap: TFlt((m_hold_cap - __real_volume) * m_wave_ratio);  //flowCap equals to critical density
   else 
-    return MIN(m_flow_cap, TFlt(m_hold_cap - __real_volume));
+    return std::min(m_flow_cap, TFlt(m_hold_cap - __real_volume));
 }
 
-TInt MNM_Veh::get_next_link()
-{
-  return m_future_links.front();
-}

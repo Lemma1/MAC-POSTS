@@ -153,19 +153,6 @@ ctm/fast:
 	$(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/build
 .PHONY : ctm/fast
 
-#=============================================================================
-# Target rules for targets named minami
-
-# Build rule for target.
-minami: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 minami
-.PHONY : minami
-
-# fast build rule for target.
-minami/fast:
-	$(MAKE) -f minami/CMakeFiles/minami.dir/build.make minami/CMakeFiles/minami.dir/build
-.PHONY : minami/fast
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -177,7 +164,6 @@ help:
 	@echo "... Glib"
 	@echo "... Snap"
 	@echo "... g3log"
-	@echo "... minami"
 	@echo "... ctm"
 .PHONY : help
 

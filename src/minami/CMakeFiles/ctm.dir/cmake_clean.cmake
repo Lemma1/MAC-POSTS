@@ -1,6 +1,9 @@
 file(REMOVE_RECURSE
   "CMakeFiles/ctm.dir/test_ctm.cpp.o"
+  "CMakeFiles/ctm.dir/vehicle.cpp.o"
   "CMakeFiles/ctm.dir/dlink.cpp.o"
+  "CMakeFiles/ctm.dir/od.cpp.o"
+  "CMakeFiles/ctm.dir/factory.cpp.o"
   "ctm.pdb"
   "ctm"
 )

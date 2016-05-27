@@ -72,9 +72,32 @@ minami/CMakeFiles/ctm.dir/test_ctm.cpp.o.provides: minami/CMakeFiles/ctm.dir/tes
 
 minami/CMakeFiles/ctm.dir/test_ctm.cpp.o.provides.build: minami/CMakeFiles/ctm.dir/test_ctm.cpp.o
 
+minami/CMakeFiles/ctm.dir/vehicle.cpp.o: minami/CMakeFiles/ctm.dir/flags.make
+minami/CMakeFiles/ctm.dir/vehicle.cpp.o: minami/vehicle.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_2)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/ctm.dir/vehicle.cpp.o"
+	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/ctm.dir/vehicle.cpp.o -c /home/weima/MINAMI/src/minami/vehicle.cpp
+
+minami/CMakeFiles/ctm.dir/vehicle.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ctm.dir/vehicle.cpp.i"
+	cd /home/weima/MINAMI/src/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/weima/MINAMI/src/minami/vehicle.cpp > CMakeFiles/ctm.dir/vehicle.cpp.i
+
+minami/CMakeFiles/ctm.dir/vehicle.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ctm.dir/vehicle.cpp.s"
+	cd /home/weima/MINAMI/src/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/weima/MINAMI/src/minami/vehicle.cpp -o CMakeFiles/ctm.dir/vehicle.cpp.s
+
+minami/CMakeFiles/ctm.dir/vehicle.cpp.o.requires:
+.PHONY : minami/CMakeFiles/ctm.dir/vehicle.cpp.o.requires
+
+minami/CMakeFiles/ctm.dir/vehicle.cpp.o.provides: minami/CMakeFiles/ctm.dir/vehicle.cpp.o.requires
+	$(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/vehicle.cpp.o.provides.build
+.PHONY : minami/CMakeFiles/ctm.dir/vehicle.cpp.o.provides
+
+minami/CMakeFiles/ctm.dir/vehicle.cpp.o.provides.build: minami/CMakeFiles/ctm.dir/vehicle.cpp.o
+
 minami/CMakeFiles/ctm.dir/dlink.cpp.o: minami/CMakeFiles/ctm.dir/flags.make
 minami/CMakeFiles/ctm.dir/dlink.cpp.o: minami/dlink.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_2)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_3)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/ctm.dir/dlink.cpp.o"
 	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/ctm.dir/dlink.cpp.o -c /home/weima/MINAMI/src/minami/dlink.cpp
 
@@ -95,22 +118,72 @@ minami/CMakeFiles/ctm.dir/dlink.cpp.o.provides: minami/CMakeFiles/ctm.dir/dlink.
 
 minami/CMakeFiles/ctm.dir/dlink.cpp.o.provides.build: minami/CMakeFiles/ctm.dir/dlink.cpp.o
 
+minami/CMakeFiles/ctm.dir/od.cpp.o: minami/CMakeFiles/ctm.dir/flags.make
+minami/CMakeFiles/ctm.dir/od.cpp.o: minami/od.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_4)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/ctm.dir/od.cpp.o"
+	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/ctm.dir/od.cpp.o -c /home/weima/MINAMI/src/minami/od.cpp
+
+minami/CMakeFiles/ctm.dir/od.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ctm.dir/od.cpp.i"
+	cd /home/weima/MINAMI/src/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/weima/MINAMI/src/minami/od.cpp > CMakeFiles/ctm.dir/od.cpp.i
+
+minami/CMakeFiles/ctm.dir/od.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ctm.dir/od.cpp.s"
+	cd /home/weima/MINAMI/src/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/weima/MINAMI/src/minami/od.cpp -o CMakeFiles/ctm.dir/od.cpp.s
+
+minami/CMakeFiles/ctm.dir/od.cpp.o.requires:
+.PHONY : minami/CMakeFiles/ctm.dir/od.cpp.o.requires
+
+minami/CMakeFiles/ctm.dir/od.cpp.o.provides: minami/CMakeFiles/ctm.dir/od.cpp.o.requires
+	$(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/od.cpp.o.provides.build
+.PHONY : minami/CMakeFiles/ctm.dir/od.cpp.o.provides
+
+minami/CMakeFiles/ctm.dir/od.cpp.o.provides.build: minami/CMakeFiles/ctm.dir/od.cpp.o
+
+minami/CMakeFiles/ctm.dir/factory.cpp.o: minami/CMakeFiles/ctm.dir/flags.make
+minami/CMakeFiles/ctm.dir/factory.cpp.o: minami/factory.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_5)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/ctm.dir/factory.cpp.o"
+	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/ctm.dir/factory.cpp.o -c /home/weima/MINAMI/src/minami/factory.cpp
+
+minami/CMakeFiles/ctm.dir/factory.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ctm.dir/factory.cpp.i"
+	cd /home/weima/MINAMI/src/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/weima/MINAMI/src/minami/factory.cpp > CMakeFiles/ctm.dir/factory.cpp.i
+
+minami/CMakeFiles/ctm.dir/factory.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ctm.dir/factory.cpp.s"
+	cd /home/weima/MINAMI/src/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/weima/MINAMI/src/minami/factory.cpp -o CMakeFiles/ctm.dir/factory.cpp.s
+
+minami/CMakeFiles/ctm.dir/factory.cpp.o.requires:
+.PHONY : minami/CMakeFiles/ctm.dir/factory.cpp.o.requires
+
+minami/CMakeFiles/ctm.dir/factory.cpp.o.provides: minami/CMakeFiles/ctm.dir/factory.cpp.o.requires
+	$(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/factory.cpp.o.provides.build
+.PHONY : minami/CMakeFiles/ctm.dir/factory.cpp.o.provides
+
+minami/CMakeFiles/ctm.dir/factory.cpp.o.provides.build: minami/CMakeFiles/ctm.dir/factory.cpp.o
+
 # Object files for target ctm
 ctm_OBJECTS = \
 "CMakeFiles/ctm.dir/test_ctm.cpp.o" \
-"CMakeFiles/ctm.dir/dlink.cpp.o"
+"CMakeFiles/ctm.dir/vehicle.cpp.o" \
+"CMakeFiles/ctm.dir/dlink.cpp.o" \
+"CMakeFiles/ctm.dir/od.cpp.o" \
+"CMakeFiles/ctm.dir/factory.cpp.o"
 
 # External object files for target ctm
 ctm_EXTERNAL_OBJECTS =
 
 minami/ctm: minami/CMakeFiles/ctm.dir/test_ctm.cpp.o
+minami/ctm: minami/CMakeFiles/ctm.dir/vehicle.cpp.o
 minami/ctm: minami/CMakeFiles/ctm.dir/dlink.cpp.o
+minami/ctm: minami/CMakeFiles/ctm.dir/od.cpp.o
+minami/ctm: minami/CMakeFiles/ctm.dir/factory.cpp.o
 minami/ctm: minami/CMakeFiles/ctm.dir/build.make
-minami/ctm: 3rdparty/g3log/libg3log.a
-minami/ctm: minami/libminami.so
 minami/ctm: snap-core/libSnap.so
-minami/ctm: glib-core/libGlib.so
 minami/ctm: 3rdparty/g3log/libg3log.a
+minami/ctm: glib-core/libGlib.so
 minami/ctm: minami/CMakeFiles/ctm.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX executable ctm"
 	cd /home/weima/MINAMI/src/minami && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ctm.dir/link.txt --verbose=$(VERBOSE)
@@ -120,7 +193,10 @@ minami/CMakeFiles/ctm.dir/build: minami/ctm
 .PHONY : minami/CMakeFiles/ctm.dir/build
 
 minami/CMakeFiles/ctm.dir/requires: minami/CMakeFiles/ctm.dir/test_ctm.cpp.o.requires
+minami/CMakeFiles/ctm.dir/requires: minami/CMakeFiles/ctm.dir/vehicle.cpp.o.requires
 minami/CMakeFiles/ctm.dir/requires: minami/CMakeFiles/ctm.dir/dlink.cpp.o.requires
+minami/CMakeFiles/ctm.dir/requires: minami/CMakeFiles/ctm.dir/od.cpp.o.requires
+minami/CMakeFiles/ctm.dir/requires: minami/CMakeFiles/ctm.dir/factory.cpp.o.requires
 .PHONY : minami/CMakeFiles/ctm.dir/requires
 
 minami/CMakeFiles/ctm.dir/clean:

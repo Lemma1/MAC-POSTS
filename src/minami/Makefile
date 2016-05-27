@@ -115,20 +115,6 @@ ctm/fast:
 	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/build
 .PHONY : ctm/fast
 
-# Convenience name for target.
-minami/CMakeFiles/minami.dir/rule:
-	cd /home/weima/MINAMI/src && $(MAKE) -f CMakeFiles/Makefile2 minami/CMakeFiles/minami.dir/rule
-.PHONY : minami/CMakeFiles/minami.dir/rule
-
-# Convenience name for target.
-minami: minami/CMakeFiles/minami.dir/rule
-.PHONY : minami
-
-# fast build rule for target.
-minami/fast:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/minami.dir/build.make minami/CMakeFiles/minami.dir/build
-.PHONY : minami/fast
-
 dlink.o: dlink.cpp.o
 .PHONY : dlink.o
 
@@ -152,6 +138,54 @@ dlink.s: dlink.cpp.s
 dlink.cpp.s:
 	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/dlink.cpp.s
 .PHONY : dlink.cpp.s
+
+factory.o: factory.cpp.o
+.PHONY : factory.o
+
+# target to build an object file
+factory.cpp.o:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/factory.cpp.o
+.PHONY : factory.cpp.o
+
+factory.i: factory.cpp.i
+.PHONY : factory.i
+
+# target to preprocess a source file
+factory.cpp.i:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/factory.cpp.i
+.PHONY : factory.cpp.i
+
+factory.s: factory.cpp.s
+.PHONY : factory.s
+
+# target to generate assembly for a file
+factory.cpp.s:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/factory.cpp.s
+.PHONY : factory.cpp.s
+
+od.o: od.cpp.o
+.PHONY : od.o
+
+# target to build an object file
+od.cpp.o:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/od.cpp.o
+.PHONY : od.cpp.o
+
+od.i: od.cpp.i
+.PHONY : od.i
+
+# target to preprocess a source file
+od.cpp.i:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/od.cpp.i
+.PHONY : od.cpp.i
+
+od.s: od.cpp.s
+.PHONY : od.s
+
+# target to generate assembly for a file
+od.cpp.s:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/od.cpp.s
+.PHONY : od.cpp.s
 
 test_ctm.o: test_ctm.cpp.o
 .PHONY : test_ctm.o
@@ -177,22 +211,54 @@ test_ctm.cpp.s:
 	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/test_ctm.cpp.s
 .PHONY : test_ctm.cpp.s
 
+vehicle.o: vehicle.cpp.o
+.PHONY : vehicle.o
+
+# target to build an object file
+vehicle.cpp.o:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/vehicle.cpp.o
+.PHONY : vehicle.cpp.o
+
+vehicle.i: vehicle.cpp.i
+.PHONY : vehicle.i
+
+# target to preprocess a source file
+vehicle.cpp.i:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/vehicle.cpp.i
+.PHONY : vehicle.cpp.i
+
+vehicle.s: vehicle.cpp.s
+.PHONY : vehicle.s
+
+# target to generate assembly for a file
+vehicle.cpp.s:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/vehicle.cpp.s
+.PHONY : vehicle.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... minami"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... ctm"
 	@echo "... dlink.o"
 	@echo "... dlink.i"
 	@echo "... dlink.s"
+	@echo "... factory.o"
+	@echo "... factory.i"
+	@echo "... factory.s"
+	@echo "... od.o"
+	@echo "... od.i"
+	@echo "... od.s"
 	@echo "... test_ctm.o"
 	@echo "... test_ctm.i"
 	@echo "... test_ctm.s"
+	@echo "... vehicle.o"
+	@echo "... vehicle.i"
+	@echo "... vehicle.s"
 .PHONY : help
 
 

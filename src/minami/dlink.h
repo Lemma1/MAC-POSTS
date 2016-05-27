@@ -1,7 +1,7 @@
 #ifndef DLINK_H
 #define DLINK_H
 
-#include "Snap.h"
+#include "vehicle.h"
 
 #include "g3log/g3log.hpp"
 #include "g3log/logworker.hpp"
@@ -22,16 +22,17 @@ public:
   int virtual evolve(TInt timestamp){return 0;};
   TFlt virtual get_link_supply(){return TFlt(0);};
   int virtual clear_incoming_array(){return 0;};
+  void virtual print_info(){};
+// protected:
   TInt m_number_of_lane;
   TFlt m_length;
   TFlt m_ffs;
-
   std::map<TInt, std::deque<MNM_Veh*>*> m_finished_array;
   std::deque<MNM_Veh *> m_incoming_array;
 };
 
 
-class MNM_Dlink_Ctm : MNM_Dlink
+class MNM_Dlink_Ctm : public MNM_Dlink
 {
 public:
   MNM_Dlink_Ctm(TFlt lane_hold_cap, 
@@ -45,14 +46,14 @@ public:
   int virtual evolve(TInt timestamp);
   TFlt virtual get_link_supply();
   int virtual clear_incoming_array();
-  void print_info();
+  void virtual print_info();
 
 private:
   class Ctm_Cell;
   int init_cell_array(TFlt unit_time, TFlt std_cell_length, TFlt lane_hold_cap_last_cell);
   int update_out_veh();
   int move_last_cell();
-  int move_veh_queue(std::deque<MNM_Veh*> from_queue, std::deque<MNM_Veh*> to_queue, TInt number_tomove);
+  int move_veh_queue(std::deque<MNM_Veh*> *from_queue, std::deque<MNM_Veh*> *to_queue, TInt number_tomove);
   TInt m_num_cells;
   TFlt m_lane_hold_cap;
   TFlt m_lane_flow_cap;
@@ -80,16 +81,13 @@ public:
   std::deque<MNM_Veh*>  m_veh_queue; 
 };
 
-
-class MNM_Veh
+class MNM_Dlink_Pq : public MNM_Dlink
 {
-public:
-  MNM_Veh();
-  ~MNM_Veh();
-  TInt get_next_link();
-private:
-  TInt m_ID;
-  TInt m_current_link;
-  std::vector<TInt> m_future_links;
+  MNM_Dlink_Pq();
+  ~MNM_Dlink_Pq();
+  int virtual evolve(TInt timestamp);
+  TFlt virtual get_link_supply();
+  int virtual clear_incoming_array();
+  void virtual print_info(){};
 };
 #endif
