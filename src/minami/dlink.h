@@ -27,8 +27,11 @@ public:
   TInt m_number_of_lane;
   TFlt m_length;
   TFlt m_ffs;
-  std::map<TInt, std::deque<MNM_Veh*>*> m_finished_array;
+  std::deque<MNM_Veh *> m_finished_array;
   std::deque<MNM_Veh *> m_incoming_array;
+
+protected:
+  int move_veh_queue(std::deque<MNM_Veh*> *from_queue, std::deque<MNM_Veh*> *to_queue, TInt number_tomove);
 };
 
 
@@ -53,7 +56,6 @@ private:
   int init_cell_array(TFlt unit_time, TFlt std_cell_length, TFlt lane_hold_cap_last_cell);
   int update_out_veh();
   int move_last_cell();
-  int move_veh_queue(std::deque<MNM_Veh*> *from_queue, std::deque<MNM_Veh*> *to_queue, TInt number_tomove);
   TInt m_num_cells;
   TFlt m_lane_hold_cap;
   TFlt m_lane_flow_cap;
@@ -81,13 +83,32 @@ public:
   std::deque<MNM_Veh*>  m_veh_queue; 
 };
 
+/**************************************************************************
+                          Poing Queue
+**************************************************************************/
 class MNM_Dlink_Pq : public MNM_Dlink
 {
-  MNM_Dlink_Pq();
+public:
+  MNM_Dlink_Pq(TFlt lane_hold_cap, 
+               TFlt lane_flow_cap, 
+               TInt number_of_lane,
+               TFlt length,
+               TFlt ffs,
+               TFlt unit_time,
+               TFlt flow_scalar);
   ~MNM_Dlink_Pq();
   int virtual evolve(TInt timestamp);
   TFlt virtual get_link_supply();
   int virtual clear_incoming_array();
-  void virtual print_info(){};
+  void virtual print_info();
+
+private:
+  std::map<MNM_Veh*, TInt> m_veh_queue;
+  TInt m_volume; //vehicle number, without the flow scalar
+  TFlt m_lane_hold_cap;
+  TFlt m_lane_flow_cap;
+  TFlt m_flow_scalar;
+  TFlt m_hold_cap;
+  TInt m_max_stamp;
 };
 #endif

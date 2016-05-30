@@ -8,13 +8,26 @@ MNM_Dlink::MNM_Dlink( TInt number_of_lane,
   m_number_of_lane = number_of_lane;
   m_length = length;
 
-  m_finished_array = std::map<TInt, std::deque<MNM_Veh*>*>();
+  m_finished_array = std::deque<MNM_Veh *>();
   m_incoming_array = std::deque<MNM_Veh *>();
 }
 
 MNM_Dlink::~MNM_Dlink()
 {
 
+}
+
+int MNM_Dlink::move_veh_queue(std::deque<MNM_Veh*> *from_queue,
+                                  std::deque<MNM_Veh*> *to_queue, 
+                                  TInt number_tomove)
+{
+  MNM_Veh* __veh;
+  for (int i=0; i<number_tomove; ++i) {
+    __veh = from_queue -> front();
+    from_queue -> pop_front();
+    to_queue -> push_back(__veh);
+  }
+  return 0;
 }
 
 MNM_Dlink_Ctm::MNM_Dlink_Ctm( TFlt lane_hold_cap, 
@@ -128,11 +141,8 @@ int MNM_Dlink_Ctm::evolve(TInt timestamp)
       m_cell_array[i] -> m_volume = m_cell_array[i] -> m_veh_queue.size();
     }
   }
-  m_cell_array[m_num_cells - 1] -> m_volume = m_cell_array[m_num_cells - 1] -> m_veh_queue.size();
-  std::map<TInt, std::deque<MNM_Veh*>*>::iterator __que_it;
-  for (__que_it=m_finished_array.begin(); __que_it != m_finished_array.end(); ++__que_it) {
-    m_cell_array[m_num_cells - 1] -> m_volume += __que_it -> second -> size();
-  }
+  m_cell_array[m_num_cells - 1] -> m_volume = m_cell_array[m_num_cells - 1] -> m_veh_queue.size()
+                                                + m_finished_array.size();
   return 0;
 }
 
@@ -152,18 +162,6 @@ int MNM_Dlink_Ctm::clear_incoming_array() {
   return 0;
 }
 
-int MNM_Dlink_Ctm::move_veh_queue(std::deque<MNM_Veh*> *from_queue,
-                                  std::deque<MNM_Veh*> *to_queue, 
-                                  TInt number_tomove)
-{
-  MNM_Veh* __veh;
-  for (int i=0; i<number_tomove; ++i) {
-    __veh = from_queue -> front();
-    from_queue -> pop_front();
-    to_queue -> push_back(__veh);
-  }
-  return 0;
-}
 
 int MNM_Dlink_Ctm::move_last_cell() {
   TInt __num_veh_tomove;
@@ -174,8 +172,7 @@ int MNM_Dlink_Ctm::move_last_cell() {
     __veh = m_cell_array[m_num_cells - 1] -> m_veh_queue.front();
     m_cell_array[m_num_cells - 1] -> m_veh_queue.pop_front();
     if (__veh -> has_next_link()) {
-      __que_it = m_finished_array.find(__veh -> get_next_link());
-      __que_it -> second -> push_back(__veh);
+      m_finished_array.push_back(__veh);
     }
     else {
       __veh -> get_destionation() -> receive_veh(__veh);
@@ -214,3 +211,70 @@ TFlt MNM_Dlink_Ctm::Ctm_Cell::get_supply()
     return std::min(m_flow_cap, TFlt(m_hold_cap - __real_volume));
 }
 
+/**************************************************************************
+                          Poing Queue
+**************************************************************************/
+MNM_Dlink_Pq::MNM_Dlink_Pq( TFlt lane_hold_cap, 
+                              TFlt lane_flow_cap, 
+                              TInt number_of_lane,
+                              TFlt length,
+                              TFlt ffs,
+                              TFlt unit_time,
+                              TFlt flow_scalar)
+  : MNM_Dlink::MNM_Dlink ( number_of_lane, length, ffs )
+{
+  m_lane_hold_cap = lane_hold_cap;
+  m_lane_flow_cap = lane_flow_cap;
+  m_flow_scalar = flow_scalar;
+  m_hold_cap = m_lane_hold_cap * TFlt(number_of_lane) * m_length;
+  m_max_stamp = TInt(floor(m_length/(m_ffs * unit_time)));
+  m_veh_queue = std::map<MNM_Veh*, TInt>();
+  m_volume = TInt(0);
+}
+
+TFlt MNM_Dlink_Pq::get_link_supply()
+{
+  return m_hold_cap;
+}
+
+int MNM_Dlink_Pq::clear_incoming_array() {
+  TInt __num_veh_tomove = TInt(m_incoming_array.size()) < TInt(get_link_supply() * m_flow_scalar)
+                      ? TInt(m_incoming_array.size()) : TInt(get_link_supply() * m_flow_scalar);
+  MNM_Veh *__veh;
+  for (int i=0; i < __num_veh_tomove; ++i) {
+    __veh = m_incoming_array.front();
+    m_incoming_array.pop_front();
+    m_veh_queue.insert(std::pair<MNM_Veh*, TInt>(__veh, TInt(0)));
+  }
+  // move_veh_queue(&m_incoming_array, , m_incoming_array.size());
+
+  // m_cell_array[0] -> m_volume = m_cell_array[0] ->m_veh_queue.size();
+  return 0;
+}
+
+void MNM_Dlink_Pq::print_info()
+{
+  printf("Link Dynamic model: Poing Queue\n");
+  printf("Real volume in the link: %.4f\n", (float)(m_volume/m_flow_scalar));
+  printf("Finished real volume in the link: %.2f\n", (float)(TFlt(m_finished_array.size())/m_flow_scalar));
+}
+
+int MNM_Dlink_Pq::evolve(TInt timestamp)
+{
+  std::map<MNM_Veh*, TInt>::iterator __que_it = m_veh_queue.begin();
+  while (__que_it != m_veh_queue.end()) {
+    if (__que_it -> second >= m_max_stamp) {
+      m_finished_array.push_back(__que_it -> first);
+      __que_it = m_veh_queue.erase(__que_it); //c++ 11
+    }
+    else {
+      __que_it -> second += 1;
+      __que_it++;
+    }
+  }
+
+  /* volume */
+  m_volume = TInt(m_finished_array.size() + m_veh_queue.size());
+
+  return 0;
+}
