@@ -30,7 +30,7 @@ int MNM_Origin::release(MNM_Veh_Factory* veh_factory)
   MNM_Veh *__veh;
   std::map<MNM_Destination*, TFlt*>::iterator __demand_it;
   for (__demand_it = m_demand.begin(); __demand_it != m_demand.end(); __demand_it++) {
-    __veh_to_release = TInt(std::round((__demand_it -> second)[m_current_interval] * m_flow_scalar));
+    __veh_to_release = TInt(MNM_Ults::round((__demand_it -> second)[m_current_interval] * m_flow_scalar));
     for (int i=0; i<__veh_to_release; ++i) {
       __veh = veh_factory -> make_veh(m_current_interval);
       m_origin_node -> m_in_veh_queue.push_back(__veh);
@@ -52,7 +52,6 @@ MNM_Destination::~MNM_Destination()
 
 int MNM_Destination::receive_veh(MNM_Veh* veh)
 {
-  LOG(DEBUG) << "receive veh: " << m_Dest_ID;
   free(veh);
   return 0;
 }

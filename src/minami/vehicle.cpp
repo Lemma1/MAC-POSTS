@@ -1,29 +1,30 @@
 #include "vehicle.h"
 
-MNM_Veh::MNM_Veh(TInt ID) {
+MNM_Veh::MNM_Veh(TInt ID, TInt start_time) {
   m_veh_ID = ID;
-  m_current_link = TInt(-1);
-  m_future_links = std::deque<TInt>();
+  m_current_link = NULL;
+  m_next_link = NULL;
+  m_start_time = start_time;
 }
 
-int MNM_Veh::set_current_link(TInt ID) {
-  m_current_link = ID;
+int MNM_Veh::set_current_link(MNM_Dlink *link) {
+  m_current_link = link;
   return 0;
 }
 
-TInt MNM_Veh::get_current_link() {
+MNM_Dlink *MNM_Veh::get_current_link() {
   return m_current_link;
 }
 
 
-TInt MNM_Veh::get_next_link()
+MNM_Dlink *MNM_Veh::get_next_link()
 {
-  return m_future_links.front();
+  return m_next_link;
 }
 
 bool MNM_Veh::has_next_link()
 {
-  return m_future_links.size() >= 1;
+  return (m_next_link != NULL);
 }
 
 

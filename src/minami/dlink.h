@@ -2,6 +2,7 @@
 #define DLINK_H
 
 #include "vehicle.h"
+#include "ults.h"
 
 #include "g3log/g3log.hpp"
 #include "g3log/logworker.hpp"

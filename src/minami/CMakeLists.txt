@@ -4,5 +4,5 @@
 
 #add_executable (pathDemo test_path.cpp)
 
-add_executable (ctm test_ctm.cpp vehicle.cpp dlink.cpp od.cpp factory.cpp)
+add_executable (ctm test_ctm.cpp vehicle.cpp dlink.cpp od.cpp factory.cpp dnode.cpp ults.cpp)
 target_link_libraries (ctm LINK_PUBLIC Snap g3log ${CMAKE_THREAD_INIT})

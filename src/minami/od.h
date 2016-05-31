@@ -2,16 +2,17 @@
 #define OD_H
 
 #include "Snap.h"
-#include "vehicle.h"
 #include "factory.h"
 #include "dnode.h"
+#include "ults.h"
 
-#include "g3log/g3log.hpp"
-#include "g3log/logworker.hpp"
+#include <map>
 
 class MNM_Destination;
 class MNM_Veh;
 class MNM_Veh_Factory;
+class MNM_DMOND;
+class MNM_DMDND;
 
 class MNM_Origin
 {
@@ -37,6 +38,7 @@ public:
   ~MNM_Destination();
   TInt m_Dest_ID;
   TFlt m_flow_scalar;
+  MNM_DMDND *m_dest_node;
   int receive_veh(MNM_Veh* veh);
 };
 

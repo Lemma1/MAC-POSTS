@@ -112,7 +112,7 @@ int MNM_Dlink_Ctm::update_out_veh()
       __demand = m_cell_array[i]->get_demand();
       __supply = m_cell_array[i+1]->get_supply();
       __temp_out_flux = std::min(__demand, __supply) * m_flow_scalar;
-      m_cell_array[i] -> m_out_veh= TInt(std::round(__temp_out_flux)); 
+      m_cell_array[i] -> m_out_veh= TInt(MNM_Ults::round(__temp_out_flux)); 
     }
 
     m_cell_array[m_num_cells - 1] -> m_out_veh = m_cell_array[m_num_cells - 1] -> m_volume;

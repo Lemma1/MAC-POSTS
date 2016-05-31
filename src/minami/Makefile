@@ -139,6 +139,30 @@ dlink.cpp.s:
 	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/dlink.cpp.s
 .PHONY : dlink.cpp.s
 
+dnode.o: dnode.cpp.o
+.PHONY : dnode.o
+
+# target to build an object file
+dnode.cpp.o:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/dnode.cpp.o
+.PHONY : dnode.cpp.o
+
+dnode.i: dnode.cpp.i
+.PHONY : dnode.i
+
+# target to preprocess a source file
+dnode.cpp.i:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/dnode.cpp.i
+.PHONY : dnode.cpp.i
+
+dnode.s: dnode.cpp.s
+.PHONY : dnode.s
+
+# target to generate assembly for a file
+dnode.cpp.s:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/dnode.cpp.s
+.PHONY : dnode.cpp.s
+
 factory.o: factory.cpp.o
 .PHONY : factory.o
 
@@ -211,6 +235,30 @@ test_ctm.cpp.s:
 	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/test_ctm.cpp.s
 .PHONY : test_ctm.cpp.s
 
+ults.o: ults.cpp.o
+.PHONY : ults.o
+
+# target to build an object file
+ults.cpp.o:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/ults.cpp.o
+.PHONY : ults.cpp.o
+
+ults.i: ults.cpp.i
+.PHONY : ults.i
+
+# target to preprocess a source file
+ults.cpp.i:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/ults.cpp.i
+.PHONY : ults.cpp.i
+
+ults.s: ults.cpp.s
+.PHONY : ults.s
+
+# target to generate assembly for a file
+ults.cpp.s:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/ults.cpp.s
+.PHONY : ults.cpp.s
+
 vehicle.o: vehicle.cpp.o
 .PHONY : vehicle.o
 
@@ -247,6 +295,9 @@ help:
 	@echo "... dlink.o"
 	@echo "... dlink.i"
 	@echo "... dlink.s"
+	@echo "... dnode.o"
+	@echo "... dnode.i"
+	@echo "... dnode.s"
 	@echo "... factory.o"
 	@echo "... factory.i"
 	@echo "... factory.s"
@@ -256,6 +307,9 @@ help:
 	@echo "... test_ctm.o"
 	@echo "... test_ctm.i"
 	@echo "... test_ctm.s"
+	@echo "... ults.o"
+	@echo "... ults.i"
+	@echo "... ults.s"
 	@echo "... vehicle.o"
 	@echo "... vehicle.i"
 	@echo "... vehicle.s"
