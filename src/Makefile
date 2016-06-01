@@ -141,17 +141,17 @@ g3log/fast:
 .PHONY : g3log/fast
 
 #=============================================================================
-# Target rules for targets named ctm
+# Target rules for targets named dta
 
 # Build rule for target.
-ctm: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ctm
-.PHONY : ctm
+dta: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dta
+.PHONY : dta
 
 # fast build rule for target.
-ctm/fast:
-	$(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/build
-.PHONY : ctm/fast
+dta/fast:
+	$(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/build
+.PHONY : dta/fast
 
 # Help Target
 help:
@@ -164,7 +164,7 @@ help:
 	@echo "... Glib"
 	@echo "... Snap"
 	@echo "... g3log"
-	@echo "... ctm"
+	@echo "... dta"
 .PHONY : help
 
 

@@ -102,25 +102,25 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-minami/CMakeFiles/ctm.dir/rule:
-	cd /home/weima/MINAMI/src && $(MAKE) -f CMakeFiles/Makefile2 minami/CMakeFiles/ctm.dir/rule
-.PHONY : minami/CMakeFiles/ctm.dir/rule
+minami/CMakeFiles/dta.dir/rule:
+	cd /home/weima/MINAMI/src && $(MAKE) -f CMakeFiles/Makefile2 minami/CMakeFiles/dta.dir/rule
+.PHONY : minami/CMakeFiles/dta.dir/rule
 
 # Convenience name for target.
-ctm: minami/CMakeFiles/ctm.dir/rule
-.PHONY : ctm
+dta: minami/CMakeFiles/dta.dir/rule
+.PHONY : dta
 
 # fast build rule for target.
-ctm/fast:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/build
-.PHONY : ctm/fast
+dta/fast:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/build
+.PHONY : dta/fast
 
 dlink.o: dlink.cpp.o
 .PHONY : dlink.o
 
 # target to build an object file
 dlink.cpp.o:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/dlink.cpp.o
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/dlink.cpp.o
 .PHONY : dlink.cpp.o
 
 dlink.i: dlink.cpp.i
@@ -128,7 +128,7 @@ dlink.i: dlink.cpp.i
 
 # target to preprocess a source file
 dlink.cpp.i:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/dlink.cpp.i
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/dlink.cpp.i
 .PHONY : dlink.cpp.i
 
 dlink.s: dlink.cpp.s
@@ -136,7 +136,7 @@ dlink.s: dlink.cpp.s
 
 # target to generate assembly for a file
 dlink.cpp.s:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/dlink.cpp.s
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/dlink.cpp.s
 .PHONY : dlink.cpp.s
 
 dnode.o: dnode.cpp.o
@@ -144,7 +144,7 @@ dnode.o: dnode.cpp.o
 
 # target to build an object file
 dnode.cpp.o:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/dnode.cpp.o
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/dnode.cpp.o
 .PHONY : dnode.cpp.o
 
 dnode.i: dnode.cpp.i
@@ -152,7 +152,7 @@ dnode.i: dnode.cpp.i
 
 # target to preprocess a source file
 dnode.cpp.i:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/dnode.cpp.i
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/dnode.cpp.i
 .PHONY : dnode.cpp.i
 
 dnode.s: dnode.cpp.s
@@ -160,15 +160,39 @@ dnode.s: dnode.cpp.s
 
 # target to generate assembly for a file
 dnode.cpp.s:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/dnode.cpp.s
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/dnode.cpp.s
 .PHONY : dnode.cpp.s
+
+dta.o: dta.cpp.o
+.PHONY : dta.o
+
+# target to build an object file
+dta.cpp.o:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/dta.cpp.o
+.PHONY : dta.cpp.o
+
+dta.i: dta.cpp.i
+.PHONY : dta.i
+
+# target to preprocess a source file
+dta.cpp.i:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/dta.cpp.i
+.PHONY : dta.cpp.i
+
+dta.s: dta.cpp.s
+.PHONY : dta.s
+
+# target to generate assembly for a file
+dta.cpp.s:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/dta.cpp.s
+.PHONY : dta.cpp.s
 
 factory.o: factory.cpp.o
 .PHONY : factory.o
 
 # target to build an object file
 factory.cpp.o:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/factory.cpp.o
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/factory.cpp.o
 .PHONY : factory.cpp.o
 
 factory.i: factory.cpp.i
@@ -176,7 +200,7 @@ factory.i: factory.cpp.i
 
 # target to preprocess a source file
 factory.cpp.i:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/factory.cpp.i
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/factory.cpp.i
 .PHONY : factory.cpp.i
 
 factory.s: factory.cpp.s
@@ -184,15 +208,39 @@ factory.s: factory.cpp.s
 
 # target to generate assembly for a file
 factory.cpp.s:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/factory.cpp.s
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/factory.cpp.s
 .PHONY : factory.cpp.s
+
+io.o: io.cpp.o
+.PHONY : io.o
+
+# target to build an object file
+io.cpp.o:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/io.cpp.o
+.PHONY : io.cpp.o
+
+io.i: io.cpp.i
+.PHONY : io.i
+
+# target to preprocess a source file
+io.cpp.i:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/io.cpp.i
+.PHONY : io.cpp.i
+
+io.s: io.cpp.s
+.PHONY : io.s
+
+# target to generate assembly for a file
+io.cpp.s:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/io.cpp.s
+.PHONY : io.cpp.s
 
 od.o: od.cpp.o
 .PHONY : od.o
 
 # target to build an object file
 od.cpp.o:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/od.cpp.o
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/od.cpp.o
 .PHONY : od.cpp.o
 
 od.i: od.cpp.i
@@ -200,7 +248,7 @@ od.i: od.cpp.i
 
 # target to preprocess a source file
 od.cpp.i:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/od.cpp.i
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/od.cpp.i
 .PHONY : od.cpp.i
 
 od.s: od.cpp.s
@@ -208,39 +256,15 @@ od.s: od.cpp.s
 
 # target to generate assembly for a file
 od.cpp.s:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/od.cpp.s
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/od.cpp.s
 .PHONY : od.cpp.s
-
-test_ctm.o: test_ctm.cpp.o
-.PHONY : test_ctm.o
-
-# target to build an object file
-test_ctm.cpp.o:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/test_ctm.cpp.o
-.PHONY : test_ctm.cpp.o
-
-test_ctm.i: test_ctm.cpp.i
-.PHONY : test_ctm.i
-
-# target to preprocess a source file
-test_ctm.cpp.i:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/test_ctm.cpp.i
-.PHONY : test_ctm.cpp.i
-
-test_ctm.s: test_ctm.cpp.s
-.PHONY : test_ctm.s
-
-# target to generate assembly for a file
-test_ctm.cpp.s:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/test_ctm.cpp.s
-.PHONY : test_ctm.cpp.s
 
 ults.o: ults.cpp.o
 .PHONY : ults.o
 
 # target to build an object file
 ults.cpp.o:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/ults.cpp.o
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/ults.cpp.o
 .PHONY : ults.cpp.o
 
 ults.i: ults.cpp.i
@@ -248,7 +272,7 @@ ults.i: ults.cpp.i
 
 # target to preprocess a source file
 ults.cpp.i:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/ults.cpp.i
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/ults.cpp.i
 .PHONY : ults.cpp.i
 
 ults.s: ults.cpp.s
@@ -256,7 +280,7 @@ ults.s: ults.cpp.s
 
 # target to generate assembly for a file
 ults.cpp.s:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/ults.cpp.s
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/ults.cpp.s
 .PHONY : ults.cpp.s
 
 vehicle.o: vehicle.cpp.o
@@ -264,7 +288,7 @@ vehicle.o: vehicle.cpp.o
 
 # target to build an object file
 vehicle.cpp.o:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/vehicle.cpp.o
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/vehicle.cpp.o
 .PHONY : vehicle.cpp.o
 
 vehicle.i: vehicle.cpp.i
@@ -272,7 +296,7 @@ vehicle.i: vehicle.cpp.i
 
 # target to preprocess a source file
 vehicle.cpp.i:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/vehicle.cpp.i
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/vehicle.cpp.i
 .PHONY : vehicle.cpp.i
 
 vehicle.s: vehicle.cpp.s
@@ -280,7 +304,7 @@ vehicle.s: vehicle.cpp.s
 
 # target to generate assembly for a file
 vehicle.cpp.s:
-	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/vehicle.cpp.s
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/vehicle.cpp.s
 .PHONY : vehicle.cpp.s
 
 # Help Target
@@ -291,22 +315,25 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... ctm"
+	@echo "... dta"
 	@echo "... dlink.o"
 	@echo "... dlink.i"
 	@echo "... dlink.s"
 	@echo "... dnode.o"
 	@echo "... dnode.i"
 	@echo "... dnode.s"
+	@echo "... dta.o"
+	@echo "... dta.i"
+	@echo "... dta.s"
 	@echo "... factory.o"
 	@echo "... factory.i"
 	@echo "... factory.s"
+	@echo "... io.o"
+	@echo "... io.i"
+	@echo "... io.s"
 	@echo "... od.o"
 	@echo "... od.i"
 	@echo "... od.s"
-	@echo "... test_ctm.o"
-	@echo "... test_ctm.i"
-	@echo "... test_ctm.s"
 	@echo "... ults.o"
 	@echo "... ults.i"
 	@echo "... ults.s"

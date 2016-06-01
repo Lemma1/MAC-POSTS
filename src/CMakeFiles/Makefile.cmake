@@ -56,5 +56,5 @@ set(CMAKE_DEPEND_INFO_FILES
   "glib-core/CMakeFiles/Glib.dir/DependInfo.cmake"
   "snap-core/CMakeFiles/Snap.dir/DependInfo.cmake"
   "3rdparty/g3log/CMakeFiles/g3log.dir/DependInfo.cmake"
-  "minami/CMakeFiles/ctm.dir/DependInfo.cmake"
+  "minami/CMakeFiles/dta.dir/DependInfo.cmake"
   )

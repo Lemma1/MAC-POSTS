@@ -6,19 +6,13 @@
 
 #IncludeRegexTransform: 
 
-/home/weima/MINAMI/src/minami/path.h
-Snap.h
-/home/weima/MINAMI/src/minami/Snap.h
-
-/home/weima/MINAMI/src/minami/test_path.cpp
+/home/weima/MINAMI/src/minami/main.cpp
 Snap.h
 /home/weima/MINAMI/src/minami/Snap.h
 g3log/g3log.hpp
 /home/weima/MINAMI/src/minami/g3log/g3log.hpp
 g3log/logworker.hpp
 /home/weima/MINAMI/src/minami/g3log/logworker.hpp
-path.h
-/home/weima/MINAMI/src/minami/path.h
 
 3rdparty/g3log/g3log/active.hpp
 thread

@@ -48,6 +48,24 @@ map
 deque
 -
 
+/home/weima/MINAMI/src/minami/dta.cpp
+dta.h
+/home/weima/MINAMI/src/minami/dta.h
+
+/home/weima/MINAMI/src/minami/dta.h
+Snap.h
+/home/weima/MINAMI/src/minami/Snap.h
+dlink.h
+/home/weima/MINAMI/src/minami/dlink.h
+od.h
+/home/weima/MINAMI/src/minami/od.h
+vehicle.h
+/home/weima/MINAMI/src/minami/vehicle.h
+dnode.h
+/home/weima/MINAMI/src/minami/dnode.h
+factory.h
+/home/weima/MINAMI/src/minami/factory.h
+
 /home/weima/MINAMI/src/minami/factory.cpp
 factory.h
 /home/weima/MINAMI/src/minami/factory.h

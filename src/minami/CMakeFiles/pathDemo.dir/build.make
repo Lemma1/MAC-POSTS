@@ -49,43 +49,41 @@ include minami/CMakeFiles/pathDemo.dir/progress.make
 # Include the compile flags for this target's objects.
 include minami/CMakeFiles/pathDemo.dir/flags.make
 
-minami/CMakeFiles/pathDemo.dir/test_path.cpp.o: minami/CMakeFiles/pathDemo.dir/flags.make
-minami/CMakeFiles/pathDemo.dir/test_path.cpp.o: minami/test_path.cpp
+minami/CMakeFiles/pathDemo.dir/main.cpp.o: minami/CMakeFiles/pathDemo.dir/flags.make
+minami/CMakeFiles/pathDemo.dir/main.cpp.o: minami/main.cpp
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_1)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/pathDemo.dir/test_path.cpp.o"
-	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/pathDemo.dir/test_path.cpp.o -c /home/weima/MINAMI/src/minami/test_path.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/pathDemo.dir/main.cpp.o"
+	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/pathDemo.dir/main.cpp.o -c /home/weima/MINAMI/src/minami/main.cpp
 
-minami/CMakeFiles/pathDemo.dir/test_path.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/pathDemo.dir/test_path.cpp.i"
-	cd /home/weima/MINAMI/src/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/weima/MINAMI/src/minami/test_path.cpp > CMakeFiles/pathDemo.dir/test_path.cpp.i
+minami/CMakeFiles/pathDemo.dir/main.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/pathDemo.dir/main.cpp.i"
+	cd /home/weima/MINAMI/src/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/weima/MINAMI/src/minami/main.cpp > CMakeFiles/pathDemo.dir/main.cpp.i
 
-minami/CMakeFiles/pathDemo.dir/test_path.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/pathDemo.dir/test_path.cpp.s"
-	cd /home/weima/MINAMI/src/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/weima/MINAMI/src/minami/test_path.cpp -o CMakeFiles/pathDemo.dir/test_path.cpp.s
+minami/CMakeFiles/pathDemo.dir/main.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/pathDemo.dir/main.cpp.s"
+	cd /home/weima/MINAMI/src/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/weima/MINAMI/src/minami/main.cpp -o CMakeFiles/pathDemo.dir/main.cpp.s
 
-minami/CMakeFiles/pathDemo.dir/test_path.cpp.o.requires:
-.PHONY : minami/CMakeFiles/pathDemo.dir/test_path.cpp.o.requires
+minami/CMakeFiles/pathDemo.dir/main.cpp.o.requires:
+.PHONY : minami/CMakeFiles/pathDemo.dir/main.cpp.o.requires
 
-minami/CMakeFiles/pathDemo.dir/test_path.cpp.o.provides: minami/CMakeFiles/pathDemo.dir/test_path.cpp.o.requires
-	$(MAKE) -f minami/CMakeFiles/pathDemo.dir/build.make minami/CMakeFiles/pathDemo.dir/test_path.cpp.o.provides.build
-.PHONY : minami/CMakeFiles/pathDemo.dir/test_path.cpp.o.provides
+minami/CMakeFiles/pathDemo.dir/main.cpp.o.provides: minami/CMakeFiles/pathDemo.dir/main.cpp.o.requires
+	$(MAKE) -f minami/CMakeFiles/pathDemo.dir/build.make minami/CMakeFiles/pathDemo.dir/main.cpp.o.provides.build
+.PHONY : minami/CMakeFiles/pathDemo.dir/main.cpp.o.provides
 
-minami/CMakeFiles/pathDemo.dir/test_path.cpp.o.provides.build: minami/CMakeFiles/pathDemo.dir/test_path.cpp.o
+minami/CMakeFiles/pathDemo.dir/main.cpp.o.provides.build: minami/CMakeFiles/pathDemo.dir/main.cpp.o
 
 # Object files for target pathDemo
 pathDemo_OBJECTS = \
-"CMakeFiles/pathDemo.dir/test_path.cpp.o"
+"CMakeFiles/pathDemo.dir/main.cpp.o"
 
 # External object files for target pathDemo
 pathDemo_EXTERNAL_OBJECTS =
 
-minami/pathDemo: minami/CMakeFiles/pathDemo.dir/test_path.cpp.o
+minami/pathDemo: minami/CMakeFiles/pathDemo.dir/main.cpp.o
 minami/pathDemo: minami/CMakeFiles/pathDemo.dir/build.make
-minami/pathDemo: 3rdparty/g3log/libg3log.a
-minami/pathDemo: minami/libminami.so
 minami/pathDemo: snap-core/libSnap.so
-minami/pathDemo: glib-core/libGlib.so
 minami/pathDemo: 3rdparty/g3log/libg3log.a
+minami/pathDemo: glib-core/libGlib.so
 minami/pathDemo: minami/CMakeFiles/pathDemo.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX executable pathDemo"
 	cd /home/weima/MINAMI/src/minami && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/pathDemo.dir/link.txt --verbose=$(VERBOSE)
@@ -94,7 +92,7 @@ minami/pathDemo: minami/CMakeFiles/pathDemo.dir/link.txt
 minami/CMakeFiles/pathDemo.dir/build: minami/pathDemo
 .PHONY : minami/CMakeFiles/pathDemo.dir/build
 
-minami/CMakeFiles/pathDemo.dir/requires: minami/CMakeFiles/pathDemo.dir/test_path.cpp.o.requires
+minami/CMakeFiles/pathDemo.dir/requires: minami/CMakeFiles/pathDemo.dir/main.cpp.o.requires
 .PHONY : minami/CMakeFiles/pathDemo.dir/requires
 
 minami/CMakeFiles/pathDemo.dir/clean:

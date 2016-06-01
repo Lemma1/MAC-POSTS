@@ -6,6 +6,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/ctm.dir/factory.cpp.o"
   "CMakeFiles/ctm.dir/dnode.cpp.o"
   "CMakeFiles/ctm.dir/ults.cpp.o"
+  "CMakeFiles/ctm.dir/dta.cpp.o"
   "ctm.pdb"
   "ctm"
 )

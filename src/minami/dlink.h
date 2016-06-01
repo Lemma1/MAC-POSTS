@@ -16,7 +16,8 @@ class MNM_Veh;
 class MNM_Dlink
 {
 public:
-  MNM_Dlink( TInt number_of_lane,
+  MNM_Dlink( TInt ID,
+             TInt number_of_lane,
              TFlt length,
              TFlt ffs );
   ~MNM_Dlink();
@@ -25,6 +26,7 @@ public:
   int virtual clear_incoming_array(){return 0;};
   void virtual print_info(){};
 // protected:
+  TInt m_link_ID;
   TInt m_number_of_lane;
   TFlt m_length;
   TFlt m_ffs;
@@ -39,7 +41,8 @@ protected:
 class MNM_Dlink_Ctm : public MNM_Dlink
 {
 public:
-  MNM_Dlink_Ctm(TFlt lane_hold_cap, 
+  MNM_Dlink_Ctm(TInt ID,
+                TFlt lane_hold_cap, 
                 TFlt lane_flow_cap, 
                 TInt number_of_lane,
                 TFlt length,
@@ -90,7 +93,8 @@ public:
 class MNM_Dlink_Pq : public MNM_Dlink
 {
 public:
-  MNM_Dlink_Pq(TFlt lane_hold_cap, 
+  MNM_Dlink_Pq(TInt ID,
+               TFlt lane_hold_cap, 
                TFlt lane_flow_cap, 
                TInt number_of_lane,
                TFlt length,

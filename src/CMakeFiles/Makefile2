@@ -189,7 +189,7 @@ clean: snap-core/CMakeFiles/Snap.dir/clean
 3rdparty/g3log/CMakeFiles/g3log.dir/all:
 	$(MAKE) -f 3rdparty/g3log/CMakeFiles/g3log.dir/build.make 3rdparty/g3log/CMakeFiles/g3log.dir/depend
 	$(MAKE) -f 3rdparty/g3log/CMakeFiles/g3log.dir/build.make 3rdparty/g3log/CMakeFiles/g3log.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles  10 11 12 13 14 15 16 17
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles  11 12 13 14 15 16 17 18
 	@echo "Built target g3log"
 .PHONY : 3rdparty/g3log/CMakeFiles/g3log.dir/all
 
@@ -221,11 +221,11 @@ clean: 3rdparty/g3log/CMakeFiles/g3log.dir/clean
 # Directory level rules for directory minami
 
 # Convenience name for "all" pass in the directory.
-minami/all: minami/CMakeFiles/ctm.dir/all
+minami/all: minami/CMakeFiles/dta.dir/all
 .PHONY : minami/all
 
 # Convenience name for "clean" pass in the directory.
-minami/clean: minami/CMakeFiles/ctm.dir/clean
+minami/clean: minami/CMakeFiles/dta.dir/clean
 .PHONY : minami/clean
 
 # Convenience name for "preinstall" pass in the directory.
@@ -233,40 +233,40 @@ minami/preinstall:
 .PHONY : minami/preinstall
 
 #=============================================================================
-# Target rules for target minami/CMakeFiles/ctm.dir
+# Target rules for target minami/CMakeFiles/dta.dir
 
 # All Build rule for target.
-minami/CMakeFiles/ctm.dir/all: glib-core/CMakeFiles/Glib.dir/all
-minami/CMakeFiles/ctm.dir/all: snap-core/CMakeFiles/Snap.dir/all
-minami/CMakeFiles/ctm.dir/all: 3rdparty/g3log/CMakeFiles/g3log.dir/all
-	$(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/depend
-	$(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles  3 4 5 6 7 8 9
-	@echo "Built target ctm"
-.PHONY : minami/CMakeFiles/ctm.dir/all
+minami/CMakeFiles/dta.dir/all: glib-core/CMakeFiles/Glib.dir/all
+minami/CMakeFiles/dta.dir/all: snap-core/CMakeFiles/Snap.dir/all
+minami/CMakeFiles/dta.dir/all: 3rdparty/g3log/CMakeFiles/g3log.dir/all
+	$(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/depend
+	$(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles  3 4 5 6 7 8 9 10
+	@echo "Built target dta"
+.PHONY : minami/CMakeFiles/dta.dir/all
 
 # Include target in all.
-all: minami/CMakeFiles/ctm.dir/all
+all: minami/CMakeFiles/dta.dir/all
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-minami/CMakeFiles/ctm.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/weima/MINAMI/src/CMakeFiles 17
-	$(MAKE) -f CMakeFiles/Makefile2 minami/CMakeFiles/ctm.dir/all
+minami/CMakeFiles/dta.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/weima/MINAMI/src/CMakeFiles 18
+	$(MAKE) -f CMakeFiles/Makefile2 minami/CMakeFiles/dta.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/weima/MINAMI/src/CMakeFiles 0
-.PHONY : minami/CMakeFiles/ctm.dir/rule
+.PHONY : minami/CMakeFiles/dta.dir/rule
 
 # Convenience name for target.
-ctm: minami/CMakeFiles/ctm.dir/rule
-.PHONY : ctm
+dta: minami/CMakeFiles/dta.dir/rule
+.PHONY : dta
 
 # clean rule for target.
-minami/CMakeFiles/ctm.dir/clean:
-	$(MAKE) -f minami/CMakeFiles/ctm.dir/build.make minami/CMakeFiles/ctm.dir/clean
-.PHONY : minami/CMakeFiles/ctm.dir/clean
+minami/CMakeFiles/dta.dir/clean:
+	$(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/clean
+.PHONY : minami/CMakeFiles/dta.dir/clean
 
 # clean rule for target.
-clean: minami/CMakeFiles/ctm.dir/clean
+clean: minami/CMakeFiles/dta.dir/clean
 .PHONY : clean
 
 #=============================================================================

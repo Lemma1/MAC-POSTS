@@ -1,0 +1,5 @@
+# Directed graph: a.txt 
+# Nodes: 10 Edges: 8
+# FromNodeId	ToNodeId
+1	2
+2	3

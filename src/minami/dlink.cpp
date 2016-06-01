@@ -1,9 +1,11 @@
 #include "dlink.h"
 
-MNM_Dlink::MNM_Dlink( TInt number_of_lane,
+MNM_Dlink::MNM_Dlink( TInt ID,
+                      TInt number_of_lane,
                       TFlt length,
                       TFlt ffs )
 {
+  m_link_ID = ID;
   m_ffs = ffs;
   m_number_of_lane = number_of_lane;
   m_length = length;
@@ -30,14 +32,15 @@ int MNM_Dlink::move_veh_queue(std::deque<MNM_Veh*> *from_queue,
   return 0;
 }
 
-MNM_Dlink_Ctm::MNM_Dlink_Ctm( TFlt lane_hold_cap, 
+MNM_Dlink_Ctm::MNM_Dlink_Ctm( TInt ID,
+                              TFlt lane_hold_cap, 
                               TFlt lane_flow_cap, 
                               TInt number_of_lane,
                               TFlt length,
                               TFlt ffs,
                               TFlt unit_time,
                               TFlt flow_scalar)
-  : MNM_Dlink::MNM_Dlink ( number_of_lane, length, ffs )
+  : MNM_Dlink::MNM_Dlink ( ID, number_of_lane, length, ffs )
 {
   m_lane_hold_cap = lane_hold_cap;
   m_lane_flow_cap = lane_flow_cap;
@@ -214,14 +217,15 @@ TFlt MNM_Dlink_Ctm::Ctm_Cell::get_supply()
 /**************************************************************************
                           Poing Queue
 **************************************************************************/
-MNM_Dlink_Pq::MNM_Dlink_Pq( TFlt lane_hold_cap, 
+MNM_Dlink_Pq::MNM_Dlink_Pq(   TInt ID,
+                              TFlt lane_hold_cap, 
                               TFlt lane_flow_cap, 
                               TInt number_of_lane,
                               TFlt length,
                               TFlt ffs,
                               TFlt unit_time,
                               TFlt flow_scalar)
-  : MNM_Dlink::MNM_Dlink ( number_of_lane, length, ffs )
+  : MNM_Dlink::MNM_Dlink ( ID, number_of_lane, length, ffs )
 {
   m_lane_hold_cap = lane_hold_cap;
   m_lane_flow_cap = lane_flow_cap;
