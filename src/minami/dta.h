@@ -19,6 +19,8 @@ public:
   ~MNM_Dta();
   int initialize();
   int hook_up();
+  int build_from_files();
+  bool is_ok();
 // private:
   int hook_up_odANDnode();
   int hook_up_linkANDnode();
@@ -31,6 +33,7 @@ public:
   MNM_Node_Factory *m_node_factory;
   MNM_Link_Factory *m_link_factory;
   MNM_OD_Factory *m_od_factory;
+  PNGraph m_graph;
 };               
 
 #endif
