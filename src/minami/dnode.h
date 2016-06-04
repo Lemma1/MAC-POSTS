@@ -23,20 +23,11 @@ public:
   ~MNM_Dnode();
   int virtual evolve(TInt timestamp){return 0;};
   void virtual print_info(){};
+  int virtual prepare_loading(){return 0;};
 protected:
   TInt m_node_ID;
   TFlt m_flow_scalar;
 };
-
-class MNM_Dnode_FWJ : public MNM_Dnode
-{
-public:
-  MNM_Dnode_FWJ(TInt ID, TFlt flow_scalar);
-  ~MNM_Dnode_FWJ();
-  int virtual evolve(TInt timestamp);
-  void virtual print_info();
-};
-
 
 class MNM_DMOND : public MNM_Dnode
 {
@@ -67,6 +58,43 @@ public:
 private:
   MNM_Destination *m_dest;
   std::vector<MNM_Dlink*> m_in_link_array;
+};
+
+/**************************************************************************
+                              In-out node
+**************************************************************************/
+
+class MNM_Dnode_Inout : public MNM_Dnode
+{
+public:
+  MNM_Dnode_Inout(TInt ID, TFlt flow_scalar);
+  ~MNM_Dnode_Inout();
+  int virtual evolve(TInt timestamp){return 0;};
+  void virtual print_info();
+  int virtual prepare_loading();
+protected:
+  int prepare_supplyANDdemand();
+  int virtual compute_flow(){return 0;};
+  int round_flow_to_vehicle();
+  int move_vehicle();
+  std::vector<MNM_Dlink*> m_out_link_array;
+  std::vector<MNM_Dlink*> m_in_link_array;
+  TFlt *m_demand;
+  TFlt *m_supply;
+  TFlt *m_veh_flow;
+  TInt *m_veh_tomove;
+};
+
+/**************************************************************************
+                              FWJ node
+**************************************************************************/
+class MNM_Dnode_FWJ : public MNM_Dnode_Inout
+{
+public:
+  MNM_Dnode_FWJ(TInt ID, TFlt flow_scalar);
+  ~MNM_Dnode_FWJ();
+  void virtual print_info();
+  int virtual compute_flow();
 };
 
 #endif

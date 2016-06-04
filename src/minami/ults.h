@@ -11,6 +11,7 @@ class MNM_Ults
 {
 public:
   TInt static round(TFlt in);
+  TFlt static min(TFlt a, TFlt b);
 };
 
 

@@ -32,6 +32,11 @@ int MNM_Dta::build_from_files()
   return 0;  
 }
 
+int MNM_Dta:: hook_up_odANDnode()
+{
+  return 0;
+}
+
 int main()
 {
   MNM_Dta *test_dta = new MNM_Dta("input_files");

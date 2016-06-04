@@ -15,6 +15,10 @@ TInt MNM_Ults::round(TFlt in)
     return TInt(floorN);
 }
 
+TFlt MNM_Ults::min(TFlt a, TFlt b)
+{
+  return a<b? a:b;
+}
 
 
 Chameleon::Chameleon(std::string const& value) 
