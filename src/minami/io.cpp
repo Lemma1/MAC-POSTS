@@ -110,7 +110,8 @@ int MNM_IO::build_link_factory(std::string file_folder, MNM_ConfReader *conf_rea
   return 0;
 }
 
-int  MNM_IO::build_od_factory(std::string file_folder, MNM_ConfReader *conf_reader, MNM_OD_Factory *od_factory)
+int  MNM_IO::build_od_factory(std::string file_folder, MNM_ConfReader *conf_reader, 
+                                MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory)
 {
   /* find file */
   std::string __od_file_name = file_folder + "/MNM_input_od";
@@ -127,6 +128,8 @@ int  MNM_IO::build_od_factory(std::string file_folder, MNM_ConfReader *conf_read
   TInt __dest_ID, __origin_ID, __node_ID;
   std::string __line;
   std::vector<std::string> __words;
+  MNM_Origin *__origin;
+  MNM_Destination *__dest;
   if (__od_file.is_open())
   {
     printf("Start build Origin-Destination factory.\n");
@@ -139,7 +142,11 @@ int  MNM_IO::build_od_factory(std::string file_folder, MNM_ConfReader *conf_read
         std::cout << "Processing: " << __line << "\n";
         __origin_ID = TInt(std::stoi(__words[0]));
         __node_ID = TInt(std::stoi(__words[1]));
-        od_factory -> make_origin(__origin_ID, __max_interval, __flow_scalar);
+        __origin = od_factory -> make_origin(__origin_ID, __max_interval, __flow_scalar);
+
+        /* hook up */
+        __origin ->  m_origin_node =  (MNM_DMOND*) node_factory -> get_node(__node_ID);
+        ((MNM_DMOND*)  node_factory -> get_node(__node_ID)) -> hook_up_origin(__origin);
       }
     }
     std::getline(__od_file,__line); // skip another line
@@ -151,7 +158,11 @@ int  MNM_IO::build_od_factory(std::string file_folder, MNM_ConfReader *conf_read
         std::cout << "Processing: " << __line << "\n";
         __dest_ID = TInt(std::stoi(__words[0]));
         __node_ID = TInt(std::stoi(__words[1]));
-        od_factory -> make_destination(__dest_ID);
+        __dest = od_factory -> make_destination(__dest_ID);
+
+        /* hook up */
+        __dest ->  m_dest_node =  (MNM_DMDND*) node_factory -> get_node(__node_ID);
+        ((MNM_DMDND*)  node_factory -> get_node(__node_ID)) -> hook_up_destination(__dest);
       }
     }      
   }
@@ -167,6 +178,59 @@ PNGraph MNM_IO::build_graph(std::string file_folder, MNM_ConfReader *conf_reader
   PNGraph __graph = TSnap::LoadEdgeList <PNGraph> (__graph_file_name.c_str());
   return __graph;
 }
+
+
+
+int MNM_IO::build_demand(std::string file_folder, MNM_ConfReader *conf_reader, MNM_OD_Factory *od_factory)
+{
+  /* find file */
+  std::string __demand_file_name = file_folder + "/MNM_input_demand";
+  std::ifstream __demand_file;
+  __demand_file.open(__demand_file_name, std::ios::in);
+
+  /* read config */
+  TInt __max_interval = conf_reader -> get_int("max_interval"); 
+  TInt __num_OD = conf_reader -> get_int("OD_pair");
+
+  /* build */
+  TInt __O_ID, __D_ID;
+  MNM_Origin *__origin;
+  MNM_Destination *__dest;
+  std::string __line;
+  std::vector<std::string> __words;
+  if (__demand_file.is_open())
+  {
+    printf("Start build demand profile.\n");
+    TFlt *__demand_vector = (TFlt*) malloc(sizeof(TFlt) * __max_interval);
+    memset(__demand_vector, 0x0, sizeof(TFlt) * __max_interval);
+    std::getline(__demand_file,__line); //skip the first line
+    for (int i=0; i < __num_OD; ++i){
+      std::getline(__demand_file,__line);
+      __words = split(__line, ' ');
+      if (TInt(__words.size()) == (__max_interval + 2)) {
+        __O_ID = TInt(std::stoi(__words[0]));
+        __D_ID = TInt(std::stoi(__words[1]));
+        for(int j=0; j<__max_interval; ++j){
+          __demand_vector[j] = TFlt(std::stod(__words[j+2]));
+        }
+        __origin = od_factory -> get_origin(__O_ID);
+        __dest = od_factory ->get_destination(__D_ID);
+        __origin -> add_dest_demand(__dest, __demand_vector);
+      }
+      else{
+        printf("Something wrong in build_demand!\n");
+        free(__demand_vector);
+        exit(-1);
+      }
+    }
+    free(__demand_vector);
+    __demand_file.close();
+  }  
+  return 0;
+}
+
+
+
 
 std::vector<std::string> MNM_IO::split(const std::string &text, char sep) 
 {

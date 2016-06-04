@@ -134,11 +134,18 @@ MNM_Dnode_Inout::MNM_Dnode_Inout(TInt ID, TFlt flow_scalar)
 {
   m_out_link_array = std::vector<MNM_Dlink*>();
   m_in_link_array = std::vector<MNM_Dlink*>();
+  m_demand = NULL;
+  m_supply = NULL;
+  m_veh_flow = NULL;
+  m_veh_tomove = NULL;
 }
 
 MNM_Dnode_Inout::~MNM_Dnode_Inout()
 {
-
+  if (m_demand != NULL) free(m_demand);
+  if (m_supply != NULL) free(m_supply);
+  if (m_veh_flow != NULL) free(m_veh_flow);
+  if (m_veh_tomove != NULL) free(m_veh_tomove);
 }
 
 int MNM_Dnode_Inout::prepare_loading()

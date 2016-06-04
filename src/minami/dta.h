@@ -18,11 +18,8 @@ public:
   MNM_Dta(std::string file_folder);
   ~MNM_Dta();
   int initialize();
-  int hook_up();
   int build_from_files();
   bool is_ok();
-// private:
-  int hook_up_odANDnode();
   int hook_up_linkANDnode();
 
   TFlt m_unit_time;

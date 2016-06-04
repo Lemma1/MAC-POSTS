@@ -36,6 +36,7 @@ public:
   MNM_Node_Factory();
   ~MNM_Node_Factory();
   MNM_Dnode *make_node(TInt ID, DNode_type node_type, TFlt flow_scalar);
+  MNM_Dnode *get_node(TInt ID);
   std::map<TInt, MNM_Dnode*> m_node_map;
 };
 
@@ -65,6 +66,8 @@ public:
   ~MNM_OD_Factory();
   MNM_Destination *make_destination(TInt ID);
   MNM_Origin *make_origin(TInt ID, TInt max_interval, TFlt flow_scalar);
+  MNM_Destination *get_destination(TInt ID);
+  MNM_Origin *get_origin(TInt ID);
   std::map<TInt, MNM_Origin*> m_origin_map;
   std::map<TInt, MNM_Destination*> m_destination_map;
 };

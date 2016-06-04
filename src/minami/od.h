@@ -22,11 +22,11 @@ public:
   TInt m_Origin_ID;
   int release(MNM_Veh_Factory* veh_factory);
   int add_dest_demand(MNM_Destination *dest, TFlt* demand);
+  MNM_DMOND *m_origin_node;
 private:
   TInt m_current_interval;
   TInt m_max_interval;
   TFlt m_flow_scalar;
-  MNM_DMOND *m_origin_node;
   std::map<MNM_Destination*, TFlt*> m_demand;
 };
 

@@ -53,8 +53,11 @@ MNM_Dnode *MNM_Node_Factory::make_node(TInt ID, DNode_type node_type, TFlt flow_
   return __node;
 }
 
-
-
+MNM_Dnode *MNM_Node_Factory::get_node(TInt ID)
+{
+  return m_node_map.find(ID) -> second;
+}
+MNM_Destination *get_destination(TInt ID);
 /**************************************************************************
                           Link factory
 **************************************************************************/
@@ -114,4 +117,14 @@ MNM_Origin *MNM_OD_Factory::make_origin(TInt ID, TInt max_interval, TFlt flow_sc
   __origin = new MNM_Origin(ID, max_interval, flow_scalar);
   m_origin_map.insert(std::pair<TInt, MNM_Origin*>(ID, __origin));
   return __origin;
+}
+
+MNM_Destination *MNM_OD_Factory::get_destination(TInt ID)
+{
+  return m_destination_map.find(ID) -> second;
+}
+
+MNM_Origin *MNM_OD_Factory::get_origin(TInt ID)
+{
+  return m_origin_map.find(ID) -> second;
 }

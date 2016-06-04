@@ -79,10 +79,10 @@ protected:
   int move_vehicle();
   std::vector<MNM_Dlink*> m_out_link_array;
   std::vector<MNM_Dlink*> m_in_link_array;
-  TFlt *m_demand;
-  TFlt *m_supply;
-  TFlt *m_veh_flow;
-  TInt *m_veh_tomove;
+  TFlt *m_demand; //2d array
+  TFlt *m_supply; //1d array
+  TFlt *m_veh_flow; //2d array
+  TInt *m_veh_tomove; //2d array
 };
 
 /**************************************************************************
