@@ -85,6 +85,8 @@ dnode.h
 /home/weima/MINAMI/src/minami/dnode.h
 dlink.h
 /home/weima/MINAMI/src/minami/dlink.h
+enum.h
+/home/weima/MINAMI/src/minami/enum.h
 iostream
 -
 map
@@ -105,6 +107,8 @@ ults.h
 /home/weima/MINAMI/src/minami/ults.h
 factory.h
 /home/weima/MINAMI/src/minami/factory.h
+enum.h
+/home/weima/MINAMI/src/minami/enum.h
 string
 -
 vector
@@ -125,6 +129,26 @@ ults.h
 /home/weima/MINAMI/src/minami/ults.h
 map
 -
+
+/home/weima/MINAMI/src/minami/test_dta.cpp
+Snap.h
+/home/weima/MINAMI/src/minami/Snap.h
+dlink.h
+/home/weima/MINAMI/src/minami/dlink.h
+od.h
+/home/weima/MINAMI/src/minami/od.h
+vehicle.h
+/home/weima/MINAMI/src/minami/vehicle.h
+dnode.h
+/home/weima/MINAMI/src/minami/dnode.h
+factory.h
+/home/weima/MINAMI/src/minami/factory.h
+ults.h
+/home/weima/MINAMI/src/minami/ults.h
+io.h
+/home/weima/MINAMI/src/minami/io.h
+dta.h
+/home/weima/MINAMI/src/minami/dta.h
 
 /home/weima/MINAMI/src/minami/ults.cpp
 ults.h
@@ -625,6 +649,8 @@ snap-core/cmty.h
 snap-core/cncom.h
 
 snap-core/coreper.h
+
+snap-core/enum.h
 
 snap-core/ff.h
 bd.h

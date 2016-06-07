@@ -259,6 +259,30 @@ od.cpp.s:
 	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/od.cpp.s
 .PHONY : od.cpp.s
 
+test_dta.o: test_dta.cpp.o
+.PHONY : test_dta.o
+
+# target to build an object file
+test_dta.cpp.o:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/test_dta.cpp.o
+.PHONY : test_dta.cpp.o
+
+test_dta.i: test_dta.cpp.i
+.PHONY : test_dta.i
+
+# target to preprocess a source file
+test_dta.cpp.i:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/test_dta.cpp.i
+.PHONY : test_dta.cpp.i
+
+test_dta.s: test_dta.cpp.s
+.PHONY : test_dta.s
+
+# target to generate assembly for a file
+test_dta.cpp.s:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/test_dta.cpp.s
+.PHONY : test_dta.cpp.s
+
 ults.o: ults.cpp.o
 .PHONY : ults.o
 
@@ -334,6 +358,9 @@ help:
 	@echo "... od.o"
 	@echo "... od.i"
 	@echo "... od.s"
+	@echo "... test_dta.o"
+	@echo "... test_dta.i"
+	@echo "... test_dta.s"
 	@echo "... ults.o"
 	@echo "... ults.i"
 	@echo "... ults.s"

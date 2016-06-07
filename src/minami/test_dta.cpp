@@ -1,0 +1,28 @@
+#include "Snap.h"
+#include "dlink.h"
+#include "od.h"
+#include "vehicle.h"
+#include "dnode.h"
+#include "factory.h"
+#include "ults.h"
+#include "io.h"
+#include "dta.h"
+
+
+int main()
+{
+  // MNM_IO::build_node_factory(test_dta -> m_file_folder, test_dta->m_config, test_dta->m_node_factory);
+  // std::cout << test_dta -> m_node_factory -> m_node_map.size() << "\n";
+  // MNM_IO::build_link_factory(test_dta -> m_file_folder, test_dta->m_config, test_dta->m_link_factory);
+  // std::cout << test_dta -> m_link_factory -> m_link_map.size() << "\n";
+  // MNM_IO::build_od_factory(test_dta -> m_file_folder, test_dta->m_config, test_dta->m_od_factory, test_dta->m_node_factory);
+  // std::cout << test_dta -> m_od_factory -> m_origin_map.size() << "\n";
+  // std::cout << test_dta -> m_od_factory -> m_destination_map.size() << "\n";
+  // test_dta -> m_graph = MNM_IO::build_graph(test_dta -> m_file_folder,test_dta -> m_config);
+  // test_dta -> m_graph  -> Dump();
+  MNM_Dta *test_dta = new MNM_Dta("input_files");
+  test_dta -> build_from_files();
+  test_dta -> hook_up_linkANDnode();
+  test_dta -> is_ok();
+  return 0;
+}

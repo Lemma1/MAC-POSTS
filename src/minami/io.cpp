@@ -39,7 +39,7 @@ int MNM_IO::build_node_factory(std::string file_folder, MNM_ConfReader *conf_rea
           node_factory -> make_node(__node_ID, MNM_TYPE_ORIGIN, __flow_scalar);
         }
         if (__type =="DMDND"){
-          node_factory -> make_node(__node_ID, MNM_TYPE_ORIGIN, __flow_scalar);
+          node_factory -> make_node(__node_ID, MNM_TYPE_DEST, __flow_scalar);
         }
       }
     }

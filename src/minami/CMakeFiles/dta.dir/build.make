@@ -49,9 +49,32 @@ include minami/CMakeFiles/dta.dir/progress.make
 # Include the compile flags for this target's objects.
 include minami/CMakeFiles/dta.dir/flags.make
 
+minami/CMakeFiles/dta.dir/test_dta.cpp.o: minami/CMakeFiles/dta.dir/flags.make
+minami/CMakeFiles/dta.dir/test_dta.cpp.o: minami/test_dta.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_1)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/dta.dir/test_dta.cpp.o"
+	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/dta.dir/test_dta.cpp.o -c /home/weima/MINAMI/src/minami/test_dta.cpp
+
+minami/CMakeFiles/dta.dir/test_dta.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/dta.dir/test_dta.cpp.i"
+	cd /home/weima/MINAMI/src/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/weima/MINAMI/src/minami/test_dta.cpp > CMakeFiles/dta.dir/test_dta.cpp.i
+
+minami/CMakeFiles/dta.dir/test_dta.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/dta.dir/test_dta.cpp.s"
+	cd /home/weima/MINAMI/src/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/weima/MINAMI/src/minami/test_dta.cpp -o CMakeFiles/dta.dir/test_dta.cpp.s
+
+minami/CMakeFiles/dta.dir/test_dta.cpp.o.requires:
+.PHONY : minami/CMakeFiles/dta.dir/test_dta.cpp.o.requires
+
+minami/CMakeFiles/dta.dir/test_dta.cpp.o.provides: minami/CMakeFiles/dta.dir/test_dta.cpp.o.requires
+	$(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/test_dta.cpp.o.provides.build
+.PHONY : minami/CMakeFiles/dta.dir/test_dta.cpp.o.provides
+
+minami/CMakeFiles/dta.dir/test_dta.cpp.o.provides.build: minami/CMakeFiles/dta.dir/test_dta.cpp.o
+
 minami/CMakeFiles/dta.dir/dta.cpp.o: minami/CMakeFiles/dta.dir/flags.make
 minami/CMakeFiles/dta.dir/dta.cpp.o: minami/dta.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_2)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/dta.dir/dta.cpp.o"
 	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/dta.dir/dta.cpp.o -c /home/weima/MINAMI/src/minami/dta.cpp
 
@@ -74,7 +97,7 @@ minami/CMakeFiles/dta.dir/dta.cpp.o.provides.build: minami/CMakeFiles/dta.dir/dt
 
 minami/CMakeFiles/dta.dir/vehicle.cpp.o: minami/CMakeFiles/dta.dir/flags.make
 minami/CMakeFiles/dta.dir/vehicle.cpp.o: minami/vehicle.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_2)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_3)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/dta.dir/vehicle.cpp.o"
 	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/dta.dir/vehicle.cpp.o -c /home/weima/MINAMI/src/minami/vehicle.cpp
 
@@ -97,7 +120,7 @@ minami/CMakeFiles/dta.dir/vehicle.cpp.o.provides.build: minami/CMakeFiles/dta.di
 
 minami/CMakeFiles/dta.dir/dlink.cpp.o: minami/CMakeFiles/dta.dir/flags.make
 minami/CMakeFiles/dta.dir/dlink.cpp.o: minami/dlink.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_3)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_4)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/dta.dir/dlink.cpp.o"
 	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/dta.dir/dlink.cpp.o -c /home/weima/MINAMI/src/minami/dlink.cpp
 
@@ -120,7 +143,7 @@ minami/CMakeFiles/dta.dir/dlink.cpp.o.provides.build: minami/CMakeFiles/dta.dir/
 
 minami/CMakeFiles/dta.dir/od.cpp.o: minami/CMakeFiles/dta.dir/flags.make
 minami/CMakeFiles/dta.dir/od.cpp.o: minami/od.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_4)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_5)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/dta.dir/od.cpp.o"
 	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/dta.dir/od.cpp.o -c /home/weima/MINAMI/src/minami/od.cpp
 
@@ -143,7 +166,7 @@ minami/CMakeFiles/dta.dir/od.cpp.o.provides.build: minami/CMakeFiles/dta.dir/od.
 
 minami/CMakeFiles/dta.dir/factory.cpp.o: minami/CMakeFiles/dta.dir/flags.make
 minami/CMakeFiles/dta.dir/factory.cpp.o: minami/factory.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_5)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_6)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/dta.dir/factory.cpp.o"
 	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/dta.dir/factory.cpp.o -c /home/weima/MINAMI/src/minami/factory.cpp
 
@@ -166,7 +189,7 @@ minami/CMakeFiles/dta.dir/factory.cpp.o.provides.build: minami/CMakeFiles/dta.di
 
 minami/CMakeFiles/dta.dir/dnode.cpp.o: minami/CMakeFiles/dta.dir/flags.make
 minami/CMakeFiles/dta.dir/dnode.cpp.o: minami/dnode.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_6)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_7)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/dta.dir/dnode.cpp.o"
 	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/dta.dir/dnode.cpp.o -c /home/weima/MINAMI/src/minami/dnode.cpp
 
@@ -189,7 +212,7 @@ minami/CMakeFiles/dta.dir/dnode.cpp.o.provides.build: minami/CMakeFiles/dta.dir/
 
 minami/CMakeFiles/dta.dir/ults.cpp.o: minami/CMakeFiles/dta.dir/flags.make
 minami/CMakeFiles/dta.dir/ults.cpp.o: minami/ults.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_7)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_8)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/dta.dir/ults.cpp.o"
 	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/dta.dir/ults.cpp.o -c /home/weima/MINAMI/src/minami/ults.cpp
 
@@ -212,7 +235,7 @@ minami/CMakeFiles/dta.dir/ults.cpp.o.provides.build: minami/CMakeFiles/dta.dir/u
 
 minami/CMakeFiles/dta.dir/io.cpp.o: minami/CMakeFiles/dta.dir/flags.make
 minami/CMakeFiles/dta.dir/io.cpp.o: minami/io.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_8)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles $(CMAKE_PROGRESS_9)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/dta.dir/io.cpp.o"
 	cd /home/weima/MINAMI/src/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/dta.dir/io.cpp.o -c /home/weima/MINAMI/src/minami/io.cpp
 
@@ -235,6 +258,7 @@ minami/CMakeFiles/dta.dir/io.cpp.o.provides.build: minami/CMakeFiles/dta.dir/io.
 
 # Object files for target dta
 dta_OBJECTS = \
+"CMakeFiles/dta.dir/test_dta.cpp.o" \
 "CMakeFiles/dta.dir/dta.cpp.o" \
 "CMakeFiles/dta.dir/vehicle.cpp.o" \
 "CMakeFiles/dta.dir/dlink.cpp.o" \
@@ -247,6 +271,7 @@ dta_OBJECTS = \
 # External object files for target dta
 dta_EXTERNAL_OBJECTS =
 
+minami/dta: minami/CMakeFiles/dta.dir/test_dta.cpp.o
 minami/dta: minami/CMakeFiles/dta.dir/dta.cpp.o
 minami/dta: minami/CMakeFiles/dta.dir/vehicle.cpp.o
 minami/dta: minami/CMakeFiles/dta.dir/dlink.cpp.o
@@ -267,6 +292,7 @@ minami/dta: minami/CMakeFiles/dta.dir/link.txt
 minami/CMakeFiles/dta.dir/build: minami/dta
 .PHONY : minami/CMakeFiles/dta.dir/build
 
+minami/CMakeFiles/dta.dir/requires: minami/CMakeFiles/dta.dir/test_dta.cpp.o.requires
 minami/CMakeFiles/dta.dir/requires: minami/CMakeFiles/dta.dir/dta.cpp.o.requires
 minami/CMakeFiles/dta.dir/requires: minami/CMakeFiles/dta.dir/vehicle.cpp.o.requires
 minami/CMakeFiles/dta.dir/requires: minami/CMakeFiles/dta.dir/dlink.cpp.o.requires

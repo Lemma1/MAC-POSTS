@@ -5,6 +5,7 @@
 #include "vehicle.h"
 #include "dnode.h"
 #include "dlink.h"
+#include "enum.h"
 
 #include <iostream>
 #include <map>
@@ -15,8 +16,7 @@ class MNM_Destination;
 class MNM_Origin;
 class MNM_Dlink;
 
-enum DNode_type {MNM_TYPE_ORIGIN, MNM_TYPE_DEST, MNM_TYPE_FWJ};
-enum DLink_type {MNM_TYPE_CTM, MNM_TYPE_PQ};
+
 
 class MNM_Veh_Factory
 {
@@ -55,6 +55,7 @@ public:
                         TFlt ffs,
                         TFlt unit_time,
                         TFlt flow_scalar);
+  MNM_Dlink *get_link(TInt ID);
   std::map<TInt, MNM_Dlink*> m_link_map;
 };
 

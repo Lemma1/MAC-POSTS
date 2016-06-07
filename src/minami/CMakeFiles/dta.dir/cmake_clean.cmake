@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/dta.dir/test_dta.cpp.o"
   "CMakeFiles/dta.dir/dta.cpp.o"
   "CMakeFiles/dta.dir/vehicle.cpp.o"
   "CMakeFiles/dta.dir/dlink.cpp.o"

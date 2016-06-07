@@ -21,11 +21,13 @@ class MNM_Dnode
 public:
   MNM_Dnode(TInt ID, TFlt flow_scalar);
   ~MNM_Dnode();
+  TInt m_node_ID;
   int virtual evolve(TInt timestamp){return 0;};
   void virtual print_info(){};
   int virtual prepare_loading(){return 0;};
+  int virtual add_out_link(MNM_Dlink* out_link){printf("Error!\n"); return 0;};
+  int virtual add_in_link(MNM_Dlink* int_link){printf("Error!\n"); return 0;};
 protected:
-  TInt m_node_ID;
   TFlt m_flow_scalar;
 };
 
@@ -36,7 +38,7 @@ public:
   ~MNM_DMOND();
   int virtual evolve(TInt timestamp);
   void virtual print_info();
-  int add_out_link(MNM_Dlink* out_link);
+  int virtual add_out_link(MNM_Dlink* out_link);
   int hook_up_origin(MNM_Origin *origin);
   std::deque<MNM_Veh *> m_in_veh_queue;
 private:
@@ -52,7 +54,7 @@ public:
   ~MNM_DMDND();
   int virtual evolve(TInt timestamp);
   void virtual print_info();
-  int add_in_link(MNM_Dlink *link);
+  int virtual add_in_link(MNM_Dlink *link);
   int hook_up_destination(MNM_Destination *dest);
   std::deque<MNM_Veh *> m_out_veh_queue;
 private:
@@ -72,6 +74,8 @@ public:
   int virtual evolve(TInt timestamp){return 0;};
   void virtual print_info();
   int virtual prepare_loading();
+  int virtual add_out_link(MNM_Dlink* out_link);
+  int virtual add_in_link(MNM_Dlink* int_link);
 protected:
   int prepare_supplyANDdemand();
   int virtual compute_flow(){return 0;};

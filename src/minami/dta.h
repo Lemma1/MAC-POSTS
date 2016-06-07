@@ -21,7 +21,8 @@ public:
   int build_from_files();
   bool is_ok();
   int hook_up_linkANDnode();
-
+  int run(bool verbose);
+private:
   TFlt m_unit_time;
   TFlt m_flow_scalar;
   std::string m_file_folder;

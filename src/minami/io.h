@@ -4,6 +4,7 @@
 #include "Snap.h"
 #include "ults.h"
 #include "factory.h"
+#include "enum.h"
 
 #include <string>
 #include <vector>

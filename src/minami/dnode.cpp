@@ -247,6 +247,17 @@ void MNM_Dnode_Inout::print_info()
   ;
 }
 
+int MNM_Dnode_Inout::add_out_link(MNM_Dlink* out_link)
+{
+  m_out_link_array.push_back(out_link);
+  return 0;
+}
+
+int MNM_Dnode_Inout::add_in_link(MNM_Dlink *link)
+{
+  m_in_link_array.push_back(link);
+  return 0;
+}
 
 /**************************************************************************
                               FWJ node

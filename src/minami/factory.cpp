@@ -92,6 +92,10 @@ MNM_Dlink *MNM_Link_Factory::make_link( TInt ID,
   return __link;
 }
 
+MNM_Dlink *MNM_Link_Factory::get_link(TInt ID)
+{
+  return m_link_map.find(ID) -> second;
+}
 /**************************************************************************
                           OD factory
 **************************************************************************/
