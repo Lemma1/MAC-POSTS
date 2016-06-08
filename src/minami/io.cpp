@@ -170,12 +170,37 @@ int  MNM_IO::build_od_factory(std::string file_folder, MNM_ConfReader *conf_read
   return 0;
 }
 
-PNGraph MNM_IO::build_graph(std::string file_folder, MNM_ConfReader *conf_reader)
+PNEGraph MNM_IO::build_graph(std::string file_folder, MNM_ConfReader *conf_reader)
 {
   /* find file */
   std::string __network_name = conf_reader -> get_string("network_name");
   std::string __graph_file_name = file_folder + "/" + __network_name;
-  PNGraph __graph = TSnap::LoadEdgeList <PNGraph> (__graph_file_name.c_str());
+  std::ifstream __graph_file;
+  __graph_file.open(__graph_file_name, std::ios::in);
+
+  TInt __num_of_link = conf_reader -> get_int("num_of_link");
+
+  printf("Start build graph.\n");
+  PNEGraph __graph = PNEGraph::TObj::New();
+  
+  int __link_ID, __from_ID, __to_ID;
+  std::string __line;
+  std::vector<std::string> __words;
+  std::getline(__graph_file,__line); // skip one line
+  for (int i=0; i<__num_of_link; ++i){
+    std::getline(__graph_file,__line);
+    __words = split(__line, ' ');
+    if (__words.size() == 3){
+      std::cout << "Processing: " << __line << "\n";
+      __link_ID = TInt(std::stoi(__words[0]));
+      __from_ID = TInt(std::stoi(__words[1]));
+      __to_ID = TInt(std::stoi(__words[2]));
+    if (! __graph->IsNode(__from_ID)) { __graph->AddNode(__from_ID); }
+    if (! __graph->IsNode(__to_ID)) { __graph->AddNode(__to_ID); }
+    __graph->AddEdge(__from_ID, __to_ID, __link_ID);
+    }
+  }
+  __graph->Defrag();
   return __graph;
 }
 

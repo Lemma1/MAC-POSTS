@@ -38,3 +38,10 @@ int MNM_Veh::set_destination(MNM_Destination * dest)
   m_dest = dest;
   return 0;
 }
+
+
+int MNM_Veh::set_next_link(MNM_Dlink *link)
+{
+  m_next_link = link;
+  return 0;
+}

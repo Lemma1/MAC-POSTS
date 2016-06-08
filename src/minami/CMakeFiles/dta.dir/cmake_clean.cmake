@@ -8,6 +8,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/dta.dir/dnode.cpp.o"
   "CMakeFiles/dta.dir/ults.cpp.o"
   "CMakeFiles/dta.dir/io.cpp.o"
+  "CMakeFiles/dta.dir/routing.cpp.o"
+  "CMakeFiles/dta.dir/statistics.cpp.o"
   "dta.pdb"
   "dta"
 )

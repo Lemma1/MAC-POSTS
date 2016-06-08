@@ -10,6 +10,8 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "/home/weima/MINAMI/src/minami/factory.cpp" "/home/weima/MINAMI/src/minami/CMakeFiles/dta.dir/factory.cpp.o"
   "/home/weima/MINAMI/src/minami/io.cpp" "/home/weima/MINAMI/src/minami/CMakeFiles/dta.dir/io.cpp.o"
   "/home/weima/MINAMI/src/minami/od.cpp" "/home/weima/MINAMI/src/minami/CMakeFiles/dta.dir/od.cpp.o"
+  "/home/weima/MINAMI/src/minami/routing.cpp" "/home/weima/MINAMI/src/minami/CMakeFiles/dta.dir/routing.cpp.o"
+  "/home/weima/MINAMI/src/minami/statistics.cpp" "/home/weima/MINAMI/src/minami/CMakeFiles/dta.dir/statistics.cpp.o"
   "/home/weima/MINAMI/src/minami/test_dta.cpp" "/home/weima/MINAMI/src/minami/CMakeFiles/dta.dir/test_dta.cpp.o"
   "/home/weima/MINAMI/src/minami/ults.cpp" "/home/weima/MINAMI/src/minami/CMakeFiles/dta.dir/ults.cpp.o"
   "/home/weima/MINAMI/src/minami/vehicle.cpp" "/home/weima/MINAMI/src/minami/CMakeFiles/dta.dir/vehicle.cpp.o"

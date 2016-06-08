@@ -19,6 +19,16 @@ MNM_Dlink::~MNM_Dlink()
 
 }
 
+int MNM_Dlink::hook_up_node(MNM_Dnode *from, MNM_Dnode *to)
+{
+  m_from_node = from;
+  m_to_node = to;
+  return 0;
+}
+
+
+
+
 int MNM_Dlink::move_veh_queue(std::deque<MNM_Veh*> *from_queue,
                                   std::deque<MNM_Veh*> *to_queue, 
                                   TInt number_tomove)
@@ -100,7 +110,7 @@ void MNM_Dlink_Ctm::print_info() {
   printf("Volume for each cell is:\n");
   for (int i = 0; i < m_num_cells; ++i)
   {
-    printf("%d,\n", int(m_cell_array[i] -> m_volume));
+    printf("%d, ", int(m_cell_array[i] -> m_volume));
   }
   printf("\n");
 }
@@ -114,11 +124,11 @@ int MNM_Dlink_Ctm::update_out_veh()
     {
       __demand = m_cell_array[i]->get_demand();
       __supply = m_cell_array[i+1]->get_supply();
-      __temp_out_flux = std::min(__demand, __supply) * m_flow_scalar;
+      __temp_out_flux = MNM_Ults::min(__demand, __supply) * m_flow_scalar;
       m_cell_array[i] -> m_out_veh= TInt(MNM_Ults::round(__temp_out_flux)); 
     }
 
-    m_cell_array[m_num_cells - 1] -> m_out_veh = m_cell_array[m_num_cells - 1] -> m_volume;
+    m_cell_array[m_num_cells - 1] -> m_out_veh = m_cell_array[m_num_cells - 1] -> m_veh_queue.size();
   }
   return 0;
 }
@@ -178,7 +188,9 @@ int MNM_Dlink_Ctm::move_last_cell() {
       m_finished_array.push_back(__veh);
     }
     else {
-      __veh -> get_destionation() -> receive_veh(__veh);
+      printf("Dlink_CTM::Some thing wrong!\n");
+      exit(-1);
+      // __veh -> get_destionation() -> receive_veh(__veh);
     }
   }
   return 0;

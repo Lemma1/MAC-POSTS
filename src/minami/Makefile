@@ -259,6 +259,54 @@ od.cpp.s:
 	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/od.cpp.s
 .PHONY : od.cpp.s
 
+routing.o: routing.cpp.o
+.PHONY : routing.o
+
+# target to build an object file
+routing.cpp.o:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/routing.cpp.o
+.PHONY : routing.cpp.o
+
+routing.i: routing.cpp.i
+.PHONY : routing.i
+
+# target to preprocess a source file
+routing.cpp.i:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/routing.cpp.i
+.PHONY : routing.cpp.i
+
+routing.s: routing.cpp.s
+.PHONY : routing.s
+
+# target to generate assembly for a file
+routing.cpp.s:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/routing.cpp.s
+.PHONY : routing.cpp.s
+
+statistics.o: statistics.cpp.o
+.PHONY : statistics.o
+
+# target to build an object file
+statistics.cpp.o:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/statistics.cpp.o
+.PHONY : statistics.cpp.o
+
+statistics.i: statistics.cpp.i
+.PHONY : statistics.i
+
+# target to preprocess a source file
+statistics.cpp.i:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/statistics.cpp.i
+.PHONY : statistics.cpp.i
+
+statistics.s: statistics.cpp.s
+.PHONY : statistics.s
+
+# target to generate assembly for a file
+statistics.cpp.s:
+	cd /home/weima/MINAMI/src && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/statistics.cpp.s
+.PHONY : statistics.cpp.s
+
 test_dta.o: test_dta.cpp.o
 .PHONY : test_dta.o
 
@@ -358,6 +406,12 @@ help:
 	@echo "... od.o"
 	@echo "... od.i"
 	@echo "... od.s"
+	@echo "... routing.o"
+	@echo "... routing.i"
+	@echo "... routing.s"
+	@echo "... statistics.o"
+	@echo "... statistics.i"
+	@echo "... statistics.s"
 	@echo "... test_dta.o"
 	@echo "... test_dta.i"
 	@echo "... test_dta.s"

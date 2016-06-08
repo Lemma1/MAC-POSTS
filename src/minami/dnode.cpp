@@ -5,6 +5,8 @@ MNM_Dnode::MNM_Dnode(TInt ID, TFlt flow_scalar)
 {
   m_node_ID = ID;
   m_flow_scalar = flow_scalar;
+  m_out_link_array = std::vector<MNM_Dlink*>();
+  m_in_link_array = std::vector<MNM_Dlink*>();
 }
 
 MNM_Dnode::~MNM_Dnode()
@@ -21,8 +23,8 @@ MNM_DMOND::MNM_DMOND(TInt ID, TFlt flow_scalar)
   : MNM_Dnode::MNM_Dnode(ID, flow_scalar)
 {
   m_origin = NULL;
-  m_out_link_array = std::vector<MNM_Dlink*>();
   m_out_volume = std::map<MNM_Dlink*, TInt>();
+  m_in_veh_queue = std::deque<MNM_Veh *>();
 }
 
 int MNM_DMOND::evolve(TInt timestamp)
@@ -87,7 +89,6 @@ MNM_DMDND::MNM_DMDND(TInt ID, TFlt flow_scalar)
   : MNM_Dnode::MNM_Dnode(ID, flow_scalar)
 {
   m_dest = NULL;
-  m_in_link_array = std::vector<MNM_Dlink*>();
 }
 
 int MNM_DMDND::add_in_link(MNM_Dlink *link)
@@ -132,8 +133,6 @@ int MNM_DMDND::hook_up_destination(MNM_Destination *dest)
 MNM_Dnode_Inout::MNM_Dnode_Inout(TInt ID, TFlt flow_scalar)
   : MNM_Dnode::MNM_Dnode(ID, flow_scalar)
 {
-  m_out_link_array = std::vector<MNM_Dlink*>();
-  m_in_link_array = std::vector<MNM_Dlink*>();
   m_demand = NULL;
   m_supply = NULL;
   m_veh_flow = NULL;
@@ -170,8 +169,7 @@ int MNM_Dnode_Inout::prepare_supplyANDdemand()
   TInt __count;
   std::deque <MNM_Veh*>::iterator __veh_it;
   MNM_Dlink *__in_link, *__out_link;
-
-  for (size_t i=0; i< m_in_link_array.size(); ++i){
+  for (size_t i=0; i < m_in_link_array.size(); ++i){
     __in_link = m_in_link_array[i];
     for (size_t j=0; j< m_out_link_array.size(); ++j){
       __count = 0;
@@ -259,6 +257,15 @@ int MNM_Dnode_Inout::add_in_link(MNM_Dlink *link)
   return 0;
 }
 
+
+int MNM_Dnode_Inout::evolve(TInt timestamp)
+{
+  prepare_supplyANDdemand();
+  compute_flow();
+  round_flow_to_vehicle();
+  move_vehicle();
+  return 0;
+}
 /**************************************************************************
                               FWJ node
 **************************************************************************/
@@ -288,8 +295,7 @@ int MNM_Dnode_FWJ::compute_flow()
       __sum_in_flow += m_demand[i * __offset + j];
     }
     for (size_t i=0; i< m_in_link_array.size(); ++i){
-      __sum_in_flow += m_demand[i * __offset + j];
-      __portion = m_demand[i * __offset + j] / __sum_in_flow;
+      __portion = MNM_Ults::divide(m_demand[i * __offset + j], __sum_in_flow);
       m_veh_flow[i * __offset + j] = MNM_Ults::min(m_demand[i * __offset + j], __portion * m_supply[j]);
     }
   }

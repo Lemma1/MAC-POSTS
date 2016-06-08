@@ -1,11 +1,3 @@
-#include "Snap.h"
-#include "dlink.h"
-#include "od.h"
-#include "vehicle.h"
-#include "dnode.h"
-#include "factory.h"
-#include "ults.h"
-#include "io.h"
 #include "dta.h"
 
 
@@ -22,7 +14,8 @@ int main()
   // test_dta -> m_graph  -> Dump();
   MNM_Dta *test_dta = new MNM_Dta("input_files");
   test_dta -> build_from_files();
-  test_dta -> hook_up_linkANDnode();
+  test_dta -> hook_up_node_and_link();
   test_dta -> is_ok();
+  test_dta -> loading(true);
   return 0;
 }

@@ -27,6 +27,8 @@ public:
   int virtual prepare_loading(){return 0;};
   int virtual add_out_link(MNM_Dlink* out_link){printf("Error!\n"); return 0;};
   int virtual add_in_link(MNM_Dlink* int_link){printf("Error!\n"); return 0;};
+  std::vector<MNM_Dlink*> m_out_link_array;
+  std::vector<MNM_Dlink*> m_in_link_array;
 protected:
   TFlt m_flow_scalar;
 };
@@ -43,7 +45,6 @@ public:
   std::deque<MNM_Veh *> m_in_veh_queue;
 private:
   MNM_Origin *m_origin;
-  std::vector<MNM_Dlink*> m_out_link_array;
   std::map<MNM_Dlink*, TInt> m_out_volume;
 };
 
@@ -59,7 +60,6 @@ public:
   std::deque<MNM_Veh *> m_out_veh_queue;
 private:
   MNM_Destination *m_dest;
-  std::vector<MNM_Dlink*> m_in_link_array;
 };
 
 /**************************************************************************
@@ -71,7 +71,7 @@ class MNM_Dnode_Inout : public MNM_Dnode
 public:
   MNM_Dnode_Inout(TInt ID, TFlt flow_scalar);
   ~MNM_Dnode_Inout();
-  int virtual evolve(TInt timestamp){return 0;};
+  int virtual evolve(TInt timestamp);
   void virtual print_info();
   int virtual prepare_loading();
   int virtual add_out_link(MNM_Dlink* out_link);
@@ -81,8 +81,6 @@ protected:
   int virtual compute_flow(){return 0;};
   int round_flow_to_vehicle();
   int move_vehicle();
-  std::vector<MNM_Dlink*> m_out_link_array;
-  std::vector<MNM_Dlink*> m_in_link_array;
   TFlt *m_demand; //2d array
   TFlt *m_supply; //1d array
   TFlt *m_veh_flow; //2d array

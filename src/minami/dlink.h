@@ -12,6 +12,7 @@
 #include <map>
 
 class MNM_Veh;
+class MNM_Dnode;
 
 class MNM_Dlink
 {
@@ -25,8 +26,11 @@ public:
   TFlt virtual get_link_supply(){return TFlt(0);};
   int virtual clear_incoming_array(){return 0;};
   void virtual print_info(){};
+  int hook_up_node(MNM_Dnode *from, MNM_Dnode *to);
 // protected:
   TInt m_link_ID;
+  MNM_Dnode *m_from_node;
+  MNM_Dnode *m_to_node;
   TInt m_number_of_lane;
   TFlt m_length;
   TFlt m_ffs;

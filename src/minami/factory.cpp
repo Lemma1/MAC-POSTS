@@ -16,6 +16,7 @@ MNM_Veh_Factory::~MNM_Veh_Factory()
 
 MNM_Veh *MNM_Veh_Factory::make_veh(TInt timestamp)
 {
+  printf("A vehicle is produce at time %d, ID is %d\n", (int)timestamp, (int)m_num_veh + 1);
   MNM_Veh *__veh = new MNM_Veh(m_num_veh + 1, timestamp);
   m_veh_map.insert(std::pair<TInt, MNM_Veh*>(m_num_veh + 1, __veh));
   m_num_veh += 1;

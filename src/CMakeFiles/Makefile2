@@ -189,7 +189,7 @@ clean: snap-core/CMakeFiles/Snap.dir/clean
 3rdparty/g3log/CMakeFiles/g3log.dir/all:
 	$(MAKE) -f 3rdparty/g3log/CMakeFiles/g3log.dir/build.make 3rdparty/g3log/CMakeFiles/g3log.dir/depend
 	$(MAKE) -f 3rdparty/g3log/CMakeFiles/g3log.dir/build.make 3rdparty/g3log/CMakeFiles/g3log.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles  12 13 14 15 16 17 18 19
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles  14 15 16 17 18 19 20 21
 	@echo "Built target g3log"
 .PHONY : 3rdparty/g3log/CMakeFiles/g3log.dir/all
 
@@ -241,7 +241,7 @@ minami/CMakeFiles/dta.dir/all: snap-core/CMakeFiles/Snap.dir/all
 minami/CMakeFiles/dta.dir/all: 3rdparty/g3log/CMakeFiles/g3log.dir/all
 	$(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/depend
 	$(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles  3 4 5 6 7 8 9 10 11
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/src/CMakeFiles  3 4 5 6 7 8 9 10 11 12 13
 	@echo "Built target dta"
 .PHONY : minami/CMakeFiles/dta.dir/all
 
@@ -251,7 +251,7 @@ all: minami/CMakeFiles/dta.dir/all
 
 # Build rule for subdir invocation for target.
 minami/CMakeFiles/dta.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/weima/MINAMI/src/CMakeFiles 19
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/weima/MINAMI/src/CMakeFiles 21
 	$(MAKE) -f CMakeFiles/Makefile2 minami/CMakeFiles/dta.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/weima/MINAMI/src/CMakeFiles 0
 .PHONY : minami/CMakeFiles/dta.dir/rule

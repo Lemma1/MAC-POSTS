@@ -17,7 +17,6 @@ class MNM_Origin;
 class MNM_Dlink;
 
 
-
 class MNM_Veh_Factory
 {
 public:
