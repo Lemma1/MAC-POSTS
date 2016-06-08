@@ -5,6 +5,7 @@ MNM_Veh::MNM_Veh(TInt ID, TInt start_time) {
   m_current_link = NULL;
   m_next_link = NULL;
   m_start_time = start_time;
+  m_finish_time = -1;
 }
 
 int MNM_Veh::set_current_link(MNM_Dlink *link) {
@@ -43,5 +44,11 @@ int MNM_Veh::set_destination(MNM_Destination * dest)
 int MNM_Veh::set_next_link(MNM_Dlink *link)
 {
   m_next_link = link;
+  return 0;
+}
+
+int MNM_Veh::finish(TInt finish_time)
+{
+  m_finish_time = finish_time;
   return 0;
 }

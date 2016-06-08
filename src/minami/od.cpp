@@ -35,6 +35,7 @@ int MNM_Origin::release(MNM_Veh_Factory* veh_factory, TInt current_interval)
       __veh_to_release = TInt(MNM_Ults::round((__demand_it -> second)[m_current_assign_interval] * m_flow_scalar));
       for (int i=0; i<__veh_to_release; ++i) {
         __veh = veh_factory -> make_veh(current_interval);
+        __veh -> set_destination(__demand_it -> first);
         m_origin_node -> m_in_veh_queue.push_back(__veh);
       }
     }
@@ -54,10 +55,22 @@ MNM_Destination::~MNM_Destination()
 
 }
 
-int MNM_Destination::receive_veh(MNM_Veh* veh)
+int MNM_Destination::receive(TInt current_interval)
 {
-  printf("-------------Receive veh %d\n", (int)veh -> m_veh_ID);
-  free(veh);
+
+  MNM_Veh *__veh;
+  size_t __num_to_receive = m_dest_node -> m_out_veh_queue.size();
+  for (size_t i=0; i < __num_to_receive; ++i){
+    __veh = m_dest_node -> m_out_veh_queue.front();
+    if (__veh -> get_destionation() != this){
+      printf("MNM_Destination::receive: Something wrong!\n");
+      exit(-1);
+    }
+    __veh -> finish(current_interval);
+    printf("_______Receive Vehicle ID: %d\n", (int) __veh -> m_veh_ID);
+    m_dest_node -> m_out_veh_queue.pop_front();
+  }
+  
   return 0;
 }
 

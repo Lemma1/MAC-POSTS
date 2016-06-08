@@ -130,6 +130,7 @@ int MNM_Dta::loading(bool verbose)
   MNM_Origin *__origin;
   MNM_Dnode *__node;
   MNM_Dlink *__link;
+  MNM_Destination *__dest;
 
   printf("MNM: Prepare loading!\n");
   m_routing -> init_routing();
@@ -158,7 +159,7 @@ int MNM_Dta::loading(bool verbose)
     }
 
     // step 4: move vehicles through link
-      for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
+    for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
       __link = __link_it -> second;
       // printf("Current Link %d:, incomming %d, finished %d\n", __link -> m_link_ID, __link -> m_incoming_array.size(),  __link -> m_finished_array.size());
       __link -> clear_incoming_array();
@@ -167,6 +168,10 @@ int MNM_Dta::loading(bool verbose)
     }
 
     // step 5: Destination receive vehicle  
+    for (auto __dest_it = m_od_factory -> m_destination_map.begin(); __dest_it != m_od_factory -> m_destination_map.end(); __dest_it++){
+      __dest = __dest_it -> second;
+      __dest -> receive(__cur_int);
+    }
 
     __cur_int ++;
   }

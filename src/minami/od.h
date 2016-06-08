@@ -39,7 +39,7 @@ public:
   TInt m_Dest_ID;
   TFlt m_flow_scalar;
   MNM_DMDND *m_dest_node;
-  int receive_veh(MNM_Veh* veh);
+  int receive(TInt current_interval);
 };
 
 #endif
