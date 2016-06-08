@@ -27,7 +27,6 @@ int MNM_Origin::add_dest_demand(MNM_Destination *dest, TFlt* demand)
 int MNM_Origin::release(MNM_Veh_Factory* veh_factory, TInt current_interval)
 {
   if (m_current_assign_interval < m_max_assign_interval){
-    printf("Current assign interval: %d\n", (int)m_current_assign_interval);
     TInt __veh_to_release;
     MNM_Veh *__veh;
     std::map<MNM_Destination*, TFlt*>::iterator __demand_it;
@@ -67,7 +66,7 @@ int MNM_Destination::receive(TInt current_interval)
       exit(-1);
     }
     __veh -> finish(current_interval);
-    printf("_______Receive Vehicle ID: %d\n", (int) __veh -> m_veh_ID);
+    // printf("_______Receive Vehicle ID: %d\n", (int) __veh -> m_veh_ID);
     m_dest_node -> m_out_veh_queue.pop_front();
   }
   

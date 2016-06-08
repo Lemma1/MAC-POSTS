@@ -59,7 +59,7 @@ int MNM_Dta::hook_up_node_and_link()
       __node -> add_in_link(__link);
     }   
   }
-
+  printf("Hook up link to node\n");
   // hook up link to node
   for (auto __link_it = m_graph->BegEI(); __link_it < m_graph->EndEI(); __link_it++){
     __link = m_link_factory -> get_link(__link_it.GetId());
@@ -149,6 +149,7 @@ int MNM_Dta::loading(bool verbose)
         __origin -> release(m_veh_factory, __cur_int);
       }      
     }
+
     // step 2: route the vehicle
     m_routing -> update_routing();
 
@@ -164,7 +165,7 @@ int MNM_Dta::loading(bool verbose)
       // printf("Current Link %d:, incomming %d, finished %d\n", __link -> m_link_ID, __link -> m_incoming_array.size(),  __link -> m_finished_array.size());
       __link -> clear_incoming_array();
       __link -> evolve(__cur_int);
-      __link -> print_info();
+      // __link -> print_info();
     }
 
     // step 5: Destination receive vehicle  

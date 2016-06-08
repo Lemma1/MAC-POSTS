@@ -165,6 +165,7 @@ TFlt MNM_Dlink_Ctm::get_link_supply() {
 }
 
 int MNM_Dlink_Ctm::clear_incoming_array() {
+  // printf("link ID: %d, in comming: %d, supply : %d\n", (int )m_link_ID,(int)m_incoming_array.size(), (int) (get_link_supply() * m_flow_scalar) );
   if (get_link_supply() * m_flow_scalar < m_incoming_array.size()) {
     LOG(WARNING) << "Wrong incoming array size";
     exit(-1);

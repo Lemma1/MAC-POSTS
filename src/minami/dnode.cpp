@@ -195,10 +195,23 @@ int MNM_Dnode_Inout::round_flow_to_vehicle()
   // the rounding mechanism may cause the lack of vehicle in m_finished_array
   // but demand is always a integer and only supply can be float, so don't need to worry about it
   size_t __offset = m_out_link_array.size();
-  for (size_t i=0; i< m_in_link_array.size(); ++i){
-    for (size_t j=0; j< m_out_link_array.size(); ++j){
+  MNM_Dlink *__out_link;
+  TInt __to_move;
+  size_t __rand_idx;
+  for (size_t j=0; j< m_out_link_array.size(); ++j){
+    __to_move = 0;
+    __out_link = m_out_link_array[j];
+    for (size_t i=0; i< m_in_link_array.size(); ++i){
       m_veh_tomove[i * __offset + j] = MNM_Ults::round(m_veh_flow[i * __offset + j] * m_flow_scalar);
+      __to_move += m_veh_tomove[i * __offset + j];
+      // printf("Rounding %d, %d the value %f to %d\n", i, j, m_veh_flow[i * __offset + j] * m_flow_scalar, m_veh_tomove[i * __offset + j]);
     }
+    while (TFlt(__to_move) > __out_link -> get_link_supply()){
+      __rand_idx = rand() % m_in_link_array.size();
+      m_veh_tomove[__rand_idx * __offset + j] -= 1;
+      __to_move -= 1;
+    }
+    // printf("Rounding %d, %d the value %f to %d\n", i, j, m_veh_flow[i * __offset + j] * m_flow_scalar, m_veh_tomove[i * __offset + j]);
   }
   return 0;
 }
@@ -216,6 +229,7 @@ int MNM_Dnode_Inout::move_vehicle()
       __in_link = m_in_link_array[i];
       __num_to_move = m_veh_tomove[i * __offset + j];
       __size = __in_link->m_finished_array.size();
+      // printf("In node %d, from link %d to link %d, %d to move\n", m_node_ID, __in_link ->m_link_ID, __out_link->m_link_ID, __num_to_move);
       for (size_t k=0; k<__size; ++k){
         if (__num_to_move > 0){
           __veh = __in_link->m_finished_array.front();

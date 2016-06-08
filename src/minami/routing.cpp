@@ -47,7 +47,7 @@ int MNM_Routing_Random::update_routing()
   TInt __out_ID;
   MNM_Dlink *__next_link;
   MNM_Dlink* __link;
-  printf("MNM_Routing: route the origin vehciles.\n");
+  // printf("MNM_Routing: route the origin vehciles.\n");
   /* route the vehicle in Origin nodes */
   for (auto __origin_it = m_od_factory->m_origin_map.begin(); __origin_it != m_od_factory->m_origin_map.end(); __origin_it++){
     __origin = __origin_it -> second;
@@ -60,7 +60,7 @@ int MNM_Routing_Random::update_routing()
       (*__veh_it) -> set_next_link(__next_link);
     }
   }
-  printf("MNM_Routing: route the link vehciles.\n");
+  // printf("MNM_Routing: route the link vehciles.\n");
   TInt __link_ID;
   /* route the vehicles at the end of each link */
   for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it ++){
@@ -78,7 +78,7 @@ int MNM_Routing_Random::update_routing()
       }
     }
   }
-  printf("MNM_Routing: Finished.\n");
+  // printf("MNM_Routing: Finishsssed.\n");
   return 0;
 }
 
