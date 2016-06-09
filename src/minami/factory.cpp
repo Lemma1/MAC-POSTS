@@ -56,7 +56,12 @@ MNM_Dnode *MNM_Node_Factory::make_node(TInt ID, DNode_type node_type, TFlt flow_
 
 MNM_Dnode *MNM_Node_Factory::get_node(TInt ID)
 {
-  return m_node_map.find(ID) -> second;
+  auto __node_it = m_node_map.find(ID);
+  if (__node_it == m_node_map.end()) {
+    printf("No such node ID %d\n", (int) ID);
+    return NULL;
+  }
+  return __node_it -> second;
 }
 MNM_Destination *get_destination(TInt ID);
 /**************************************************************************

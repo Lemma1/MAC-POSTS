@@ -31,16 +31,25 @@ int MNM_IO::build_node_factory(std::string file_folder, MNM_ConfReader *conf_rea
       if (__words.size() == 2) {
         std::cout << "Processing: " << __line << "\n";
         __node_ID = TInt(std::stoi(__words[0]));
-        __type = __words[1];
+        __type = trim(__words[1]);
         if (__type == "FWJ"){
           node_factory -> make_node(__node_ID, MNM_TYPE_FWJ, __flow_scalar);
+          continue;
         }
         if (__type =="DMOND"){
           node_factory -> make_node(__node_ID, MNM_TYPE_ORIGIN, __flow_scalar);
+          continue;
         }
         if (__type =="DMDND"){
           node_factory -> make_node(__node_ID, MNM_TYPE_DEST, __flow_scalar);
+          continue;
         }
+        printf("Wrong node type, %s\n", __type.c_str());
+        exit(-1);
+      }
+      else {
+        printf("MNM_IO::build_node_factory::Wrong length of line.\n");
+        exit(-1);
       }
     }
     __node_file.close();
@@ -81,7 +90,7 @@ int MNM_IO::build_link_factory(std::string file_folder, MNM_ConfReader *conf_rea
       if (__words.size() == 7) {
         std::cout << "Processing: " << __line << "\n";
         __link_ID = TInt(std::stoi(__words[0]));
-        __type = __words[1];
+        __type = trim(__words[1]);
         __length = TFlt(std::stod(__words[2]));
         __ffs = TFlt(std::stod(__words[3]));
         __lane_flow_cap = TFlt(std::stod(__words[4]));
@@ -98,11 +107,19 @@ int MNM_IO::build_link_factory(std::string file_folder, MNM_ConfReader *conf_rea
         if (__type == "PQ"){
           link_factory -> make_link(__link_ID, MNM_TYPE_PQ, __lane_hold_cap, __lane_flow_cap, __number_of_lane, 
                                     __length, __ffs, __unit_time, __flow_scalar);
+          continue;
         }
         if (__type =="CTM"){
           link_factory -> make_link(__link_ID, MNM_TYPE_CTM, __lane_hold_cap, __lane_flow_cap, __number_of_lane, 
                                     __length, __ffs, __unit_time, __flow_scalar);
+          continue;
         }
+        printf("Wrong link type, %s\n", __type.c_str());
+        exit(-1);
+      }
+      else{
+        printf("MNM_IO::build_link_factory::Wrong length of line.\n");
+        exit(-1);        
       }
     }
     __link_file.close();

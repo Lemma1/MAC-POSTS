@@ -44,17 +44,17 @@ int MNM_Dta::hook_up_node_and_link()
   MNM_Dlink *__link;
   // hook up node to link
   for (auto __node_it = m_graph->BegNI(); __node_it < m_graph->EndNI(); __node_it++) {
-    printf("node id %d with out-degree %d and in-degree %d\n",
-      __node_it.GetId(), __node_it.GetOutDeg(), __node_it.GetInDeg());
+    // printf("node id %d with out-degree %d and in-degree %d\n",
+      // __node_it.GetId(), __node_it.GetOutDeg(), __node_it.GetInDeg());
     __node_ID = __node_it.GetId();
     __node = m_node_factory -> get_node(__node_ID);
     for (int e = 0; e < __node_it.GetOutDeg(); ++e) {
-      printf("Out: edge (%d %d)\n", __node_it.GetId(), __node_it.GetOutNId(e));
+      // printf("Out: edge (%d %d)\n", __node_it.GetId(), __node_it.GetOutNId(e));
       __link = m_link_factory -> get_link(__node_it.GetOutEId(e));
       __node -> add_out_link(__link);
     }
     for (int e = 0; e < __node_it.GetInDeg(); ++e) {
-      printf("In: edge (%d %d)\n", __node_it.GetInNId(e), __node_it.GetId());
+      // printf("In: edge (%d %d)\n", __node_it.GetInNId(e), __node_it.GetId());
       __link = m_link_factory -> get_link(__node_it.GetInEId(e));
       __node -> add_in_link(__link);
     }   

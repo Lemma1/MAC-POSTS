@@ -22,6 +22,15 @@ public:
 
 private:
   static std::vector<std::string> split(const std::string &text, char sep);
+  static  std::string inline &ltrim(std::string &s) {s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+        return s;}
+
+  // trim from end
+  static  std::string inline &rtrim(std::string &s) {s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+        return s;}
+
+  // trim from both ends
+  static  std::string inline &trim(std::string &s) {return ltrim(rtrim(s));}
 };
 
 #endif
