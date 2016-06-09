@@ -123,6 +123,7 @@ int  MNM_IO::build_od_factory(std::string file_folder, MNM_ConfReader *conf_read
   TInt __num_of_D = conf_reader -> get_int("num_of_D");
   TFlt __flow_scalar = conf_reader -> get_float("flow_scalar");
   TInt __max_interval = conf_reader -> get_int("max_interval");
+  TInt __frequency = conf_reader -> get_int("assign_frq");
 
   /* build */
   TInt __dest_ID, __origin_ID, __node_ID;
@@ -142,7 +143,7 @@ int  MNM_IO::build_od_factory(std::string file_folder, MNM_ConfReader *conf_read
         std::cout << "Processing: " << __line << "\n";
         __origin_ID = TInt(std::stoi(__words[0]));
         __node_ID = TInt(std::stoi(__words[1]));
-        __origin = od_factory -> make_origin(__origin_ID, __max_interval, __flow_scalar);
+        __origin = od_factory -> make_origin(__origin_ID, __max_interval, __flow_scalar, __frequency);
 
         /* hook up */
         __origin ->  m_origin_node =  (MNM_DMOND*) node_factory -> get_node(__node_ID);

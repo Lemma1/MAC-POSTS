@@ -143,12 +143,10 @@ int MNM_Dta::loading(bool verbose)
   while (__cur_int < 20){
     printf("-------------------------------    Interval %d   ------------------------------ \n", (int)__cur_int);
     // step 1: Origin release vehicle
-    if (__cur_int % m_assign_freq == 0){
-      for (auto __origin_it = m_od_factory -> m_origin_map.begin(); __origin_it != m_od_factory -> m_origin_map.end(); __origin_it++){
-        __origin = __origin_it -> second;
-        __origin -> release(m_veh_factory, __cur_int);
-      }      
-    }
+    for (auto __origin_it = m_od_factory -> m_origin_map.begin(); __origin_it != m_od_factory -> m_origin_map.end(); __origin_it++){
+      __origin = __origin_it -> second;
+      __origin -> release(m_veh_factory, __cur_int);
+    }      
 
     // step 2: route the vehicle
     m_routing -> update_routing();

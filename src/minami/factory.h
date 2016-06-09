@@ -65,7 +65,7 @@ public:
   MNM_OD_Factory();
   ~MNM_OD_Factory();
   MNM_Destination *make_destination(TInt ID);
-  MNM_Origin *make_origin(TInt ID, TInt max_interval, TFlt flow_scalar);
+  MNM_Origin *make_origin(TInt ID, TInt max_interval, TFlt flow_scalar, TInt frequency);
   MNM_Destination *get_destination(TInt ID);
   MNM_Origin *get_origin(TInt ID);
   std::map<TInt, MNM_Origin*> m_origin_map;

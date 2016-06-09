@@ -116,10 +116,10 @@ MNM_Destination *MNM_OD_Factory::make_destination(TInt ID)
 }
 
 
-MNM_Origin *MNM_OD_Factory::make_origin(TInt ID, TInt max_interval, TFlt flow_scalar)
+MNM_Origin *MNM_OD_Factory::make_origin(TInt ID, TInt max_interval, TFlt flow_scalar, TInt frequency)
 {
   MNM_Origin *__origin;
-  __origin = new MNM_Origin(ID, max_interval, flow_scalar);
+  __origin = new MNM_Origin(ID, max_interval, flow_scalar, frequency);
   m_origin_map.insert(std::pair<TInt, MNM_Origin*>(ID, __origin));
   return __origin;
 }

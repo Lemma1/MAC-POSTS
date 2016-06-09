@@ -1,11 +1,16 @@
 #include "od.h"
 
-MNM_Origin::MNM_Origin(TInt ID, TInt max_interval, TFlt flow_scalar)
+MNM_Origin::MNM_Origin(TInt ID, TInt max_interval, TFlt flow_scalar, TInt frequency)
 {
   m_Origin_ID = ID;
   m_max_assign_interval = max_interval;
   m_flow_scalar = flow_scalar;
   m_current_assign_interval = 0;
+  if (frequency <= 0){
+    printf("MNM_Origin::MNM_Origin::Wrong frequency.\n");
+    exit(-1);
+  }
+  m_frequency = frequency;
   m_demand = std::map<MNM_Destination*, TFlt*>();
 }
 
@@ -26,7 +31,7 @@ int MNM_Origin::add_dest_demand(MNM_Destination *dest, TFlt* demand)
 
 int MNM_Origin::release(MNM_Veh_Factory* veh_factory, TInt current_interval)
 {
-  if (m_current_assign_interval < m_max_assign_interval){
+  if (m_current_assign_interval < m_max_assign_interval && current_interval % m_frequency == 0){
     TInt __veh_to_release;
     MNM_Veh *__veh;
     std::map<MNM_Destination*, TFlt*>::iterator __demand_it;

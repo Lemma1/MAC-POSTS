@@ -206,8 +206,11 @@ int MNM_Dnode_Inout::round_flow_to_vehicle()
       __to_move += m_veh_tomove[i * __offset + j];
       // printf("Rounding %d, %d the value %f to %d\n", i, j, m_veh_flow[i * __offset + j] * m_flow_scalar, m_veh_tomove[i * __offset + j]);
     }
-    while (TFlt(__to_move) > __out_link -> get_link_supply()){
+    // printf("Going to loop %d vs supply %f\n", __to_move, __out_link -> get_link_supply());
+    while (TFlt(__to_move) > (__out_link -> get_link_supply() * m_flow_scalar)){
       __rand_idx = rand() % m_in_link_array.size();
+      
+      
       m_veh_tomove[__rand_idx * __offset + j] -= 1;
       __to_move -= 1;
     }
