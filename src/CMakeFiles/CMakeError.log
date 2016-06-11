@@ -1,9 +1,0 @@
-Determining if files pthread.h exist failed with the following output:
-
-Source:
-/* */
-#include <pthread.h>
-
-
-int main(void){return 0;}
-

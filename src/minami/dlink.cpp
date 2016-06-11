@@ -227,6 +227,16 @@ TFlt MNM_Dlink_Ctm::Ctm_Cell::get_supply()
     return std::min(m_flow_cap, TFlt(m_hold_cap - __real_volume));
 }
 
+
+TFlt MNM_Dlink_Ctm::get_link_flow()
+{
+  TInt __total_volume = 0;
+  for (int i = 0; i < m_num_cells; ++i){
+    __total_volume += m_cell_array[i] -> m_volume;
+  }
+  return TFlt(__total_volume) / m_flow_scalar;
+}
+
 /**************************************************************************
                           Poing Queue
 **************************************************************************/
@@ -294,4 +304,9 @@ int MNM_Dlink_Pq::evolve(TInt timestamp)
   m_volume = TInt(m_finished_array.size() + m_veh_queue.size());
 
   return 0;
+}
+
+TFlt MNM_Dlink_Pq::get_link_flow()
+{
+  return TFlt(m_volume) / m_flow_scalar;
 }

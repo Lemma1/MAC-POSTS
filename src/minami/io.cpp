@@ -29,7 +29,7 @@ int MNM_IO::build_node_factory(std::string file_folder, MNM_ConfReader *conf_rea
       std::getline(__node_file,__line);
       __words = split(__line, ' ');
       if (__words.size() == 2) {
-        std::cout << "Processing: " << __line << "\n";
+        // std::cout << "Processing: " << __line << "\n";
         __node_ID = TInt(std::stoi(__words[0]));
         __type = trim(__words[1]);
         if (__type == "FWJ"){
@@ -88,7 +88,7 @@ int MNM_IO::build_link_factory(std::string file_folder, MNM_ConfReader *conf_rea
       std::getline(__link_file,__line);
       __words = split(__line, ' ');
       if (__words.size() == 7) {
-        std::cout << "Processing: " << __line << "\n";
+        // std::cout << "Processing: " << __line << "\n";
         __link_ID = TInt(std::stoi(__words[0]));
         __type = trim(__words[1]);
         __length = TFlt(std::stod(__words[2]));
@@ -152,12 +152,12 @@ int  MNM_IO::build_od_factory(std::string file_folder, MNM_ConfReader *conf_read
   {
     printf("Start build Origin-Destination factory.\n");
     std::getline(__od_file,__line); //skip the first line
-    printf("Processing Origin node.\n");
+    // printf("Processing Origin node.\n");
     for (int i=0; i < __num_of_O; ++i){
       std::getline(__od_file,__line);
       __words = split(__line, ' ');
       if (__words.size() == 2) {
-        std::cout << "Processing: " << __line << "\n";
+        // std::cout << "Processing: " << __line << "\n";
         __origin_ID = TInt(std::stoi(__words[0]));
         __node_ID = TInt(std::stoi(__words[1]));
         __origin = od_factory -> make_origin(__origin_ID, __max_interval, __flow_scalar, __frequency);
@@ -168,12 +168,12 @@ int  MNM_IO::build_od_factory(std::string file_folder, MNM_ConfReader *conf_read
       }
     }
     std::getline(__od_file,__line); // skip another line
-    printf("Processing Destination node.\n");
+    // printf("Processing Destination node.\n");
     for (int i=0; i < __num_of_D; ++i){
       std::getline(__od_file,__line);
       __words = split(__line, ' ');
       if (__words.size() == 2) {
-        std::cout << "Processing: " << __line << "\n";
+        // std::cout << "Processing: " << __line << "\n";
         __dest_ID = TInt(std::stoi(__words[0]));
         __node_ID = TInt(std::stoi(__words[1]));
         __dest = od_factory -> make_destination(__dest_ID);
@@ -209,7 +209,7 @@ PNEGraph MNM_IO::build_graph(std::string file_folder, MNM_ConfReader *conf_reade
     std::getline(__graph_file,__line);
     __words = split(__line, ' ');
     if (__words.size() == 3){
-      std::cout << "Processing: " << __line << "\n";
+      // std::cout << "Processing: " << __line << "\n";
       __link_ID = TInt(std::stoi(__words[0]));
       __from_ID = TInt(std::stoi(__words[1]));
       __to_ID = TInt(std::stoi(__words[2]));

@@ -1,1 +1,0 @@
-/home/weima/MINAMI/src/minami/CMakeFiles/helloDemo.dir

@@ -4,14 +4,12 @@
 #include "Snap.h"
 #include "dlink.h"
 #include "od.h"
-#include "vehicle.h"
 #include "dnode.h"
 #include "factory.h"
 #include "ults.h"
 #include "io.h"
 #include "statistics.h"
 #include "routing.h"
-
 
 
 #include <string>
@@ -27,6 +25,7 @@ public:
   int hook_up_node_and_link();
   int loading(bool verbose);
 private:
+  int set_statistics();
   TFlt m_unit_time;
   TFlt m_flow_scalar;
   TInt m_assign_freq;

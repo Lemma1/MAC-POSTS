@@ -59,8 +59,6 @@ dlink.h
 /home/weima/MINAMI/src/minami/dlink.h
 od.h
 /home/weima/MINAMI/src/minami/od.h
-vehicle.h
-/home/weima/MINAMI/src/minami/vehicle.h
 dnode.h
 /home/weima/MINAMI/src/minami/dnode.h
 factory.h
@@ -75,6 +73,8 @@ routing.h
 /home/weima/MINAMI/src/minami/routing.h
 string
 -
+
+/home/weima/MINAMI/src/minami/enum.h
 
 /home/weima/MINAMI/src/minami/factory.cpp
 factory.h
@@ -153,6 +153,22 @@ statistics.h
 /home/weima/MINAMI/src/minami/statistics.h
 
 /home/weima/MINAMI/src/minami/statistics.h
+Snap.h
+/home/weima/MINAMI/src/minami/Snap.h
+dnode.h
+/home/weima/MINAMI/src/minami/dnode.h
+dlink.h
+/home/weima/MINAMI/src/minami/dlink.h
+factory.h
+/home/weima/MINAMI/src/minami/factory.h
+enum.h
+/home/weima/MINAMI/src/minami/enum.h
+string
+-
+iostream
+-
+fstream
+-
 
 /home/weima/MINAMI/src/minami/test_dta.cpp
 dta.h
@@ -657,8 +673,6 @@ snap-core/cmty.h
 snap-core/cncom.h
 
 snap-core/coreper.h
-
-snap-core/enum.h
 
 snap-core/ff.h
 bd.h

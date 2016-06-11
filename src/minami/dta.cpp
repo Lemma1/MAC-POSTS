@@ -13,14 +13,24 @@ int MNM_Dta::initialize()
   m_link_factory = new MNM_Link_Factory();
   m_od_factory = new MNM_OD_Factory();
   m_config = new MNM_ConfReader(m_file_folder + "/config.conf", "DTA");
-  m_statistics = new MNM_Statistics();
+  
   m_unit_time = m_config -> get_int("unit_time");
   m_flow_scalar = m_config -> get_int("flow_scalar");
   m_assign_freq = m_config -> get_int("assign_frq");
-
+  set_statistics();
   return 0;
 }
 
+int MNM_Dta::set_statistics()
+{
+  MNM_ConfReader *__record_config = new MNM_ConfReader(m_file_folder + "/config.conf", "STAT");
+  if (__record_config -> get_string("rec_mode") == "LRn"){
+    m_statistics = new MNM_Statistics_Lrn(m_file_folder, m_config, __record_config,
+                                   m_od_factory, m_node_factory, m_link_factory);
+  }
+  printf("finished\n");
+  return 0;
+}
 
 int MNM_Dta::build_from_files()
 {
@@ -134,6 +144,7 @@ int MNM_Dta::loading(bool verbose)
 
   printf("MNM: Prepare loading!\n");
   m_routing -> init_routing();
+  m_statistics -> init_record();
   for (auto __node_it = m_node_factory -> m_node_map.begin(); __node_it != m_node_factory -> m_node_map.end(); __node_it++){
     __node = __node_it -> second;
     __node -> prepare_loading();
@@ -172,8 +183,12 @@ int MNM_Dta::loading(bool verbose)
       __dest -> receive(__cur_int);
     }
 
+    // step 5: update record
+    m_statistics -> update_record(__cur_int);
+
     __cur_int ++;
   }
 
+  m_statistics -> post_record();
   return 0;
 }
