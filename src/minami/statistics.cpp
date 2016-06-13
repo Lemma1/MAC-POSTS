@@ -125,7 +125,6 @@ int MNM_Statistics::post_record()
 {
   if (m_record_volume){
     if (m_load_interval_volume_file.is_open()){
-      printf("Closed\n");
       m_load_interval_volume_file.close();
     }
     if (m_record_interval_volume_file.is_open()) m_record_interval_volume_file.close();

@@ -1,1 +1,0 @@
-g++  -fPIC -g -Wall  -shared -Wl,-soname,libspdlog.so -o libspdlog.so  

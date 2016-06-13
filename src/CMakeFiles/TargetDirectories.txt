@@ -1,4 +1,0 @@
-/home/weima/MINAMI/src/snap-core/CMakeFiles/Snap.dir
-/home/weima/MINAMI/src/glib-core/CMakeFiles/Glib.dir
-/home/weima/MINAMI/src/minami/CMakeFiles/dta.dir
-/home/weima/MINAMI/src/3rdparty/g3log/CMakeFiles/g3log.dir
