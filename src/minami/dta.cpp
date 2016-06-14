@@ -160,7 +160,7 @@ int MNM_Dta::loading(bool verbose)
     }      
 
     // step 2: route the vehicle
-    m_routing -> update_routing();
+    m_routing -> update_routing(__cur_int);
 
     // step 3: move vehicles through node
     for (auto __node_it = m_node_factory -> m_node_map.begin(); __node_it != m_node_factory -> m_node_map.end(); __node_it++){

@@ -19,8 +19,10 @@ public:
   ~MNM_Statistics();
 
   /* may or may not be initialized */
-  std::map<MNM_Dlink*, TFlt> m_load_interval_volume;
-  std::map<MNM_Dlink*, TFlt> m_record_interval_volume;
+  std::map<TInt, TFlt> m_load_interval_volume;
+  std::map<TInt, TFlt> m_record_interval_volume;
+  std::map<TInt, TFlt> m_record_interval_tt;
+  std::map<TInt, TFlt> m_load_interval_tt;
 
   /* universal function */
   int record_loading_interval_condition(TInt timestamp);
@@ -31,6 +33,7 @@ public:
 protected:
   int init_record_value();
   bool m_record_volume;
+  bool m_record_tt;
   std::string m_file_folder;
   Record_type m_record_type;
   MNM_ConfReader *m_self_config;
@@ -41,6 +44,8 @@ protected:
 
   std::ofstream m_load_interval_volume_file;
   std::ofstream m_record_interval_volume_file;
+  std::ofstream m_load_interval_tt_file;
+  std::ofstream m_record_interval_tt_file;
 
 };
 
@@ -56,6 +61,7 @@ public:
   int virtual post_record();
 private:
   TInt m_n;
-  std::map<MNM_Dlink*, TFlt> m_to_be_volume;
+  std::map<TInt, TFlt> m_to_be_volume;
+  std::map<TInt, TFlt> m_to_be_tt;
 };
 #endif

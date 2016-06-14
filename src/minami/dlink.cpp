@@ -1,4 +1,5 @@
 #include "dlink.h"
+#include "limits.h"
 
 MNM_Dlink::MNM_Dlink( TInt ID,
                       TInt number_of_lane,
@@ -237,6 +238,29 @@ TFlt MNM_Dlink_Ctm::get_link_flow()
   return TFlt(__total_volume) / m_flow_scalar;
 }
 
+
+TFlt MNM_Dlink_Ctm::get_link_tt()
+{
+  TFlt __cost, __spd;
+  TFlt __rho  = get_link_flow()/m_number_of_lane/m_length/m_flow_scalar;// get the density in veh/mile
+  TFlt __rhoj = m_lane_hold_cap; //get the jam density
+  TFlt __rhok = m_lane_flow_cap/m_ffs; //get the critical density
+  //  if (abs(rho - rhok) <= 0.0001) cost = POS_INF_INT;
+  if (__rho >= __rhoj) {
+    __cost = DBL_MAX; //sean: i think we should use rhoj, not rhok
+  } 
+  else {
+    if (__rho <= __rhok) {
+      __spd = m_ffs;
+    }
+    else {
+      __spd = MNM_Ults::max(0.001*m_ffs, m_lane_flow_cap *(__rhoj - __rho)/((__rhoj - __rhok)*__rho));
+    }
+    __cost = m_length/__spd;
+  } 
+  return __cost;
+}
+
 /**************************************************************************
                           Poing Queue
 **************************************************************************/
@@ -310,3 +334,30 @@ TFlt MNM_Dlink_Pq::get_link_flow()
 {
   return TFlt(m_volume) / m_flow_scalar;
 }
+
+
+
+TFlt MNM_Dlink_Pq::get_link_tt()
+{
+  TFlt __cost, __spd;
+  TFlt __rho  = m_volume/m_number_of_lane/m_length/m_flow_scalar;// get the density in veh/mile
+  TFlt __rhoj = m_lane_hold_cap; //get the jam density
+  TFlt __rhok = m_lane_flow_cap/m_ffs; //get the critical density
+  //  if (abs(rho - rhok) <= 0.0001) cost = POS_INF_INT;
+  if (__rho >= __rhoj) {
+    __cost = DBL_MAX; //sean: i think we should use rhoj, not rhok
+  } 
+  else {
+    if (__rho <= __rhok) {
+      __spd = m_ffs;
+    }
+    else {
+      __spd = MNM_Ults::max(DBL_EPSILON * m_ffs, m_lane_flow_cap *(__rhoj - __rho)/((__rhoj - __rhok)*__rho));
+    }
+    __cost = m_length/__spd;
+  } 
+  return __cost;
+}
+
+
+

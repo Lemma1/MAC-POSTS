@@ -20,6 +20,11 @@ TFlt MNM_Ults::min(TFlt a, TFlt b)
   return a<b? a:b;
 }
 
+TFlt MNM_Ults::max(TFlt a, TFlt b)
+{
+  return a>b? a:b;
+}
+
 TFlt MNM_Ults::divide(TFlt a, TFlt b){
   if (a == TFlt(0)) return TFlt(0);
   return a/b;

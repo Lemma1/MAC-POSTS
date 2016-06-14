@@ -28,6 +28,7 @@ public:
   void virtual print_info(){};
   int hook_up_node(MNM_Dnode *from, MNM_Dnode *to);
   TFlt virtual get_link_flow(){return TFlt(0);};
+  TFlt virtual get_link_tt(){return TFlt(0);};
 // protected:
   TInt m_link_ID;
   MNM_Dnode *m_from_node;
@@ -60,6 +61,7 @@ public:
   int virtual clear_incoming_array();
   void virtual print_info();
   TFlt virtual get_link_flow();
+  TFlt virtual get_link_tt();
 
 private:
   class Ctm_Cell;
@@ -113,6 +115,7 @@ public:
   int virtual clear_incoming_array();
   void virtual print_info();
   TFlt virtual get_link_flow();
+  TFlt virtual get_link_tt();
 private:
   std::map<MNM_Veh*, TInt> m_veh_queue;
   TInt m_volume; //vehicle number, without the flow scalar

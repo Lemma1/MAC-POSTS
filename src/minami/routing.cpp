@@ -38,7 +38,7 @@ int MNM_Routing_Random::init_routing()
 }
 
 
-int MNM_Routing_Random::update_routing()
+int MNM_Routing_Random::update_routing(TInt Timestamp)
 {
   MNM_Origin *__origin;
   MNM_DMOND *__origin_node;
@@ -82,3 +82,27 @@ int MNM_Routing_Random::update_routing()
   return 0;
 }
 
+/**************************************************************************
+                          Hybrid rouing
+**************************************************************************/
+
+MNM_Routing_Hybrid::MNM_Routing_Hybrid(PNEGraph &graph, MNM_Statistics* statistics, MNM_OD_Factory *od_factory, MNM_Link_Factory *link_factory)
+  : MNM_Routing::MNM_Routing(graph, statistics, od_factory, link_factory)
+{
+
+}
+
+MNM_Routing_Hybrid::~MNM_Routing_Hybrid()
+{
+
+}
+
+int MNM_Routing_Hybrid::init_routing()
+{
+  return 0;
+}
+
+int MNM_Routing_Hybrid::update_routing(TInt Timestamp)
+{
+  return 0;
+}
