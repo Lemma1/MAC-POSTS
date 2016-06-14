@@ -238,7 +238,7 @@ int MNM_Statistics_Lrn::update_record(TInt timestamp)
   MNM_Dlink *__link;
   TFlt __flow;
   if (m_record_volume){
-    if ((timestamp + 1) % m_n == 0){
+    if ((timestamp + 1) % m_n == 0 || timestamp == 0){
       for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
         __link = __link_it -> second;
         __flow = __link -> get_link_flow();
@@ -257,7 +257,7 @@ int MNM_Statistics_Lrn::update_record(TInt timestamp)
     }
   } 
   if (m_record_tt){
-    if ((timestamp + 1) % m_n == 0){
+    if ((timestamp + 1) % m_n == 0 || timestamp == 0){
       for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
         __link = __link_it -> second;
         __flow = __link -> get_link_tt();

@@ -283,6 +283,30 @@ routing.cpp.s:
 	cd /home/weima/MINAMI/build && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/routing.cpp.s
 .PHONY : routing.cpp.s
 
+shortest_path.o: shortest_path.cpp.o
+.PHONY : shortest_path.o
+
+# target to build an object file
+shortest_path.cpp.o:
+	cd /home/weima/MINAMI/build && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/shortest_path.cpp.o
+.PHONY : shortest_path.cpp.o
+
+shortest_path.i: shortest_path.cpp.i
+.PHONY : shortest_path.i
+
+# target to preprocess a source file
+shortest_path.cpp.i:
+	cd /home/weima/MINAMI/build && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/shortest_path.cpp.i
+.PHONY : shortest_path.cpp.i
+
+shortest_path.s: shortest_path.cpp.s
+.PHONY : shortest_path.s
+
+# target to generate assembly for a file
+shortest_path.cpp.s:
+	cd /home/weima/MINAMI/build && $(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/shortest_path.cpp.s
+.PHONY : shortest_path.cpp.s
+
 statistics.o: statistics.cpp.o
 .PHONY : statistics.o
 
@@ -409,6 +433,9 @@ help:
 	@echo "... routing.o"
 	@echo "... routing.i"
 	@echo "... routing.s"
+	@echo "... shortest_path.o"
+	@echo "... shortest_path.i"
+	@echo "... shortest_path.s"
 	@echo "... statistics.o"
 	@echo "... statistics.i"
 	@echo "... statistics.s"

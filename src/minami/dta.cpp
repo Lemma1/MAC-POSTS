@@ -17,7 +17,8 @@ int MNM_Dta::initialize()
   m_unit_time = m_config -> get_int("unit_time");
   m_flow_scalar = m_config -> get_int("flow_scalar");
   m_assign_freq = m_config -> get_int("assign_frq");
-  set_statistics();
+  
+
   return 0;
 }
 
@@ -32,6 +33,15 @@ int MNM_Dta::set_statistics()
   return 0;
 }
 
+int MNM_Dta::set_routing()
+{
+  if (m_config -> get_string("routing_type") == "Hybrid"){
+    m_routing = new MNM_Routing_Hybrid(m_file_folder, m_graph, m_statistics,
+                                   m_od_factory, m_node_factory, m_link_factory);
+  }
+  return 0;  
+}
+
 int MNM_Dta::build_from_files()
 {
   MNM_IO::build_node_factory(m_file_folder, m_config, m_node_factory);
@@ -42,8 +52,10 @@ int MNM_Dta::build_from_files()
   // std::cout << test_dta -> m_od_factory -> m_origin_map.size() << "\n";
   // std::cout << test_dta -> m_od_factory -> m_destination_map.size() << "\n";
   m_graph = MNM_IO::build_graph(m_file_folder, m_config);
-  m_routing = new MNM_Routing_Random(m_graph, m_statistics, m_od_factory, m_link_factory);
+  // m_routing = new MNM_Routing_Random(m_graph, m_statistics, m_od_factory, m_link_factory);
   MNM_IO::build_demand(m_file_folder, m_config, m_od_factory);
+  set_statistics();
+  set_routing();
   return 0;  
 }
 
@@ -186,9 +198,25 @@ int MNM_Dta::loading(bool verbose)
     // step 5: update record
     m_statistics -> update_record(__cur_int);
 
+    // test();
     __cur_int ++;
   }
 
   m_statistics -> post_record();
   return 0;
 }
+
+
+
+// int MNM_Dta::test()
+// {
+//   auto output_map = std::map<TInt, TInt>();
+//   MNM_Shortest_Path::all_to_one(4, 
+//                         m_graph, m_statistics -> m_load_interval_tt,
+//                         output_map);
+//   for (auto _it = output_map.begin(); _it!=output_map.end(); _it++){
+//     printf("For node %d, it should head to %d\n", _it -> first, _it -> second);
+//   }
+//   return 0;
+// }
+

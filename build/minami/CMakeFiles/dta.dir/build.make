@@ -302,6 +302,29 @@ minami/CMakeFiles/dta.dir/statistics.cpp.o.provides: minami/CMakeFiles/dta.dir/s
 
 minami/CMakeFiles/dta.dir/statistics.cpp.o.provides.build: minami/CMakeFiles/dta.dir/statistics.cpp.o
 
+minami/CMakeFiles/dta.dir/shortest_path.cpp.o: minami/CMakeFiles/dta.dir/flags.make
+minami/CMakeFiles/dta.dir/shortest_path.cpp.o: /home/weima/MINAMI/src/minami/shortest_path.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/weima/MINAMI/build/CMakeFiles $(CMAKE_PROGRESS_12)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object minami/CMakeFiles/dta.dir/shortest_path.cpp.o"
+	cd /home/weima/MINAMI/build/minami && g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/dta.dir/shortest_path.cpp.o -c /home/weima/MINAMI/src/minami/shortest_path.cpp
+
+minami/CMakeFiles/dta.dir/shortest_path.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/dta.dir/shortest_path.cpp.i"
+	cd /home/weima/MINAMI/build/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/weima/MINAMI/src/minami/shortest_path.cpp > CMakeFiles/dta.dir/shortest_path.cpp.i
+
+minami/CMakeFiles/dta.dir/shortest_path.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/dta.dir/shortest_path.cpp.s"
+	cd /home/weima/MINAMI/build/minami && g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/weima/MINAMI/src/minami/shortest_path.cpp -o CMakeFiles/dta.dir/shortest_path.cpp.s
+
+minami/CMakeFiles/dta.dir/shortest_path.cpp.o.requires:
+.PHONY : minami/CMakeFiles/dta.dir/shortest_path.cpp.o.requires
+
+minami/CMakeFiles/dta.dir/shortest_path.cpp.o.provides: minami/CMakeFiles/dta.dir/shortest_path.cpp.o.requires
+	$(MAKE) -f minami/CMakeFiles/dta.dir/build.make minami/CMakeFiles/dta.dir/shortest_path.cpp.o.provides.build
+.PHONY : minami/CMakeFiles/dta.dir/shortest_path.cpp.o.provides
+
+minami/CMakeFiles/dta.dir/shortest_path.cpp.o.provides.build: minami/CMakeFiles/dta.dir/shortest_path.cpp.o
+
 # Object files for target dta
 dta_OBJECTS = \
 "CMakeFiles/dta.dir/test_dta.cpp.o" \
@@ -314,7 +337,8 @@ dta_OBJECTS = \
 "CMakeFiles/dta.dir/ults.cpp.o" \
 "CMakeFiles/dta.dir/io.cpp.o" \
 "CMakeFiles/dta.dir/routing.cpp.o" \
-"CMakeFiles/dta.dir/statistics.cpp.o"
+"CMakeFiles/dta.dir/statistics.cpp.o" \
+"CMakeFiles/dta.dir/shortest_path.cpp.o"
 
 # External object files for target dta
 dta_EXTERNAL_OBJECTS =
@@ -330,6 +354,7 @@ minami/dta: minami/CMakeFiles/dta.dir/ults.cpp.o
 minami/dta: minami/CMakeFiles/dta.dir/io.cpp.o
 minami/dta: minami/CMakeFiles/dta.dir/routing.cpp.o
 minami/dta: minami/CMakeFiles/dta.dir/statistics.cpp.o
+minami/dta: minami/CMakeFiles/dta.dir/shortest_path.cpp.o
 minami/dta: minami/CMakeFiles/dta.dir/build.make
 minami/dta: snap-core/libSnap.so
 minami/dta: 3rdparty/g3log/libg3log.a
@@ -353,6 +378,7 @@ minami/CMakeFiles/dta.dir/requires: minami/CMakeFiles/dta.dir/ults.cpp.o.require
 minami/CMakeFiles/dta.dir/requires: minami/CMakeFiles/dta.dir/io.cpp.o.requires
 minami/CMakeFiles/dta.dir/requires: minami/CMakeFiles/dta.dir/routing.cpp.o.requires
 minami/CMakeFiles/dta.dir/requires: minami/CMakeFiles/dta.dir/statistics.cpp.o.requires
+minami/CMakeFiles/dta.dir/requires: minami/CMakeFiles/dta.dir/shortest_path.cpp.o.requires
 .PHONY : minami/CMakeFiles/dta.dir/requires
 
 minami/CMakeFiles/dta.dir/clean:

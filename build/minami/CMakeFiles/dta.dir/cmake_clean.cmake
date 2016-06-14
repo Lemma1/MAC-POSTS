@@ -10,6 +10,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/dta.dir/io.cpp.o"
   "CMakeFiles/dta.dir/routing.cpp.o"
   "CMakeFiles/dta.dir/statistics.cpp.o"
+  "CMakeFiles/dta.dir/shortest_path.cpp.o"
   "dta.pdb"
   "dta"
 )
