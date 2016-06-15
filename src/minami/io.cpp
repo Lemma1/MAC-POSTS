@@ -249,6 +249,7 @@ int MNM_IO::build_demand(std::string file_folder, MNM_ConfReader *conf_reader, M
     std::getline(__demand_file,__line); //skip the first line
     for (int i=0; i < __num_OD; ++i){
       std::getline(__demand_file,__line);
+      // std::cout << "Processing: " << __line << "\n";
       __words = split(__line, ' ');
       if (TInt(__words.size()) == (__max_interval + 2)) {
         __O_ID = TInt(std::stoi(__words[0]));

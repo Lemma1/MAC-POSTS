@@ -16,7 +16,10 @@ MNM_Origin::MNM_Origin(TInt ID, TInt max_interval, TFlt flow_scalar, TInt freque
 
 MNM_Origin::~MNM_Origin()
 {
-
+  for (auto __demand_it = m_demand.begin(); __demand_it != m_demand.end(); __demand_it++) {
+    free(__demand_it -> second);
+  }
+  m_demand.clear();
 }
 
 int MNM_Origin::add_dest_demand(MNM_Destination *dest, TFlt* demand)
@@ -67,6 +70,7 @@ int MNM_Destination::receive(TInt current_interval)
   for (size_t i=0; i < __num_to_receive; ++i){
     __veh = m_dest_node -> m_out_veh_queue.front();
     if (__veh -> get_destionation() != this){
+      printf("The veh is heading to %d, but we are %d\n", __veh -> get_destionation() -> m_dest_node -> m_node_ID, m_dest_node -> m_node_ID);
       printf("MNM_Destination::receive: Something wrong!\n");
       exit(-1);
     }

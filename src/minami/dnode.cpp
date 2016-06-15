@@ -29,8 +29,14 @@ MNM_DMOND::MNM_DMOND(TInt ID, TFlt flow_scalar)
 
 int MNM_DMOND::evolve(TInt timestamp)
 {
+  MNM_Dlink *__link, *__to_link;
+
+  for (unsigned i=0; i<m_out_link_array.size(); ++i){
+    __link = m_out_link_array[i];
+    m_out_volume.find(__link) -> second = 0;
+  }  
+
   /* compute our flow */
-  MNM_Dlink *__link;
   std::deque<MNM_Veh*>::iterator __que_it = m_in_veh_queue.begin();
   while (__que_it != m_in_veh_queue.end()) {
     __link = (*__que_it) -> get_next_link();
@@ -44,21 +50,40 @@ int MNM_DMOND::evolve(TInt timestamp)
     }
   }
   /* move vehicle */
-  __que_it = m_in_veh_queue.begin();
-  TInt __count;
-  while (__que_it != m_in_veh_queue.end()) {
-    __link = (*__que_it) -> get_next_link();
-    __count = m_out_volume.find(__link) -> second;
-    if (__count > 0){
-      __link -> m_incoming_array.push_back(*__que_it);
-      (*__que_it) -> set_current_link(__link);
-      __que_it = m_in_veh_queue.erase(__que_it); //c++ 11
-      m_out_volume.find(__link) -> second -= 1;
-    }
-    else{
-      __que_it++;
+  MNM_Veh *__veh;
+  for (unsigned i=0; i<m_out_link_array.size(); ++i){
+    __link = m_out_link_array[i];
+    __que_it = m_in_veh_queue.begin();
+    while (__que_it != m_in_veh_queue.end()) {
+      if (m_out_volume.find(__to_link) -> second > 0){
+        __veh = *__que_it;
+        __to_link = __veh -> get_next_link();
+        if (__to_link == __link){
+           __to_link -> m_incoming_array.push_back(__veh);
+          (__veh) -> set_current_link(__to_link);
+          __que_it = m_in_veh_queue.erase(__que_it); //c++ 11
+          m_out_volume.find(__to_link) -> second -= 1;
+        }
+        else{
+          __que_it++;
+        }
+      }
+      else{
+        break; //break whill loop
+      }
+
     }
   }
+
+  // for (unsigned i=0; i<m_out_link_array.size(); ++i){
+  //   __link = m_out_link_array[i];
+  //   if (m_out_volume.find(__link) -> second != 0){
+  //     printf("Something wrong in moving vehicles on DMOND\n");
+  //     printf("Remaining out volume in link %d is %d\n", (int)__link -> m_link_ID, (int)m_out_volume.find(__link) -> second);
+  //     exit(-1);
+  //   }
+  // }  
+
   return 0;
 }
 
@@ -101,12 +126,17 @@ int MNM_DMDND::evolve(TInt timestamp)
 {
   MNM_Dlink *__link;
   MNM_Veh *__veh;
-  unsigned __size;
-  for (unsigned i=0; i<m_in_link_array.size(); ++i){
+  size_t __size;
+  // printf("in link size:%d\n", m_in_link_array.size());
+  for (size_t i = 0; i<m_in_link_array.size(); ++i){
     __link = m_in_link_array[i];
     __size = __link->m_finished_array.size();
-    for (unsigned j=0; j<__size; ++j){
+    for (size_t j=0; j<__size; ++j){
       __veh = __link->m_finished_array.front();
+      if (__veh -> get_next_link() != NULL){
+        printf("Something wrong in DMDND evolve\n");
+        exit(-1);
+      }
       m_out_veh_queue.push_back(__veh);
       __veh -> set_current_link(NULL);
       __link -> m_finished_array.pop_front();
@@ -151,11 +181,12 @@ int MNM_Dnode_Inout::prepare_loading()
 {
   TInt __num_in = m_in_link_array.size();
   TInt __num_out = m_out_link_array.size();
+  // printf("num_in: %d, num_out: %d\n", __num_in, __num_out);
   m_demand = (TFlt*) malloc(sizeof(TFlt) * __num_in * __num_out);
   memset(m_demand, 0x0, sizeof(TFlt) * __num_in * __num_out);
   m_supply = (TFlt*) malloc(sizeof(TFlt) * __num_out);
   memset(m_supply, 0x0, sizeof(TFlt) * __num_out);
-  m_veh_flow = (TFlt*) malloc(sizeof(TFlt) * __num_out);
+  m_veh_flow = (TFlt*) malloc(sizeof(TFlt) * __num_in * __num_out);
   memset(m_veh_flow, 0x0, sizeof(TFlt) * __num_in * __num_out);
   m_veh_tomove = (TInt*) malloc(sizeof(TInt) * __num_in * __num_out);
   memset(m_veh_tomove, 0x0, sizeof(TInt) * __num_in * __num_out);
@@ -164,6 +195,7 @@ int MNM_Dnode_Inout::prepare_loading()
 
 int MNM_Dnode_Inout::prepare_supplyANDdemand()
 {
+  // printf("MNM_Dnode_Inout::prepare_supplyANDdemand\n");
    /* calculate demand */
   size_t __offset = m_out_link_array.size();
   TInt __count;
@@ -192,6 +224,7 @@ int MNM_Dnode_Inout::prepare_supplyANDdemand()
 
 int MNM_Dnode_Inout::round_flow_to_vehicle()
 {
+  // printf("MNM_Dnode_Inout::round_flow_to_vehicle\n");
   // the rounding mechanism may cause the lack of vehicle in m_finished_array
   // but demand is always a integer and only supply can be float, so don't need to worry about it
   size_t __offset = m_out_link_array.size();
@@ -209,10 +242,10 @@ int MNM_Dnode_Inout::round_flow_to_vehicle()
     // printf("Going to loop %d vs supply %f\n", __to_move, __out_link -> get_link_supply());
     while (TFlt(__to_move) > (__out_link -> get_link_supply() * m_flow_scalar)){
       __rand_idx = rand() % m_in_link_array.size();
-      
-      
-      m_veh_tomove[__rand_idx * __offset + j] -= 1;
-      __to_move -= 1;
+      if (m_veh_tomove[__rand_idx * __offset + j] >= 1){
+        m_veh_tomove[__rand_idx * __offset + j] -= 1;
+        __to_move -= 1;
+      }
     }
     // printf("Rounding %d, %d the value %f to %d\n", i, j, m_veh_flow[i * __offset + j] * m_flow_scalar, m_veh_tomove[i * __offset + j]);
   }
@@ -221,9 +254,9 @@ int MNM_Dnode_Inout::round_flow_to_vehicle()
 
 int MNM_Dnode_Inout::move_vehicle()
 {
+  // printf("MNM_Dnode_Inout::move_vehicle\n");
   MNM_Dlink *__in_link, *__out_link;
   MNM_Veh *__veh;
-  size_t __size;
   size_t __offset = m_out_link_array.size();
   TInt __num_to_move;
   for (size_t j=0; j<m_out_link_array.size(); ++j){
@@ -231,22 +264,44 @@ int MNM_Dnode_Inout::move_vehicle()
     for (size_t i=0; i<m_in_link_array.size(); ++i) {
       __in_link = m_in_link_array[i];
       __num_to_move = m_veh_tomove[i * __offset + j];
-      __size = __in_link->m_finished_array.size();
       // printf("In node %d, from link %d to link %d, %d to move\n", m_node_ID, __in_link ->m_link_ID, __out_link->m_link_ID, __num_to_move);
-      for (size_t k=0; k<__size; ++k){
-        if (__num_to_move > 0){
-          __veh = __in_link->m_finished_array.front();
-          __out_link ->m_incoming_array.push_back(__veh);
-          __veh -> set_current_link(__out_link);
-          __in_link -> m_finished_array.pop_front();
-          __num_to_move -= 1;
+      // for (size_t k=0; k<__size; ++k){
+      //   if (__num_to_move > 0){
+      //     __veh = __in_link->m_finished_array[k];
+      //     if (__veh -> get_next_link() == __out_link){
+      //       __out_link ->m_incoming_array.push_back(__veh);
+      //       __veh -> set_current_link(__out_link);
+      //       // __in_link -> m_finished_array.pop_front();
+
+      //       __num_to_move -= 1;            
+      //     }
+      //   }
+      //   else{
+      //     break; // break the inner most structure
+      //   }
+      // }
+      auto __veh_it = __in_link->m_finished_array.begin();
+      while (__veh_it != __in_link->m_finished_array.end()) {
+        if (__num_to_move > 0) {
+          __veh = *__veh_it;
+          if (__veh -> get_next_link() == __out_link){
+            __out_link ->m_incoming_array.push_back(__veh);
+            __veh -> set_current_link(__out_link);
+            __veh_it = __in_link->m_finished_array.erase(__veh_it); //c++ 11
+            __num_to_move -= 1; 
+          }
+          else {
+            __veh_it++;
+          }
         }
         else{
           break; // break the inner most structure
         }
       }
       if (__num_to_move != 0){
-        printf("Something wrong during the vehicle moving.\n");
+        printf("Something wrong during the vehicle moving, remaining to move %d\n", (int)__num_to_move);
+        printf("The finished veh queue is now %d size\n", (int)__in_link->m_finished_array.size());
+        printf("But it is heading to %d\n", (int)__in_link->m_finished_array.front() -> get_next_link() -> m_link_ID);
         exit(-1);
       }
     }
@@ -304,10 +359,11 @@ void MNM_Dnode_FWJ::print_info()
 
 int MNM_Dnode_FWJ::compute_flow()
 {
+  // printf("MNM_Dnode_FWJ::compute_flow\n");
   size_t __offset = m_out_link_array.size();
   TFlt __sum_in_flow, __portion;
   for (size_t j=0; j< m_out_link_array.size(); ++j){
-    __sum_in_flow = 0;
+    __sum_in_flow = TFlt(0);
     for (size_t i=0; i< m_in_link_array.size(); ++i){
       __sum_in_flow += m_demand[i * __offset + j];
     }

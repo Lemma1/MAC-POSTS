@@ -4,7 +4,7 @@ project (MINAMI C CXX)
 find_package(Threads)
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_COMPILER g++)
-set (CMAKE_CXX_FLAGS "-std=c++11 -m64 -Wall -pthread")
+set (CMAKE_CXX_FLAGS "-std=c++11 -m64 -Wall -pthread -O2")
 set (CMAKE_EXE_LIKKER_FLAGS "-pthread")
 
 

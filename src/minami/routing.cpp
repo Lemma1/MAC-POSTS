@@ -99,7 +99,12 @@ MNM_Routing_Hybrid::MNM_Routing_Hybrid(std::string file_folder, PNEGraph &graph,
 
 MNM_Routing_Hybrid::~MNM_Routing_Hybrid()
 {
-
+  for (auto _it = m_od_factory -> m_destination_map.begin(); _it != m_od_factory -> m_destination_map.end(); _it++){
+    m_table -> find(_it -> second) -> second -> clear();
+    free(m_table -> find(_it -> second) -> second);
+  }
+  m_table -> clear();
+  free(m_table);
 }
 
 int MNM_Routing_Hybrid::init_routing()
@@ -120,19 +125,22 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
   MNM_Destination *_dest;
   TInt _dest_node_ID;
   std::map<TInt, TInt> *_shortest_path_tree;
-  if ((timestamp + 1) % m_routing_freq  == 0 || timestamp == 0) {
+  if ((timestamp) % m_routing_freq  == 0 || timestamp == 0) {
+    printf("Calculating the shortest path trees!\n");
     for (auto _it = m_od_factory -> m_destination_map.begin(); _it != m_od_factory -> m_destination_map.end(); _it++){
       _dest = _it -> second;
       _dest_node_ID = _dest -> m_dest_node -> m_node_ID;
+      // printf("Destination ID: %d\n", (int) _dest_node_ID);
       _shortest_path_tree = m_table -> find(_dest) -> second;
-      MNM_Shortest_Path::all_to_one(_dest_node_ID, m_graph, m_statistics -> m_record_interval_tt, *_shortest_path_tree);
-      for (auto _it = _shortest_path_tree -> begin(); _it!=_shortest_path_tree -> end(); _it++){
-      // printf("For node %d, it should head to %d\n", _it -> first, _it -> second);
-  }
+      MNM_Shortest_Path::all_to_one_FIFO(_dest_node_ID, m_graph, m_statistics -> m_record_interval_tt, *_shortest_path_tree);
+  //     for (auto _it = _shortest_path_tree -> begin(); _it!=_shortest_path_tree -> end(); _it++){
+  //     // printf("For node %d, it should head to %d\n", _it -> first, _it -> second);
+  // }
     }
   }
 
   /* route the vehicle in Origin nodes */
+  printf("Routing the vehicle!\n");
   MNM_Origin *_origin;
   MNM_DMOND *_origin_node;
   TInt _node_ID, _next_link_ID;
@@ -145,6 +153,10 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
     for (auto _veh_it = _origin_node -> m_in_veh_queue.begin(); _veh_it!=_origin_node -> m_in_veh_queue.end(); _veh_it++){
       _veh = *_veh_it;
       _next_link_ID = m_table -> find(_veh -> get_destionation()) -> second -> find(_node_ID) -> second;
+      if (_next_link_ID < 0){
+        printf("Something wrong in routing, wrong next link 1\n");
+        exit(-1);
+      }
       _next_link = m_link_factory -> get_link(_next_link_ID);
       _veh -> set_next_link(_next_link);
     }
@@ -163,6 +175,11 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
       }
       else{
         _next_link_ID = m_table -> find(_veh -> get_destionation()) -> second -> find(_node_ID) -> second;
+        if (_next_link_ID == -1){
+          printf("Something wrong in routing, wrong next link 2\n");
+          printf("The node is %d, the vehicle should head to %d\n", (int)_node_ID, (int)_veh_dest -> m_dest_node -> m_node_ID);
+          exit(-1);
+        }
         _next_link = m_link_factory -> get_link(_next_link_ID);
         _veh -> set_next_link(_next_link);
       }

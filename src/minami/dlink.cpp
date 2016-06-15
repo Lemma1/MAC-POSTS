@@ -242,7 +242,7 @@ TFlt MNM_Dlink_Ctm::get_link_flow()
 TFlt MNM_Dlink_Ctm::get_link_tt()
 {
   TFlt __cost, __spd;
-  TFlt __rho  = get_link_flow()/m_number_of_lane/m_length/m_flow_scalar;// get the density in veh/mile
+  TFlt __rho  = get_link_flow()/m_number_of_lane/m_length;// get the density in veh/mile
   TFlt __rhoj = m_lane_hold_cap; //get the jam density
   TFlt __rhok = m_lane_flow_cap/m_ffs; //get the critical density
   //  if (abs(rho - rhok) <= 0.0001) cost = POS_INF_INT;
@@ -340,7 +340,7 @@ TFlt MNM_Dlink_Pq::get_link_flow()
 TFlt MNM_Dlink_Pq::get_link_tt()
 {
   TFlt __cost, __spd;
-  TFlt __rho  = get_link_flow()/m_number_of_lane/m_length/m_flow_scalar;// get the density in veh/mile
+  TFlt __rho  = get_link_flow()/m_number_of_lane/m_length;// get the density in veh/mile
   TFlt __rhoj = m_lane_hold_cap; //get the jam density
   TFlt __rhok = m_lane_flow_cap/m_ffs; //get the critical density
   //  if (abs(rho - rhok) <= 0.0001) cost = POS_INF_INT;

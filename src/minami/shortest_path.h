@@ -16,7 +16,10 @@ public:
   int static one_to_one(TInt origin_node_ID, TInt dest_node_ID, 
                         PNEGraph graph, std::map<TInt, TFlt>& cost_map,
                         std::vector<TInt> &output_array);
-  int static all_to_one(TInt dest_node_ID, 
+  int static all_to_one_Dijkstra(TInt dest_node_ID, 
+                        PNEGraph graph, std::map<TInt, TFlt>& cost_map,
+                        std::map<TInt, TInt> &output_map);
+  int static all_to_one_FIFO(TInt dest_node_ID, 
                         PNEGraph graph, std::map<TInt, TFlt>& cost_map,
                         std::map<TInt, TInt> &output_map);
 };

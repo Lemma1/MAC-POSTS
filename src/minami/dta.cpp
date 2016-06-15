@@ -39,6 +39,8 @@ int MNM_Dta::set_routing()
     m_routing = new MNM_Routing_Hybrid(m_file_folder, m_graph, m_statistics,
                                    m_od_factory, m_node_factory, m_link_factory);
   }
+  // m_routing = new MNM_Routing_Random(m_graph, m_statistics, m_od_factory, m_node_factory, m_link_factory);
+
   return 0;  
 }
 
@@ -52,7 +54,6 @@ int MNM_Dta::build_from_files()
   // std::cout << test_dta -> m_od_factory -> m_origin_map.size() << "\n";
   // std::cout << test_dta -> m_od_factory -> m_destination_map.size() << "\n";
   m_graph = MNM_IO::build_graph(m_file_folder, m_config);
-  // m_routing = new MNM_Routing_Random(m_graph, m_statistics, m_od_factory, m_link_factory);
   MNM_IO::build_demand(m_file_folder, m_config, m_od_factory);
   set_statistics();
   set_routing();
@@ -149,37 +150,43 @@ bool MNM_Dta::is_ok()
 int MNM_Dta::loading(bool verbose)
 {
   TInt __cur_int = 0;
+  TInt __total_int = m_config ->get_int("total_interval");
   MNM_Origin *__origin;
   MNM_Dnode *__node;
   MNM_Dlink *__link;
   MNM_Destination *__dest;
 
+
   printf("MNM: Prepare loading!\n");
   m_routing -> init_routing();
+  printf("Finish prepare routing\n");
   m_statistics -> init_record();
   for (auto __node_it = m_node_factory -> m_node_map.begin(); __node_it != m_node_factory -> m_node_map.end(); __node_it++){
     __node = __node_it -> second;
+    // printf("Node ID: %d\n", __node -> m_node_ID);
     __node -> prepare_loading();
   }
-
-  printf("MNM: Staring main loop: loading!\n");
-  while (__cur_int < 20){
+  while (__cur_int < __total_int){
     printf("-------------------------------    Interval %d   ------------------------------ \n", (int)__cur_int);
     // step 1: Origin release vehicle
+    printf("Realsing!\n");
     for (auto __origin_it = m_od_factory -> m_origin_map.begin(); __origin_it != m_od_factory -> m_origin_map.end(); __origin_it++){
       __origin = __origin_it -> second;
       __origin -> release(m_veh_factory, __cur_int);
     }      
 
+    printf("Routing!\n");
     // step 2: route the vehicle
     m_routing -> update_routing(__cur_int);
 
+    printf("Moving through node!\n");
     // step 3: move vehicles through node
     for (auto __node_it = m_node_factory -> m_node_map.begin(); __node_it != m_node_factory -> m_node_map.end(); __node_it++){
       __node = __node_it -> second;
       __node -> evolve(__cur_int);
     }
 
+    printf("Moving through link\n");
     // step 4: move vehicles through link
     for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
       __link = __link_it -> second;
@@ -189,12 +196,14 @@ int MNM_Dta::loading(bool verbose)
       // __link -> print_info();
     }
 
+    printf("Receiving!\n");
     // step 5: Destination receive vehicle  
     for (auto __dest_it = m_od_factory -> m_destination_map.begin(); __dest_it != m_od_factory -> m_destination_map.end(); __dest_it++){
       __dest = __dest_it -> second;
       __dest -> receive(__cur_int);
     }
 
+    printf("Update record!\n");
     // step 5: update record
     m_statistics -> update_record(__cur_int);
 
@@ -211,7 +220,7 @@ int MNM_Dta::loading(bool verbose)
 // int MNM_Dta::test()
 // {
 //   auto output_map = std::map<TInt, TInt>();
-//   MNM_Shortest_Path::all_to_one(4, 
+//   MNM_Shortest_Path::all_to_one_FIFO(6, 
 //                         m_graph, m_statistics -> m_load_interval_tt,
 //                         output_map);
 //   for (auto _it = output_map.begin(); _it!=output_map.end(); _it++){

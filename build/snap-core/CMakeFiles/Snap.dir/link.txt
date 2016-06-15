@@ -1,1 +1,0 @@
-g++  -fPIC -std=c++11 -m64 -Wall -pthread  -shared -Wl,-soname,libSnap.so -o libSnap.so CMakeFiles/Snap.dir/Snap.cpp.o ../glib-core/libGlib.so -Wl,-rpath,/home/weima/MINAMI/build/glib-core 
