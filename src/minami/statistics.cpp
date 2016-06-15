@@ -24,7 +24,7 @@ MNM_Statistics::MNM_Statistics(std::string file_folder, MNM_ConfReader *conf_rea
 
 MNM_Statistics::~MNM_Statistics()
 {
-  free(m_self_config);
+  delete m_self_config;
 }
 
 int MNM_Statistics::init_record_value()

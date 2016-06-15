@@ -6,6 +6,10 @@ MNM_Dta::MNM_Dta(std::string file_folder)
   initialize();
 }
 
+MNM_Dta::~MNM_Dta()
+{
+}
+
 int MNM_Dta::initialize()
 {
   m_veh_factory = new MNM_Veh_Factory();

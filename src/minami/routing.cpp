@@ -101,10 +101,10 @@ MNM_Routing_Hybrid::~MNM_Routing_Hybrid()
 {
   for (auto _it = m_od_factory -> m_destination_map.begin(); _it != m_od_factory -> m_destination_map.end(); _it++){
     m_table -> find(_it -> second) -> second -> clear();
-    free(m_table -> find(_it -> second) -> second);
+    delete m_table -> find(_it -> second) -> second;
   }
   m_table -> clear();
-  free(m_table);
+  delete m_table;
 }
 
 int MNM_Routing_Hybrid::init_routing()

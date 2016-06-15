@@ -22,13 +22,13 @@ public:
              TFlt length,
              TFlt ffs );
   ~MNM_Dlink();
-  int virtual evolve(TInt timestamp){return 0;};
-  TFlt virtual get_link_supply(){return TFlt(0);};
-  int virtual clear_incoming_array(){return 0;};
-  void virtual print_info(){};
+  int virtual evolve(TInt timestamp) {return 0;};
+  TFlt virtual get_link_supply() {return TFlt(0);};
+  int virtual clear_incoming_array() {return 0;};
+  void virtual print_info() {};
   int hook_up_node(MNM_Dnode *from, MNM_Dnode *to);
-  TFlt virtual get_link_flow(){return TFlt(0);};
-  TFlt virtual get_link_tt(){return TFlt(0);};
+  TFlt virtual get_link_flow() {return TFlt(0);};
+  TFlt virtual get_link_tt() {return TFlt(0);};
 // protected:
   TInt m_link_ID;
   MNM_Dnode *m_from_node;
@@ -56,12 +56,12 @@ public:
                 TFlt unit_time,
                 TFlt flow_scalar);
   ~MNM_Dlink_Ctm();
-  int virtual evolve(TInt timestamp);
-  TFlt virtual get_link_supply();
-  int virtual clear_incoming_array();
-  void virtual print_info();
-  TFlt virtual get_link_flow();
-  TFlt virtual get_link_tt();
+  int virtual evolve(TInt timestamp) override;
+  TFlt virtual get_link_supply() override;
+  int virtual clear_incoming_array() override;
+  void virtual print_info() override;
+  TFlt virtual get_link_flow() override;
+  TFlt virtual get_link_tt() override;
 
 private:
   class Ctm_Cell;
@@ -110,12 +110,12 @@ public:
                TFlt unit_time,
                TFlt flow_scalar);
   ~MNM_Dlink_Pq();
-  int virtual evolve(TInt timestamp);
-  TFlt virtual get_link_supply();
-  int virtual clear_incoming_array();
-  void virtual print_info();
-  TFlt virtual get_link_flow();
-  TFlt virtual get_link_tt();
+  int virtual evolve(TInt timestamp) override;
+  TFlt virtual get_link_supply() override;
+  int virtual clear_incoming_array() override;
+  void virtual print_info() override;
+  TFlt virtual get_link_flow() override;
+  TFlt virtual get_link_tt() override;
 private:
   std::map<MNM_Veh*, TInt> m_veh_queue;
   TInt m_volume; //vehicle number, without the flow scalar

@@ -70,7 +70,7 @@ int MNM_Destination::receive(TInt current_interval)
   for (size_t i=0; i < __num_to_receive; ++i){
     __veh = m_dest_node -> m_out_veh_queue.front();
     if (__veh -> get_destionation() != this){
-      printf("The veh is heading to %d, but we are %d\n", __veh -> get_destionation() -> m_dest_node -> m_node_ID, m_dest_node -> m_node_ID);
+      printf("The veh is heading to %d, but we are %d\n", (int)__veh -> get_destionation() -> m_dest_node -> m_node_ID, (int)m_dest_node -> m_node_ID);
       printf("MNM_Destination::receive: Something wrong!\n");
       exit(-1);
     }
