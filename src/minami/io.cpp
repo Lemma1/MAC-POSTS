@@ -275,6 +275,60 @@ int MNM_IO::build_demand(std::string file_folder, MNM_ConfReader *conf_reader, M
 
 
 
+Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph)
+{
+  TInt Num_Path = 2;
+
+  std::ifstream _path_table_file;
+  _path_table_file.open(file_name, std::ios::in);
+  Path_Table *_path_table = new Path_Table();
+
+  /* read file */
+  std::string _line;
+  std::vector<std::string> _words;
+  TInt _origin_node_ID, _dest_node_ID, _node_ID;
+  std::map<TInt, MNM_Pathset*> *_new_map;
+  MNM_Pathset *_pathset;
+  MNM_Path *_path;
+  TInt _from_ID, _to_ID, _link_ID;
+  if (_path_table_file.is_open())
+  {
+    for (int i=0; i<Num_Path; ++i){
+      std::getline(_path_table_file,_line);
+      _words = split(_line, ' ');
+      if (_words.size() >= 2){
+        _origin_node_ID = TInt(std::stoi(_words[0]));
+        _dest_node_ID = TInt(std::stoi(_words.back()));
+        if (_path_table -> find(_origin_node_ID) == _path_table -> end()){
+          _new_map = new std::map<TInt, MNM_Pathset*>();
+          _path_table -> insert(std::pair<TInt, std::map<TInt, MNM_Pathset*>*>(_origin_node_ID, _new_map));
+        }
+        if (_path_table -> find(_origin_node_ID) -> second -> find(_dest_node_ID) == _path_table -> find(_origin_node_ID) -> second -> end()){
+          _pathset = new MNM_Pathset();
+          _path_table -> find(_origin_node_ID) -> second -> insert(std::pair<TInt, MNM_Pathset*>(_dest_node_ID, _pathset));
+        }
+        _path = new MNM_Path();
+        for (std::string _s_node_ID : _words){
+          _node_ID = TInt(std::stoi(_s_node_ID));
+          _path -> m_node_vec.push_back(_node_ID);
+        }
+        for (size_t i = 0; i < _path -> m_node_vec.size() - 1; ++i){
+          _from_ID = _path -> m_node_vec[i];
+          _to_ID = _path -> m_node_vec[i+1];
+          _link_ID = graph -> GetEI(_from_ID, _to_ID).GetId();
+          _path -> m_link_vec.push_back(_link_ID);
+        }
+        _path_table -> find(_origin_node_ID) -> second -> find(_dest_node_ID) -> second -> m_path_vec.push_back(_path);
+      }
+    }
+    _path_table_file.close();
+  }
+  return _path_table;
+}
+
+
+
+
 
 std::vector<std::string> MNM_IO::split(const std::string &text, char sep) 
 {
@@ -287,3 +341,5 @@ std::vector<std::string> MNM_IO::split(const std::string &text, char sep)
   tokens.push_back(text.substr(start));
   return tokens;
 }
+
+
