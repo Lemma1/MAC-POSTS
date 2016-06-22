@@ -11,13 +11,19 @@ MNM_Veh_Factory::MNM_Veh_Factory()
 
 MNM_Veh_Factory::~MNM_Veh_Factory()
 {
-
+  MNM_Veh *_veh;
+  for (auto _veh_it : m_veh_map){
+    _veh = _veh_it.second;
+    delete _veh;
+  }
+  m_veh_map.clear();
 }
 
-MNM_Veh *MNM_Veh_Factory::make_veh(TInt timestamp)
+MNM_Veh *MNM_Veh_Factory::make_veh(TInt timestamp, Vehicle_type veh_type)
 {
   // printf("A vehicle is produce at time %d, ID is %d\n", (int)timestamp, (int)m_num_veh + 1);
   MNM_Veh *__veh = new MNM_Veh(m_num_veh + 1, timestamp);
+  __veh -> m_type = veh_type;
   m_veh_map.insert(std::pair<TInt, MNM_Veh*>(m_num_veh + 1, __veh));
   m_num_veh += 1;
   return __veh;
@@ -71,7 +77,7 @@ MNM_Dnode *MNM_Node_Factory::get_node(TInt ID)
   }
   return __node_it -> second;
 }
-MNM_Destination *get_destination(TInt ID);
+
 /**************************************************************************
                           Link factory
 **************************************************************************/

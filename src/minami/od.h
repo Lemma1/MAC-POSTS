@@ -20,10 +20,11 @@ public:
   MNM_Origin(TInt ID, TInt max_interval, TFlt flow_scalar, TInt frequency);
   ~MNM_Origin();
   TInt m_Origin_ID;
-  int release(MNM_Veh_Factory* veh_factory, TInt current_interval);
+  int release(MNM_Veh_Factory* veh_factory, TInt current_interval);//TODO change to generalized version
+  int release_one_interval(TInt current_interval, MNM_Veh_Factory* veh_factory, TInt assign_interval, TFlt adaptive_ratio);
   int add_dest_demand(MNM_Destination *dest, TFlt* demand);
   MNM_DMOND *m_origin_node;
-private:
+// private:
   TInt m_frequency;
   TInt m_current_assign_interval;
   TInt m_max_assign_interval;

@@ -6,18 +6,18 @@
 #include "vehicle.h"
 #include "ults.h"
 #include "shortest_path.h"
+#include "path.h"
 
 typedef std::map<MNM_Destination*, std::map<TInt, TInt>*> Routing_Table; 
 
 class MNM_Routing
 {
 public:
-  MNM_Routing(PNEGraph &graph, MNM_Statistics* statistics, 
+  MNM_Routing(PNEGraph &graph,
               MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
   ~MNM_Routing();
   int virtual init_routing(){return 0;};
   int virtual update_routing(TInt timestamp){return 0;};
-  MNM_Statistics* m_statistics;
   PNEGraph m_graph;
   MNM_OD_Factory *m_od_factory;
   MNM_Link_Factory *m_link_factory;
@@ -29,7 +29,7 @@ public:
 class MNM_Routing_Random : public MNM_Routing
 {
 public:
-  MNM_Routing_Random(PNEGraph &graph, MNM_Statistics* statistics, 
+  MNM_Routing_Random(PNEGraph &graph,
                       MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
   ~MNM_Routing_Random();
   int virtual init_routing();
@@ -47,9 +47,24 @@ public:
   int virtual init_routing();
   int virtual update_routing(TInt timestamp);  
 private:
+  MNM_Statistics* m_statistics;
   Routing_Table *m_table;
   TInt m_routing_freq;
   MNM_ConfReader *m_self_config;
-
 };
+
+
+
+class MNM_Routing_Fixed : public MNM_Routing
+{
+public:
+  MNM_Routing_Fixed(Path_Table *path_table, PNEGraph &graph,
+              MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
+  ~MNM_Routing_Fixed();
+  int virtual init_routing();
+  int virtual update_routing(TInt timestamp);  
+private:
+  std::map<MNM_Veh*, std::deque<TInt>> m_tracker;
+};
+
 #endif

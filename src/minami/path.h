@@ -6,6 +6,7 @@
 #include "shortest_path.h"
 
 #include <vector>
+#include <deque>
 #include <map>
 #include <fstream>
 #include <string>
@@ -16,8 +17,8 @@ public:
   MNM_Path();
   ~MNM_Path();
   std::string node_vec_to_string();
-  std::vector<TInt> m_link_vec;
-  std::vector<TInt> m_node_vec;
+  std::deque<TInt> m_link_vec;
+  std::deque<TInt> m_node_vec;
   inline bool operator==(const MNM_Path& rhs)
   {if (m_link_vec.size() != rhs.m_link_vec.size()) return false; 
   for (size_t i=0; i<rhs.m_link_vec.size(); ++i){if (rhs.m_link_vec[i] != m_link_vec[i]) return false;} return true;}

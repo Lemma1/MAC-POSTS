@@ -5,8 +5,8 @@
 **************************************************************************/
 MNM_Path::MNM_Path()
 {
-  m_link_vec = std::vector<TInt>();
-  m_node_vec = std::vector<TInt>();
+  m_link_vec = std::deque<TInt>();
+  m_node_vec = std::deque<TInt>();
 }
 
 

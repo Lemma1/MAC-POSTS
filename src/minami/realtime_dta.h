@@ -15,10 +15,13 @@ class MNM_Realtime_Dta
 public:
   MNM_Realtime_Dta(std::string file_folder);
   ~MNM_Realtime_Dta();
+  int initialize();
   int run_from_screenshot(MNM_Dta_Screenshot* screenshot, TInt start_inter, TInt max_inter);
   std::string m_file_folder;
   PNEGraph m_graph;
-  MNM_ConfReader* m_config;
+  MNM_OD_Factory *m_od_factory;
+  MNM_ConfReader* m_dta_config;
+  MNM_ConfReader* m_realtime_dta_config;
   MNM_Dta_Screenshot *m_before_shot;
   MNM_Dta_Screenshot *m_after_shot;
   Path_Table *m_path_table;
@@ -37,7 +40,6 @@ public:
   std::string m_file_folder;
   MNM_ConfReader* m_config;
   MNM_Link_Factory *m_link_factory;
-  MNM_OD_Factory *m_od_factory;
   MNM_Node_Factory *m_node_factory;
   MNM_Veh_Factory *m_veh_factory;
 };

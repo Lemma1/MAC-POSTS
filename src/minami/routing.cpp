@@ -1,10 +1,9 @@
 #include "routing.h"
 
-MNM_Routing::MNM_Routing(PNEGraph &graph, MNM_Statistics* statistics,
+MNM_Routing::MNM_Routing(PNEGraph &graph,
                           MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory)
 {
   m_graph = graph;
-  m_statistics = statistics;
   m_od_factory = od_factory;
   m_node_factory = node_factory;
   m_link_factory = link_factory;
@@ -21,9 +20,9 @@ MNM_Routing::~MNM_Routing()
 **************************************************************************/
 /* assign each vehicle a random link ahead of it, only used for testing */
 
-MNM_Routing_Random::MNM_Routing_Random(PNEGraph &graph, MNM_Statistics* statistics, MNM_OD_Factory *od_factory, 
+MNM_Routing_Random::MNM_Routing_Random(PNEGraph &graph, MNM_OD_Factory *od_factory, 
                                           MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory)
-  : MNM_Routing::MNM_Routing(graph, statistics, od_factory, node_factory, link_factory)
+  : MNM_Routing::MNM_Routing(graph, od_factory, node_factory, link_factory)
 {
 
 }
@@ -90,8 +89,9 @@ int MNM_Routing_Random::update_routing(TInt timestamp)
 
 MNM_Routing_Hybrid::MNM_Routing_Hybrid(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, 
                   MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory)
-  : MNM_Routing::MNM_Routing(graph, statistics, od_factory, node_factory, link_factory)
+  : MNM_Routing::MNM_Routing(graph, od_factory, node_factory, link_factory)
 {
+  m_statistics = statistics;
   m_self_config = new MNM_ConfReader(file_folder + "/config.conf", "HYBRID");
   m_routing_freq = m_self_config -> get_int("route_frq");
   m_table = new Routing_Table();
@@ -186,5 +186,32 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
     }
   }
   printf("Finished Routing\n");
+  return 0;
+}
+
+
+/**************************************************************************
+                          fixed rouing
+**************************************************************************/
+
+MNM_Routing_Fixed::MNM_Routing_Fixed(Path_Table *path_table, PNEGraph &graph,
+              MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory)
+ : MNM_Routing::MNM_Routing(graph, od_factory, node_factory, link_factory)
+{
+  m_tracker = std::map<MNM_Veh*, std::deque<TInt>>();
+}
+
+MNM_Routing_Fixed::~MNM_Routing_Fixed()
+{
+  m_tracker.clear();
+}
+
+int MNM_Routing_Fixed::init_routing()
+{
+  return 0;
+}
+
+int MNM_Routing_Fixed::update_routing(TInt timestamp)
+{
   return 0;
 }

@@ -8,6 +8,11 @@ MNM_Veh::MNM_Veh(TInt ID, TInt start_time) {
   m_finish_time = -1;
 }
 
+MNM_Veh::~MNM_Veh() {
+  m_current_link = NULL;
+  m_next_link = NULL;
+}
+
 int MNM_Veh::set_current_link(MNM_Dlink *link) {
   m_current_link = link;
   return 0;

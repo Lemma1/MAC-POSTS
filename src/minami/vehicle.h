@@ -4,6 +4,7 @@
 #include "od.h"
 #include "Snap.h"
 #include "dlink.h"
+#include "enum.h"
 
 #include <deque>
 
@@ -25,6 +26,7 @@ public:
   int set_destination(MNM_Destination * dest);
   int finish(TInt finish_time);
 // private:
+  Vehicle_type m_type;
   MNM_Dlink *m_current_link;
   TInt m_start_time;
   TInt m_finish_time;
@@ -32,4 +34,19 @@ public:
   MNM_Destination *m_dest;
 };
 
+
+// class MNM_Veh_Det :: public MNM_Veh
+// {
+// public:
+//   MNM_Veh_Det(TInt ID, TInt start_time);
+//   ~MNM_Veh_Det();
+// };
+
+
+// class MNM_Veh_Adp :: public MNM_Veh
+// {
+// public:
+//   MNM_Veh_Adp(TInt ID, TInt start_time);
+//   ~MNM_Veh_Adp();
+// };
 #endif

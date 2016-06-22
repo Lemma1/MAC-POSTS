@@ -22,7 +22,7 @@ class MNM_Veh_Factory
 public:
   MNM_Veh_Factory();
   ~MNM_Veh_Factory();
-  MNM_Veh * make_veh(TInt timestamp);
+  MNM_Veh * make_veh(TInt timestamp, Vehicle_type veh_type);
   TInt m_num_veh;
   std::map<TInt, MNM_Veh*> m_veh_map;
 };
