@@ -15,6 +15,7 @@ public:
   TFlt static max(TFlt a, TFlt b);
   TFlt static divide(TFlt a, TFlt b);
   TInt static mod(TInt a, TInt b);
+  TFlt static rand_flt();
 };
 
 

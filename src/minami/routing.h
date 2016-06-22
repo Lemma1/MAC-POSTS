@@ -16,7 +16,7 @@ public:
   MNM_Routing(PNEGraph &graph,
               MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
   ~MNM_Routing();
-  int virtual init_routing(){return 0;};
+  int virtual init_routing(Path_Table *path_table=NULL){return 0;};
   int virtual update_routing(TInt timestamp){return 0;};
   PNEGraph m_graph;
   MNM_OD_Factory *m_od_factory;
@@ -32,7 +32,7 @@ public:
   MNM_Routing_Random(PNEGraph &graph,
                       MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
   ~MNM_Routing_Random();
-  int virtual init_routing();
+  int virtual init_routing(Path_Table *path_table=NULL);
   int virtual update_routing(TInt timestamp);
 };
 
@@ -44,7 +44,7 @@ public:
   MNM_Routing_Hybrid(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, 
                       MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
   ~MNM_Routing_Hybrid();
-  int virtual init_routing();
+  int virtual init_routing(Path_Table *path_table=NULL);
   int virtual update_routing(TInt timestamp);  
 private:
   MNM_Statistics* m_statistics;
@@ -58,13 +58,17 @@ private:
 class MNM_Routing_Fixed : public MNM_Routing
 {
 public:
-  MNM_Routing_Fixed(Path_Table *path_table, PNEGraph &graph,
+  MNM_Routing_Fixed(PNEGraph &graph,
               MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
   ~MNM_Routing_Fixed();
-  int virtual init_routing();
-  int virtual update_routing(TInt timestamp);  
-private:
-  std::map<MNM_Veh*, std::deque<TInt>> m_tracker;
+  int virtual init_routing(Path_Table *path_table=NULL);
+  int virtual update_routing(TInt timestamp);
+// private:
+  int set_path_table(Path_Table *path_table);
+  int register_veh(MNM_Veh* veh);
+  int add_veh_path(MNM_Veh* veh, std::deque<TInt> *link_que);
+  Path_Table *m_path_table;
+  std::map<MNM_Veh*, std::deque<TInt>*> m_tracker;
 };
 
 #endif

@@ -60,6 +60,7 @@ int main()
   // s = MNM::make_screenshot(m_file_folder, m_config, m_link_factory);
 
   MNM_Realtime_Dta *d = new MNM_Realtime_Dta(m_file_folder);
-  
+
+  d -> run_from_screenshot(d -> m_before_shot, 0 , 100, 0, d -> m_path_table);
   return 0;
 }

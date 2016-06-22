@@ -57,3 +57,15 @@ int MNM_Veh::finish(TInt finish_time)
   m_finish_time = finish_time;
   return 0;
 }
+
+
+MNM_Origin *MNM_Veh::get_origin()
+{
+  return m_origin;
+}
+
+int MNM_Veh::set_origin(MNM_Origin * origin)
+{
+  m_origin = origin;
+  return 0;
+}

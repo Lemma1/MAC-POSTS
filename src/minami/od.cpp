@@ -43,6 +43,7 @@ int MNM_Origin::release(MNM_Veh_Factory* veh_factory, TInt current_interval)
       for (int i=0; i<__veh_to_release; ++i) {
         __veh = veh_factory -> make_veh(current_interval, MNM_TYPE_ADAPTIVE);
         __veh -> set_destination(__demand_it -> first);
+        __veh -> set_origin(this);
         m_origin_node -> m_in_veh_queue.push_back(__veh);
       }
     }
@@ -70,6 +71,7 @@ int MNM_Origin::release_one_interval(TInt current_interval, MNM_Veh_Factory* veh
         exit(-1);
       }
       __veh -> set_destination(__demand_it -> first);
+      __veh -> set_origin(this);
       m_origin_node -> m_in_veh_queue.push_back(__veh); 
     }
   }

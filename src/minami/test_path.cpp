@@ -7,8 +7,8 @@
 
 int main()
 {
-  // std::string m_file_folder = "../../data/input_files_2link";
-  std::string m_file_folder = "../../data/input_files_philly";
+  std::string m_file_folder = "../../data/input_files_2link";
+  // std::string m_file_folder = "../../data/input_files_philly";
   MNM_ConfReader *m_config;
   MNM_Node_Factory *m_node_factory;
   MNM_Link_Factory *m_link_factory;
@@ -47,8 +47,8 @@ int main()
   MNM::save_path_table(path_table, m_od_factory);
 
 
-
-  // path_table = MNM_IO::load_path_table("path_table", m_graph);
+  // Path_Table *path_table;
+  // path_table = MNM_IO::load_path_table("path_table", m_graph, 189065);
 
   
   // for (size_t i = 0; i< path_table -> find(1) -> second -> find(5) -> second -> m_path_vec.size(); ++i){

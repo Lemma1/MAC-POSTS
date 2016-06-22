@@ -35,6 +35,13 @@ TInt MNM_Ults::mod(TInt a, TInt b){
   return a % b;
 }
 
+
+TFlt MNM_Ults::rand_flt(){
+  return TFlt((double) rand() / (RAND_MAX));
+}
+
+
+
 Chameleon::Chameleon(std::string const& value) 
 {
     value_=value;

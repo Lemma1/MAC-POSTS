@@ -387,9 +387,9 @@ int MNM_IO::build_demand(std::string file_folder, MNM_ConfReader *conf_reader, M
 
 
 
-Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph)
+Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph, TInt num_path)
 {
-  TInt Num_Path = 2;
+  TInt Num_Path = num_path;
 
   std::ifstream _path_table_file;
   _path_table_file.open(file_name, std::ios::in);
