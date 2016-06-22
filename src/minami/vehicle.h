@@ -24,7 +24,7 @@ public:
   MNM_Destination *get_destionation();
   int set_destination(MNM_Destination * dest);
   int finish(TInt finish_time);
-private:
+// private:
   MNM_Dlink *m_current_link;
   TInt m_start_time;
   TInt m_finish_time;

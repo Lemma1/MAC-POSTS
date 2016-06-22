@@ -59,7 +59,6 @@ MNM_Destination::MNM_Destination(TInt ID)
 
 MNM_Destination::~MNM_Destination()
 {
-
 }
 
 int MNM_Destination::receive(TInt current_interval)

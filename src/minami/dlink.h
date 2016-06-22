@@ -63,7 +63,7 @@ public:
   TFlt virtual get_link_flow() override;
   TFlt virtual get_link_tt() override;
 
-private:
+// private:
   class Ctm_Cell;
   int init_cell_array(TFlt unit_time, TFlt std_cell_length, TFlt lane_hold_cap_last_cell);
   int update_out_veh();
@@ -116,7 +116,7 @@ public:
   void virtual print_info() override;
   TFlt virtual get_link_flow() override;
   TFlt virtual get_link_tt() override;
-private:
+// private:
   std::map<MNM_Veh*, TInt> m_veh_queue;
   TInt m_volume; //vehicle number, without the flow scalar
   TFlt m_lane_hold_cap;

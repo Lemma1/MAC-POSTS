@@ -23,7 +23,7 @@ int MNM_IO::build_node_factory(std::string file_folder, MNM_ConfReader *conf_rea
 
   if (__node_file.is_open())
   {
-    printf("Start build node factory.\n");
+    // printf("Start build node factory.\n");
     std::getline(__node_file,__line); //skip the first line
     for (int i=0; i < __num_of_node; ++i){
       std::getline(__node_file,__line);
@@ -82,7 +82,7 @@ int MNM_IO::build_link_factory(std::string file_folder, MNM_ConfReader *conf_rea
 
   if (__link_file.is_open())
   {
-    printf("Start build link factory.\n");
+    // printf("Start build link factory.\n");
     std::getline(__link_file,__line); //skip the first line
     for (int i=0; i < __num_of_link; ++i){
       std::getline(__link_file,__line);
@@ -150,7 +150,7 @@ int  MNM_IO::build_od_factory(std::string file_folder, MNM_ConfReader *conf_read
   MNM_Destination *__dest;
   if (__od_file.is_open())
   {
-    printf("Start build Origin-Destination factory.\n");
+    // printf("Start build Origin-Destination factory.\n");
     std::getline(__od_file,__line); //skip the first line
     // printf("Processing Origin node.\n");
     for (int i=0; i < __num_of_O; ++i){
@@ -198,7 +198,7 @@ PNEGraph MNM_IO::build_graph(std::string file_folder, MNM_ConfReader *conf_reade
 
   TInt __num_of_link = conf_reader -> get_int("num_of_link");
 
-  printf("Start build graph.\n");
+  // printf("Start build graph.\n");
   PNEGraph __graph = PNEGraph::TObj::New();
   
   int __link_ID, __from_ID, __to_ID;
@@ -243,7 +243,7 @@ int MNM_IO::build_demand(std::string file_folder, MNM_ConfReader *conf_reader, M
   std::vector<std::string> __words;
   if (__demand_file.is_open())
   {
-    printf("Start build demand profile.\n");
+    // printf("Start build demand profile.\n");
     TFlt *__demand_vector = (TFlt*) malloc(sizeof(TFlt) * __max_interval);
     memset(__demand_vector, 0x0, sizeof(TFlt) * __max_interval);
     std::getline(__demand_file,__line); //skip the first line

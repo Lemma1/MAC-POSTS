@@ -33,6 +33,14 @@ MNM_Node_Factory::MNM_Node_Factory()
   m_node_map = std::map<TInt, MNM_Dnode*>();
 }
 
+MNM_Node_Factory::~MNM_Node_Factory()
+{
+  for (auto _map_it = m_node_map.begin(); _map_it!= m_node_map.end(); _map_it++){
+    delete _map_it -> second;
+  }
+  m_node_map.clear();
+}
+
 MNM_Dnode *MNM_Node_Factory::make_node(TInt ID, DNode_type node_type, TFlt flow_scalar)
 {
   MNM_Dnode *__node;
@@ -70,6 +78,14 @@ MNM_Destination *get_destination(TInt ID);
 MNM_Link_Factory::MNM_Link_Factory()
 {
   m_link_map = std::map<TInt, MNM_Dlink*>();
+}
+
+MNM_Link_Factory::~MNM_Link_Factory()
+{
+  for (auto _map_it = m_link_map.begin(); _map_it!= m_link_map.end(); _map_it++){
+    delete _map_it -> second;
+  }  
+  m_link_map.clear();
 }
 
 MNM_Dlink *MNM_Link_Factory::make_link( TInt ID,
@@ -111,6 +127,18 @@ MNM_OD_Factory::MNM_OD_Factory()
   m_destination_map = std::map<TInt, MNM_Destination*>();
 }
 
+
+MNM_OD_Factory::~MNM_OD_Factory()         
+{
+  for (auto _map_it = m_origin_map.begin(); _map_it!= m_origin_map.end(); _map_it++){
+    delete _map_it -> second;
+  }  
+  m_origin_map.clear();
+    for (auto _map_it = m_destination_map.begin(); _map_it!= m_destination_map.end(); _map_it++){
+    delete _map_it -> second;
+  }  
+  m_destination_map.clear();
+}
 
 MNM_Destination *MNM_OD_Factory::make_destination(TInt ID)
 {

@@ -17,7 +17,8 @@ MNM_Dlink::MNM_Dlink( TInt ID,
 
 MNM_Dlink::~MNM_Dlink()
 {
-
+  m_finished_array.clear();
+  m_incoming_array.clear();
 }
 
 int MNM_Dlink::hook_up_node(MNM_Dnode *from, MNM_Dnode *to)
@@ -67,6 +68,14 @@ MNM_Dlink_Ctm::MNM_Dlink_Ctm( TInt ID,
   m_wave_ratio = __wave_speed / m_ffs; // note that h >= 2c/v, where h is holding capacity, c is capcity, v is free flow speed. i.e., wvRatio should < 1.
   m_last_wave_ratio = (m_lane_flow_cap / (__lane_hold_cap_last_cell - m_lane_flow_cap / m_ffs))/m_ffs;
   init_cell_array(unit_time, __std_cell_length, __lane_hold_cap_last_cell);
+}
+
+MNM_Dlink_Ctm::~MNM_Dlink_Ctm()
+{
+  for (Ctm_Cell* _cell : m_cell_array){
+    delete _cell;
+  }
+  m_cell_array.clear();
 }
 
 int MNM_Dlink_Ctm::init_cell_array( TFlt unit_time, TFlt std_cell_length, TFlt lane_hold_cap_last_cell )
@@ -208,6 +217,12 @@ MNM_Dlink_Ctm::Ctm_Cell::Ctm_Cell(TFlt hold_cap, TFlt flow_cap, TFlt flow_scalar
   m_veh_queue = std::deque<MNM_Veh*>();
 }
 
+MNM_Dlink_Ctm::Ctm_Cell::~Ctm_Cell()
+{
+  m_veh_queue.clear();
+}
+
+
 TFlt MNM_Dlink_Ctm::Ctm_Cell::get_demand()
 {
   TFlt __real_volume = TFlt(m_volume) / m_flow_scalar;
@@ -281,6 +296,12 @@ MNM_Dlink_Pq::MNM_Dlink_Pq(   TInt ID,
   m_max_stamp = TInt(floor(m_length/(m_ffs * unit_time)));
   m_veh_queue = std::map<MNM_Veh*, TInt>();
   m_volume = TInt(0);
+}
+
+
+MNM_Dlink_Pq::~MNM_Dlink_Pq()
+{
+  m_veh_queue.clear();
 }
 
 TFlt MNM_Dlink_Pq::get_link_supply()
