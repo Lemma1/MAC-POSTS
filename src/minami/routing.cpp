@@ -152,7 +152,7 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
     _node_ID = _origin_node -> m_node_ID;
     for (auto _veh_it = _origin_node -> m_in_veh_queue.begin(); _veh_it!=_origin_node -> m_in_veh_queue.end(); _veh_it++){
       _veh = *_veh_it;
-      _next_link_ID = m_table -> find(_veh -> get_destionation()) -> second -> find(_node_ID) -> second;
+      _next_link_ID = m_table -> find(_veh -> get_destination()) -> second -> find(_node_ID) -> second;
       if (_next_link_ID < 0){
         printf("Something wrong in routing, wrong next link 1\n");
         exit(-1);
@@ -169,12 +169,12 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
     _node_ID = _link -> m_to_node -> m_node_ID;
     for (auto _veh_it = _link -> m_finished_array.begin(); _veh_it!=_link -> m_finished_array.end(); _veh_it++){
       _veh = *_veh_it;
-      _veh_dest = _veh -> get_destionation();
+      _veh_dest = _veh -> get_destination();
       if (_veh_dest -> m_dest_node -> m_node_ID == _node_ID){
         _veh -> set_next_link(NULL);
       }
       else{
-        _next_link_ID = m_table -> find(_veh -> get_destionation()) -> second -> find(_node_ID) -> second;
+        _next_link_ID = m_table -> find(_veh -> get_destination()) -> second -> find(_node_ID) -> second;
         if (_next_link_ID == -1){
           printf("Something wrong in routing, wrong next link 2\n");
           printf("The node is %d, the vehicle should head to %d\n", (int)_node_ID, (int)_veh_dest -> m_dest_node -> m_node_ID);
@@ -227,64 +227,63 @@ int MNM_Routing_Fixed::update_routing(TInt timestamp)
   TInt _node_ID, _next_link_ID;
   MNM_Dlink *_next_link;
   MNM_Veh *_veh;
-  printf("1\n");
   for (auto _origin_it = m_od_factory->m_origin_map.begin(); _origin_it != m_od_factory->m_origin_map.end(); _origin_it++){
-    printf("1.1\n");
+    // printf("1.1\n");
     _origin = _origin_it -> second;
     _origin_node = _origin -> m_origin_node;
     _node_ID = _origin_node -> m_node_ID;
     for (auto _veh_it = _origin_node -> m_in_veh_queue.begin(); _veh_it!=_origin_node -> m_in_veh_queue.end(); _veh_it++){
       _veh = *_veh_it;
-      printf("1.2\n");
+      // printf("1.2\n");
       if (_veh -> m_type != MNM_TYPE_STATIC){
         printf("Wrong vehicle type in routing!\n");
         exit(-1);
       }
-      printf("1.20\n");
       if (m_tracker.find(_veh) == m_tracker.end()){
-        printf("Registering!\n");
+        // printf("Registering!\n");
         register_veh(_veh);
+        _next_link_ID = m_tracker.find(_veh) -> second -> front();
+        _next_link = m_link_factory -> get_link(_next_link_ID);
+        _veh -> set_next_link(_next_link);
+        m_tracker.find(_veh) -> second -> pop_front();
       }
-      printf("1.21\n");
-      _next_link_ID = m_tracker.find(_veh) -> second -> front();
-      printf("1.22\n");
-      _next_link = m_link_factory -> get_link(_next_link_ID);
-      printf("1.3\n");
-      _veh -> set_next_link(_next_link);
-      printf("1.4\n");
-      m_tracker.find(_veh) -> second -> pop_front();
     }
   }
-  printf("2\n");
   MNM_Destination *_veh_dest;
   MNM_Dlink *_link;
   for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it ++){
     _link = _link_it -> second;
     _node_ID = _link -> m_to_node -> m_node_ID;
-    printf("2.1\n");
+    // printf("2.1\n");
     for (auto _veh_it = _link -> m_finished_array.begin(); _veh_it!=_link -> m_finished_array.end(); _veh_it++){
       _veh = *_veh_it;
-      _veh_dest = _veh -> get_destionation();
-      printf("2.2\n");
+      _veh_dest = _veh -> get_destination();
+      // printf("2.2\n");
       if (_veh_dest -> m_dest_node -> m_node_ID == _node_ID){
+        if (m_tracker.find(_veh) -> second -> size() != 0){
+          printf("Something wrong in fixed routing!\n");
+          exit(-1);
+        }
         _veh -> set_next_link(NULL);
-        m_tracker.erase(m_tracker.find(_veh));
+        // m_tracker.erase(m_tracker.find(_veh));
       }
       else{
-        printf("2.3\n");
+        // printf("2.3\n");
         if (m_tracker.find(_veh) == m_tracker.end()){
           printf("Vehicle not registered in link, impossible!\n");
           exit(-1);
         }
-        _next_link_ID = m_tracker.find(_veh) -> second -> front();
-        if (_next_link_ID == -1){
-          printf("Something wrong in routing, wrong next link 2\n");
-          printf("The node is %d, the vehicle should head to %d\n", (int)_node_ID, (int)_veh_dest -> m_dest_node -> m_node_ID);
-          exit(-1);
+        if(_veh -> get_current_link() == _veh -> get_next_link()){
+          _next_link_ID = m_tracker.find(_veh) -> second -> front();
+          if (_next_link_ID == -1){
+            printf("Something wrong in routing, wrong next link 2\n");
+            printf("The node is %d, the vehicle should head to %d\n", (int)_node_ID, (int)_veh_dest -> m_dest_node -> m_node_ID);
+            exit(-1);
+          }
+          _next_link = m_link_factory -> get_link(_next_link_ID);
+          _veh -> set_next_link(_next_link);
+          m_tracker.find(_veh) -> second -> pop_front();
         }
-        _next_link = m_link_factory -> get_link(_next_link_ID);
-        _veh -> set_next_link(_next_link);
-        m_tracker.find(_veh) -> second -> pop_front();
       }
     }
   }
@@ -297,8 +296,7 @@ int MNM_Routing_Fixed::register_veh(MNM_Veh* veh)
 {
   TFlt _r = MNM_Ults::rand_flt();
   MNM_Pathset *_pathset = m_path_table -> find(veh -> get_origin() -> m_origin_node  -> m_node_ID) -> second
-                        -> find(veh -> get_destionation() -> m_dest_node  -> m_node_ID) -> second;
-  printf("r1\n");
+                        -> find(veh -> get_destination() -> m_dest_node  -> m_node_ID) -> second;
   MNM_Path *_route_path = NULL;
   for (MNM_Path *_path : _pathset -> m_path_vec){
     if (_path -> m_p >= _r) {
@@ -314,7 +312,8 @@ int MNM_Routing_Fixed::register_veh(MNM_Veh* veh)
     exit(-1);
   }
   std::deque<TInt> *_link_queue = new std::deque<TInt>();
-  std::copy(_route_path -> m_link_vec.begin(), _route_path -> m_link_vec.end(), _link_queue -> begin());
+  std::copy(_route_path -> m_link_vec.begin(), _route_path -> m_link_vec.end(), std::back_inserter(*_link_queue));
+  // printf("old link q is %d, New link queuq is %d\n", _route_path -> m_link_vec.size(), _link_queue -> size());
   m_tracker.insert(std::pair<MNM_Veh*, std::deque<TInt>*>(veh, _link_queue));
   return 0;
 }
@@ -328,7 +327,7 @@ int MNM_Routing_Fixed::set_path_table(Path_Table *path_table)
 int MNM_Routing_Fixed::add_veh_path(MNM_Veh* veh, std::deque<TInt> *link_que)
 {
   std::deque<TInt> *_new_link_que = new std::deque<TInt>();
-  std::copy(link_que->begin(), link_que->end(), _new_link_que -> begin());
+  std::copy(link_que->begin(), link_que->end(), std::back_inserter(*_new_link_que));
   m_tracker.insert(std::pair<MNM_Veh*, std::deque<TInt>*>(veh, _new_link_que));
   return 0;
 }

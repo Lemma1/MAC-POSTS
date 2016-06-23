@@ -20,7 +20,7 @@ class MNM_Dnode
 {
 public:
   MNM_Dnode(TInt ID, TFlt flow_scalar);
-  ~MNM_Dnode();
+  virtual ~MNM_Dnode();
   TInt m_node_ID;
   int virtual evolve(TInt timestamp){return 0;};
   void virtual print_info(){};

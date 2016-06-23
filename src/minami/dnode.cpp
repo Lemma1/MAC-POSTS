@@ -61,9 +61,10 @@ int MNM_DMOND::evolve(TInt timestamp)
   MNM_Veh *__veh;
   for (unsigned i=0; i<m_out_link_array.size(); ++i){
     __link = m_out_link_array[i];
+    // printf("In node %d, %d veh to move to link %d, total veh %d \n", m_node_ID, m_out_volume.find(__link) -> second, __link -> m_link_ID, m_in_veh_queue.size());
     __que_it = m_in_veh_queue.begin();
     while (__que_it != m_in_veh_queue.end()) {
-      if (m_out_volume.find(__to_link) -> second > 0){
+      if (m_out_volume.find(__link) -> second > 0){
         __veh = *__que_it;
         __to_link = __veh -> get_next_link();
         if (__to_link == __link){
@@ -230,6 +231,7 @@ int MNM_Dnode_Inout::prepare_supplyANDdemand()
    for (size_t i=0; i< m_out_link_array.size(); ++i){
     __out_link = m_out_link_array[i];
     m_supply[i] = __out_link -> get_link_supply();
+    // printf("Link %d, supply is %.4f\n", __out_link -> m_link_ID, m_supply[i]);
   } 
 
   return 0;
@@ -382,7 +384,9 @@ int MNM_Dnode_FWJ::compute_flow()
     }
     for (size_t i=0; i< m_in_link_array.size(); ++i){
       __portion = MNM_Ults::divide(m_demand[i * __offset + j], __sum_in_flow);
+      // printf("Portion is %.4f, sum in flow is %.4f, demand is %.4f\n", __portion, __sum_in_flow, m_demand[i * __offset + j]);
       m_veh_flow[i * __offset + j] = MNM_Ults::min(m_demand[i * __offset + j], __portion * m_supply[j]);
+      // printf("to link %d the flow is %.4f\n", m_out_link_array[j] -> m_link_ID, m_veh_flow[i * __offset + j]);
     }
   }
   return 0;

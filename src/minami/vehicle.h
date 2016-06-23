@@ -23,7 +23,7 @@ public:
   MNM_Dlink *get_next_link();
   int set_next_link(MNM_Dlink *link);
   bool has_next_link();
-  MNM_Destination *get_destionation();
+  MNM_Destination *get_destination();
   int set_destination(MNM_Destination * dest);
   int finish(TInt finish_time);
   MNM_Origin *get_origin();

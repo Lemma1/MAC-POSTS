@@ -21,7 +21,7 @@ public:
              TInt number_of_lane,
              TFlt length,
              TFlt ffs );
-  ~MNM_Dlink();
+  virtual ~MNM_Dlink();
   int virtual evolve(TInt timestamp) {return 0;};
   TFlt virtual get_link_supply() {return TFlt(0);};
   int virtual clear_incoming_array() {return 0;};

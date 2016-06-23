@@ -54,7 +54,7 @@ namespace MNM
   MNM_Dta_Screenshot *make_screenshot(std::string file_folder, MNM_ConfReader* config, MNM_OD_Factory *od_factory,
                                   MNM_Link_Factory *link_factory, MNM_Node_Factory *node_factory, PNEGraph graph, 
                                   MNM_Routing_Fixed *old_routing);
-  MNM_Dta_Screenshot *make_screenshot(MNM_Dta_Screenshot* screenshot, MNM_Routing_Fixed *old_routing);
+  MNM_Dta_Screenshot *make_screenshot(MNM_Dta_Screenshot* screenshot);
   MNM_Dta_Screenshot *make_empty_screenshot(std::string file_folder, MNM_ConfReader* config, 
                                                     MNM_OD_Factory *od_factory, PNEGraph graph);
 }
@@ -64,7 +64,7 @@ void static inline copy_veh(MNM_Veh* _veh, MNM_Veh *_new_veh){
   _new_veh -> m_current_link = _veh -> m_current_link;
   _new_veh -> m_start_time = _veh -> m_start_time;
   _new_veh -> m_next_link = _veh -> m_next_link;
-  _new_veh -> m_dest = _veh -> m_dest;
-  _new_veh -> m_origin = _veh -> m_origin;
+  _new_veh -> set_destination(_veh -> get_destination());
+  _new_veh -> set_origin(_veh -> get_origin());
 };
 #endif

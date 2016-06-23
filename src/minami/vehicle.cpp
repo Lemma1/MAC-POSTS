@@ -34,7 +34,7 @@ bool MNM_Veh::has_next_link()
 }
 
 
-MNM_Destination *MNM_Veh::get_destionation()
+MNM_Destination *MNM_Veh::get_destination()
 {
   return m_dest;
 }

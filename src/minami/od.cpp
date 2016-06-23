@@ -54,6 +54,7 @@ int MNM_Origin::release(MNM_Veh_Factory* veh_factory, TInt current_interval)
 
 int MNM_Origin::release_one_interval(TInt current_interval, MNM_Veh_Factory* veh_factory, TInt assign_interval, TFlt adaptive_ratio)
 {
+  if (assign_interval < 0) return 0;
   TInt __veh_to_release;
   MNM_Veh *__veh;
   std::map<MNM_Destination*, TFlt*>::iterator __demand_it;
@@ -95,8 +96,8 @@ int MNM_Destination::receive(TInt current_interval)
   size_t __num_to_receive = m_dest_node -> m_out_veh_queue.size();
   for (size_t i=0; i < __num_to_receive; ++i){
     __veh = m_dest_node -> m_out_veh_queue.front();
-    if (__veh -> get_destionation() != this){
-      printf("The veh is heading to %d, but we are %d\n", (int)__veh -> get_destionation() -> m_dest_node -> m_node_ID, (int)m_dest_node -> m_node_ID);
+    if (__veh -> get_destination() != this){
+      printf("The veh is heading to %d, but we are %d\n", (int)__veh -> get_destination() -> m_dest_node -> m_node_ID, (int)m_dest_node -> m_node_ID);
       printf("MNM_Destination::receive: Something wrong!\n");
       exit(-1);
     }

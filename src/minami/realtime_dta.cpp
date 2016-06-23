@@ -56,10 +56,10 @@ int MNM_Realtime_Dta::run_from_screenshot(MNM_Dta_Screenshot* screenshot, TInt s
   MNM_Veh_Factory *_veh_factory = screenshot -> m_veh_factory;
   MNM_Routing *_routing = screenshot -> m_routing;
 
-  printf("MNM: Prepare loading!\n");
+  // printf("MNM: Prepare loading!\n");
   _routing -> init_routing(path_table);
   MNM_IO::hook_up_od_node(m_file_folder, m_dta_config, m_od_factory, _node_factory);  
-  printf("Finish prepare routing\n");
+  // printf("Finish prepare routing\n");
   // m_statistics -> init_record();
   for (auto _node_it = _node_factory -> m_node_map.begin(); _node_it != _node_factory -> m_node_map.end(); _node_it++){
     _node = _node_it -> second;
@@ -68,10 +68,10 @@ int MNM_Realtime_Dta::run_from_screenshot(MNM_Dta_Screenshot* screenshot, TInt s
   }
   while (_cur_inter < _total_inter){
     _real_inter = _cur_inter + start_inter;
-  //   printf("-------------------------------    Interval %d   ------------------------------ \n", (int)__cur_int);
+    printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_real_inter);
     // step 1: Origin release vehicle
 
-    printf("Realsing!\n");
+    // printf("Realsing!\n");
     if (_cur_inter == 0){
       for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){
         _origin = _origin_it -> second;
@@ -79,28 +79,28 @@ int MNM_Realtime_Dta::run_from_screenshot(MNM_Dta_Screenshot* screenshot, TInt s
       }       
     }
 
-    printf("Routing!\n");
+    // printf("Routing!\n");
     // step 2: route the vehicle
     _routing -> update_routing(_real_inter);
 
-    printf("Moving through node!\n");
+    // printf("Moving through node!\n");
     // step 3: move vehicles through node
     for (auto _node_it = _node_factory -> m_node_map.begin(); _node_it != _node_factory -> m_node_map.end(); _node_it++){
       _node = _node_it -> second;
       _node -> evolve(_real_inter);
     }
 
-    printf("Moving through link\n");
+    // printf("Moving through link\n");
     // step 4: move vehicles through link
     for (auto _link_it = _link_factory -> m_link_map.begin(); _link_it != _link_factory -> m_link_map.end(); _link_it++){
       _link = _link_it -> second;
-      // printf("Current Link %d:, incomming %d, finished %d\n", __link -> m_link_ID, __link -> m_incoming_array.size(),  __link -> m_finished_array.size());
+      // printf("Current Link %d:, incomming %d, finished %d\n", _link -> m_link_ID, _link -> m_incoming_array.size(),  _link -> m_finished_array.size());
       _link -> clear_incoming_array();
       _link -> evolve(_real_inter);
-      // __link -> print_info();
+      // _link -> print_info();
     }
 
-    printf("Receiving!\n");
+    // printf("Receiving!\n");
     // step 5: Destination receive vehicle  
     for (auto _dest_it = m_od_factory -> m_destination_map.begin(); _dest_it != m_od_factory -> m_destination_map.end(); _dest_it++){
       _dest = _dest_it -> second;
@@ -243,10 +243,10 @@ MNM_Dta_Screenshot *make_screenshot(std::string file_folder, MNM_ConfReader* con
   return _shot;
 }
 
-MNM_Dta_Screenshot *make_screenshot(MNM_Dta_Screenshot* screenshot, MNM_Routing_Fixed *old_routing)
+MNM_Dta_Screenshot *make_screenshot(MNM_Dta_Screenshot* screenshot)
 {
   return MNM::make_screenshot(screenshot -> m_file_folder, screenshot -> m_config, screenshot -> m_od_factory,
-                              screenshot -> m_link_factory, screenshot -> m_node_factory, screenshot -> m_graph, old_routing);
+                              screenshot -> m_link_factory, screenshot -> m_node_factory, screenshot -> m_graph, screenshot -> m_routing);
 }
 
 

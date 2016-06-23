@@ -5,6 +5,8 @@
 **************************************************************************/
 MNM_Path::MNM_Path()
 {
+  m_p = TFlt(0);
+  m_flow = TFlt(0);
   m_link_vec = std::deque<TInt>();
   m_node_vec = std::deque<TInt>();
 }
@@ -43,6 +45,30 @@ bool MNM_Pathset::is_in(MNM_Path* path)
     if (*tmp_path == *path) return true;
   }
   return false;
+}
+
+
+int MNM_Pathset::normalize_p()
+{
+  TFlt _tot_p = TFlt(0);
+  for (MNM_Path *_path : m_path_vec){
+    if (_path -> m_p < 0){
+      printf("Negative probability, impossible!\n");
+      exit(-1);
+    }
+    _tot_p += _path -> m_p;
+  }
+  if (_tot_p == TFlt(0)){
+    for (MNM_Path *_path : m_path_vec){
+      _path -> m_p = TFlt(1)/TFlt(m_path_vec.size());
+    }    
+  }
+  else{
+    for (MNM_Path *_path : m_path_vec){
+      _path -> m_p /= _tot_p;
+    } 
+  }
+  return 0;
 }
 
 

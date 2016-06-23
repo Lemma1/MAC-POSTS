@@ -34,6 +34,7 @@ public:
   MNM_Pathset();
   ~MNM_Pathset();
   std::vector<MNM_Path*> m_path_vec;
+  int normalize_p();
   bool is_in(MNM_Path* path);
 };
 

@@ -15,7 +15,7 @@ class MNM_Routing
 public:
   MNM_Routing(PNEGraph &graph,
               MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
-  ~MNM_Routing();
+  virtual ~MNM_Routing();
   int virtual init_routing(Path_Table *path_table=NULL){return 0;};
   int virtual update_routing(TInt timestamp){return 0;};
   PNEGraph m_graph;
