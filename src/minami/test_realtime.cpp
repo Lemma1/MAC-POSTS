@@ -8,8 +8,8 @@
 
 int main()
 {
-  // std::string m_file_folder = "../../data/input_files_2link";
-  std::string m_file_folder = "../../data/input_files_philly";
+  std::string m_file_folder = "../../data/input_files_2link";
+  // std::string m_file_folder = "../../data/input_files_philly";
   // MNM_ConfReader *m_config;
   // MNM_Node_Factory *m_node_factory;
   // MNM_Link_Factory *m_link_factory;
@@ -66,17 +66,17 @@ int main()
       _it_it.second -> normalize_p();
     }
   }
-  for (int i = 0; i < 1000; ++i)
+  for (int i = 0; i < 1; ++i)
   {
     printf("%d\n", i);
-     d -> run_from_screenshot(d -> m_before_shot, 0 , 10, 0, d -> m_path_table);
-     delete d -> m_after_shot;
-     d -> m_after_shot = MNM::make_screenshot(d -> m_before_shot);
-     d -> run_from_screenshot(d -> m_after_shot, 0 , 10, -1, d -> m_path_table);
-     printf("delete before\n");
-     delete d -> m_before_shot;
-     printf("make before\n");
-     d -> m_before_shot = MNM::make_screenshot(d -> m_after_shot);
+     d -> run_from_screenshot(d -> m_before_shot, 0 , 20, 0, d -> m_path_table);
+     // delete d -> m_after_shot;
+     // d -> m_after_shot = MNM::make_screenshot(d -> m_before_shot);
+     // d -> run_from_screenshot(d -> m_after_shot, 0 , 180, -1, d -> m_path_table);
+     // printf("delete before\n");
+     // delete d -> m_before_shot;
+     // printf("make before\n");
+     // d -> m_before_shot = MNM::make_screenshot(d -> m_after_shot);
 
   }
 

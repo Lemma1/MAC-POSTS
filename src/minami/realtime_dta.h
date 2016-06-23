@@ -5,6 +5,7 @@
 #include "path.h"
 #include "io.h"
 #include "routing.h"
+#include "marginal_cost.h"
 
 #include <string>
 #include <typeinfo>

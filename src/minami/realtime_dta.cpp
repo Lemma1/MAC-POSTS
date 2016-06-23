@@ -56,6 +56,8 @@ int MNM_Realtime_Dta::run_from_screenshot(MNM_Dta_Screenshot* screenshot, TInt s
   MNM_Veh_Factory *_veh_factory = screenshot -> m_veh_factory;
   MNM_Routing *_routing = screenshot -> m_routing;
 
+  MNM_Link_Tt *_link_tt = new MNM_Link_Tt(_link_factory, m_dta_config -> get_float("unit_time"));
+
   // printf("MNM: Prepare loading!\n");
   _routing -> init_routing(path_table);
   MNM_IO::hook_up_od_node(m_file_folder, m_dta_config, m_od_factory, _node_factory);  
@@ -68,7 +70,7 @@ int MNM_Realtime_Dta::run_from_screenshot(MNM_Dta_Screenshot* screenshot, TInt s
   }
   while (_cur_inter < _total_inter){
     _real_inter = _cur_inter + start_inter;
-    printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_real_inter);
+    // printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_real_inter);
     // step 1: Origin release vehicle
 
     // printf("Realsing!\n");
@@ -90,6 +92,7 @@ int MNM_Realtime_Dta::run_from_screenshot(MNM_Dta_Screenshot* screenshot, TInt s
       _node -> evolve(_real_inter);
     }
 
+    _link_tt -> update_tt(_real_inter);
     // printf("Moving through link\n");
     // step 4: move vehicles through link
     for (auto _link_it = _link_factory -> m_link_map.begin(); _link_it != _link_factory -> m_link_map.end(); _link_it++){
@@ -111,11 +114,14 @@ int MNM_Realtime_Dta::run_from_screenshot(MNM_Dta_Screenshot* screenshot, TInt s
   //   // // step 5: update record
   //   // m_statistics -> update_record(__cur_int);
 
+    // _link_tt -> print_info();
     _cur_inter ++;
   }
 
   // // m_statistics -> post_record();
+  delete _link_tt;
   return 0;
+
 }
 /**************************************************************************
                           Screen shot
