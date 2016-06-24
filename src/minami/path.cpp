@@ -93,7 +93,7 @@ MNM_Path *extract_path(TInt origin_ID, TInt dest_ID, std::map<TInt, TInt> &outpu
 Path_Table *build_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_Factory *link_factory)
 {
   /* setting */
-  size_t MaxIter = 5;
+  size_t MaxIter = 3;
   TFlt Mid_Scale = 3;
   TFlt Heavy_Scale = 6;
 

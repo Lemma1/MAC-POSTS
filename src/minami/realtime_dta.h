@@ -19,8 +19,15 @@ public:
   ~MNM_Realtime_Dta();
   int initialize();
   int build_path_table();
-  int run_from_screenshot(MNM_Dta_Screenshot* screenshot, TInt start_inter, 
+  int run_from_screenshot(MNM_Dta_Screenshot* screenshot,
                           TInt max_inter, TInt assign_inter, Path_Table *path_table);
+  int one_iteration();
+  int estimate_previous(TInt assign_inter);
+  TInt m_estimation_iters;
+  TInt m_optimization_iters;
+  TInt m_prediction_length;
+  TInt m_estimation_length;
+  std::map<TInt, TFlt> m_measured_cost;
   std::string m_file_folder;
   PNEGraph m_graph;
   MNM_OD_Factory *m_od_factory;
@@ -29,8 +36,6 @@ public:
   MNM_Dta_Screenshot *m_before_shot;
   MNM_Dta_Screenshot *m_after_shot;
   Path_Table *m_path_table;
-
-
 };
 
 class MNM_Dta_Screenshot

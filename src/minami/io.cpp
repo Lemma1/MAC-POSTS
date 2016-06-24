@@ -439,6 +439,39 @@ Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph, TInt 
 }
 
 
+int MNM_IO::build_vms_facotory(std::string file_folder, PNEGraph graph, TInt num_vms, MNM_Vms_Factory *vms_factory)
+{
+  /* find file */
+  std::string _vms_file_name = file_folder + "/MNM_input_vms";
+  std::ifstream _vms_file;
+  _vms_file.open(_vms_file_name, std::ios::in); 
+
+  std::string _line;
+  std::vector<std::string> _words;
+  TInt _vms_ID, _link_ID;
+  if (_vms_file.is_open())
+  {
+    // printf("Start build demand profile.\n");
+    std::getline(_vms_file,_line); //skip the first line
+    for (int i=0; i < num_vms; ++i){
+      std::getline(_vms_file,_line);
+      // std::cout << "Processing: " << __line << "\n";
+      _words = split(_line, ' ');
+      if (TInt(_words.size()) == 2) {
+        _vms_ID = TInt(std::stoi(_words[0]));
+        _link_ID = TInt(std::stoi(_words[1]));
+        vms_factory -> make_link_vms(_vms_ID, _link_ID, graph);
+      }
+      else{
+        printf("Something wrong in build_vms!\n");
+        exit(-1);
+      }
+    }
+    _vms_file.close();
+  }  
+  return 0;
+}
+
 
 
 

@@ -4,6 +4,7 @@ MNM_Realtime_Dta::MNM_Realtime_Dta(std::string file_folder)
 {
   m_file_folder = file_folder;
   m_path_table = NULL;
+  m_measured_cost = std::map<TInt, TFlt>();
   m_od_factory = new MNM_OD_Factory();
   initialize();
 }
@@ -26,6 +27,11 @@ int MNM_Realtime_Dta::initialize()
   m_before_shot = MNM::make_empty_screenshot(m_file_folder, m_dta_config, m_od_factory, m_graph);
   m_after_shot = MNM::make_empty_screenshot(m_file_folder, m_dta_config, m_od_factory, m_graph);
   build_path_table();
+
+  m_estimation_iters = m_dta_config -> get_int("estimation_iters");
+  m_optimization_iters = m_dta_config -> get_int("optimization_iters");
+  m_prediction_length = m_dta_config -> get_int("prediction_length");
+  m_estimation_length = m_dta_config -> get_int("estimation_length");
   return 0;
 }
 
@@ -40,7 +46,7 @@ int MNM_Realtime_Dta::build_path_table()
 }
 
 
-int MNM_Realtime_Dta::run_from_screenshot(MNM_Dta_Screenshot* screenshot, TInt start_inter, 
+int MNM_Realtime_Dta::run_from_screenshot(MNM_Dta_Screenshot* screenshot,
                                             TInt max_inter, TInt assign_inter, Path_Table *path_table)
 {
   TInt _cur_inter = 0;
@@ -69,7 +75,7 @@ int MNM_Realtime_Dta::run_from_screenshot(MNM_Dta_Screenshot* screenshot, TInt s
     _node -> prepare_loading();
   }
   while (_cur_inter < _total_inter){
-    _real_inter = _cur_inter + start_inter;
+    _real_inter = _cur_inter;
     // printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_real_inter);
     // step 1: Origin release vehicle
 
@@ -121,7 +127,22 @@ int MNM_Realtime_Dta::run_from_screenshot(MNM_Dta_Screenshot* screenshot, TInt s
   // // m_statistics -> post_record();
   delete _link_tt;
   return 0;
+}
 
+
+
+int MNM_Realtime_Dta::one_iteration()
+{
+
+  return 0;
+}
+
+int MNM_Realtime_Dta::estimate_previous(TInt assign_inter)
+{
+  for (int i=0; i < m_estimation_iters; ++i){
+      run_from_screenshot(m_before_shot, m_estimation_length, assign_inter, m_path_table);
+  }
+  return 0;
 }
 /**************************************************************************
                           Screen shot

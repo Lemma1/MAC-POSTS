@@ -16,7 +16,7 @@
 
 #target_link_libraries (path LINK_PUBLIC Snap g3log ${CMAKE_THREAD_INIT})
 
-add_executable (realtime test_realtime.cpp path.cpp dta.cpp vehicle.cpp dlink.cpp od.cpp factory.cpp dnode.cpp ults.cpp io.cpp routing.cpp statistics.cpp shortest_path.cpp realtime_dta.cpp marginal_cost.cpp)
+add_executable (realtime test_realtime.cpp path.cpp dta.cpp vehicle.cpp dlink.cpp od.cpp factory.cpp dnode.cpp ults.cpp io.cpp routing.cpp statistics.cpp shortest_path.cpp realtime_dta.cpp marginal_cost.cpp vms.cpp)
 
 target_link_libraries (realtime LINK_PUBLIC Snap g3log ${CMAKE_THREAD_INIT})
 

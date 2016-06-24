@@ -6,6 +6,7 @@
 #include "factory.h"
 #include "enum.h"
 #include "path.h"
+#include "vms.h"
 
 #include <string>
 #include <vector>
@@ -23,6 +24,7 @@ public:
   static PNEGraph build_graph(std::string file_folder, MNM_ConfReader *conf_reader);
   static int build_demand(std::string file_folder, MNM_ConfReader *conf_reader, MNM_OD_Factory *od_factory);
   static Path_Table *load_path_table(std::string file_name, PNEGraph graph, TInt num_path);
+  static int build_vms_facotory(std::string file_folder, PNEGraph graph, TInt num_vms, MNM_Vms_Factory *vms_factory);
 private:
   static std::vector<std::string> split(const std::string &text, char sep);
   static  std::string inline &ltrim(std::string &s) {s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
