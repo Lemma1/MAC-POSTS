@@ -9,23 +9,23 @@
 
 int main()
 {
-  std::string m_file_folder = "../../data/input_files_2link";
-  // std::string m_file_folder = "../../data/input_files_philly";
-  MNM_ConfReader *m_config;
-  MNM_Node_Factory *m_node_factory;
-  MNM_Link_Factory *m_link_factory;
-  MNM_OD_Factory *m_od_factory;
-  PNEGraph m_graph;
+  // std::string m_file_folder = "../../data/input_files_2link";
+  std::string m_file_folder = "../../data/input_files_philly";
+  // MNM_ConfReader *m_config;
+  // MNM_Node_Factory *m_node_factory;
+  // MNM_Link_Factory *m_link_factory;
+  // MNM_OD_Factory *m_od_factory;
+  // PNEGraph m_graph;
 
-  m_node_factory = new MNM_Node_Factory();
-  m_link_factory = new MNM_Link_Factory();
-  m_od_factory = new MNM_OD_Factory();
-  m_config = new MNM_ConfReader(m_file_folder + "/config.conf", "DTA");
+  // m_node_factory = new MNM_Node_Factory();
+  // m_link_factory = new MNM_Link_Factory();
+  // m_od_factory = new MNM_OD_Factory();
+  // m_config = new MNM_ConfReader(m_file_folder + "/config.conf", "DTA");
 
-  MNM_IO::build_node_factory(m_file_folder, m_config, m_node_factory);
-  MNM_IO::build_link_factory(m_file_folder, m_config, m_link_factory);
-  MNM_IO::build_od_factory(m_file_folder, m_config, m_od_factory, m_node_factory);
-  m_graph = MNM_IO::build_graph(m_file_folder, m_config);
+  // MNM_IO::build_node_factory(m_file_folder, m_config, m_node_factory);
+  // MNM_IO::build_link_factory(m_file_folder, m_config, m_link_factory);
+  // MNM_IO::build_od_factory(m_file_folder, m_config, m_od_factory, m_node_factory);
+  // m_graph = MNM_IO::build_graph(m_file_folder, m_config);
 
   // std::map<TInt, TFlt> cost_map = std::map<TInt, TFlt>();
   // for (auto _it = m_link_factory -> m_link_map.begin(); _it != m_link_factory -> m_link_map.end(); ++_it){
@@ -48,10 +48,10 @@ int main()
 
   // MNM::save_path_table(path_table, m_od_factory);
 
-  printf("0\n");
+  // printf("0\n");
   // Path_Table *path_table = MNM_IO::load_path_table("../../data/input_files_philly/path_table", m_graph, 189065);
 
-  Path_Table *path_table = MNM_IO::load_path_table("../../data/input_files_2link/path_table", m_graph, 2);
+  // Path_Table *path_table = MNM_IO::load_path_table("../../data/input_files_2link/path_table", m_graph, 2);
 
   
   // for (size_t i = 0; i< path_table -> find(1) -> second -> find(5) -> second -> m_path_vec.size(); ++i){
@@ -99,11 +99,24 @@ int main()
   // printf("Finished!\n");
 
 
-  MNM_Vms_Factory *f = new MNM_Vms_Factory();
-  // printf("1\n");
-  MNM_IO::build_vms_facotory(m_file_folder, m_graph, 1 , f);
-  // printf("2\n");
-  f -> hook_path(path_table);
-
+  // MNM_Vms_Factory *f = new MNM_Vms_Factory();
+  // // printf("1\n");
+  // MNM_IO::build_vms_facotory(m_file_folder, m_graph, 1 , f);
+  // // printf("2\n");
+  // f -> hook_path(path_table);
+// 
+  // std::map<TInt, TFlt> link_spd_map = std::map<TInt, TFlt>();
+  // MNM_IO::read_int_float("../../data/input_files_2link/MNM_input_spd", &link_spd_map);
+  // for (auto _it : link_spd_map){
+  //   printf("Link %d has spd %.4f\n", _it.first, _it.second);
+  // }
+  
+  MNM_Realtime_Dta* r = new MNM_Realtime_Dta(m_file_folder);
+  printf("1\n");
+  r -> init_running();
+  printf("2\n");
+  // r -> estimate_previous(0);
+  // r -> optimize_next(0);
+  r -> one_iteration(0);
   return 0;
 }

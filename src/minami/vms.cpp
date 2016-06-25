@@ -4,6 +4,7 @@ MNM_Link_Vms::MNM_Link_Vms(TInt ID, TInt link_ID, PNEGraph graph)
 {
   m_ID = ID;
   m_my_link_ID = link_ID;
+  m_detour_link_ID = -1;
   m_compliance_ratio = TFlt(1);
   m_out_link_vec = std::vector<TInt>();
   m_link_path_map = std::map<TInt, std::vector<MNM_Path*>*>();
@@ -49,6 +50,36 @@ int MNM_Link_Vms::hook_path(Path_Table *path_table)
   return 0;
 }
 
+TInt MNM_Link_Vms::generate_detour_link(Path_Table *path_table, TInt next_assign_inter, MNM_Node_Factory *node_factory)
+{
+  TFlt _largest_diff = -DBL_MAX;
+  TInt _largest_link = -1;
+  TFlt _tmp_optimal, _tmp_real;
+  TInt _link_ID;
+  for (auto _map_it : m_link_path_map){
+    _link_ID = _map_it.first;
+    _tmp_optimal = 0;
+    _tmp_real = 0;
+    for (MNM_Path* _path : *_map_it.second){
+      // printf("prabablity is %f\n", _path -> buffer[2] );
+      _tmp_optimal += _path -> buffer[2] 
+                      * MNM::get_demand_bynode(_path -> m_node_vec.front(), _path -> m_node_vec.back(), next_assign_inter, node_factory);
+      _tmp_real += _path -> buffer[0] 
+                      * MNM::get_demand_bynode(_path -> m_node_vec.front(), _path -> m_node_vec.back(), next_assign_inter, node_factory);
+    }
+    if (_tmp_optimal - _tmp_real > _largest_diff){
+      _largest_diff = _tmp_optimal - _tmp_real;
+      _largest_link = _link_ID;
+    }
+  }
+  if (_largest_link < 0) {
+    printf("optimal is: %.4f, real is %.4f\n", (float)_tmp_optimal, (float)_tmp_real);
+    printf("Something wrong in generate_detour_link\n");
+    exit(-1);
+  }
+  m_detour_link_ID = _largest_link;
+  return _largest_link;
+}
 
 /**************************************************************************
                           VMS factory

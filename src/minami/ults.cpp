@@ -27,6 +27,7 @@ TFlt MNM_Ults::max(TFlt a, TFlt b)
 
 TFlt MNM_Ults::divide(TFlt a, TFlt b){
   if (a == TFlt(0)) return TFlt(0);
+  if (b == TFlt(0)) return TFlt(0);
   return a/b;
 }
 

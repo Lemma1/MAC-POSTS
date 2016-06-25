@@ -43,7 +43,7 @@ public:
   int virtual add_out_link(MNM_Dlink* out_link) override;
   int hook_up_origin(MNM_Origin *origin);
   std::deque<MNM_Veh *> m_in_veh_queue;
-private:
+// private:
   MNM_Origin *m_origin;
   std::map<MNM_Dlink*, TInt> m_out_volume;
 };
@@ -58,7 +58,7 @@ public:
   int virtual add_in_link(MNM_Dlink *link) override;
   int hook_up_destination(MNM_Destination *dest);
   std::deque<MNM_Veh *> m_out_veh_queue;
-private:
+// private:
   MNM_Destination *m_dest;
 };
 

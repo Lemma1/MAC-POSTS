@@ -5,10 +5,11 @@
 **************************************************************************/
 MNM_Path::MNM_Path()
 {
-  m_p = TFlt(0);
-  m_flow = TFlt(0);
   m_link_vec = std::deque<TInt>();
   m_node_vec = std::deque<TInt>();
+  m_buffer_length = 0;
+  m_p = 0;
+  buffer = NULL;
 }
 
 
@@ -16,6 +17,7 @@ MNM_Path::~MNM_Path()
 {
   m_link_vec.clear();
   m_node_vec.clear();
+  if (buffer != NULL) free(buffer);
 }
 
 
@@ -28,6 +30,11 @@ std::string MNM_Path::node_vec_to_string()
   _s.pop_back();
   _s += "\n";
   return _s;
+}
+
+int MNM_Path::allocate_buffer(TInt length){
+  buffer = static_cast<TFlt*>(std::malloc(sizeof(TFlt) * length));
+  return 0;
 }
 
 /**************************************************************************
@@ -194,6 +201,40 @@ int save_path_table(Path_Table *path_table, MNM_OD_Factory *od_factory)
     }
   }
   _path_table_file.close();
+  return 0;
+}
+
+int allocate_path_table_buffer(Path_Table *path_table, TInt num)
+{
+  for(auto _it : *path_table){
+    for (auto _it_it : *(_it.second)){
+      for (MNM_Path* _path : _it_it.second -> m_path_vec){
+        _path -> allocate_buffer(num);
+      }
+    }
+  }  
+  return 0;
+}
+
+int normalize_path_table_p(Path_Table *path_table)
+{
+  for(auto _it : *path_table){
+    for (auto _it_it : *(_it.second)){
+      _it_it.second -> normalize_p();
+    }
+  }    
+  return 0;
+}
+
+int copy_p_to_buffer(Path_Table *path_table, TInt col)
+{
+  for(auto _it : *path_table){
+    for (auto _it_it : *(_it.second)){
+      for (MNM_Path* _path : _it_it.second -> m_path_vec){
+        _path -> buffer[col] = _path -> m_p;
+      }
+    }
+  }  
   return 0;
 }
 

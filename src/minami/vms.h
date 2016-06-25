@@ -15,10 +15,11 @@ public:
   ~MNM_Link_Vms();
   TInt m_ID;
   TInt m_my_link_ID;
+  TInt m_detour_link_ID;
   std::vector<TInt> m_out_link_vec;
   std::map<TInt, std::vector<MNM_Path*>*> m_link_path_map;
 
-  TInt generate_detour_link();
+  TInt generate_detour_link(Path_Table *path_table, TInt next_assign_inter, MNM_Node_Factory *node_factory);
   TFlt m_compliance_ratio;
   int hook_link(PNEGraph graph);
   int hook_path(Path_Table *path_table);
@@ -37,6 +38,6 @@ public:
 };
 
 namespace MNM {
-  int generate_vms_instructions(std::string file_name);
+  int generate_vms_instructions(std::string file_name, MNM_Vms_Factory* vms_factory);
 }
 #endif

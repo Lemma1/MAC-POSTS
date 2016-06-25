@@ -11,6 +11,7 @@
 class MNM_Destination;
 class MNM_Veh;
 class MNM_Veh_Factory;
+class MNM_Node_Factory;
 class MNM_DMOND;
 class MNM_DMDND;
 
@@ -44,4 +45,7 @@ public:
   int receive(TInt current_interval);
 };
 
+namespace MNM{
+  TFlt get_demand_bynode(TInt O_node, TInt D_node, TInt assign_inter, MNM_Node_Factory *node_factory);
+}
 #endif

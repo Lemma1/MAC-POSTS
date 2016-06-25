@@ -110,3 +110,23 @@ int MNM_Destination::receive(TInt current_interval)
 }
 
 
+namespace MNM{
+
+TFlt get_demand_bynode(TInt O_node, TInt D_node, TInt assign_inter, MNM_Node_Factory *node_factory)
+{
+  if (MNM_DMOND* _origin_node = dynamic_cast<MNM_DMOND*>(node_factory->get_node(O_node))){
+    MNM_Origin* _origin = _origin_node -> m_origin;
+    if (MNM_DMDND* _dest_node = dynamic_cast<MNM_DMDND*>(node_factory->get_node(D_node))){
+      MNM_Destination* _dest = _dest_node -> m_dest;
+      if (_origin -> m_demand.find(_dest) == _origin -> m_demand.end()){
+        return TFlt(0);
+      }
+      return _origin -> m_demand.find(_dest) -> second[assign_inter];
+    }
+  }
+  printf("get_demand_bynode::Can't find the origin or destination.\n");
+  exit(-1);
+}
+
+}
+

@@ -2,10 +2,13 @@
 #define REALTIME_DTA_H
 
 #include "Snap.h"
+#include "od.h"
 #include "path.h"
 #include "io.h"
 #include "routing.h"
+#include "statistics.h"
 #include "marginal_cost.h"
+
 
 #include <string>
 #include <typeinfo>
@@ -19,15 +22,34 @@ public:
   ~MNM_Realtime_Dta();
   int initialize();
   int build_path_table();
+  MNM_Statistics *get_statistics(MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
   int run_from_screenshot(MNM_Dta_Screenshot* screenshot,
                           TInt max_inter, TInt assign_inter, Path_Table *path_table);
-  int one_iteration();
+  int get_estimation_gradient(MNM_Dta_Screenshot* screenshot,
+                              TInt max_inter, TInt assign_inter, Path_Table *path_table, 
+                              std::map<TInt, TFlt> *link_spd_map);
+  int get_optimization_gradient(MNM_Dta_Screenshot* screenshot,
+                                  TInt max_inter, TInt assign_inter, Path_Table *path_table);
+  int one_iteration(TInt assign_inter);
   int estimate_previous(TInt assign_inter);
+  int optimize_next(TInt next_assign_inter);
+  int predict_next(TInt next_assign_inter);
+  int update_compliance_ratio(TInt assign_inter);
+  int update_vms(TInt next_assign_inter);
+  int init_running();
+  int reset();
   TInt m_estimation_iters;
   TInt m_optimization_iters;
+  TInt m_sample_points;
   TInt m_prediction_length;
   TInt m_estimation_length;
-  std::map<TInt, TFlt> m_measured_cost;
+  TInt m_total_assign_inter;
+
+  TFlt m_estimation_step_size;
+  TFlt m_optimization_step_size;
+
+  std::map<TInt, TFlt> m_average_link_tt;
+  std::map<TInt, TFlt> m_link_tt_difference; //only used in estimation
   std::string m_file_folder;
   PNEGraph m_graph;
   MNM_OD_Factory *m_od_factory;
@@ -35,6 +57,7 @@ public:
   MNM_ConfReader* m_realtime_dta_config;
   MNM_Dta_Screenshot *m_before_shot;
   MNM_Dta_Screenshot *m_after_shot;
+  MNM_Vms_Factory *m_vms_factory;
   Path_Table *m_path_table;
 };
 
@@ -63,6 +86,8 @@ namespace MNM
   MNM_Dta_Screenshot *make_screenshot(MNM_Dta_Screenshot* screenshot);
   MNM_Dta_Screenshot *make_empty_screenshot(std::string file_folder, MNM_ConfReader* config, 
                                                     MNM_OD_Factory *od_factory, PNEGraph graph);
+
+  int update_path_p(Path_Table *path_table, TInt col, TFlt step_size);
 }
 
 

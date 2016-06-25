@@ -458,8 +458,8 @@ int MNM_IO::build_vms_facotory(std::string file_folder, PNEGraph graph, TInt num
       // std::cout << "Processing: " << __line << "\n";
       _words = split(_line, ' ');
       if (TInt(_words.size()) == 2) {
-        _vms_ID = TInt(std::stoi(_words[0]));
-        _link_ID = TInt(std::stoi(_words[1]));
+        _vms_ID = TInt(std::stoi(trim(_words[0])));
+        _link_ID = TInt(std::stoi(trim(_words[1])));
         vms_factory -> make_link_vms(_vms_ID, _link_ID, graph);
       }
       else{
@@ -473,6 +473,40 @@ int MNM_IO::build_vms_facotory(std::string file_folder, PNEGraph graph, TInt num
 }
 
 
+int MNM_IO::read_int_float(std::string file_name, std::map<TInt, TFlt>* reader)
+{
+  /* find file */
+  std::ifstream _file;
+  _file.open(file_name, std::ios::in);   
+
+  std::string _line;
+  std::vector<std::string> _words;
+  TInt _int;
+  TFlt _float;
+  if (_file.is_open())
+  {
+    // printf("Start build demand profile.\n");
+    std::getline(_file,_line); //skip the first line
+    TInt num_record = TInt(std::stoi(trim(_line)));
+    // printf("Total is %d\n", num_record);
+    for (int i=0; i < num_record; ++i){
+      std::getline(_file,_line);
+      // std::cout << "Processing: " << __line << "\n";
+      _words = split(_line, ' ');
+      if (TInt(_words.size()) == 2) {
+        _int = TInt(std::stoi(trim(_words[0])));
+        _float = TInt(std::stoi(trim(_words[1])));
+        reader -> insert(std::pair<TInt, TFlt>(_int, _float));
+      }
+      else{
+        printf("Something wrong in build_vms!\n");
+        exit(-1);
+      }
+    }
+    _file.close();
+  }  
+  return 0;
+}
 
 
 std::vector<std::string> MNM_IO::split(const std::string &text, char sep) 
