@@ -285,12 +285,13 @@ int MNM_Realtime_Dta::get_estimation_gradient(MNM_Dta_Screenshot* screenshot,
 
   TFlt _tmp_tt;
   TFlt _demand;
+  TFlt _tmp_grad;
   for(auto _it : *path_table){
     for (auto _it_it : *(_it.second)){
       _demand = MNM::get_demand_bynode(_it.first, _it_it.first, assign_inter, _node_factory);
       // printf("Demand is %.4f\n", _demand);
       for (MNM_Path* _path : _it_it.second -> m_path_vec){
-        TFlt _tmp_grad = 0;
+        _tmp_grad = 0;
         for (TInt _link_ID : _path -> m_link_vec){
           _tmp_tt = m_average_link_tt.find(_link_ID) -> second;
           // printf("Average tt is %.4f, marginal cost is %.4f\n", (float)_tmp_tt, (float)MNM::calculate_link_mc(_link_factory->get_link(_link_ID), _tmp_tt));
@@ -320,12 +321,14 @@ int MNM_Realtime_Dta::get_optimization_gradient(MNM_Dta_Screenshot* screenshot,
   MNM_Dnode *_node;
   MNM_Dlink *_link;
   MNM_Destination *_dest;
-  TFlt num_link = TFlt(_link_factory -> m_link_map.size());
+  
 
   MNM_Node_Factory *_node_factory = screenshot -> m_node_factory;
   MNM_Link_Factory *_link_factory = screenshot -> m_link_factory;
   MNM_Veh_Factory *_veh_factory = screenshot -> m_veh_factory;
   MNM_Routing *_routing = screenshot -> m_routing;
+
+  TFlt num_link = TFlt(_link_factory -> m_link_map.size());
 
   MNM_Link_Tt *_link_tt = new MNM_Link_Tt(_link_factory, m_dta_config -> get_float("unit_time"));
   for (auto _map_it : m_average_link_tt){
@@ -414,7 +417,7 @@ int MNM_Realtime_Dta::get_optimization_gradient(MNM_Dta_Screenshot* screenshot,
           _link = _link_factory->get_link(_link_ID);
           _tmp_tt = m_average_link_tt.find(_link_ID) -> second;
           // printf("Average tt is %.4f, marginal cost is %.4f\n", (float)_tmp_tt, (float)MNM::calculate_link_mc(_link_factory->get_link(_link_ID), _tmp_tt));
-          _tmp_grad += _tmp_tt / _demand;
+          _tmp_grad += MNM_Ults::divide(_tmp_tt, _demand);
           _tmp_grad += MNM_Ults::divide(MNM::calculate_link_mc(_link, _tmp_tt)
                        * _link -> get_link_flow()
                        , _demand * num_link);
@@ -500,13 +503,13 @@ int MNM_Realtime_Dta::estimate_previous(TInt assign_inter)
     _tmp_shot = MNM::make_screenshot(m_before_shot);
     printf("estimate_previousn::get_estimation_gradient\n");
     get_estimation_gradient(_tmp_shot, m_estimation_length, assign_inter, m_path_table, &_link_spd_map);
-      for(auto _it : *m_path_table){
-      for (auto _it_it : *(_it.second)){
-        for (MNM_Path* _path : _it_it.second -> m_path_vec){
-          printf("Now the probability is %.4f\n", (float)_path -> buffer[1]);
-        }
-      }
-    } 
+    // for(auto _it : *m_path_table){
+    //   for (auto _it_it : *(_it.second)){
+    //     for (MNM_Path* _path : _it_it.second -> m_path_vec){
+    //       printf("Now the probability is %.4f\n", (float)_path -> m_p);
+    //     }
+    //   }
+    // } 
     printf("estimate_previousn::update_path_p\n");
     MNM::update_path_p(m_path_table, 1, m_estimation_step_size/TFlt(i + 1));
     printf("estimate_previousn::delete shot\n");
@@ -533,13 +536,13 @@ int MNM_Realtime_Dta::optimize_next(TInt next_assign_inter)
     printf("optimize_next::update_path_p\n");
     MNM::update_path_p(m_path_table, 3, m_optimization_step_size/TFlt(i + 1));
     printf("optimize_next::delete\n");
-    for(auto _it : *m_path_table){
-      for (auto _it_it : *(_it.second)){
-        for (MNM_Path* _path : _it_it.second -> m_path_vec){
-          printf("Now the probability is %.4f\n", (float)_path -> m_p);
-        }
-      }
-    } 
+    // for(auto _it : *m_path_table){
+    //   for (auto _it_it : *(_it.second)){
+    //     for (MNM_Path* _path : _it_it.second -> m_path_vec){
+    //       printf("Now the probability is %.4f\n", (float)_path -> m_p);
+    //     }
+    //   }
+    // } 
     if (i == m_optimization_iters - 1){
       delete m_after_shot;
       m_after_shot = _tmp_shot;
@@ -804,10 +807,15 @@ MNM_Dta_Screenshot *make_empty_screenshot(std::string file_folder, MNM_ConfReade
 
 int update_path_p(Path_Table *path_table, TInt col, TFlt step_size)
 {
+  TFlt Possible_Large = 10000;
   for(auto _it : *path_table){
     for (auto _it_it : *(_it.second)){
       for (MNM_Path* _path : _it_it.second -> m_path_vec){
-        _path -> m_p -= MNM_Ults::min(step_size * _path -> buffer[col], TFlt(0));
+        // printf("Before m_p is %lf\n", _path -> m_p);
+        _path -> m_p -= step_size * _path -> buffer[col];
+        // printf("Now m_p is %lf\n", _path -> m_p);
+        _path -> m_p = MNM_Ults::max(_path -> m_p, -Possible_Large);
+        _path -> m_p = MNM_Ults::min(_path -> m_p, Possible_Large);
       }
       _it_it.second -> normalize_p();
     }

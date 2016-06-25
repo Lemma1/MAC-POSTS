@@ -48,7 +48,6 @@ int main()
     }
     
     
-    
     rd -> one_iteration(assign_inter);
 
     if (rd -> m_before_shot -> m_veh_factory -> m_veh_map.size() > RESET_THRESHOLD 

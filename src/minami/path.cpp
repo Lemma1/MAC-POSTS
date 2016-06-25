@@ -58,12 +58,18 @@ bool MNM_Pathset::is_in(MNM_Path* path)
 int MNM_Pathset::normalize_p()
 {
   TFlt _tot_p = TFlt(0);
+  TFlt _min_p = TFlt(0);
   for (MNM_Path *_path : m_path_vec){
-    if (_path -> m_p < 0){
-      printf("Negative probability, impossible!\n");
-      exit(-1);
+    // if (_path -> m_p < 0){
+    //   printf("Negative probability, impossible!\n");
+    //   exit(-1);
+    // }
+    if (_path -> m_p < _min_p){
+      _min_p = _path -> m_p;
     }
-    _tot_p += _path -> m_p;
+  }
+  for (MNM_Path *_path : m_path_vec){
+    _tot_p += _path -> m_p - _min_p;
   }
   if (_tot_p == TFlt(0)){
     for (MNM_Path *_path : m_path_vec){
@@ -72,7 +78,7 @@ int MNM_Pathset::normalize_p()
   }
   else{
     for (MNM_Path *_path : m_path_vec){
-      _path -> m_p /= _tot_p;
+      _path -> m_p = (_path -> m_p - _min_p) / _tot_p;
     } 
   }
   return 0;
