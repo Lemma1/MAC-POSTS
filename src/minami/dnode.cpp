@@ -218,19 +218,24 @@ int MNM_Dnode_Inout::prepare_supplyANDdemand()
   for (size_t i=0; i < m_in_link_array.size(); ++i){
     __in_link = m_in_link_array[i];
     for (size_t j=0; j< m_out_link_array.size(); ++j){
-      __count = 0;
       __out_link = m_out_link_array[j];
+      // printf("Current out link is %d\n", __out_link -> m_link_ID);
+      __count = 0;
+      
       for (__veh_it = __in_link -> m_finished_array.begin(); __veh_it != __in_link -> m_finished_array.end(); __veh_it++){
         if ((*__veh_it) -> get_next_link() == __out_link) __count += 1;
       }
       m_demand[__offset*i + j] = TFlt(__count) / m_flow_scalar;
     }
   }
-
+  // printf("Finished\n");
   /* calculated supply */
-   for (size_t i=0; i< m_out_link_array.size(); ++i){
+  for (size_t i=0; i< m_out_link_array.size(); ++i){
     __out_link = m_out_link_array[i];
+    // printf("Get link s\n");
+    // printf("The out link is %d\n", __out_link -> m_link_ID);
     m_supply[i] = __out_link -> get_link_supply();
+    // printf(" get link s fin\n");
     // printf("Link %d, supply is %.4f\n", __out_link -> m_link_ID, m_supply[i]);
   } 
 
@@ -347,10 +352,15 @@ int MNM_Dnode_Inout::add_in_link(MNM_Dlink *link)
 
 int MNM_Dnode_Inout::evolve(TInt timestamp)
 {
+  // printf("1\n");
   prepare_supplyANDdemand();
+  // printf("2\n"); 
   compute_flow();
+  // printf("3\n");
   round_flow_to_vehicle();
+  // printf("4\n");
   move_vehicle();
+  // printf("5\n");
   return 0;
 }
 /**************************************************************************

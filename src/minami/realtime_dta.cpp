@@ -206,7 +206,7 @@ int MNM_Realtime_Dta::get_estimation_gradient(MNM_Dta_Screenshot* screenshot,
   for (auto _map_it : m_link_tt_difference){
     _map_it.second = 0;
   }
-  // printf("MNM: Prepare loading!\n");
+  printf("MNM: Prepare loading!\n");
   _routing -> init_routing(path_table);
   MNM_IO::hook_up_od_node(m_file_folder, m_dta_config, m_od_factory, _node_factory);  
   // printf("Finish prepare routing\n");
@@ -237,6 +237,7 @@ int MNM_Realtime_Dta::get_estimation_gradient(MNM_Dta_Screenshot* screenshot,
     // step 3: move vehicles through node
     for (auto _node_it = _node_factory -> m_node_map.begin(); _node_it != _node_factory -> m_node_map.end(); _node_it++){
       _node = _node_it -> second;
+      // printf("Current node %d\n", _node_it -> first);
       _node -> evolve(_real_inter);
     }
 
@@ -450,6 +451,9 @@ int MNM_Realtime_Dta::one_iteration(TInt assign_inter)
   update_vms(_next_assign_inter);
   printf("predict_next\n");
   predict_next(_next_assign_inter);
+  printf("generate_vms_instructions\n");
+  std::string _vms_info = m_file_folder + "/record/vms_info";
+  MNM::generate_vms_instructions(_vms_info, m_vms_factory, m_after_shot -> m_link_factory);
   return 0;
 }
 
@@ -601,7 +605,10 @@ int MNM_Realtime_Dta::predict_next(TInt next_assign_inter)
 
 
   while (_cur_inter < m_prediction_length){
-    // printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_cur_inter);
+    if ((_cur_inter+1) % 10 == 0){
+      printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_cur_inter);
+    }
+      
     // step 1: Origin release vehicle
 
     // printf("Realsing!\n");
@@ -647,6 +654,7 @@ int MNM_Realtime_Dta::predict_next(TInt next_assign_inter)
     _cur_inter ++;
   }
   _statistics -> post_record();
+  delete _statistics;
   return 0;
 }
 

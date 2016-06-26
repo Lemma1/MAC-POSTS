@@ -38,6 +38,6 @@ public:
 };
 
 namespace MNM {
-  int generate_vms_instructions(std::string file_name, MNM_Vms_Factory* vms_factory);
+  int generate_vms_instructions(std::string file_name, MNM_Vms_Factory* vms_factory, MNM_Link_Factory *link_factory);
 }
 #endif

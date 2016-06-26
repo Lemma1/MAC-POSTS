@@ -9,8 +9,10 @@
 
 int main()
 {
-  std::string m_file_folder = "../../data/input_files_2link";
+  // std::string m_file_folder = "../../data/input_files_2link";
   // std::string m_file_folder = "../../data/input_files_philly";
+  std::string m_file_folder = "../../data/input_files_new_philly";
+
   // MNM_ConfReader *m_config;
   // MNM_Node_Factory *m_node_factory;
   // MNM_Link_Factory *m_link_factory;
@@ -118,5 +120,6 @@ int main()
   // r -> estimate_previous(0);
   // r -> optimize_next(0);
   r -> one_iteration(0);
+
   return 0;
 }

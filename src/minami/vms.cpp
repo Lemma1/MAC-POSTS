@@ -117,3 +117,42 @@ int MNM_Vms_Factory::hook_path(Path_Table *path_table)
   }
   return 0;
 }
+
+
+
+namespace MNM {
+
+int generate_vms_instructions(std::string file_name, MNM_Vms_Factory* vms_factory, MNM_Link_Factory *link_factory)
+{
+  /* find file */
+  std::ofstream _vms_info_file;
+  _vms_info_file.open(file_name, std::ios::out);
+  if (!_vms_info_file.is_open()){
+    printf("Error happens when open _vms_info_file\n");
+    exit(-1);
+  }
+
+  std::string _info;
+  MNM_Dlink *_link;
+  std::string _str;
+  for (auto _map_it : vms_factory -> m_link_vms_map){
+    MNM_Link_Vms *_vms = _map_it.second;
+    _link = link_factory -> get_link(_vms -> m_detour_link_ID);
+    if (_link -> m_ffs < TFlt(60.0 * 1600.0 / 3600.0)){
+      _info = std::string("Congestion ahead, take next exit to link %s!\n", std::to_string(_vms -> m_detour_link_ID).c_str());
+    }
+    else{
+      if (_link -> get_link_tt() > _link -> m_length / _link -> m_ffs){
+        _info = std::string("Congestion ahead, drive with care!\n");
+      }
+      else{
+        _info = std::string("Drive with care!\n");
+      }
+    }
+    _str = std::to_string(_map_it.first) + " " + _info;
+    _vms_info_file << _str;
+  }
+  return 0;
+}
+
+}

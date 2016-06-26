@@ -56,6 +56,8 @@ int main()
     }
 
     std::remove(instruction_file_name.c_str());
+
+    system("python ../../a.py");
   }
   return 0;
 }
