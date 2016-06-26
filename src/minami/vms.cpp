@@ -152,6 +152,7 @@ int generate_vms_instructions(std::string file_name, MNM_Vms_Factory* vms_factor
     _str = std::to_string(_map_it.first) + " " + _info;
     _vms_info_file << _str;
   }
+  _vms_info_file.close();
   return 0;
 }
 

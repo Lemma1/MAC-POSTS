@@ -61,7 +61,9 @@ int MNM_DMOND::evolve(TInt timestamp)
   MNM_Veh *__veh;
   for (unsigned i=0; i<m_out_link_array.size(); ++i){
     __link = m_out_link_array[i];
-    // printf("In node %d, %d veh to move to link %d, total veh %d \n", m_node_ID, m_out_volume.find(__link) -> second, __link -> m_link_ID, m_in_veh_queue.size());
+    if (m_in_veh_queue.size() != 0){
+        // printf("In node %d, %d veh to move to link %d, total veh %d \n", m_node_ID, m_out_volume.find(__link) -> second, __link -> m_link_ID, m_in_veh_queue.size());  
+    }
     __que_it = m_in_veh_queue.begin();
     while (__que_it != m_in_veh_queue.end()) {
       if (m_out_volume.find(__link) -> second > 0){
