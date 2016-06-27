@@ -25,7 +25,7 @@ bool is_file_exist(const char *fileName)
 int main()
 {
 
-  std::string file_folder = "../../data/input_files_2link";
+  std::string file_folder = ".";
   std::string instruction_file_name = file_folder + "/instruction";
 
   MNM_Realtime_Dta* rd = new MNM_Realtime_Dta(file_folder);
@@ -57,7 +57,7 @@ int main()
 
     std::remove(instruction_file_name.c_str());
 
-    system("python ../../a.py");
+    system("python ../../../../../manage.py import_online_congestion");
   }
   return 0;
 }

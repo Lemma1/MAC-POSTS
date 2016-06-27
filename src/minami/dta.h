@@ -28,6 +28,9 @@ public:
 private:
   int set_statistics();
   int set_routing();
+  int check_origin_destination_connectivity();
+  TInt m_start_assign_interval;
+  TInt m_total_assign_inter;
   TFlt m_unit_time;
   TFlt m_flow_scalar;
   TInt m_assign_freq;

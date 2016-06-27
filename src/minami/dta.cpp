@@ -21,7 +21,8 @@ int MNM_Dta::initialize()
   m_unit_time = m_config -> get_int("unit_time");
   m_flow_scalar = m_config -> get_int("flow_scalar");
   m_assign_freq = m_config -> get_int("assign_frq");
-  
+  m_start_assign_interval = m_config -> get_int("start_assign_interval");
+  m_total_assign_inter = m_config ->  get_int("max_interval");
 
   return 0;
 }
@@ -134,7 +135,7 @@ bool MNM_Dta::is_ok()
        __origin_map_it != m_od_factory->m_origin_map.end(); __origin_map_it++){
     __node_ID = __origin_map_it -> second -> m_origin_node -> m_node_ID;
     __temp_flag = __temp_flag && ((m_graph -> GetNI(__node_ID)).GetId() == __node_ID)
-                  && (m_graph -> GetNI(__node_ID).GetOutDeg() == 1)
+                  && (m_graph -> GetNI(__node_ID).GetOutDeg() >= 1)
                   && (m_graph -> GetNI(__node_ID).GetInDeg() == 0);
   }
   std::map<TInt, MNM_Destination*>::iterator __dest_map_it;
@@ -143,10 +144,16 @@ bool MNM_Dta::is_ok()
     __node_ID = __dest_map_it -> second -> m_dest_node -> m_node_ID;
     __temp_flag = __temp_flag && ((m_graph -> GetNI(__node_ID)).GetId() == __node_ID)
                   && (m_graph -> GetNI(__node_ID).GetOutDeg() == 0)
-                  && (m_graph -> GetNI(__node_ID).GetInDeg() == 1);
+                  && (m_graph -> GetNI(__node_ID).GetInDeg() >= 1);
   }  
   __flag = __flag && __temp_flag;
   if (__temp_flag)  printf("Passed!\n");  
+
+  printf("Checking......OD connectivity!\n");
+  __temp_flag = check_origin_destination_connectivity();
+  __flag = __flag && __temp_flag;
+  if (__temp_flag)  printf("Passed!\n");  
+
   return __flag;
 }
 
@@ -159,7 +166,7 @@ int MNM_Dta::loading(bool verbose)
   MNM_Dnode *__node;
   MNM_Dlink *__link;
   MNM_Destination *__dest;
-
+  TInt _assign_inter = m_start_assign_interval;
 
   printf("MNM: Prepare loading!\n");
   m_routing -> init_routing();
@@ -174,10 +181,18 @@ int MNM_Dta::loading(bool verbose)
     printf("-------------------------------    Interval %d   ------------------------------ \n", (int)__cur_int);
     // step 1: Origin release vehicle
     printf("Realsing!\n");
-    for (auto __origin_it = m_od_factory -> m_origin_map.begin(); __origin_it != m_od_factory -> m_origin_map.end(); __origin_it++){
-      __origin = __origin_it -> second;
-      __origin -> release(m_veh_factory, __cur_int);
-    }      
+    // for (auto __origin_it = m_od_factory -> m_origin_map.begin(); __origin_it != m_od_factory -> m_origin_map.end(); __origin_it++){
+    //   __origin = __origin_it -> second;
+    //   __origin -> release(m_veh_factory, __cur_int);
+    // }      
+    if (__cur_int % m_assign_freq == 0 || __cur_int==0){
+      for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){
+        __origin = _origin_it -> second;
+        _assign_inter = _assign_inter % m_total_assign_inter;
+        __origin -> release_one_interval(__cur_int, m_veh_factory, _assign_inter, TFlt(0));
+      }  
+      _assign_inter += 1;
+    }
 
     printf("Routing!\n");
     // step 2: route the vehicle
@@ -219,6 +234,30 @@ int MNM_Dta::loading(bool verbose)
   return 0;
 }
 
+
+int MNM_Dta::check_origin_destination_connectivity()
+{
+  MNM_Destination *_dest;
+  TInt _dest_node_ID;
+  std::map<TInt, TInt> _shortest_path_tree = std::map<TInt, TInt>();
+  std::map<TInt, TFlt> _cost_map;
+  for (auto _map_it : m_link_factory -> m_link_map){
+    _cost_map.insert(std::pair<TInt, TFlt>(_map_it.first, TFlt(1)));
+  }
+  
+  for (auto _it = m_od_factory -> m_destination_map.begin(); _it != m_od_factory -> m_destination_map.end(); _it++){
+    _dest = _it -> second;
+    _dest_node_ID = _dest -> m_dest_node -> m_node_ID;
+    MNM_Shortest_Path::all_to_one_FIFO(_dest_node_ID, m_graph, _cost_map, _shortest_path_tree);
+    for (auto _map_it : m_od_factory -> m_origin_map){
+      if (_shortest_path_tree.find(_map_it.second -> m_origin_node -> m_node_ID)-> second == -1){
+        return false;
+      }
+    }
+// }
+  }
+  return true;
+}
 
 
 // int MNM_Dta::test()

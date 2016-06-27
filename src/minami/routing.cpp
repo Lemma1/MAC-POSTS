@@ -120,6 +120,7 @@ int MNM_Routing_Hybrid::init_routing(Path_Table *path_table)
   return 0;
 }
 
+
 int MNM_Routing_Hybrid::update_routing(TInt timestamp)
 {
   MNM_Destination *_dest;
@@ -178,7 +179,16 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
         if (_next_link_ID == -1){
           printf("Something wrong in routing, wrong next link 2\n");
           printf("The node is %d, the vehicle should head to %d\n", (int)_node_ID, (int)_veh_dest -> m_dest_node -> m_node_ID);
-          exit(-1);
+          // exit(-1);
+          auto _node_I = m_graph -> GetNI(_node_ID);
+          if (_node_I.GetOutDeg() > 0){
+            printf("Assign randomly!\n");
+            _next_link_ID = _node_I.GetOutEId(MNM_Ults::mod(rand(), _node_I.GetOutDeg()));
+          }
+          else
+          {
+            printf("Can't do anything!\n");
+          }
         }
         _next_link = m_link_factory -> get_link(_next_link_ID);
         _veh -> set_next_link(_next_link);

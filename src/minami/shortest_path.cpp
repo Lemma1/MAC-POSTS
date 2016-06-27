@@ -69,6 +69,7 @@ int MNM_Shortest_Path::all_to_one_Dijkstra(TInt dest_node_ID,
     }
     m_Q.erase(_pv);
   }
+
   for (auto _it = m_Q.begin(); _it != m_Q.end(); _it++){
     free (*_it);
   }
@@ -114,6 +115,7 @@ int MNM_Shortest_Path::all_to_one_FIFO(TInt dest_node_ID,
   TInt _in_node_ID, _tmp_ID, _in_link_ID;
   TFlt _alt, _tmp_dist;
   while (m_Q.size() != 0){
+    // printf("current m_Q size is %d\n", m_Q.size());
     _tmp_ID = m_Q.front();
     m_Q.pop_front();
     m_Q_support.find(_tmp_ID) -> second = false;

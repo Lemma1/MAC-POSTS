@@ -139,7 +139,7 @@ int generate_vms_instructions(std::string file_name, MNM_Vms_Factory* vms_factor
     MNM_Link_Vms *_vms = _map_it.second;
     _link = link_factory -> get_link(_vms -> m_detour_link_ID);
     if (_link -> m_ffs < TFlt(60.0 * 1600.0 / 3600.0)){
-      _info = std::string("Congestion ahead, take next exit to link %s!\n", std::to_string(_vms -> m_detour_link_ID).c_str());
+      _info = std::string("Congestion ahead, take next exit to link ") + std::to_string(_vms -> m_detour_link_ID) + "\n";
     }
     else{
       if (_link -> get_link_tt() > _link -> m_length / _link -> m_ffs){
@@ -150,6 +150,7 @@ int generate_vms_instructions(std::string file_name, MNM_Vms_Factory* vms_factor
       }
     }
     _str = std::to_string(_map_it.first) + " " + _info;
+    // printf("%s\n", _str.c_str());
     _vms_info_file << _str;
   }
   _vms_info_file.close();
