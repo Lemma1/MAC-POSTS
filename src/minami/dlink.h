@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <deque>
-#include <map>
+#include <unordered_map>
 
 class MNM_Veh;
 class MNM_Dnode;
@@ -117,7 +117,7 @@ public:
   TFlt virtual get_link_flow() override;
   TFlt virtual get_link_tt() override;
 // private:
-  std::map<MNM_Veh*, TInt> m_veh_queue;
+  std::unordered_map<MNM_Veh*, TInt> m_veh_queue;
   TInt m_volume; //vehicle number, without the flow scalar
   TFlt m_lane_hold_cap;
   TFlt m_lane_flow_cap;

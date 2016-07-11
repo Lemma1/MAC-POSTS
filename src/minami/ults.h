@@ -7,6 +7,27 @@
 #include <string>
 #include <map>
 
+
+// struct TIntHash {
+//  std::size_t operator()(const TInt& i) const
+//  {
+//      return std::hash<int>()(i());
+//  }
+// };
+
+namespace std
+{
+    template<> struct hash<TInt>
+    {
+        typedef TInt argument_type;
+        typedef std::size_t result_type;
+        result_type operator()(argument_type const& s) const
+        {
+            return std::hash<int>()(s());
+        }
+    };
+}
+
 class MNM_Ults
 {
 public:

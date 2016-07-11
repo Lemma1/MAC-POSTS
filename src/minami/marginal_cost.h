@@ -5,6 +5,8 @@
 #include "factory.h"
 #include "vehicle.h"
 
+#include <unordered_map>
+
 struct Vehicle_Record {
   MNM_Dlink* m_link;
   TFlt m_start_time; 
@@ -25,8 +27,8 @@ public:
   TFlt m_update_speed;
   TFlt m_unit_time;
   MNM_Link_Factory *m_link_factory;
-  std::map<MNM_Veh*, Vehicle_Record*> m_tracker;
-  std::map<MNM_Dlink*, TFlt> m_tt_map;
+  std::unordered_map<MNM_Veh*, Vehicle_Record*> m_tracker;
+  std::unordered_map<MNM_Dlink*, TFlt> m_tt_map;
 };
 
 

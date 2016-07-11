@@ -10,9 +10,11 @@ MNM_Statistics::MNM_Statistics(std::string file_folder, MNM_ConfReader *conf_rea
   m_node_factory = node_factory;
   m_link_factory = link_factory;
 
-  m_record_interval_volume = std::map<TInt, TFlt>();
-  m_load_interval_volume = std::map<TInt, TFlt>();
-
+  m_record_interval_volume = std::unordered_map<TInt, TFlt>();
+  m_load_interval_volume = std::unordered_map<TInt, TFlt>();
+  m_record_interval_tt = std::unordered_map<TInt, TFlt>();
+  m_load_interval_tt = std::unordered_map<TInt, TFlt>();
+  
   if (m_load_interval_volume_file.is_open()) m_load_interval_volume_file.close();
   if (m_record_interval_volume_file.is_open()) m_record_interval_volume_file.close();
   if (m_load_interval_tt_file.is_open()) m_load_interval_tt_file.close();
@@ -224,8 +226,8 @@ MNM_Statistics_Lrn::MNM_Statistics_Lrn(std::string file_folder, MNM_ConfReader *
   : MNM_Statistics::MNM_Statistics(file_folder,conf_reader, record_config, od_factory, node_factory, link_factory)
 {
   m_n = record_config -> get_int("rec_mode_para");
-  m_to_be_volume = std::map<TInt, TFlt>();
-  m_to_be_tt = std::map<TInt, TFlt>();
+  m_to_be_volume = std::unordered_map<TInt, TFlt>();
+  m_to_be_tt = std::unordered_map<TInt, TFlt>();
 }
 
 MNM_Statistics_Lrn::~MNM_Statistics_Lrn()

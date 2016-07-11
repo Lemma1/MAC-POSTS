@@ -12,7 +12,7 @@ int main()
   // std::cout << test_dta -> m_od_factory -> m_destination_map.size() << "\n";
   // test_dta -> m_graph = MNM_IO::build_graph(test_dta -> m_file_folder,test_dta -> m_config);
   // test_dta -> m_graph  -> Dump();
-  MNM_Dta *test_dta = new MNM_Dta(".");
+  MNM_Dta *test_dta = new MNM_Dta("../../data/input_files_new_philly_dta");
   // MNM_Dta *test_dta = new MNM_Dta("../../data/input_files_7link");
   test_dta -> build_from_files();
   printf("Hooking......\n");
@@ -20,6 +20,9 @@ int main()
   // printf("Checking......\n");
   // test_dta -> is_ok();
   test_dta -> loading(true);
+
+
+  delete test_dta;
 
   return 0;
 }

@@ -109,10 +109,10 @@ MNM_Routing_Hybrid::~MNM_Routing_Hybrid()
 
 int MNM_Routing_Hybrid::init_routing(Path_Table *path_table)
 {
-  std::map<TInt, TInt> *_shortest_path_tree;
+  std::unordered_map<TInt, TInt> *_shortest_path_tree;
   for (auto _it = m_od_factory -> m_destination_map.begin(); _it != m_od_factory -> m_destination_map.end(); _it++){
-    _shortest_path_tree = new std::map<TInt, TInt>();
-    m_table -> insert(std::pair<MNM_Destination*, std::map<TInt, TInt>*>(_it -> second, _shortest_path_tree));
+    _shortest_path_tree = new std::unordered_map<TInt, TInt>();
+    m_table -> insert(std::pair<MNM_Destination*, std::unordered_map<TInt, TInt>*>(_it -> second, _shortest_path_tree));
     // for (auto _node_it = m_node_factory -> m_node_map.begin(); _node_it != m_node_factory -> m_node_map.end(); _node_it++){
     //   _shortest_path_tree -> insert(std::pair<TInt, TInt>(_node_it -> first, -1));
     // }
@@ -125,7 +125,7 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
 {
   MNM_Destination *_dest;
   TInt _dest_node_ID;
-  std::map<TInt, TInt> *_shortest_path_tree;
+  std::unordered_map<TInt, TInt> *_shortest_path_tree;
   if ((timestamp) % m_routing_freq  == 0 || timestamp == 0) {
     printf("Calculating the shortest path trees!\n");
     for (auto _it = m_od_factory -> m_destination_map.begin(); _it != m_od_factory -> m_destination_map.end(); _it++){
@@ -208,7 +208,7 @@ MNM_Routing_Fixed::MNM_Routing_Fixed(PNEGraph &graph,
               MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory)
  : MNM_Routing::MNM_Routing(graph, od_factory, node_factory, link_factory)
 {
-  m_tracker = std::map<MNM_Veh*, std::deque<TInt>*>();
+  m_tracker = std::unordered_map<MNM_Veh*, std::deque<TInt>*>();
 }
 
 MNM_Routing_Fixed::~MNM_Routing_Fixed()
@@ -308,7 +308,9 @@ int MNM_Routing_Fixed::register_veh(MNM_Veh* veh)
   MNM_Pathset *_pathset = m_path_table -> find(veh -> get_origin() -> m_origin_node  -> m_node_ID) -> second
                         -> find(veh -> get_destination() -> m_dest_node  -> m_node_ID) -> second;
   MNM_Path *_route_path = NULL;
+  // printf("1\n");
   for (MNM_Path *_path : _pathset -> m_path_vec){
+    // printf("2\n");
     if (_path -> m_p >= _r) {
       _route_path = _path;
       break;
@@ -317,6 +319,7 @@ int MNM_Routing_Fixed::register_veh(MNM_Veh* veh)
       _r -= _path -> m_p;
     }
   }
+  // printf("3\n");
   if (_route_path == NULL){
     printf("Wrong prabability!\n");
     exit(-1);

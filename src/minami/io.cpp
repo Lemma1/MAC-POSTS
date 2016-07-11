@@ -389,6 +389,7 @@ int MNM_IO::build_demand(std::string file_folder, MNM_ConfReader *conf_reader, M
 
 Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph, TInt num_path)
 {
+  printf("Loading Path Table!\n");
   TInt Num_Path = num_path;
 
   std::ifstream _path_table_file;
@@ -399,12 +400,11 @@ Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph, TInt 
   std::string _line;
   std::vector<std::string> _words;
   TInt _origin_node_ID, _dest_node_ID, _node_ID;
-  std::map<TInt, MNM_Pathset*> *_new_map;
+  std::unordered_map<TInt, MNM_Pathset*> *_new_map;
   MNM_Pathset *_pathset;
   MNM_Path *_path;
   TInt _from_ID, _to_ID, _link_ID;
-  if (_path_table_file.is_open())
-  {
+  if (_path_table_file.is_open()){
     for (int i=0; i<Num_Path; ++i){
       std::getline(_path_table_file,_line);
       _words = split(_line, ' ');
@@ -412,8 +412,8 @@ Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph, TInt 
         _origin_node_ID = TInt(std::stoi(_words[0]));
         _dest_node_ID = TInt(std::stoi(_words.back()));
         if (_path_table -> find(_origin_node_ID) == _path_table -> end()){
-          _new_map = new std::map<TInt, MNM_Pathset*>();
-          _path_table -> insert(std::pair<TInt, std::map<TInt, MNM_Pathset*>*>(_origin_node_ID, _new_map));
+          _new_map = new std::unordered_map<TInt, MNM_Pathset*>();
+          _path_table -> insert(std::pair<TInt, std::unordered_map<TInt, MNM_Pathset*>*>(_origin_node_ID, _new_map));
         }
         if (_path_table -> find(_origin_node_ID) -> second -> find(_dest_node_ID) == _path_table -> find(_origin_node_ID) -> second -> end()){
           _pathset = new MNM_Pathset();
@@ -435,6 +435,11 @@ Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph, TInt 
     }
     _path_table_file.close();
   }
+  else{
+    printf("Can't open path table file!\n");
+    exit(-1);
+  }
+   printf("Finish Loading Path Table!\n");
   return _path_table;
 }
 
@@ -473,7 +478,7 @@ int MNM_IO::build_vms_facotory(std::string file_folder, PNEGraph graph, TInt num
 }
 
 
-int MNM_IO::read_int_float(std::string file_name, std::map<TInt, TFlt>* reader)
+int MNM_IO::read_int_float(std::string file_name, std::unordered_map<TInt, TFlt>* reader)
 {
   /* find file */
   std::ifstream _file;

@@ -8,7 +8,9 @@
 #include "shortest_path.h"
 #include "path.h"
 
-typedef std::map<MNM_Destination*, std::map<TInt, TInt>*> Routing_Table; 
+#include <unordered_map>
+
+typedef std::unordered_map<MNM_Destination*, std::unordered_map<TInt, TInt>*> Routing_Table; 
 
 class MNM_Routing
 {
@@ -68,7 +70,7 @@ public:
   int register_veh(MNM_Veh* veh);
   int add_veh_path(MNM_Veh* veh, std::deque<TInt> *link_que);
   Path_Table *m_path_table;
-  std::map<MNM_Veh*, std::deque<TInt>*> m_tracker;
+  std::unordered_map<MNM_Veh*, std::deque<TInt>*> m_tracker;
 };
 
 #endif

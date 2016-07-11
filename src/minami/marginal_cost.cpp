@@ -5,8 +5,8 @@ MNM_Link_Tt::MNM_Link_Tt(MNM_Link_Factory *link_facotory, TFlt unit_time)
   m_link_factory = link_facotory;
   m_unit_time = unit_time;
   m_update_speed = 0.5;
-  m_tracker = std::map<MNM_Veh*, Vehicle_Record*>();
-  m_tt_map =std::map<MNM_Dlink*, TFlt>();
+  m_tracker = std::unordered_map<MNM_Veh*, Vehicle_Record*>();
+  m_tt_map =std::unordered_map<MNM_Dlink*, TFlt>();
   intialize();
 }
 

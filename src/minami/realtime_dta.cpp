@@ -25,11 +25,11 @@ int MNM_Realtime_Dta::initialize()
   m_graph = MNM_IO::build_graph(m_file_folder, m_dta_config);
   MNM_IO::build_od_factory(m_file_folder, m_dta_config, m_od_factory);
   MNM_IO::build_demand(m_file_folder, m_dta_config, m_od_factory);
-  // m_path_table = MNM_IO::load_path_table(m_file_name, m_graph, TInt num_path)
+  // m_path_table = MNM_IO::load_path_table(m_file_name, m_graph, TInt num_path);
   // MNM_IO::hook_up_od_node(m_file_folder, m_dta_conf_reader, m_od_factory, m_before_shot -> node_factory);  
 
-  m_average_link_tt = std::map<TInt, TFlt>();
-  m_link_tt_difference = std::map<TInt, TFlt>();
+  m_average_link_tt = std::unordered_map<TInt, TFlt>();
+  m_link_tt_difference = std::unordered_map<TInt, TFlt>();
 
 
   build_path_table();
@@ -181,7 +181,7 @@ int MNM_Realtime_Dta::run_from_screenshot(MNM_Dta_Screenshot* screenshot,
 
 int MNM_Realtime_Dta::get_estimation_gradient(MNM_Dta_Screenshot* screenshot,
                                             TInt max_inter, TInt assign_inter, Path_Table *path_table, 
-                                            std::map<TInt, TFlt> *link_spd_map)
+                                            std::unordered_map<TInt, TFlt> *link_spd_map)
 {
   TInt _grad_position = 1;
 
@@ -209,7 +209,7 @@ int MNM_Realtime_Dta::get_estimation_gradient(MNM_Dta_Screenshot* screenshot,
   printf("MNM: Prepare loading!\n");
   _routing -> init_routing(path_table);
   MNM_IO::hook_up_od_node(m_file_folder, m_dta_config, m_od_factory, _node_factory);  
-  // printf("Finish prepare routing\n");
+  printf("Finish prepare routing\n");
   // m_statistics -> init_record();
   for (auto _node_it = _node_factory -> m_node_map.begin(); _node_it != _node_factory -> m_node_map.end(); _node_it++){
     _node = _node_it -> second;
@@ -498,7 +498,7 @@ int MNM_Realtime_Dta::update_vms(TInt next_assign_inter){
 int MNM_Realtime_Dta::estimate_previous(TInt assign_inter)
 {
   std::string _spd_name = m_file_folder + "/MNM_input_spd";
-  std::map<TInt, TFlt> _link_spd_map = std::map<TInt, TFlt>();
+  std::unordered_map<TInt, TFlt> _link_spd_map = std::unordered_map<TInt, TFlt>();
   MNM_IO::read_int_float(_spd_name, &_link_spd_map);
   MNM_Dta_Screenshot *_tmp_shot;
 

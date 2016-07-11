@@ -2,9 +2,10 @@
 #define SHORTEST_PATH_H
 
 #include "Snap.h"
+#include "ults.h"
 
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <deque>
 #include <algorithm>
 
@@ -14,14 +15,14 @@ class MNM_Shortest_Path
 {
 public:
   int static one_to_one(TInt origin_node_ID, TInt dest_node_ID, 
-                        PNEGraph graph, std::map<TInt, TFlt>& cost_map,
+                        PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
                         std::vector<TInt> &output_array);
   int static all_to_one_Dijkstra(TInt dest_node_ID, 
-                        PNEGraph graph, std::map<TInt, TFlt>& cost_map,
-                        std::map<TInt, TInt> &output_map);
+                        PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
+                        std::unordered_map<TInt, TInt> &output_map);
   int static all_to_one_FIFO(TInt dest_node_ID, 
-                        PNEGraph graph, std::map<TInt, TFlt>& cost_map,
-                        std::map<TInt, TInt> &output_map);
+                        PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
+                        std::unordered_map<TInt, TInt> &output_map);
 };
 
 

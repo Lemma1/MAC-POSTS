@@ -8,8 +8,8 @@
 #include "ults.h"
 
 #include <vector>
-#include <map>
 #include <deque>
+#include <unordered_map>
 
 class MNM_Dlink;
 class MNM_Destination;
@@ -45,7 +45,7 @@ public:
   std::deque<MNM_Veh *> m_in_veh_queue;
 // private:
   MNM_Origin *m_origin;
-  std::map<MNM_Dlink*, TInt> m_out_volume;
+  std::unordered_map<MNM_Dlink*, TInt> m_out_volume;
 };
 
 class MNM_DMDND : public MNM_Dnode

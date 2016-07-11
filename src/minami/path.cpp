@@ -87,7 +87,7 @@ int MNM_Pathset::normalize_p()
 
 namespace MNM{
 
-MNM_Path *extract_path(TInt origin_ID, TInt dest_ID, std::map<TInt, TInt> &output_map, PNEGraph &graph)
+MNM_Path *extract_path(TInt origin_ID, TInt dest_ID, std::unordered_map<TInt, TInt> &output_map, PNEGraph &graph)
 {
   TInt _current_node_ID = origin_ID;
   TInt _current_link_ID = -1;
@@ -113,22 +113,22 @@ Path_Table *build_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_
   /* initialize data structure */
   Path_Table *_path_table = new Path_Table();
   for (auto _o_it = od_factory -> m_origin_map.begin(); _o_it != od_factory -> m_origin_map.end(); _o_it++){
-    std::map<TInt, MNM_Pathset*> *_new_map = new std::map<TInt, MNM_Pathset*>();
-    _path_table -> insert(std::pair<TInt, std::map<TInt, MNM_Pathset*>*>(_o_it -> second -> m_origin_node -> m_node_ID, _new_map));
+    std::unordered_map<TInt, MNM_Pathset*> *_new_map = new std::unordered_map<TInt, MNM_Pathset*>();
+    _path_table -> insert(std::pair<TInt, std::unordered_map<TInt, MNM_Pathset*>*>(_o_it -> second -> m_origin_node -> m_node_ID, _new_map));
     for (auto _d_it = od_factory -> m_destination_map.begin(); _d_it != od_factory -> m_destination_map.end(); _d_it++){
       MNM_Pathset *_pathset = new MNM_Pathset();
       _new_map -> insert(std::pair<TInt, MNM_Pathset*>(_d_it -> second -> m_dest_node -> m_node_ID, _pathset));
     }
   }
 
-  std::map<TInt, TInt> _mid_shortest_path_tree = std::map<TInt, TInt>();
-  std::map<TInt, TInt> _heavy_shortest_path_tree = std::map<TInt, TInt>();
-  std::map<TInt, TFlt> _heavy_cost_map = std::map<TInt, TFlt>();
-  std::map<TInt, TFlt> _mid_cost_map = std::map<TInt, TFlt>();
+  std::unordered_map<TInt, TInt> _mid_shortest_path_tree = std::unordered_map<TInt, TInt>();
+  std::unordered_map<TInt, TInt> _heavy_shortest_path_tree = std::unordered_map<TInt, TInt>();
+  std::unordered_map<TInt, TFlt> _heavy_cost_map = std::unordered_map<TInt, TFlt>();
+  std::unordered_map<TInt, TFlt> _mid_cost_map = std::unordered_map<TInt, TFlt>();
 
   TInt _dest_node_ID, _origin_node_ID;
-  std::map<TInt, TFlt> _free_cost_map =  std::map<TInt, TFlt>();
-  std::map<TInt, TInt> _free_shortest_path_tree;
+  std::unordered_map<TInt, TFlt> _free_cost_map =  std::unordered_map<TInt, TFlt>();
+  std::unordered_map<TInt, TInt> _free_shortest_path_tree;
   MNM_Path *_path;
   for (auto _link_it = link_factory -> m_link_map.begin(); _link_it!= link_factory -> m_link_map.end(); _link_it++){
     _free_cost_map.insert(std::pair<TInt, TFlt>(_link_it -> first, _link_it -> second -> get_link_tt()));

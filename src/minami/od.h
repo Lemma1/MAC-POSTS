@@ -6,7 +6,7 @@
 #include "dnode.h"
 #include "ults.h"
 
-#include <map>
+#include <unordered_map>
 
 class MNM_Destination;
 class MNM_Veh;
@@ -30,7 +30,7 @@ public:
   TInt m_current_assign_interval;
   TInt m_max_assign_interval;
   TFlt m_flow_scalar;
-  std::map<MNM_Destination*, TFlt*> m_demand;
+  std::unordered_map<MNM_Destination*, TFlt*> m_demand;
 };
 
 

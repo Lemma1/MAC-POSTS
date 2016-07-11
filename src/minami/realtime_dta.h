@@ -27,7 +27,7 @@ public:
                           TInt max_inter, TInt assign_inter, Path_Table *path_table);
   int get_estimation_gradient(MNM_Dta_Screenshot* screenshot,
                               TInt max_inter, TInt assign_inter, Path_Table *path_table, 
-                              std::map<TInt, TFlt> *link_spd_map);
+                              std::unordered_map<TInt, TFlt> *link_spd_map);
   int get_optimization_gradient(MNM_Dta_Screenshot* screenshot,
                                   TInt max_inter, TInt assign_inter, Path_Table *path_table);
   int one_iteration(TInt assign_inter);
@@ -48,8 +48,8 @@ public:
   TFlt m_estimation_step_size;
   TFlt m_optimization_step_size;
 
-  std::map<TInt, TFlt> m_average_link_tt;
-  std::map<TInt, TFlt> m_link_tt_difference; //only used in estimation
+  std::unordered_map<TInt, TFlt> m_average_link_tt;
+  std::unordered_map<TInt, TFlt> m_link_tt_difference; //only used in estimation
   std::string m_file_folder;
   PNEGraph m_graph;
   MNM_OD_Factory *m_od_factory;

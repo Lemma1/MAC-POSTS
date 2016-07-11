@@ -7,7 +7,7 @@ MNM_Link_Vms::MNM_Link_Vms(TInt ID, TInt link_ID, PNEGraph graph)
   m_detour_link_ID = -1;
   m_compliance_ratio = TFlt(1);
   m_out_link_vec = std::vector<TInt>();
-  m_link_path_map = std::map<TInt, std::vector<MNM_Path*>*>();
+  m_link_path_map = std::unordered_map<TInt, std::vector<MNM_Path*>*>();
   hook_link(graph);
 }
 
@@ -87,7 +87,7 @@ TInt MNM_Link_Vms::generate_detour_link(Path_Table *path_table, TInt next_assign
 
 MNM_Vms_Factory::MNM_Vms_Factory()
 {
-  m_link_vms_map = std::map<TInt, MNM_Link_Vms*>();
+  m_link_vms_map = std::unordered_map<TInt, MNM_Link_Vms*>();
 }
 
 MNM_Vms_Factory::~MNM_Vms_Factory()

@@ -5,7 +5,7 @@
 
 
 int MNM_Shortest_Path::one_to_one(TInt origin_node_ID, TInt dest_node_ID, 
-                      PNEGraph graph, std::map<TInt, TFlt>& cost_map,
+                      PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
                       std::vector<TInt> &output_array)
 {
   return 0;
@@ -13,19 +13,19 @@ int MNM_Shortest_Path::one_to_one(TInt origin_node_ID, TInt dest_node_ID,
 
 
 int MNM_Shortest_Path::all_to_one_Dijkstra(TInt dest_node_ID, 
-                      PNEGraph graph, std::map<TInt, TFlt>& cost_map,
-                      std::map<TInt, TInt> &output_map)
+                      PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
+                      std::unordered_map<TInt, TInt> &output_map)
 {
   if (output_map.size() != 0){
     // printf("Output map already exist, clear!\n");
     output_map.clear();
   }
   // printf("1\n");
-  std::map<TInt, TFlt> _dist = std::map<TInt, TFlt>();
+  std::unordered_map<TInt, TFlt> _dist = std::unordered_map<TInt, TFlt>();
   _dist.insert(std::pair<TInt, TFlt>(dest_node_ID, TFlt(0)));
   
-  std::deque<MNM_Cost*> m_Q;
-  std::map<TInt, MNM_Cost*> m_Q_support;
+  std::deque<MNM_Cost*> m_Q = std::deque<MNM_Cost*>();
+  std::unordered_map<TInt, MNM_Cost*> m_Q_support = std::unordered_map<TInt, MNM_Cost*>();
   MNM_Cost *_cost = new MNM_Cost(dest_node_ID, TFlt(0));
   m_Q.push_back(_cost);
   m_Q_support.insert(std::pair<TInt, MNM_Cost*>(dest_node_ID, _cost));
@@ -80,18 +80,18 @@ int MNM_Shortest_Path::all_to_one_Dijkstra(TInt dest_node_ID,
 }
 
 int MNM_Shortest_Path::all_to_one_FIFO(TInt dest_node_ID, 
-                      PNEGraph graph, std::map<TInt, TFlt>& cost_map,
-                      std::map<TInt, TInt> &output_map)
+                      PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
+                      std::unordered_map<TInt, TInt> &output_map)
 {
   // if (output_map.size() != 0){
   //   // printf("Output map already exist, clear!\n");
   //   output_map.clear();
   // }
-  std::map<TInt, TFlt> _dist = std::map<TInt, TFlt>();
+  std::unordered_map<TInt, TFlt> _dist = std::unordered_map<TInt, TFlt>();
   _dist.insert(std::pair<TInt, TFlt>(dest_node_ID, TFlt(0)));
   
   std::deque<TInt> m_Q = std::deque<TInt>();
-  std::map<TInt, bool> m_Q_support = std::map<TInt, bool>();
+  std::unordered_map<TInt, bool> m_Q_support = std::unordered_map<TInt, bool>();
 
   m_Q.push_back(dest_node_ID);
   m_Q_support.insert(std::pair<TInt, bool>(dest_node_ID, true));

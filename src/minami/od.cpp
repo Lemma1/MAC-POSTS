@@ -11,40 +11,39 @@ MNM_Origin::MNM_Origin(TInt ID, TInt max_interval, TFlt flow_scalar, TInt freque
     exit(-1);
   }
   m_frequency = frequency;
-  m_demand = std::map<MNM_Destination*, TFlt*>();
+  m_demand = std::unordered_map<MNM_Destination*, TFlt*>();
 }
 
 MNM_Origin::~MNM_Origin()
 {
-  for (auto __demand_it = m_demand.begin(); __demand_it != m_demand.end(); __demand_it++) {
-    free(__demand_it -> second);
+  for (auto _demand_it = m_demand.begin(); _demand_it != m_demand.end(); _demand_it++) {
+    free(_demand_it -> second);
   }
   m_demand.clear();
 }
 
 int MNM_Origin::add_dest_demand(MNM_Destination *dest, TFlt* demand)
 {
-  TFlt* __demand = (TFlt*) malloc(sizeof(TFlt) * m_max_assign_interval);
+  TFlt* _demand = (TFlt*) malloc(sizeof(TFlt) * m_max_assign_interval);
   for (int i = 0; i < m_max_assign_interval; ++i) {
-    __demand[i] =  TFlt(demand[i]);
+    _demand[i] =  TFlt(demand[i]);
   }
-  m_demand.insert(std::pair<MNM_Destination*, TFlt*>(dest, __demand));
+  m_demand.insert(std::pair<MNM_Destination*, TFlt*>(dest, _demand));
   return 0;
 }
 
 int MNM_Origin::release(MNM_Veh_Factory* veh_factory, TInt current_interval)
 {
   if (m_current_assign_interval < m_max_assign_interval && current_interval % m_frequency == 0){
-    TInt __veh_to_release;
-    MNM_Veh *__veh;
-    std::map<MNM_Destination*, TFlt*>::iterator __demand_it;
-    for (__demand_it = m_demand.begin(); __demand_it != m_demand.end(); __demand_it++) {
-      __veh_to_release = TInt(MNM_Ults::round((__demand_it -> second)[m_current_assign_interval] * m_flow_scalar));
-      for (int i=0; i<__veh_to_release; ++i) {
-        __veh = veh_factory -> make_veh(current_interval, MNM_TYPE_ADAPTIVE);
-        __veh -> set_destination(__demand_it -> first);
-        __veh -> set_origin(this);
-        m_origin_node -> m_in_veh_queue.push_back(__veh);
+    TInt _veh_to_release;
+    MNM_Veh *_veh;
+    for (auto _demand_it = m_demand.begin(); _demand_it != m_demand.end(); _demand_it++) {
+      _veh_to_release = TInt(MNM_Ults::round((_demand_it -> second)[m_current_assign_interval] * m_flow_scalar));
+      for (int i=0; i<_veh_to_release; ++i) {
+        _veh = veh_factory -> make_veh(current_interval, MNM_TYPE_ADAPTIVE);
+        _veh -> set_destination(_demand_it -> first);
+        _veh -> set_origin(this);
+        m_origin_node -> m_in_veh_queue.push_back(_veh);
       }
     }
     m_current_assign_interval ++;
@@ -55,25 +54,24 @@ int MNM_Origin::release(MNM_Veh_Factory* veh_factory, TInt current_interval)
 int MNM_Origin::release_one_interval(TInt current_interval, MNM_Veh_Factory* veh_factory, TInt assign_interval, TFlt adaptive_ratio)
 {
   if (assign_interval < 0) return 0;
-  TInt __veh_to_release;
-  MNM_Veh *__veh;
-  std::map<MNM_Destination*, TFlt*>::iterator __demand_it;
-  for (__demand_it = m_demand.begin(); __demand_it != m_demand.end(); __demand_it++) {
-    __veh_to_release = TInt(MNM_Ults::round((__demand_it -> second)[assign_interval] * m_flow_scalar));
-    for (int i=0; i<__veh_to_release; ++i) {
+  TInt _veh_to_release;
+  MNM_Veh *_veh;
+  for (auto _demand_it = m_demand.begin(); _demand_it != m_demand.end(); _demand_it++) {
+    _veh_to_release = TInt(MNM_Ults::round((_demand_it -> second)[assign_interval] * m_flow_scalar));
+    for (int i=0; i<_veh_to_release; ++i) {
       if (adaptive_ratio == TFlt(0)){
-        __veh = veh_factory -> make_veh(current_interval, MNM_TYPE_STATIC);
+        _veh = veh_factory -> make_veh(current_interval, MNM_TYPE_STATIC);
       }
       else if (adaptive_ratio == TFlt(1)){
-        __veh = veh_factory -> make_veh(current_interval, MNM_TYPE_ADAPTIVE);
+        _veh = veh_factory -> make_veh(current_interval, MNM_TYPE_ADAPTIVE);
       }
       else{
         printf("HyBrid assign, not implemented!\n");
         exit(-1);
       }
-      __veh -> set_destination(__demand_it -> first);
-      __veh -> set_origin(this);
-      m_origin_node -> m_in_veh_queue.push_back(__veh); 
+      _veh -> set_destination(_demand_it -> first);
+      _veh -> set_origin(this);
+      m_origin_node -> m_in_veh_queue.push_back(_veh); 
     }
   }
   return 0;
@@ -92,16 +90,16 @@ MNM_Destination::~MNM_Destination()
 int MNM_Destination::receive(TInt current_interval)
 {
 
-  MNM_Veh *__veh;
-  size_t __num_to_receive = m_dest_node -> m_out_veh_queue.size();
-  for (size_t i=0; i < __num_to_receive; ++i){
-    __veh = m_dest_node -> m_out_veh_queue.front();
-    if (__veh -> get_destination() != this){
-      printf("The veh is heading to %d, but we are %d\n", (int)__veh -> get_destination() -> m_dest_node -> m_node_ID, (int)m_dest_node -> m_node_ID);
+  MNM_Veh *_veh;
+  size_t _num_to_receive = m_dest_node -> m_out_veh_queue.size();
+  for (size_t i=0; i < _num_to_receive; ++i){
+    _veh = m_dest_node -> m_out_veh_queue.front();
+    if (_veh -> get_destination() != this){
+      printf("The veh is heading to %d, but we are %d\n", (int)_veh -> get_destination() -> m_dest_node -> m_node_ID, (int)m_dest_node -> m_node_ID);
       printf("MNM_Destination::receive: Something wrong!\n");
       exit(-1);
     }
-    __veh -> finish(current_interval);
+    _veh -> finish(current_interval);
     // printf("_______Receive Vehicle ID: %d\n", (int) __veh -> m_veh_ID);
     m_dest_node -> m_out_veh_queue.pop_front();
   }

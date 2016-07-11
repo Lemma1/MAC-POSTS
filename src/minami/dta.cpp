@@ -130,7 +130,7 @@ bool MNM_Dta::is_ok()
   TInt __node_ID;
   __temp_flag = (TInt(m_od_factory -> m_origin_map.size()) == m_config -> get_int("num_of_O"))
                 && (TInt(m_od_factory -> m_destination_map.size()) == m_config -> get_int("num_of_D"));
-  std::map<TInt, MNM_Origin*>::iterator __origin_map_it;
+  std::unordered_map<TInt, MNM_Origin*>::iterator __origin_map_it;
   for (__origin_map_it = m_od_factory->m_origin_map.begin();
        __origin_map_it != m_od_factory->m_origin_map.end(); __origin_map_it++){
     __node_ID = __origin_map_it -> second -> m_origin_node -> m_node_ID;
@@ -138,7 +138,7 @@ bool MNM_Dta::is_ok()
                   && (m_graph -> GetNI(__node_ID).GetOutDeg() >= 1)
                   && (m_graph -> GetNI(__node_ID).GetInDeg() == 0);
   }
-  std::map<TInt, MNM_Destination*>::iterator __dest_map_it;
+  std::unordered_map<TInt, MNM_Destination*>::iterator __dest_map_it;
   for (__dest_map_it = m_od_factory->m_destination_map.begin();
        __dest_map_it != m_od_factory->m_destination_map.end(); __dest_map_it++){
     __node_ID = __dest_map_it -> second -> m_dest_node -> m_node_ID;
@@ -188,8 +188,15 @@ int MNM_Dta::loading(bool verbose)
     if (__cur_int % m_assign_freq == 0 || __cur_int==0){
       for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){
         __origin = _origin_it -> second;
-        _assign_inter = _assign_inter % m_total_assign_inter;
-        __origin -> release_one_interval(__cur_int, m_veh_factory, _assign_inter, TFlt(0));
+        
+        if (_assign_inter >= m_total_assign_inter) {
+          __origin -> release_one_interval(__cur_int, m_veh_factory, -1, TFlt(0));
+        }
+        else{
+          __origin -> release_one_interval(__cur_int, m_veh_factory, _assign_inter, TFlt(0));
+        }
+        // _assign_inter = _assign_inter % m_total_assign_inter;
+        // __origin -> release_one_interval(__cur_int, m_veh_factory, _assign_inter, TFlt(0));
       }  
       _assign_inter += 1;
     }
@@ -239,8 +246,8 @@ int MNM_Dta::check_origin_destination_connectivity()
 {
   MNM_Destination *_dest;
   TInt _dest_node_ID;
-  std::map<TInt, TInt> _shortest_path_tree = std::map<TInt, TInt>();
-  std::map<TInt, TFlt> _cost_map;
+  std::unordered_map<TInt, TInt> _shortest_path_tree = std::unordered_map<TInt, TInt>();
+  std::unordered_map<TInt, TFlt> _cost_map;
   for (auto _map_it : m_link_factory -> m_link_map){
     _cost_map.insert(std::pair<TInt, TFlt>(_map_it.first, TFlt(1)));
   }
@@ -262,7 +269,7 @@ int MNM_Dta::check_origin_destination_connectivity()
 
 // int MNM_Dta::test()
 // {
-//   auto output_map = std::map<TInt, TInt>();
+//   auto output_map = std::unordered_map<TInt, TInt>();
 //   MNM_Shortest_Path::all_to_one_FIFO(6, 
 //                         m_graph, m_statistics -> m_load_interval_tt,
 //                         output_map);

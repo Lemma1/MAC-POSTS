@@ -6,9 +6,10 @@
 #include "dnode.h"
 #include "dlink.h"
 #include "enum.h"
+#include "ults.h"
 
 #include <iostream>
-#include <map>
+#include <unordered_map>
 
 class MNM_Veh;
 class MNM_Dnode;
@@ -24,7 +25,7 @@ public:
   ~MNM_Veh_Factory();
   MNM_Veh * make_veh(TInt timestamp, Vehicle_type veh_type);
   TInt m_num_veh;
-  std::map<TInt, MNM_Veh*> m_veh_map;
+  std::unordered_map<TInt, MNM_Veh*> m_veh_map;
 };
 
 
@@ -36,7 +37,7 @@ public:
   ~MNM_Node_Factory();
   MNM_Dnode *make_node(TInt ID, DNode_type node_type, TFlt flow_scalar);
   MNM_Dnode *get_node(TInt ID);
-  std::map<TInt, MNM_Dnode*> m_node_map;
+  std::unordered_map<TInt, MNM_Dnode*> m_node_map;
 };
 
 
@@ -55,7 +56,7 @@ public:
                         TFlt unit_time,
                         TFlt flow_scalar);
   MNM_Dlink *get_link(TInt ID);
-  std::map<TInt, MNM_Dlink*> m_link_map;
+  std::unordered_map<TInt, MNM_Dlink*> m_link_map;
 };
 
 
@@ -68,7 +69,7 @@ public:
   MNM_Origin *make_origin(TInt ID, TInt max_interval, TFlt flow_scalar, TInt frequency);
   MNM_Destination *get_destination(TInt ID);
   MNM_Origin *get_origin(TInt ID);
-  std::map<TInt, MNM_Origin*> m_origin_map;
-  std::map<TInt, MNM_Destination*> m_destination_map;
+  std::unordered_map<TInt, MNM_Origin*> m_origin_map;
+  std::unordered_map<TInt, MNM_Destination*> m_destination_map;
 };
 #endif

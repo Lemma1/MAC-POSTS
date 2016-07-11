@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <deque>
-#include <map>
+#include <unordered_map>
 #include <fstream>
 #include <string>
 
@@ -40,7 +40,7 @@ public:
   bool is_in(MNM_Path* path);
 };
 
-typedef std::map<TInt, std::map<TInt, MNM_Pathset*>*> Path_Table;
+typedef std::unordered_map<TInt, std::unordered_map<TInt, MNM_Pathset*>*> Path_Table;
 
 namespace MNM {
   MNM_Path *extract_path(TInt origin_ID, TInt dest_ID, std::map<TInt, TInt> &output_map, PNEGraph &graph);

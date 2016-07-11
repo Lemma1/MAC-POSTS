@@ -5,7 +5,7 @@
 **************************************************************************/
 MNM_Veh_Factory::MNM_Veh_Factory()
 {
-  m_veh_map = std::map<TInt, MNM_Veh*>();
+  m_veh_map = std::unordered_map<TInt, MNM_Veh*>();
   m_num_veh = TInt(0);
 }
 
@@ -36,7 +36,7 @@ MNM_Veh *MNM_Veh_Factory::make_veh(TInt timestamp, Vehicle_type veh_type)
 
 MNM_Node_Factory::MNM_Node_Factory()
 {
-  m_node_map = std::map<TInt, MNM_Dnode*>();
+  m_node_map = std::unordered_map<TInt, MNM_Dnode*>();
 }
 
 MNM_Node_Factory::~MNM_Node_Factory()
@@ -83,7 +83,7 @@ MNM_Dnode *MNM_Node_Factory::get_node(TInt ID)
 **************************************************************************/
 MNM_Link_Factory::MNM_Link_Factory()
 {
-  m_link_map = std::map<TInt, MNM_Dlink*>();
+  m_link_map = std::unordered_map<TInt, MNM_Dlink*>();
 }
 
 MNM_Link_Factory::~MNM_Link_Factory()
@@ -129,8 +129,8 @@ MNM_Dlink *MNM_Link_Factory::get_link(TInt ID)
 **************************************************************************/
 MNM_OD_Factory::MNM_OD_Factory()         
 {
-  m_origin_map = std::map<TInt, MNM_Origin*>();
-  m_destination_map = std::map<TInt, MNM_Destination*>();
+  m_origin_map = std::unordered_map<TInt, MNM_Origin*>();
+  m_destination_map = std::unordered_map<TInt, MNM_Destination*>();
 }
 
 

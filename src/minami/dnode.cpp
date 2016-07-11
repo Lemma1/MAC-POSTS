@@ -24,7 +24,7 @@ MNM_DMOND::MNM_DMOND(TInt ID, TFlt flow_scalar)
   : MNM_Dnode::MNM_Dnode(ID, flow_scalar)
 {
   m_origin = NULL;
-  m_out_volume = std::map<MNM_Dlink*, TInt>();
+  m_out_volume = std::unordered_map<MNM_Dlink*, TInt>();
   m_in_veh_queue = std::deque<MNM_Veh *>();
 }
 

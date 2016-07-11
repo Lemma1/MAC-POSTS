@@ -19,10 +19,10 @@ public:
   virtual ~MNM_Statistics();
 
   /* may or may not be initialized */
-  std::map<TInt, TFlt> m_load_interval_volume;
-  std::map<TInt, TFlt> m_record_interval_volume;
-  std::map<TInt, TFlt> m_record_interval_tt;
-  std::map<TInt, TFlt> m_load_interval_tt;
+  std::unordered_map<TInt, TFlt> m_load_interval_volume;
+  std::unordered_map<TInt, TFlt> m_record_interval_volume;
+  std::unordered_map<TInt, TFlt> m_record_interval_tt;
+  std::unordered_map<TInt, TFlt> m_load_interval_tt;
 
   /* universal function */
   int record_loading_interval_condition(TInt timestamp);
@@ -61,7 +61,7 @@ public:
   int virtual post_record();
 private:
   TInt m_n;
-  std::map<TInt, TFlt> m_to_be_volume;
-  std::map<TInt, TFlt> m_to_be_tt;
+  std::unordered_map<TInt, TFlt> m_to_be_volume;
+  std::unordered_map<TInt, TFlt> m_to_be_tt;
 };
 #endif
