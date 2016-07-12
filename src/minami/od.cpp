@@ -57,7 +57,7 @@ int MNM_Origin::release_one_interval(TInt current_interval, MNM_Veh_Factory* veh
   TInt _veh_to_release;
   MNM_Veh *_veh;
   for (auto _demand_it = m_demand.begin(); _demand_it != m_demand.end(); _demand_it++) {
-    _veh_to_release = TInt(MNM_Ults::round((_demand_it -> second)[assign_interval] * m_flow_scalar));
+    _veh_to_release = TInt(MNM_Ults::round((_demand_it -> second)[assign_interval] * m_flow_scalar)) ;
     for (int i=0; i<_veh_to_release; ++i) {
       if (adaptive_ratio == TFlt(0)){
         _veh = veh_factory -> make_veh(current_interval, MNM_TYPE_STATIC);
@@ -100,7 +100,7 @@ int MNM_Destination::receive(TInt current_interval)
       exit(-1);
     }
     _veh -> finish(current_interval);
-    // printf("_______Receive Vehicle ID: %d\n", (int) __veh -> m_veh_ID);
+    // printf("Receive Vehicle ID: %d, origin node is %d, destination node is %d\n", _veh -> m_veh_ID(), _veh -> get_origin() -> m_origin_node -> m_node_ID(), _veh -> get_destination() -> m_dest_node -> m_node_ID());
     m_dest_node -> m_out_veh_queue.pop_front();
   }
   

@@ -63,10 +63,18 @@ MNM_Dlink_Ctm::MNM_Dlink_Ctm( TInt ID,
   if(m_num_cells == 0) {
     m_num_cells = 1;
   }
-  TFlt _lane_hold_cap_last_cell = ((m_length - TFlt(m_num_cells - 1) * _std_cell_length) / _std_cell_length) * m_lane_hold_cap ;
+  TFlt _lane_hold_cap_last_cell = MNM_Ults::max(((m_length - TFlt(m_num_cells - 1) * _std_cell_length) / _std_cell_length) * m_lane_hold_cap,  m_lane_hold_cap);
   TFlt _wave_speed =  m_lane_flow_cap / (m_lane_hold_cap - m_lane_flow_cap / m_ffs); //laneFlwCap/ffs is the critical density.
   m_wave_ratio = _wave_speed / m_ffs; // note that h >= 2c/v, where h is holding capacity, c is capcity, v is free flow speed. i.e., wvRatio should < 1.
+  if (m_wave_ratio < 0){
+    printf("Wave ratio won't less than zero, current link ID is %d\n", m_link_ID());
+    exit(-1);
+  }
   m_last_wave_ratio = (m_lane_flow_cap / (_lane_hold_cap_last_cell - m_lane_flow_cap / m_ffs))/m_ffs;
+  if (m_last_wave_ratio < 0){
+    printf("Last cell Wave ratio won't less than zero, current link ID is %d\n", m_link_ID());
+    exit(-1);
+  }  
   init_cell_array(unit_time, _std_cell_length, _lane_hold_cap_last_cell);
 }
 
@@ -135,18 +143,19 @@ int MNM_Dlink_Ctm::update_out_veh()
       _demand = m_cell_array[i]->get_demand();
       _supply = m_cell_array[i+1]->get_supply();
       _temp_out_flux = MNM_Ults::min(_demand, _supply) * m_flow_scalar;
-      m_cell_array[i] -> m_out_veh= TInt(MNM_Ults::round(_temp_out_flux)); 
+      m_cell_array[i] -> m_out_veh= MNM_Ults::round(_temp_out_flux); 
     }
-
-    m_cell_array[m_num_cells - 1] -> m_out_veh = m_cell_array[m_num_cells - 1] -> m_veh_queue.size();
   }
+  m_cell_array[m_num_cells - 1] -> m_out_veh = m_cell_array[m_num_cells - 1] -> m_veh_queue.size();
   return 0;
 }
 
 int MNM_Dlink_Ctm::evolve(TInt timestamp)
 {
+  // printf("update_out_veh\n");
   update_out_veh();
   TInt _num_veh_tomove;
+  // printf("move previou cells\n");
   /* previous cells */
   if(m_num_cells > 1) {
     for (int i = 0; i < m_num_cells - 1; ++i) {
@@ -157,8 +166,11 @@ int MNM_Dlink_Ctm::evolve(TInt timestamp)
     }
   }
   /* last cell */
+  // printf("move last cell \n");
   move_last_cell();
+
   /* update volume */
+  // printf("update volume\n");
   if(m_num_cells > 1) {
     for (int i = 0; i < m_num_cells - 1; ++i) {
       m_cell_array[i] -> m_volume = m_cell_array[i] -> m_veh_queue.size();
@@ -234,7 +246,7 @@ TFlt MNM_Dlink_Ctm::Ctm_Cell::get_supply()
   TFlt _real_volume = TFlt(m_volume) / m_flow_scalar;
   if (_real_volume >= m_hold_cap) 
   {
-    _real_volume = m_hold_cap;
+    // _real_volume = m_hold_cap;
     return TFlt(0.0);
   }
   if(m_wave_ratio <= 1.0) //this one is quite tricky, why not just _min(flwCap, hldCap - curDensity)*wvRatio? 

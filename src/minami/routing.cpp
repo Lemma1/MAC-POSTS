@@ -1,4 +1,5 @@
 #include "routing.h"
+#include <omp.h>
 
 MNM_Routing::MNM_Routing(PNEGraph &graph,
                           MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory)
@@ -129,18 +130,19 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
   if ((timestamp) % m_routing_freq  == 0 || timestamp == 0) {
     printf("Calculating the shortest path trees!\n");
     for (auto _it = m_od_factory -> m_destination_map.begin(); _it != m_od_factory -> m_destination_map.end(); _it++){
-      _dest = _it -> second;
-      _dest_node_ID = _dest -> m_dest_node -> m_node_ID;
-      // printf("Destination ID: %d\n", (int) _dest_node_ID);
-      _shortest_path_tree = m_table -> find(_dest) -> second;
-      MNM_Shortest_Path::all_to_one_FIFO(_dest_node_ID, m_graph, m_statistics -> m_record_interval_tt, *_shortest_path_tree);
-  //     for (auto _it = _shortest_path_tree -> begin(); _it!=_shortest_path_tree -> end(); _it++){
-  //     // printf("For node %d, it should head to %d\n", _it -> first, _it -> second);
-  // }
+    #pragma omp task firstprivate(_it)
+      {
+        _dest = _it -> second;
+        _dest_node_ID = _dest -> m_dest_node -> m_node_ID;
+        // printf("Destination ID: %d\n", (int) _dest_node_ID);
+        _shortest_path_tree = m_table -> find(_dest) -> second;
+        MNM_Shortest_Path::all_to_one_FIFO(_dest_node_ID, m_graph, m_statistics -> m_record_interval_tt, *_shortest_path_tree);
+        // MNM_Shortest_Path::all_to_one_Dijkstra(_dest_node_ID, m_graph, m_statistics -> m_record_interval_tt, *_shortest_path_tree);
+      } 
     }
   }
 
-  
+
   /* route the vehicle in Origin nodes */
   printf("Routing the vehicle!\n");
   MNM_Origin *_origin;

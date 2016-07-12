@@ -45,4 +45,11 @@ private:
   MNM_Routing *m_routing;
 };               
 
+
+namespace MNM
+{
+  int print_vehicle_statistics(MNM_Veh_Factory *veh_factory);
+  int print_vehicle_info(MNM_Veh_Factory *veh_factory);
+}
+
 #endif

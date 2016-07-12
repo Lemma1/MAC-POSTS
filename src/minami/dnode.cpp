@@ -36,7 +36,7 @@ MNM_DMOND::~MNM_DMOND()
 
 int MNM_DMOND::evolve(TInt timestamp)
 {
-  MNM_Dnode::evolve(timestamp);
+  // printf("MNM_DMOND node evolve\n");
   MNM_Dlink *__link, *__to_link;
 
   for (unsigned i=0; i<m_out_link_array.size(); ++i){
@@ -95,7 +95,7 @@ int MNM_DMOND::evolve(TInt timestamp)
   //     exit(-1);
   //   }
   // }  
-
+  // printf("Finish MNM_DMOND evolve\n");
   return 0;
 }
 
@@ -141,7 +141,7 @@ int MNM_DMDND::add_in_link(MNM_Dlink *link)
 
 int MNM_DMDND::evolve(TInt timestamp)
 {
-  MNM_Dnode::evolve(timestamp);
+  // printf("MNM_DMDND node evomlve\n");
   MNM_Dlink *__link;
   MNM_Veh *__veh;
   size_t __size;
@@ -364,7 +364,7 @@ int MNM_Dnode_Inout::add_in_link(MNM_Dlink *link)
 
 int MNM_Dnode_Inout::evolve(TInt timestamp)
 {
-  MNM_Dnode::evolve(timestamp);
+  // printf("Inout node evolve\n");
   // printf("1\n");
   prepare_supplyANDdemand();
   // printf("2\n"); 

@@ -216,7 +216,12 @@ int MNM_Dta::loading(bool verbose)
     // step 4: move vehicles through link
     for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
       __link = __link_it -> second;
-      // printf("Current Link %d:, incomming %d, finished %d\n", __link -> m_link_ID, __link -> m_incoming_array.size(),  __link -> m_finished_array.size());
+      // if (__link -> get_link_flow() > 0){
+      //   printf("Current Link %d:, traffic flow %.4f, incomming %d, finished %d\n", 
+      //       __link -> m_link_ID(), __link -> get_link_flow()(), (int)__link -> m_incoming_array.size(),  (int)__link -> m_finished_array.size());
+      //   __link -> print_info();
+      // }
+      
       __link -> clear_incoming_array();
       __link -> evolve(__cur_int);
       // __link -> print_info();
@@ -233,6 +238,7 @@ int MNM_Dta::loading(bool verbose)
     // step 5: update record
     m_statistics -> update_record(__cur_int);
 
+    MNM::print_vehicle_statistics(m_veh_factory);
     // test();
     __cur_int ++;
   }
@@ -279,3 +285,33 @@ int MNM_Dta::check_origin_destination_connectivity()
 //   return 0;
 // }
 
+
+
+namespace MNM
+{
+int print_vehicle_statistics(MNM_Veh_Factory *veh_factory)
+{
+  TInt _total_veh = TInt(veh_factory -> m_veh_map.size());
+  TInt _finished_veh = 0;
+  TInt _enroute_veh;
+  for (auto _map_it : veh_factory -> m_veh_map){
+    if (_map_it.second -> m_finish_time > 0) _finished_veh += 1;
+  }
+  _enroute_veh = _total_veh - _finished_veh;
+  printf("Released vehicle %d, Enroute vehicle %d, Finished vehicle %d\n", _total_veh(), _enroute_veh(), _finished_veh());
+  return 0;
+}
+
+int print_vehicle_info(MNM_Veh_Factory *veh_factory)
+{
+  MNM_Veh *_veh;
+  for (auto _map_it : veh_factory -> m_veh_map){
+    _veh = _map_it.second;
+    printf("Vehicle ID %d, from origin node %d to destination node %d, is current on link %d and heads to link %d\n",
+            _veh -> m_veh_ID(), _veh -> get_origin() -> m_origin_node -> m_node_ID(), _veh -> get_destination() -> m_dest_node -> m_node_ID(),
+            _veh -> get_current_link() -> m_link_ID(), _veh -> get_next_link() -> m_link_ID());
+  }
+  return 0;
+}
+
+}
