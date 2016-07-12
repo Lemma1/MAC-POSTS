@@ -15,7 +15,6 @@ MNM_Dnode::~MNM_Dnode()
   m_in_link_array.clear();
 }
 
-
 /**************************************************************************
                           Origin node
 **************************************************************************/
@@ -37,6 +36,7 @@ MNM_DMOND::~MNM_DMOND()
 
 int MNM_DMOND::evolve(TInt timestamp)
 {
+  MNM_Dnode::evolve(timestamp);
   MNM_Dlink *__link, *__to_link;
 
   for (unsigned i=0; i<m_out_link_array.size(); ++i){
@@ -51,6 +51,7 @@ int MNM_DMOND::evolve(TInt timestamp)
     m_out_volume.find(__link) -> second += 1;
     __que_it++;
   }
+
   for (unsigned i=0; i<m_out_link_array.size(); ++i){
     __link = m_out_link_array[i];
     if ((__link -> get_link_supply() * m_flow_scalar) < TFlt(m_out_volume.find(__link) -> second)){
@@ -140,6 +141,7 @@ int MNM_DMDND::add_in_link(MNM_Dlink *link)
 
 int MNM_DMDND::evolve(TInt timestamp)
 {
+  MNM_Dnode::evolve(timestamp);
   MNM_Dlink *__link;
   MNM_Veh *__veh;
   size_t __size;
@@ -195,17 +197,17 @@ MNM_Dnode_Inout::~MNM_Dnode_Inout()
 
 int MNM_Dnode_Inout::prepare_loading()
 {
-  TInt __num_in = m_in_link_array.size();
-  TInt __num_out = m_out_link_array.size();
+  TInt _num_in = m_in_link_array.size();
+  TInt _num_out = m_out_link_array.size();
   // printf("num_in: %d, num_out: %d\n", __num_in, __num_out);
-  m_demand = (TFlt*) malloc(sizeof(TFlt) * __num_in * __num_out);
-  memset(m_demand, 0x0, sizeof(TFlt) * __num_in * __num_out);
-  m_supply = (TFlt*) malloc(sizeof(TFlt) * __num_out);
-  memset(m_supply, 0x0, sizeof(TFlt) * __num_out);
-  m_veh_flow = (TFlt*) malloc(sizeof(TFlt) * __num_in * __num_out);
-  memset(m_veh_flow, 0x0, sizeof(TFlt) * __num_in * __num_out);
-  m_veh_tomove = (TInt*) malloc(sizeof(TInt) * __num_in * __num_out);
-  memset(m_veh_tomove, 0x0, sizeof(TInt) * __num_in * __num_out);
+  m_demand = (TFlt*) malloc(sizeof(TFlt) * _num_in * _num_out);
+  memset(m_demand, 0x0, sizeof(TFlt) * _num_in * _num_out);
+  m_supply = (TFlt*) malloc(sizeof(TFlt) * _num_out);
+  memset(m_supply, 0x0, sizeof(TFlt) * _num_out);
+  m_veh_flow = (TFlt*) malloc(sizeof(TFlt) * _num_in * _num_out);
+  memset(m_veh_flow, 0x0, sizeof(TFlt) * _num_in * _num_out);
+  m_veh_tomove = (TInt*) malloc(sizeof(TInt) * _num_in * _num_out);
+  memset(m_veh_tomove, 0x0, sizeof(TInt) * _num_in * _num_out);
   return 0;
 }
 
@@ -217,8 +219,16 @@ int MNM_Dnode_Inout::prepare_supplyANDdemand()
   TInt __count;
   std::deque <MNM_Veh*>::iterator __veh_it;
   MNM_Dlink *__in_link, *__out_link;
+
+
   for (size_t i=0; i < m_in_link_array.size(); ++i){
     __in_link = m_in_link_array[i];
+    for (__veh_it = __in_link -> m_finished_array.begin(); __veh_it != __in_link -> m_finished_array.end(); __veh_it++){
+      if (std::find(m_out_link_array.begin(), m_out_link_array.end(), (*__veh_it) -> get_next_link()) == m_out_link_array.end()) {
+        printf("Vehicle in the wrong node, no exit!\n");
+        exit(-1);
+      }
+    }
     for (size_t j=0; j< m_out_link_array.size(); ++j){
       __out_link = m_out_link_array[j];
       // printf("Current out link is %d\n", __out_link -> m_link_ID);
@@ -354,6 +364,7 @@ int MNM_Dnode_Inout::add_in_link(MNM_Dlink *link)
 
 int MNM_Dnode_Inout::evolve(TInt timestamp)
 {
+  MNM_Dnode::evolve(timestamp);
   // printf("1\n");
   prepare_supplyANDdemand();
   // printf("2\n"); 

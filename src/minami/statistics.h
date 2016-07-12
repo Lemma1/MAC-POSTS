@@ -24,6 +24,11 @@ public:
   std::unordered_map<TInt, TFlt> m_record_interval_tt;
   std::unordered_map<TInt, TFlt> m_load_interval_tt;
 
+  std::vector<MNM_Dlink*> m_link_order; 
+  //since iteration of the unordered_map is not guaranteed the same order,
+  //so we keep the order first
+
+
   /* universal function */
   int record_loading_interval_condition(TInt timestamp);
   int record_record_interval_condition(TInt timestamp);

@@ -41,7 +41,10 @@ TFlt MNM_Ults::rand_flt(){
   return TFlt((double) rand() / (RAND_MAX));
 }
 
-
+TFlt MNM_Ults::max_link_cost()
+{
+  return TFlt(60 * 60);
+}
 
 Chameleon::Chameleon(std::string const& value) 
 {

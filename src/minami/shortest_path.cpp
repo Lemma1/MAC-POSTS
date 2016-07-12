@@ -16,10 +16,10 @@ int MNM_Shortest_Path::all_to_one_Dijkstra(TInt dest_node_ID,
                       PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
                       std::unordered_map<TInt, TInt> &output_map)
 {
-  if (output_map.size() != 0){
-    // printf("Output map already exist, clear!\n");
-    output_map.clear();
-  }
+  // if (output_map.size() != 0){
+  //   // printf("Output map already exist, clear!\n");
+  //   output_map.clear();
+  // }
   // printf("1\n");
   std::unordered_map<TInt, TFlt> _dist = std::unordered_map<TInt, TFlt>();
   _dist.insert(std::pair<TInt, TFlt>(dest_node_ID, TFlt(0)));
@@ -87,6 +87,11 @@ int MNM_Shortest_Path::all_to_one_FIFO(TInt dest_node_ID,
   //   // printf("Output map already exist, clear!\n");
   //   output_map.clear();
   // }
+
+  // for (auto _map_it : cost_map){
+  //   printf("For link ID %d, it's cost is %.4f\n", _map_it.first(), _map_it.second());
+  // }
+
   std::unordered_map<TInt, TFlt> _dist = std::unordered_map<TInt, TFlt>();
   _dist.insert(std::pair<TInt, TFlt>(dest_node_ID, TFlt(0)));
   
@@ -126,6 +131,7 @@ int MNM_Shortest_Path::all_to_one_FIFO(TInt dest_node_ID,
       // m_Q.push_back(m_Q_support.find(_in_node_ID) -> second);
       _in_link_ID = graph -> GetEI(_in_node_ID, _tmp_ID).GetId();
       _alt = _tmp_dist + cost_map.find(_in_link_ID) -> second;
+      // printf("Current alternative distance is %.4f\n", _alt());
       if (_alt < _dist.find(_in_node_ID) -> second){
         // m_Q.push_back(m_Q_support.find(_in_node_ID) -> second);
         _dist.find(_in_node_ID) -> second = _alt;

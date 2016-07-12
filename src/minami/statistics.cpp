@@ -14,7 +14,9 @@ MNM_Statistics::MNM_Statistics(std::string file_folder, MNM_ConfReader *conf_rea
   m_load_interval_volume = std::unordered_map<TInt, TFlt>();
   m_record_interval_tt = std::unordered_map<TInt, TFlt>();
   m_load_interval_tt = std::unordered_map<TInt, TFlt>();
-  
+
+  m_link_order = std::vector<MNM_Dlink*>();
+
   if (m_load_interval_volume_file.is_open()) m_load_interval_volume_file.close();
   if (m_record_interval_volume_file.is_open()) m_record_interval_volume_file.close();
   if (m_load_interval_tt_file.is_open()) m_load_interval_tt_file.close();
@@ -27,6 +29,10 @@ MNM_Statistics::MNM_Statistics(std::string file_folder, MNM_ConfReader *conf_rea
 MNM_Statistics::~MNM_Statistics()
 {
   delete m_self_config;
+  m_record_interval_volume.clear();
+  m_load_interval_volume.clear();
+  m_record_interval_tt.clear();
+  m_load_interval_tt.clear();
 }
 
 int MNM_Statistics::init_record_value()
@@ -135,6 +141,10 @@ int MNM_Statistics::init_record()
       }
     }
   }
+
+  for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
+    m_link_order.push_back(_link_it -> second);
+  }  
   return 0;
 }
 
@@ -146,8 +156,8 @@ int MNM_Statistics::record_loading_interval_condition(TInt timestamp)
   MNM_Dlink *__link;
   TFlt __flow,  __tt;
   if (m_record_volume && m_load_interval_volume_file.is_open()){
-    for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
-      __link = __link_it -> second;
+    for (auto __link_it = m_link_order.begin(); __link_it != m_link_order.end(); __link_it++){
+      __link = *__link_it;
       __flow = m_load_interval_volume.find(__link -> m_link_ID) -> second;
       __str += std::to_string(__flow) + " ";
     }
@@ -158,8 +168,8 @@ int MNM_Statistics::record_loading_interval_condition(TInt timestamp)
 
   __str.clear();
   if (m_record_tt && m_load_interval_tt_file.is_open()){
-    for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
-      __link = __link_it -> second;
+    for (auto __link_it = m_link_order.begin(); __link_it != m_link_order.end(); __link_it++){
+      __link = *__link_it;
       __tt = m_load_interval_tt.find(__link -> m_link_ID) -> second;
       __str += std::to_string(__tt) + " ";
     }
@@ -177,8 +187,8 @@ int MNM_Statistics::record_record_interval_condition(TInt timestamp)
   MNM_Dlink *__link;
   TFlt __flow, __tt;
   if (m_record_volume && m_record_interval_volume_file.is_open()){
-    for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
-      __link = __link_it -> second;
+    for (auto __link_it = m_link_order.begin(); __link_it != m_link_order.end(); __link_it++){
+      __link = *__link_it;
       __flow = m_record_interval_volume.find(__link -> m_link_ID) -> second;
       __str += std::to_string(__flow) + " ";
     }
@@ -189,8 +199,8 @@ int MNM_Statistics::record_record_interval_condition(TInt timestamp)
   __str.clear();
 
   if (m_record_tt && m_record_interval_tt_file.is_open()){
-    for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
-      __link = __link_it -> second;
+    for (auto __link_it = m_link_order.begin(); __link_it != m_link_order.end(); __link_it++){
+      __link = *__link_it;
       __tt = m_record_interval_tt.find(__link -> m_link_ID) -> second;
       __str += std::to_string(__tt) + " ";
     }

@@ -1,4 +1,5 @@
 #include "dta.h"
+#include "omp.h"
 
 MNM_Dta::MNM_Dta(std::string file_folder)
 {
@@ -188,7 +189,6 @@ int MNM_Dta::loading(bool verbose)
     if (__cur_int % m_assign_freq == 0 || __cur_int==0){
       for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){
         __origin = _origin_it -> second;
-        
         if (_assign_inter >= m_total_assign_inter) {
           __origin -> release_one_interval(__cur_int, m_veh_factory, -1, TFlt(0));
         }
@@ -197,7 +197,7 @@ int MNM_Dta::loading(bool verbose)
         }
         // _assign_inter = _assign_inter % m_total_assign_inter;
         // __origin -> release_one_interval(__cur_int, m_veh_factory, _assign_inter, TFlt(0));
-      }  
+      } 
       _assign_inter += 1;
     }
 

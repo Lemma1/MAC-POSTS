@@ -37,6 +37,7 @@ public:
   TFlt static divide(TFlt a, TFlt b);
   TInt static mod(TInt a, TInt b);
   TFlt static rand_flt();
+  TFlt static max_link_cost();
 };
 
 

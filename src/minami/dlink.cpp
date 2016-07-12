@@ -262,7 +262,7 @@ TFlt MNM_Dlink_Ctm::get_link_tt()
   TFlt _rhok = m_lane_flow_cap/m_ffs; //get the critical density
   //  if (abs(rho - rhok) <= 0.0001) cost = POS_INF_INT;
   if (_rho >= _rhoj) {
-    _cost = DBL_MAX; //sean: i think we should use rhoj, not rhok
+    _cost = MNM_Ults::max_link_cost(); //sean: i think we should use rhoj, not rhok
   } 
   else {
     if (_rho <= _rhok) {
@@ -366,7 +366,7 @@ TFlt MNM_Dlink_Pq::get_link_tt()
   TFlt _rhok = m_lane_flow_cap/m_ffs; //get the critical density
   //  if (abs(rho - rhok) <= 0.0001) cost = POS_INF_INT;
   if (_rho >= _rhoj) {
-    _cost = DBL_MAX; //sean: i think we should use rhoj, not rhok
+    _cost = MNM_Ults::max_link_cost(); //sean: i think we should use rhoj, not rhok
   } 
   else {
     if (_rho <= _rhok) {

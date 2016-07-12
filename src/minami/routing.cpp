@@ -140,6 +140,7 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
     }
   }
 
+  
   /* route the vehicle in Origin nodes */
   printf("Routing the vehicle!\n");
   MNM_Origin *_origin;
@@ -158,8 +159,10 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
         printf("Something wrong in routing, wrong next link 1\n");
         exit(-1);
       }
+      // printf("From origin, The next link ID will be %d\n", _next_link_ID());
       _next_link = m_link_factory -> get_link(_next_link_ID);
       _veh -> set_next_link(_next_link);
+      // printf("The next link now it's %d\n", _veh -> get_next_link() -> m_link_ID());
     }
   }  
 
@@ -170,6 +173,20 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
     _node_ID = _link -> m_to_node -> m_node_ID;
     for (auto _veh_it = _link -> m_finished_array.begin(); _veh_it!=_link -> m_finished_array.end(); _veh_it++){
       _veh = *_veh_it;
+      if (_link != _veh -> get_current_link()){
+        printf("Wrong current link!\n");
+        exit(-1);
+      }
+      // if (_link != _veh -> get_next_link()){
+      //   printf("Wrong node allocation!\n");
+      //   printf("The next link should be %d, but now it's %d, current link is %d\n",_link -> m_link_ID(), 
+      //                 _veh -> get_next_link() -> m_link_ID(), _veh -> get_current_link() -> m_link_ID());
+      //   _next_link_ID = m_table -> find(_veh -> get_destination()) -> second -> find(_node_ID) -> second;
+      //   _node_ID = m_table -> find(_veh -> get_destination()) -> second -> find(1) -> second;
+      //   printf("The next link ID will be %d\n", _next_link_ID());
+      //   printf("From origin, The next link ID will be %d\n", _node_ID());
+      //   exit(-1);
+      // }
       _veh_dest = _veh -> get_destination();
       if (_veh_dest -> m_dest_node -> m_node_ID == _node_ID){
         _veh -> set_next_link(NULL);
@@ -191,6 +208,24 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
           }
         }
         _next_link = m_link_factory -> get_link(_next_link_ID);
+        if (_next_link != NULL) {
+          // printf("Checking future\n");
+          TInt _next_node_ID = _next_link -> m_to_node -> m_node_ID;
+          if (_next_node_ID != _veh -> get_destination() -> m_dest_node -> m_node_ID){
+            // printf("Destination node is %d\n", _veh -> get_destination() -> m_dest_node -> m_node_ID());
+            if (m_table -> find(_veh -> get_destination()) == m_table -> end()){
+              printf("Cant'f find Destination\n");
+            }
+            if (m_table -> find(_veh -> get_destination()) -> second -> find(_next_node_ID) == m_table -> find(_veh -> get_destination()) -> second -> end()){
+              printf("can't find _next_node_ID\n");
+            }
+            if (m_table -> find(_veh -> get_destination()) -> second -> find(_next_node_ID) -> second == -1){
+              printf("Something wrong for the future node!\n");
+              exit(-1);
+            }
+            // printf("Pass checking\n");
+          }
+        }
         _veh -> set_next_link(_next_link);
       }
     }
