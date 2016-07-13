@@ -7,8 +7,22 @@ MNM_Dlink::MNM_Dlink( TInt ID,
                       TFlt ffs )
 {
   m_link_ID = ID;
+  if (ffs < 0){
+    printf("link speed less than zero, current link ID is %d\n", m_link_ID());
+    exit(-1);    
+  }
   m_ffs = ffs;
+  
+  if (number_of_lane < 0){
+    printf("m_number_of_lane less than zero, current link ID is %d\n", m_link_ID());
+    exit(-1);    
+  }
   m_number_of_lane = number_of_lane;
+
+  if (length < 0){
+    printf("link length less than zero, current link ID is %d\n", m_link_ID());
+    exit(-1);    
+  }
   m_length = length;
 
   m_finished_array = std::deque<MNM_Veh *>();
@@ -54,7 +68,24 @@ MNM_Dlink_Ctm::MNM_Dlink_Ctm( TInt ID,
                               TFlt flow_scalar)
   : MNM_Dlink::MNM_Dlink ( ID, number_of_lane, length, ffs )
 {
+  if (lane_hold_cap < 0){
+    printf("lane_hold_cap can't be less than zero, current link ID is %d\n", m_link_ID());
+    exit(-1);
+  }
+  if (lane_hold_cap > TFlt(300) / TFlt(1600)){
+    printf("lane_hold_cap is too large, we will replace it to 300 veh/mile, current link ID is %d\n", m_link_ID());
+    lane_hold_cap = TFlt(300) / TFlt(1600);
+  }  
   m_lane_hold_cap = lane_hold_cap;
+
+  if (lane_flow_cap < 0){
+    printf("lane_flow_cap can't be less than zero, current link ID is %d\n", m_link_ID());
+    exit(-1);
+  }
+  if (lane_flow_cap > TFlt(3500) / TFlt(3600)){
+    printf("lane_flow_cap is too large, we will replace it to 3500 veh/hour, current link ID is %d\n", m_link_ID());
+    lane_flow_cap = TFlt(3500) / TFlt(3600);
+  }  
   m_lane_flow_cap = lane_flow_cap;
   m_flow_scalar = flow_scalar;
   m_cell_array = std::vector<Ctm_Cell*>();

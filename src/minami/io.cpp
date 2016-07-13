@@ -491,7 +491,7 @@ int MNM_IO::read_int_float(std::string file_name, std::unordered_map<TInt, TFlt>
   if (_file.is_open())
   {
     // printf("Start build demand profile.\n");
-    std::getline(_file,_line); //skip the first line
+    std::getline(_file,_line);
     TInt num_record = TInt(std::stoi(trim(_line)));
     // printf("Total is %d\n", num_record);
     for (int i=0; i < num_record; ++i){
@@ -512,6 +512,46 @@ int MNM_IO::read_int_float(std::string file_name, std::unordered_map<TInt, TFlt>
   }  
   return 0;
 }
+
+
+int MNM_IO::build_workzone_list(std::string file_folder, MNM_Workzone* workzone)
+{
+  /* find file */
+  std::string _workzone_file_name = file_folder + "/MNM_input_workzone";
+  std::ifstream _workzone_file;
+  _workzone_file.open(_workzone_file_name, std::ios::in);  
+
+  std::string _line;
+  std::vector<std::string> _words;
+  TInt _link_ID;
+
+  if (_workzone_file.is_open())
+  {
+    printf("Start build workzone profile.\n");
+    std::getline(_workzone_file,_line);
+    TInt num_workzone = TInt(std::stoi(trim(_line)));
+    for (int i=0; i < num_workzone; ++i){
+      std::getline(_workzone_file,_line);
+      // std::cout << "Processing: " << __line << "\n";
+      _words = split(_line, ' ');
+      if (TInt(_words.size()) == 1) {
+        _link_ID = TInt(std::stoi(trim(_words[0])));
+        Link_Workzone _w = {_link_ID};
+        workzone -> m_workzone_list.push_back(_w);
+      }
+      else{
+        printf("Something wrong in build_workzone!\n");
+        exit(-1);
+      }
+    }
+    _workzone_file.close();
+  }  
+
+  return 0;
+
+}
+
+
 
 
 std::vector<std::string> MNM_IO::split(const std::string &text, char sep) 

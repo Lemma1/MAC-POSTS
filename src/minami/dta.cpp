@@ -18,7 +18,6 @@ int MNM_Dta::initialize()
   m_link_factory = new MNM_Link_Factory();
   m_od_factory = new MNM_OD_Factory();
   m_config = new MNM_ConfReader(m_file_folder + "/config.conf", "DTA");
-  
   m_unit_time = m_config -> get_int("unit_time");
   m_flow_scalar = m_config -> get_int("flow_scalar");
   m_assign_freq = m_config -> get_int("assign_frq");
@@ -50,6 +49,13 @@ int MNM_Dta::set_routing()
   return 0;  
 }
 
+int MNM_Dta::build_workzone()
+{
+  m_workzone = new MNM_Workzone(m_node_factory, m_link_factory, m_graph);
+  MNM_IO::build_workzone_list(m_file_folder, m_workzone);  
+  return 0;
+}
+
 int MNM_Dta::build_from_files()
 {
   MNM_IO::build_node_factory(m_file_folder, m_config, m_node_factory);
@@ -61,6 +67,7 @@ int MNM_Dta::build_from_files()
   // std::cout << test_dta -> m_od_factory -> m_destination_map.size() << "\n";
   m_graph = MNM_IO::build_graph(m_file_folder, m_config);
   MNM_IO::build_demand(m_file_folder, m_config, m_od_factory);
+  build_workzone();
   set_statistics();
   set_routing();
   return 0;  
@@ -158,6 +165,21 @@ bool MNM_Dta::is_ok()
   return __flag;
 }
 
+int MNM_Dta::pre_loading()
+{
+  MNM_Dnode *__node;
+  printf("MNM: Prepare loading!\n");
+  m_routing -> init_routing();
+  // printf("Finish prepare routing\n");
+  m_statistics -> init_record();
+  for (auto __node_it = m_node_factory -> m_node_map.begin(); __node_it != m_node_factory -> m_node_map.end(); __node_it++){
+    __node = __node_it -> second;
+    // printf("Node ID: %d\n", __node -> m_node_ID);
+    __node -> prepare_loading();
+  }
+  m_workzone -> init_workzone();
+  return 0;
+}
 
 int MNM_Dta::loading(bool verbose)
 {
@@ -169,15 +191,7 @@ int MNM_Dta::loading(bool verbose)
   MNM_Destination *__dest;
   TInt _assign_inter = m_start_assign_interval;
 
-  printf("MNM: Prepare loading!\n");
-  m_routing -> init_routing();
-  printf("Finish prepare routing\n");
-  m_statistics -> init_record();
-  for (auto __node_it = m_node_factory -> m_node_map.begin(); __node_it != m_node_factory -> m_node_map.end(); __node_it++){
-    __node = __node_it -> second;
-    // printf("Node ID: %d\n", __node -> m_node_ID);
-    __node -> prepare_loading();
-  }
+  pre_loading();
   while (__cur_int < __total_int){
     printf("-------------------------------    Interval %d   ------------------------------ \n", (int)__cur_int);
     // step 1: Origin release vehicle

@@ -56,6 +56,7 @@ public:
                         TFlt unit_time,
                         TFlt flow_scalar);
   MNM_Dlink *get_link(TInt ID);
+  int delete_link(TInt ID);
   std::unordered_map<TInt, MNM_Dlink*> m_link_map;
 };
 
@@ -72,4 +73,5 @@ public:
   std::unordered_map<TInt, MNM_Origin*> m_origin_map;
   std::unordered_map<TInt, MNM_Destination*> m_destination_map;
 };
+
 #endif

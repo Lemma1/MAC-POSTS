@@ -8,7 +8,7 @@
 
 #add_executable (ctm test_ctm.cpp vehicle.cpp dlink.cpp od.cpp factory.cpp dnode.cpp ults.cpp dta.cpp)
 
-add_executable (dta_response test_dta.cpp dta.cpp vehicle.cpp dlink.cpp od.cpp factory.cpp dnode.cpp ults.cpp io.cpp routing.cpp statistics.cpp shortest_path.cpp path.cpp vms.cpp)
+add_executable (dta_response test_dta.cpp dta.cpp vehicle.cpp dlink.cpp od.cpp factory.cpp dnode.cpp ults.cpp io.cpp routing.cpp statistics.cpp shortest_path.cpp path.cpp vms.cpp workzone.cpp)
 
 target_link_libraries (dta_response LINK_PUBLIC Snap g3log ${CMAKE_THREAD_INIT})
 

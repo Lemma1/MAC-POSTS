@@ -7,6 +7,7 @@
 #include "enum.h"
 #include "path.h"
 #include "vms.h"
+#include "workzone.h"
 
 #include <string>
 #include <vector>
@@ -26,6 +27,8 @@ public:
   static Path_Table *load_path_table(std::string file_name, PNEGraph graph, TInt num_path);
   static int build_vms_facotory(std::string file_folder, PNEGraph graph, TInt num_vms, MNM_Vms_Factory *vms_factory);
   static int read_int_float(std::string file_name, std::unordered_map<TInt, TFlt>* reader);
+  static int build_workzone_list(std::string file_folder, MNM_Workzone* workzone);
+
 private:
   static std::vector<std::string> split(const std::string &text, char sep);
   static  std::string inline &ltrim(std::string &s) {s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));

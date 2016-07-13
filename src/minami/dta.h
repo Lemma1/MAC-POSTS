@@ -28,7 +28,9 @@ public:
 private:
   int set_statistics();
   int set_routing();
+  int build_workzone();
   int check_origin_destination_connectivity();
+  int pre_loading();
   TInt m_start_assign_interval;
   TInt m_total_assign_inter;
   TFlt m_unit_time;
@@ -43,6 +45,7 @@ private:
   PNEGraph m_graph;
   MNM_Statistics *m_statistics;
   MNM_Routing *m_routing;
+  MNM_Workzone *m_workzone;
 };               
 
 

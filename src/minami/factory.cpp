@@ -124,6 +124,18 @@ MNM_Dlink *MNM_Link_Factory::get_link(TInt ID)
 {
   return m_link_map.find(ID) -> second;
 }
+
+
+int MNM_Link_Factory::delete_link(TInt ID)
+{
+  auto _map_it = m_link_map.find(ID);
+  if (_map_it == m_link_map.end()){
+    printf("Can't delete link!\n");
+    exit(-1);
+  }
+  m_link_map.erase(_map_it);
+  return 0;
+}
 /**************************************************************************
                           OD factory
 **************************************************************************/

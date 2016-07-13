@@ -130,15 +130,15 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
   if ((timestamp) % m_routing_freq  == 0 || timestamp == 0) {
     printf("Calculating the shortest path trees!\n");
     for (auto _it = m_od_factory -> m_destination_map.begin(); _it != m_od_factory -> m_destination_map.end(); _it++){
-    #pragma omp task firstprivate(_it)
-      {
+    // #pragma omp task firstprivate(_it)
+      // {
         _dest = _it -> second;
         _dest_node_ID = _dest -> m_dest_node -> m_node_ID;
         // printf("Destination ID: %d\n", (int) _dest_node_ID);
         _shortest_path_tree = m_table -> find(_dest) -> second;
         MNM_Shortest_Path::all_to_one_FIFO(_dest_node_ID, m_graph, m_statistics -> m_record_interval_tt, *_shortest_path_tree);
         // MNM_Shortest_Path::all_to_one_Dijkstra(_dest_node_ID, m_graph, m_statistics -> m_record_interval_tt, *_shortest_path_tree);
-      } 
+      // } 
     }
   }
 
