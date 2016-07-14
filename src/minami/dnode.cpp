@@ -223,12 +223,12 @@ int MNM_Dnode_Inout::prepare_supplyANDdemand()
 
   for (size_t i=0; i < m_in_link_array.size(); ++i){
     __in_link = m_in_link_array[i];
-    for (__veh_it = __in_link -> m_finished_array.begin(); __veh_it != __in_link -> m_finished_array.end(); __veh_it++){
-      if (std::find(m_out_link_array.begin(), m_out_link_array.end(), (*__veh_it) -> get_next_link()) == m_out_link_array.end()) {
-        printf("Vehicle in the wrong node, no exit!\n");
-        exit(-1);
-      }
-    }
+    // for (__veh_it = __in_link -> m_finished_array.begin(); __veh_it != __in_link -> m_finished_array.end(); __veh_it++){
+    //   if (std::find(m_out_link_array.begin(), m_out_link_array.end(), (*__veh_it) -> get_next_link()) == m_out_link_array.end()) {
+    //     printf("Vehicle in the wrong node, no exit!\n");
+    //     exit(-1);
+    //   }
+    // }
     for (size_t j=0; j< m_out_link_array.size(); ++j){
       __out_link = m_out_link_array[j];
       // printf("Current out link is %d\n", __out_link -> m_link_ID);

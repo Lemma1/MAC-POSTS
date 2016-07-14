@@ -9,6 +9,15 @@ MNM_Dta::MNM_Dta(std::string file_folder)
 
 MNM_Dta::~MNM_Dta()
 {
+  delete m_veh_factory;
+  delete m_node_factory;
+  delete m_link_factory;
+  delete m_od_factory;
+  delete m_config;
+  delete m_routing;
+  delete m_statistics;
+  delete m_workzone;
+  m_graph -> Clr();  
 }
 
 int MNM_Dta::initialize()

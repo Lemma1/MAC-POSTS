@@ -11,6 +11,7 @@ int MNM_IO::build_node_factory(std::string file_folder, MNM_ConfReader *conf_rea
   std::ifstream __node_file;
   __node_file.open(__node_file_name, std::ios::in);
 
+
   /* read confid */
   TInt __num_of_node = conf_reader -> get_int("num_of_node");
   TFlt __flow_scalar = conf_reader -> get_float("flow_scalar");
@@ -550,8 +551,6 @@ int MNM_IO::build_workzone_list(std::string file_folder, MNM_Workzone* workzone)
   return 0;
 
 }
-
-
 
 
 std::vector<std::string> MNM_IO::split(const std::string &text, char sep) 

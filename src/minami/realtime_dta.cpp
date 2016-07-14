@@ -820,7 +820,13 @@ int update_path_p(Path_Table *path_table, TInt col, TFlt step_size)
     for (auto _it_it : *(_it.second)){
       for (MNM_Path* _path : _it_it.second -> m_path_vec){
         // printf("Before m_p is %lf\n", _path -> m_p);
-        _path -> m_p -= step_size * _path -> buffer[col];
+        if (_path -> buffer[col] > 0){
+          _path -> m_p /= (1 + step_size);
+        }
+        else {
+          _path -> m_p *= (1 + step_size);
+        }
+        // _path -> m_p -= step_size * _path -> buffer[col];
         // printf("Now m_p is %lf\n", _path -> m_p);
         _path -> m_p = MNM_Ults::max(_path -> m_p, -Possible_Large);
         _path -> m_p = MNM_Ults::min(_path -> m_p, Possible_Large);
