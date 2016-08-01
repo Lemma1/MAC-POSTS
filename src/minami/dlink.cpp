@@ -73,7 +73,7 @@ MNM_Dlink_Ctm::MNM_Dlink_Ctm( TInt ID,
     exit(-1);
   }
   if (lane_hold_cap > TFlt(300) / TFlt(1600)){
-    printf("lane_hold_cap is too large, we will replace it to 300 veh/mile, current link ID is %d\n", m_link_ID());
+    // printf("lane_hold_cap is too large, we will replace it to 300 veh/mile, current link ID is %d\n", m_link_ID());
     lane_hold_cap = TFlt(300) / TFlt(1600);
   }  
   m_lane_hold_cap = lane_hold_cap;
@@ -83,7 +83,7 @@ MNM_Dlink_Ctm::MNM_Dlink_Ctm( TInt ID,
     exit(-1);
   }
   if (lane_flow_cap > TFlt(3500) / TFlt(3600)){
-    printf("lane_flow_cap is too large, we will replace it to 3500 veh/hour, current link ID is %d\n", m_link_ID());
+    // printf("lane_flow_cap is too large, we will replace it to 3500 veh/hour, current link ID is %d\n", m_link_ID());
     lane_flow_cap = TFlt(3500) / TFlt(3600);
   }  
   m_lane_flow_cap = lane_flow_cap;

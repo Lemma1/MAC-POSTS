@@ -38,7 +38,12 @@ public:
   TInt static mod(TInt a, TInt b);
   TFlt static rand_flt();
   TFlt static max_link_cost();
+  int static copy_file( const char* srce_file, const char* dest_file );
+  int static copy_file( std::string srce_file, std::string dest_file );
 };
+
+
+
 
 
 class Chameleon {

@@ -244,5 +244,17 @@ int copy_p_to_buffer(Path_Table *path_table, TInt col)
   return 0;
 }
 
+int copy_buffer_to_p(Path_Table *path_table, TInt col)
+{
+  for(auto _it : *path_table){
+    for (auto _it_it : *(_it.second)){
+      for (MNM_Path* _path : _it_it.second -> m_path_vec){
+        _path -> m_p = _path -> buffer[col];
+      }
+    }
+  }  
+  return 0;
+}
+
 }//end namespace MNM
 

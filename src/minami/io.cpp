@@ -491,10 +491,11 @@ int MNM_IO::read_int_float(std::string file_name, std::unordered_map<TInt, TFlt>
   TFlt _float;
   if (_file.is_open())
   {
-    // printf("Start build demand profile.\n");
+    printf("Start build demand profile.\n");
     std::getline(_file,_line);
+    std::cout << "Processing: " << _line << "\n";
     TInt num_record = TInt(std::stoi(trim(_line)));
-    // printf("Total is %d\n", num_record);
+    printf("Total is %d\n", num_record());
     for (int i=0; i < num_record; ++i){
       std::getline(_file,_line);
       // std::cout << "Processing: " << __line << "\n";
