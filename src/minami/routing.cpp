@@ -42,41 +42,41 @@ int MNM_Routing_Random::init_routing(Path_Table *path_table)
 
 int MNM_Routing_Random::update_routing(TInt timestamp)
 {
-  MNM_Origin *__origin;
-  MNM_DMOND *__origin_node;
-  TInt __node_ID;
-  TNEGraph::TNodeI __node_I;
-  TInt __out_ID;
-  MNM_Dlink *__next_link;
-  MNM_Dlink* __link;
+  MNM_Origin *_origin;
+  MNM_DMOND *_origin_node;
+  TInt _node_ID;
+  TNEGraph::TNodeI _node_I;
+  TInt _out_ID;
+  MNM_Dlink *_next_link;
+  MNM_Dlink* _link;
   // printf("MNM_Routing: route the origin vehciles.\n");
   /* route the vehicle in Origin nodes */
-  for (auto __origin_it = m_od_factory->m_origin_map.begin(); __origin_it != m_od_factory->m_origin_map.end(); __origin_it++){
-    __origin = __origin_it -> second;
-    __origin_node = __origin -> m_origin_node;
-    __node_ID = __origin_node -> m_node_ID;
-    for (auto __veh_it = __origin_node -> m_in_veh_queue.begin(); __veh_it!=__origin_node -> m_in_veh_queue.end(); __veh_it++){
-      __node_I = m_graph -> GetNI(__node_ID);
-      __out_ID = __node_I.GetOutNId(MNM_Ults::mod(rand(), __node_I.GetOutDeg()));
-      __next_link = m_link_factory -> get_link(m_graph -> GetEI(__node_ID, __out_ID).GetId());
-      (*__veh_it) -> set_next_link(__next_link);
+  for (auto _origin_it = m_od_factory->m_origin_map.begin(); _origin_it != m_od_factory->m_origin_map.end(); _origin_it++){
+    _origin = _origin_it -> second;
+    _origin_node = _origin -> m_origin_node;
+    _node_ID = _origin_node -> m_node_ID;
+    for (auto _veh_it = _origin_node -> m_in_veh_queue.begin(); _veh_it!=_origin_node -> m_in_veh_queue.end(); _veh_it++){
+      _node_I = m_graph -> GetNI(_node_ID);
+      _out_ID = _node_I.GetOutNId(MNM_Ults::mod(rand(), _node_I.GetOutDeg()));
+      _next_link = m_link_factory -> get_link(m_graph -> GetEI(_node_ID, _out_ID).GetId());
+      (*_veh_it) -> set_next_link(_next_link);
     }
   }
   // printf("MNM_Routing: route the link vehciles.\n");
-  TInt __link_ID;
+  TInt _link_ID;
   /* route the vehicles at the end of each link */
-  for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it ++){
-    __link = __link_it -> second;
-    __node_ID = __link -> m_to_node -> m_node_ID;
-    for (auto __veh_it = __link -> m_finished_array.begin(); __veh_it!=__link -> m_finished_array.end(); __veh_it++){
-      __node_I = m_graph -> GetNI(__node_ID);
-      if (__node_I.GetOutDeg() > 0){
-        __link_ID = __node_I.GetOutEId(MNM_Ults::mod(rand(), __node_I.GetOutDeg()));
-        __next_link = m_link_factory -> get_link(__link_ID);
-        (*__veh_it) -> set_next_link(__next_link);
+  for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it ++){
+    _link = _link_it -> second;
+    _node_ID = _link -> m_to_node -> m_node_ID;
+    for (auto _veh_it = _link -> m_finished_array.begin(); _veh_it!=_link -> m_finished_array.end(); _veh_it++){
+      _node_I = m_graph -> GetNI(_node_ID);
+      if (_node_I.GetOutDeg() > 0){
+        _link_ID = _node_I.GetOutEId(MNM_Ults::mod(rand(), _node_I.GetOutDeg()));
+        _next_link = m_link_factory -> get_link(_link_ID);
+        (*_veh_it) -> set_next_link(_next_link);
       }
       else{
-        (*__veh_it) -> set_next_link(NULL);
+        (*_veh_it) -> set_next_link(NULL);
       }
     }
   }
@@ -136,8 +136,8 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
         _dest_node_ID = _dest -> m_dest_node -> m_node_ID;
         // printf("Destination ID: %d\n", (int) _dest_node_ID);
         _shortest_path_tree = m_table -> find(_dest) -> second;
-        MNM_Shortest_Path::all_to_one_FIFO(_dest_node_ID, m_graph, m_statistics -> m_record_interval_tt, *_shortest_path_tree);
-        // MNM_Shortest_Path::all_to_one_Dijkstra(_dest_node_ID, m_graph, m_statistics -> m_record_interval_tt, *_shortest_path_tree);
+        // MNM_Shortest_Path::all_to_one_FIFO(_dest_node_ID, m_graph, m_statistics -> m_record_interval_tt, *_shortest_path_tree);
+        MNM_Shortest_Path::all_to_one_Dijkstra(_dest_node_ID, m_graph, m_statistics -> m_record_interval_tt, *_shortest_path_tree);
       // } 
     }
   }

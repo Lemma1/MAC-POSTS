@@ -41,14 +41,27 @@ int main()
 
     std::string line;
     TInt assign_inter;
-    if (instruction_file.is_open()){
-      getline(instruction_file, line);
-      assign_inter = TInt(std::stoi(line));
-      instruction_file.close();
+    try {
+      if (instruction_file.is_open()){
+        getline(instruction_file, line);
+        assign_inter = TInt(std::stoi(line));
+        instruction_file.close();
+      }
+      
+      if (assign_inter == 0){
+        rd -> reset();
+      }
     }
-    
-    
-    rd -> one_iteration(assign_inter);
+    catch (int e) {
+      printf("Can't retrive interval, skip this interval.\n");
+    }
+
+    try {
+      rd -> one_iteration(assign_inter);
+    }
+    catch (int e) {
+      printf("Skip this interval.\n");
+    }
 
     if (rd -> m_before_shot -> m_veh_factory -> m_veh_map.size() > RESET_THRESHOLD 
           || rd -> m_after_shot -> m_veh_factory -> m_veh_map.size() > RESET_THRESHOLD){
@@ -57,10 +70,9 @@ int main()
 
     std::remove(instruction_file_name.c_str());
 
-    system("python ../../../../../manage.py import_online_congestion");
+    system("python /home/hzn/project/dataproject/manage.py import_online_congestion");
   }
   return 0;
 }
-
 
 

@@ -22,11 +22,11 @@ MNM_Veh_Factory::~MNM_Veh_Factory()
 MNM_Veh *MNM_Veh_Factory::make_veh(TInt timestamp, Vehicle_type veh_type)
 {
   // printf("A vehicle is produce at time %d, ID is %d\n", (int)timestamp, (int)m_num_veh + 1);
-  MNM_Veh *__veh = new MNM_Veh(m_num_veh + 1, timestamp);
-  __veh -> m_type = veh_type;
-  m_veh_map.insert(std::pair<TInt, MNM_Veh*>(m_num_veh + 1, __veh));
+  MNM_Veh *_veh = new MNM_Veh(m_num_veh + 1, timestamp);
+  _veh -> m_type = veh_type;
+  m_veh_map.insert(std::pair<TInt, MNM_Veh*>(m_num_veh + 1, _veh));
   m_num_veh += 1;
-  return __veh;
+  return _veh;
 }
 
 
@@ -49,33 +49,33 @@ MNM_Node_Factory::~MNM_Node_Factory()
 
 MNM_Dnode *MNM_Node_Factory::make_node(TInt ID, DNode_type node_type, TFlt flow_scalar)
 {
-  MNM_Dnode *__node;
+  MNM_Dnode *_node;
   switch (node_type){
     case MNM_TYPE_FWJ:
-      __node = new MNM_Dnode_FWJ(ID, flow_scalar);
+      _node = new MNM_Dnode_FWJ(ID, flow_scalar);
       break;
     case MNM_TYPE_ORIGIN:
-      __node = new MNM_DMOND(ID, flow_scalar);
+      _node = new MNM_DMOND(ID, flow_scalar);
       break;
     case MNM_TYPE_DEST:
-      __node = new MNM_DMDND(ID, flow_scalar);
+      _node = new MNM_DMDND(ID, flow_scalar);
       break;
     default:
       printf("Wrong node type.\n");
       exit(-1);
   }
-  m_node_map.insert(std::pair<TInt, MNM_Dnode*>(ID, __node));
-  return __node;
+  m_node_map.insert(std::pair<TInt, MNM_Dnode*>(ID, _node));
+  return _node;
 }
 
 MNM_Dnode *MNM_Node_Factory::get_node(TInt ID)
 {
-  auto __node_it = m_node_map.find(ID);
-  if (__node_it == m_node_map.end()) {
+  auto _node_it = m_node_map.find(ID);
+  if (_node_it == m_node_map.end()) {
     printf("No such node ID %d\n", (int) ID);
     return NULL;
   }
-  return __node_it -> second;
+  return _node_it -> second;
 }
 
 /**************************************************************************
@@ -104,20 +104,20 @@ MNM_Dlink *MNM_Link_Factory::make_link( TInt ID,
                       TFlt unit_time,
                       TFlt flow_scalar)
 {
-  MNM_Dlink *__link;
+  MNM_Dlink *_link;
   switch (link_type){
     case MNM_TYPE_CTM:
-      __link = new MNM_Dlink_Ctm(ID, lane_hold_cap, lane_flow_cap, number_of_lane, length, ffs, unit_time, flow_scalar);
+      _link = new MNM_Dlink_Ctm(ID, lane_hold_cap, lane_flow_cap, number_of_lane, length, ffs, unit_time, flow_scalar);
       break;
     case MNM_TYPE_PQ:
-      __link = new MNM_Dlink_Pq(ID, lane_hold_cap, lane_flow_cap, number_of_lane, length, ffs, unit_time, flow_scalar);
+      _link = new MNM_Dlink_Pq(ID, lane_hold_cap, lane_flow_cap, number_of_lane, length, ffs, unit_time, flow_scalar);
       break;
     default:
       printf("Wrong link type.\n");
       exit(-1);
   }
-  m_link_map.insert(std::pair<TInt, MNM_Dlink*>(ID, __link));
-  return __link;
+  m_link_map.insert(std::pair<TInt, MNM_Dlink*>(ID, _link));
+  return _link;
 }
 
 MNM_Dlink *MNM_Link_Factory::get_link(TInt ID)
@@ -160,19 +160,19 @@ MNM_OD_Factory::~MNM_OD_Factory()
 
 MNM_Destination *MNM_OD_Factory::make_destination(TInt ID)
 {
-  MNM_Destination *__dest;
-  __dest = new MNM_Destination(ID);
-  m_destination_map.insert(std::pair<TInt, MNM_Destination*>(ID, __dest));
-  return __dest;
+  MNM_Destination *_dest;
+  _dest = new MNM_Destination(ID);
+  m_destination_map.insert(std::pair<TInt, MNM_Destination*>(ID, _dest));
+  return _dest;
 }
 
 
 MNM_Origin *MNM_OD_Factory::make_origin(TInt ID, TInt max_interval, TFlt flow_scalar, TInt frequency)
 {
-  MNM_Origin *__origin;
-  __origin = new MNM_Origin(ID, max_interval, flow_scalar, frequency);
-  m_origin_map.insert(std::pair<TInt, MNM_Origin*>(ID, __origin));
-  return __origin;
+  MNM_Origin *_origin;
+  _origin = new MNM_Origin(ID, max_interval, flow_scalar, frequency);
+  m_origin_map.insert(std::pair<TInt, MNM_Origin*>(ID, _origin));
+  return _origin;
 }
 
 MNM_Destination *MNM_OD_Factory::get_destination(TInt ID)

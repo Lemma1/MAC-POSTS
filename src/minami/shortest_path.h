@@ -21,7 +21,7 @@ public:
                         PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
                         std::unordered_map<TInt, TInt> &output_map);
   int static all_to_one_FIFO(TInt dest_node_ID, 
-                        PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
+                        PNEGraph graph, const std::unordered_map<TInt, TFlt>& cost_map,
                         std::unordered_map<TInt, TInt> &output_map);
   int static all_to_one_LIFO(TInt dest_node_ID, 
                         PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
@@ -35,10 +35,18 @@ public:
   MNM_Cost(TInt ID, TFlt cost){m_ID = ID; m_cost = cost;};
   TInt m_ID;
   TFlt m_cost;
-  bool operator <(const MNM_Cost& d){return m_cost < d.m_cost;};
-  bool operator >(const MNM_Cost& d){return m_cost > d.m_cost;};
-  bool operator <=(const MNM_Cost& d){return m_cost <= d.m_cost;};
-  bool operator >=(const MNM_Cost& d){return m_cost >= d.m_cost;};
+  // bool operator <(const MNM_Cost& d){return m_cost >= d.m_cost;};
+  // bool operator >(const MNM_Cost& d){return m_cost > d.m_cost;};
+  // bool operator <=(const MNM_Cost& d){return m_cost <= d.m_cost;};
+  // bool operator >=(const MNM_Cost& d){return m_cost >= d.m_cost;};
+};
+
+struct LessThanByCost
+{
+  bool operator()(const MNM_Cost* lhs, const  MNM_Cost* rhs) const
+  {
+    return lhs -> m_cost >= rhs -> m_cost;
+  }
 };
 
 bool CompareCostDecendSort(MNM_Cost *lhs, MNM_Cost *rhs);

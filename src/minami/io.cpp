@@ -7,45 +7,45 @@
 int MNM_IO::build_node_factory(std::string file_folder, MNM_ConfReader *conf_reader, MNM_Node_Factory *node_factory)
 {
   /* find file */
-  std::string __node_file_name = file_folder + "/MNM_input_node";
-  std::ifstream __node_file;
-  __node_file.open(__node_file_name, std::ios::in);
+  std::string _node_file_name = file_folder + "/MNM_input_node";
+  std::ifstream _node_file;
+  _node_file.open(_node_file_name, std::ios::in);
 
 
   /* read confid */
-  TInt __num_of_node = conf_reader -> get_int("num_of_node");
-  TFlt __flow_scalar = conf_reader -> get_float("flow_scalar");
+  TInt _num_of_node = conf_reader -> get_int("num_of_node");
+  TFlt _flow_scalar = conf_reader -> get_float("flow_scalar");
 
   /* read file */
-  std::string __line;
-  std::vector<std::string> __words;
-  TInt __node_ID;
-  std::string __type;
+  std::string _line;
+  std::vector<std::string> _words;
+  TInt _node_ID;
+  std::string _type;
 
-  if (__node_file.is_open())
+  if (_node_file.is_open())
   {
     // printf("Start build node factory.\n");
-    std::getline(__node_file,__line); //skip the first line
-    for (int i=0; i < __num_of_node; ++i){
-      std::getline(__node_file,__line);
-      __words = split(__line, ' ');
-      if (__words.size() == 2) {
-        // std::cout << "Processing: " << __line << "\n";
-        __node_ID = TInt(std::stoi(__words[0]));
-        __type = trim(__words[1]);
-        if (__type == "FWJ"){
-          node_factory -> make_node(__node_ID, MNM_TYPE_FWJ, __flow_scalar);
+    std::getline(_node_file,_line); //skip the first line
+    for (int i=0; i < _num_of_node; ++i){
+      std::getline(_node_file,_line);
+      _words = split(_line, ' ');
+      if (_words.size() == 2) {
+        // std::cout << "Processing: " << _line << "\n";
+        _node_ID = TInt(std::stoi(_words[0]));
+        _type = trim(_words[1]);
+        if (_type == "FWJ"){
+          node_factory -> make_node(_node_ID, MNM_TYPE_FWJ, _flow_scalar);
           continue;
         }
-        if (__type =="DMOND"){
-          node_factory -> make_node(__node_ID, MNM_TYPE_ORIGIN, __flow_scalar);
+        if (_type =="DMOND"){
+          node_factory -> make_node(_node_ID, MNM_TYPE_ORIGIN, _flow_scalar);
           continue;
         }
-        if (__type =="DMDND"){
-          node_factory -> make_node(__node_ID, MNM_TYPE_DEST, __flow_scalar);
+        if (_type =="DMDND"){
+          node_factory -> make_node(_node_ID, MNM_TYPE_DEST, _flow_scalar);
           continue;
         }
-        printf("Wrong node type, %s\n", __type.c_str());
+        printf("Wrong node type, %s\n", _type.c_str());
         exit(-1);
       }
       else {
@@ -53,7 +53,7 @@ int MNM_IO::build_node_factory(std::string file_folder, MNM_ConfReader *conf_rea
         exit(-1);
       }
     }
-    __node_file.close();
+    _node_file.close();
   }
   return 0;
 }
@@ -61,61 +61,61 @@ int MNM_IO::build_node_factory(std::string file_folder, MNM_ConfReader *conf_rea
 int MNM_IO::build_link_factory(std::string file_folder, MNM_ConfReader *conf_reader, MNM_Link_Factory *link_factory)
 {
   /* find file */
-  std::string __link_file_name = file_folder + "/MNM_input_link";
-  std::ifstream __link_file;
-  __link_file.open(__link_file_name, std::ios::in);
+  std::string _link_file_name = file_folder + "/MNM_input_link";
+  std::ifstream _link_file;
+  _link_file.open(_link_file_name, std::ios::in);
 
   /* read config */
-  TInt __num_of_link = conf_reader -> get_int("num_of_link");
-  TFlt __flow_scalar = conf_reader -> get_float("flow_scalar");
-  TFlt __unit_time = conf_reader -> get_float("unit_time");
+  TInt _num_of_link = conf_reader -> get_int("num_of_link");
+  TFlt _flow_scalar = conf_reader -> get_float("flow_scalar");
+  TFlt _unit_time = conf_reader -> get_float("unit_time");
 
   /* read file */
-  std::string __line;
-  std::vector<std::string> __words;
-  TInt __link_ID;
-  TFlt __lane_hold_cap; 
-  TFlt __lane_flow_cap;
-  TInt __number_of_lane;
-  TFlt __length;
-  TFlt __ffs;
-  std::string __type;
+  std::string _line;
+  std::vector<std::string> _words;
+  TInt _link_ID;
+  TFlt _lane_hold_cap; 
+  TFlt _lane_flow_cap;
+  TInt _number_of_lane;
+  TFlt _length;
+  TFlt _ffs;
+  std::string _type;
 
-  if (__link_file.is_open())
+  if (_link_file.is_open())
   {
     // printf("Start build link factory.\n");
-    std::getline(__link_file,__line); //skip the first line
-    for (int i=0; i < __num_of_link; ++i){
-      std::getline(__link_file,__line);
-      __words = split(__line, ' ');
-      if (__words.size() == 7) {
-        // std::cout << "Processing: " << __line << "\n";
-        __link_ID = TInt(std::stoi(__words[0]));
-        __type = trim(__words[1]);
-        __length = TFlt(std::stod(__words[2]));
-        __ffs = TFlt(std::stod(__words[3]));
-        __lane_flow_cap = TFlt(std::stod(__words[4]));
-        __lane_hold_cap = TFlt(std::stod(__words[5]));
-        __number_of_lane = TInt(std::stoi(__words[6]));
+    std::getline(_link_file,_line); //skip the first line
+    for (int i=0; i < _num_of_link; ++i){
+      std::getline(_link_file,_line);
+      _words = split(_line, ' ');
+      if (_words.size() == 7) {
+        // std::cout << "Processing: " << _line << "\n";
+        _link_ID = TInt(std::stoi(_words[0]));
+        _type = trim(_words[1]);
+        _length = TFlt(std::stod(_words[2]));
+        _ffs = TFlt(std::stod(_words[3]));
+        _lane_flow_cap = TFlt(std::stod(_words[4]));
+        _lane_hold_cap = TFlt(std::stod(_words[5]));
+        _number_of_lane = TInt(std::stoi(_words[6]));
 
         /* unit conversion */
-        __length = __length * TFlt(1600);
-        __ffs = __ffs * TFlt(1600) / TFlt(3600);
-        __lane_flow_cap = __lane_flow_cap / TFlt(3600);
-        __lane_hold_cap = __lane_hold_cap / TFlt(1600);
+        _length = _length * TFlt(1600);
+        _ffs = _ffs * TFlt(1600) / TFlt(3600);
+        _lane_flow_cap = _lane_flow_cap / TFlt(3600);
+        _lane_hold_cap = _lane_hold_cap / TFlt(1600);
 
         /* build */
-        if (__type == "PQ"){
-          link_factory -> make_link(__link_ID, MNM_TYPE_PQ, __lane_hold_cap, __lane_flow_cap, __number_of_lane, 
-                                    __length, __ffs, __unit_time, __flow_scalar);
+        if (_type == "PQ"){
+          link_factory -> make_link(_link_ID, MNM_TYPE_PQ, _lane_hold_cap, _lane_flow_cap, _number_of_lane, 
+                                    _length, _ffs, _unit_time, _flow_scalar);
           continue;
         }
-        if (__type =="CTM"){
-          link_factory -> make_link(__link_ID, MNM_TYPE_CTM, __lane_hold_cap, __lane_flow_cap, __number_of_lane, 
-                                    __length, __ffs, __unit_time, __flow_scalar);
+        if (_type =="CTM"){
+          link_factory -> make_link(_link_ID, MNM_TYPE_CTM, _lane_hold_cap, _lane_flow_cap, _number_of_lane, 
+                                    _length, _ffs, _unit_time, _flow_scalar);
           continue;
         }
-        printf("Wrong link type, %s\n", __type.c_str());
+        printf("Wrong link type, %s\n", _type.c_str());
         exit(-1);
       }
       else{
@@ -123,7 +123,7 @@ int MNM_IO::build_link_factory(std::string file_folder, MNM_ConfReader *conf_rea
         exit(-1);        
       }
     }
-    __link_file.close();
+    _link_file.close();
   }
   return 0;
 }
@@ -132,60 +132,60 @@ int  MNM_IO::build_od_factory(std::string file_folder, MNM_ConfReader *conf_read
                                 MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory)
 {
   /* find file */
-  std::string __od_file_name = file_folder + "/MNM_input_od";
-  std::ifstream __od_file;
-  __od_file.open(__od_file_name, std::ios::in);
+  std::string _od_file_name = file_folder + "/MNM_input_od";
+  std::ifstream _od_file;
+  _od_file.open(_od_file_name, std::ios::in);
 
   /* read config */
-  TInt __num_of_O = conf_reader -> get_int("num_of_O");
-  TInt __num_of_D = conf_reader -> get_int("num_of_D");
-  TFlt __flow_scalar = conf_reader -> get_float("flow_scalar");
-  TInt __max_interval = conf_reader -> get_int("max_interval");
-  TInt __frequency = conf_reader -> get_int("assign_frq");
+  TInt _num_of_O = conf_reader -> get_int("num_of_O");
+  TInt _num_of_D = conf_reader -> get_int("num_of_D");
+  TFlt _flow_scalar = conf_reader -> get_float("flow_scalar");
+  TInt _max_interval = conf_reader -> get_int("max_interval");
+  TInt _frequency = conf_reader -> get_int("assign_frq");
 
   /* build */
-  TInt __dest_ID, __origin_ID, __node_ID;
-  std::string __line;
-  std::vector<std::string> __words;
-  MNM_Origin *__origin;
-  MNM_Destination *__dest;
-  if (__od_file.is_open())
+  TInt _dest_ID, _origin_ID, _node_ID;
+  std::string _line;
+  std::vector<std::string> _words;
+  MNM_Origin *_origin;
+  MNM_Destination *_dest;
+  if (_od_file.is_open())
   {
     // printf("Start build Origin-Destination factory.\n");
-    std::getline(__od_file,__line); //skip the first line
+    std::getline(_od_file,_line); //skip the first line
     // printf("Processing Origin node.\n");
-    for (int i=0; i < __num_of_O; ++i){
-      std::getline(__od_file,__line);
-      __words = split(__line, ' ');
-      if (__words.size() == 2) {
-        // std::cout << "Processing: " << __line << "\n";
-        __origin_ID = TInt(std::stoi(__words[0]));
-        __node_ID = TInt(std::stoi(__words[1]));
-        __origin = od_factory -> make_origin(__origin_ID, __max_interval, __flow_scalar, __frequency);
+    for (int i=0; i < _num_of_O; ++i){
+      std::getline(_od_file,_line);
+      _words = split(_line, ' ');
+      if (_words.size() == 2) {
+        // std::cout << "Processing: " << _line << "\n";
+        _origin_ID = TInt(std::stoi(_words[0]));
+        _node_ID = TInt(std::stoi(_words[1]));
+        _origin = od_factory -> make_origin(_origin_ID, _max_interval, _flow_scalar, _frequency);
 
         /* hook up */
-        __origin ->  m_origin_node =  (MNM_DMOND*) node_factory -> get_node(__node_ID);
-        ((MNM_DMOND*)  node_factory -> get_node(__node_ID)) -> hook_up_origin(__origin);
+        _origin ->  m_origin_node =  (MNM_DMOND*) node_factory -> get_node(_node_ID);
+        ((MNM_DMOND*)  node_factory -> get_node(_node_ID)) -> hook_up_origin(_origin);
       }
     }
-    std::getline(__od_file,__line); // skip another line
+    std::getline(_od_file,_line); // skip another line
     // printf("Processing Destination node.\n");
-    for (int i=0; i < __num_of_D; ++i){
-      std::getline(__od_file,__line);
-      __words = split(__line, ' ');
-      if (__words.size() == 2) {
-        // std::cout << "Processing: " << __line << "\n";
-        __dest_ID = TInt(std::stoi(__words[0]));
-        __node_ID = TInt(std::stoi(__words[1]));
-        __dest = od_factory -> make_destination(__dest_ID);
+    for (int i=0; i < _num_of_D; ++i){
+      std::getline(_od_file,_line);
+      _words = split(_line, ' ');
+      if (_words.size() == 2) {
+        // std::cout << "Processing: " << _line << "\n";
+        _dest_ID = TInt(std::stoi(_words[0]));
+        _node_ID = TInt(std::stoi(_words[1]));
+        _dest = od_factory -> make_destination(_dest_ID);
 
         /* hook up */
-        __dest ->  m_dest_node =  (MNM_DMDND*) node_factory -> get_node(__node_ID);
-        ((MNM_DMDND*)  node_factory -> get_node(__node_ID)) -> hook_up_destination(__dest);
+        _dest ->  m_dest_node =  (MNM_DMDND*) node_factory -> get_node(_node_ID);
+        ((MNM_DMDND*)  node_factory -> get_node(_node_ID)) -> hook_up_destination(_dest);
       }
     }      
   }
-  __od_file.close();
+  _od_file.close();
   return 0;
 }
 
@@ -194,57 +194,57 @@ int  MNM_IO::build_od_factory(std::string file_folder, MNM_ConfReader *conf_read
 int MNM_IO::hook_up_od_node(std::string file_folder, MNM_ConfReader *conf_reader, MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory)
 {
   /* find file */
-  std::string __od_file_name = file_folder + "/MNM_input_od";
-  std::ifstream __od_file;
-  __od_file.open(__od_file_name, std::ios::in);
+  std::string _od_file_name = file_folder + "/MNM_input_od";
+  std::ifstream _od_file;
+  _od_file.open(_od_file_name, std::ios::in);
 
   /* read config */
-  TInt __num_of_O = conf_reader -> get_int("num_of_O");
-  TInt __num_of_D = conf_reader -> get_int("num_of_D");
+  TInt _num_of_O = conf_reader -> get_int("num_of_O");
+  TInt _num_of_D = conf_reader -> get_int("num_of_D");
 
   /* build */
-  TInt __dest_ID, __origin_ID, __node_ID;
-  std::string __line;
-  std::vector<std::string> __words;
-  MNM_Origin *__origin;
-  MNM_Destination *__dest;
-  if (__od_file.is_open())
+  TInt _dest_ID, _origin_ID, _node_ID;
+  std::string _line;
+  std::vector<std::string> _words;
+  MNM_Origin *_origin;
+  MNM_Destination *_dest;
+  if (_od_file.is_open())
   {
     // printf("Start build Origin-Destination factory.\n");
-    std::getline(__od_file,__line); //skip the first line
+    std::getline(_od_file,_line); //skip the first line
     // printf("Processing Origin node.\n");
-    for (int i=0; i < __num_of_O; ++i){
-      std::getline(__od_file,__line);
-      __words = split(__line, ' ');
-      if (__words.size() == 2) {
-        // std::cout << "Processing: " << __line << "\n";
-        __origin_ID = TInt(std::stoi(__words[0]));
-        __node_ID = TInt(std::stoi(__words[1]));
-        __origin = od_factory ->get_origin(__origin_ID);
+    for (int i=0; i < _num_of_O; ++i){
+      std::getline(_od_file,_line);
+      _words = split(_line, ' ');
+      if (_words.size() == 2) {
+        // std::cout << "Processing: " << _line << "\n";
+        _origin_ID = TInt(std::stoi(_words[0]));
+        _node_ID = TInt(std::stoi(_words[1]));
+        _origin = od_factory ->get_origin(_origin_ID);
 
         /* hook up */
-        __origin ->  m_origin_node =  (MNM_DMOND*) node_factory -> get_node(__node_ID);
-        ((MNM_DMOND*)  node_factory -> get_node(__node_ID)) -> hook_up_origin(__origin);
+        _origin ->  m_origin_node =  (MNM_DMOND*) node_factory -> get_node(_node_ID);
+        ((MNM_DMOND*)  node_factory -> get_node(_node_ID)) -> hook_up_origin(_origin);
       }
     }
-    std::getline(__od_file,__line); // skip another line
+    std::getline(_od_file,_line); // skip another line
     // printf("Processing Destination node.\n");
-    for (int i=0; i < __num_of_D; ++i){
-      std::getline(__od_file,__line);
-      __words = split(__line, ' ');
-      if (__words.size() == 2) {
-        // std::cout << "Processing: " << __line << "\n";
-        __dest_ID = TInt(std::stoi(__words[0]));
-        __node_ID = TInt(std::stoi(__words[1]));
-        __dest = od_factory -> get_destination(__dest_ID);
+    for (int i=0; i < _num_of_D; ++i){
+      std::getline(_od_file,_line);
+      _words = split(_line, ' ');
+      if (_words.size() == 2) {
+        // std::cout << "Processing: " << _line << "\n";
+        _dest_ID = TInt(std::stoi(_words[0]));
+        _node_ID = TInt(std::stoi(_words[1]));
+        _dest = od_factory -> get_destination(_dest_ID);
 
         /* hook up */
-        __dest ->  m_dest_node =  (MNM_DMDND*) node_factory -> get_node(__node_ID);
-        ((MNM_DMDND*)  node_factory -> get_node(__node_ID)) -> hook_up_destination(__dest);
+        _dest ->  m_dest_node =  (MNM_DMDND*) node_factory -> get_node(_node_ID);
+        ((MNM_DMDND*)  node_factory -> get_node(_node_ID)) -> hook_up_destination(_dest);
       }
     }      
   }
-  __od_file.close();
+  _od_file.close();
   return 0;  
 }
 
@@ -253,86 +253,86 @@ int  MNM_IO::build_od_factory(std::string file_folder, MNM_ConfReader *conf_read
                                 MNM_OD_Factory *od_factory)
 {
   /* find file */
-  std::string __od_file_name = file_folder + "/MNM_input_od";
-  std::ifstream __od_file;
-  __od_file.open(__od_file_name, std::ios::in);
+  std::string _od_file_name = file_folder + "/MNM_input_od";
+  std::ifstream _od_file;
+  _od_file.open(_od_file_name, std::ios::in);
 
   /* read config */
-  TInt __num_of_O = conf_reader -> get_int("num_of_O");
-  TInt __num_of_D = conf_reader -> get_int("num_of_D");
-  TFlt __flow_scalar = conf_reader -> get_float("flow_scalar");
-  TInt __max_interval = conf_reader -> get_int("max_interval");
-  TInt __frequency = conf_reader -> get_int("assign_frq");
+  TInt _num_of_O = conf_reader -> get_int("num_of_O");
+  TInt _num_of_D = conf_reader -> get_int("num_of_D");
+  TFlt _flow_scalar = conf_reader -> get_float("flow_scalar");
+  TInt _max_interval = conf_reader -> get_int("max_interval");
+  TInt _frequency = conf_reader -> get_int("assign_frq");
 
   /* build */
-  TInt __dest_ID, __origin_ID, __node_ID;
-  std::string __line;
-  std::vector<std::string> __words;
-  if (__od_file.is_open())
+  TInt _dest_ID, _origin_ID, _node_ID;
+  std::string _line;
+  std::vector<std::string> _words;
+  if (_od_file.is_open())
   {
     // printf("Start build Origin-Destination factory.\n");
-    std::getline(__od_file,__line); //skip the first line
+    std::getline(_od_file,_line); //skip the first line
     // printf("Processing Origin node.\n");
-    for (int i=0; i < __num_of_O; ++i){
-      std::getline(__od_file,__line);
-      __words = split(__line, ' ');
-      if (__words.size() == 2) {
-        // std::cout << "Processing: " << __line << "\n";
-        __origin_ID = TInt(std::stoi(__words[0]));
-        __node_ID = TInt(std::stoi(__words[1]));
-        od_factory -> make_origin(__origin_ID, __max_interval, __flow_scalar, __frequency);
+    for (int i=0; i < _num_of_O; ++i){
+      std::getline(_od_file,_line);
+      _words = split(_line, ' ');
+      if (_words.size() == 2) {
+        // std::cout << "Processing: " << _line << "\n";
+        _origin_ID = TInt(std::stoi(_words[0]));
+        _node_ID = TInt(std::stoi(_words[1]));
+        od_factory -> make_origin(_origin_ID, _max_interval, _flow_scalar, _frequency);
 
       }
     }
-    std::getline(__od_file,__line); // skip another line
+    std::getline(_od_file,_line); // skip another line
     // printf("Processing Destination node.\n");
-    for (int i=0; i < __num_of_D; ++i){
-      std::getline(__od_file,__line);
-      __words = split(__line, ' ');
-      if (__words.size() == 2) {
-        // std::cout << "Processing: " << __line << "\n";
-        __dest_ID = TInt(std::stoi(__words[0]));
-        __node_ID = TInt(std::stoi(__words[1]));
-        od_factory -> make_destination(__dest_ID);
+    for (int i=0; i < _num_of_D; ++i){
+      std::getline(_od_file,_line);
+      _words = split(_line, ' ');
+      if (_words.size() == 2) {
+        // std::cout << "Processing: " << _line << "\n";
+        _dest_ID = TInt(std::stoi(_words[0]));
+        _node_ID = TInt(std::stoi(_words[1]));
+        od_factory -> make_destination(_dest_ID);
       }
     }      
   }
-  __od_file.close();
+  _od_file.close();
   return 0;
 }
 
 PNEGraph MNM_IO::build_graph(std::string file_folder, MNM_ConfReader *conf_reader)
 {
   /* find file */
-  std::string __network_name = conf_reader -> get_string("network_name");
-  std::string __graph_file_name = file_folder + "/" + __network_name;
-  std::ifstream __graph_file;
-  __graph_file.open(__graph_file_name, std::ios::in);
+  std::string _network_name = conf_reader -> get_string("network_name");
+  std::string _graph_file_name = file_folder + "/" + _network_name;
+  std::ifstream _graph_file;
+  _graph_file.open(_graph_file_name, std::ios::in);
 
-  TInt __num_of_link = conf_reader -> get_int("num_of_link");
+  TInt _num_of_link = conf_reader -> get_int("num_of_link");
 
   // printf("Start build graph.\n");
-  PNEGraph __graph = PNEGraph::TObj::New();
+  PNEGraph _graph = PNEGraph::TObj::New();
   
-  int __link_ID, __from_ID, __to_ID;
-  std::string __line;
-  std::vector<std::string> __words;
-  std::getline(__graph_file,__line); // skip one line
-  for (int i=0; i<__num_of_link; ++i){
-    std::getline(__graph_file,__line);
-    __words = split(__line, ' ');
-    if (__words.size() == 3){
-      // std::cout << "Processing: " << __line << "\n";
-      __link_ID = TInt(std::stoi(__words[0]));
-      __from_ID = TInt(std::stoi(__words[1]));
-      __to_ID = TInt(std::stoi(__words[2]));
-    if (! __graph->IsNode(__from_ID)) { __graph->AddNode(__from_ID); }
-    if (! __graph->IsNode(__to_ID)) { __graph->AddNode(__to_ID); }
-    __graph->AddEdge(__from_ID, __to_ID, __link_ID);
+  int _link_ID, _from_ID, _to_ID;
+  std::string _line;
+  std::vector<std::string> _words;
+  std::getline(_graph_file,_line); // skip one line
+  for (int i=0; i<_num_of_link; ++i){
+    std::getline(_graph_file,_line);
+    _words = split(_line, ' ');
+    if (_words.size() == 3){
+      // std::cout << "Processing: " << _line << "\n";
+      _link_ID = TInt(std::stoi(_words[0]));
+      _from_ID = TInt(std::stoi(_words[1]));
+      _to_ID = TInt(std::stoi(_words[2]));
+    if (! _graph->IsNode(_from_ID)) { _graph->AddNode(_from_ID); }
+    if (! _graph->IsNode(_to_ID)) { _graph->AddNode(_to_ID); }
+    _graph->AddEdge(_from_ID, _to_ID, _link_ID);
     }
   }
-  __graph->Defrag();
-  return __graph;
+  _graph->Defrag();
+  return _graph;
 }
 
 
@@ -340,48 +340,48 @@ PNEGraph MNM_IO::build_graph(std::string file_folder, MNM_ConfReader *conf_reade
 int MNM_IO::build_demand(std::string file_folder, MNM_ConfReader *conf_reader, MNM_OD_Factory *od_factory)
 {
   /* find file */
-  std::string __demand_file_name = file_folder + "/MNM_input_demand";
-  std::ifstream __demand_file;
-  __demand_file.open(__demand_file_name, std::ios::in);
+  std::string _demand_file_name = file_folder + "/MNM_input_demand";
+  std::ifstream _demand_file;
+  _demand_file.open(_demand_file_name, std::ios::in);
 
   /* read config */
-  TInt __max_interval = conf_reader -> get_int("max_interval"); 
-  TInt __num_OD = conf_reader -> get_int("OD_pair");
+  TInt _max_interval = conf_reader -> get_int("max_interval"); 
+  TInt _num_OD = conf_reader -> get_int("OD_pair");
 
   /* build */
-  TInt __O_ID, __D_ID;
-  MNM_Origin *__origin;
-  MNM_Destination *__dest;
-  std::string __line;
-  std::vector<std::string> __words;
-  if (__demand_file.is_open())
+  TInt _O_ID, _D_ID;
+  MNM_Origin *_origin;
+  MNM_Destination *_dest;
+  std::string _line;
+  std::vector<std::string> _words;
+  if (_demand_file.is_open())
   {
     // printf("Start build demand profile.\n");
-    TFlt *__demand_vector = (TFlt*) malloc(sizeof(TFlt) * __max_interval);
-    memset(__demand_vector, 0x0, sizeof(TFlt) * __max_interval);
-    std::getline(__demand_file,__line); //skip the first line
-    for (int i=0; i < __num_OD; ++i){
-      std::getline(__demand_file,__line);
-      // std::cout << "Processing: " << __line << "\n";
-      __words = split(__line, ' ');
-      if (TInt(__words.size()) == (__max_interval + 2)) {
-        __O_ID = TInt(std::stoi(__words[0]));
-        __D_ID = TInt(std::stoi(__words[1]));
-        for(int j=0; j<__max_interval; ++j){
-          __demand_vector[j] = TFlt(std::stod(__words[j+2]));
+    TFlt *_demand_vector = (TFlt*) malloc(sizeof(TFlt) * _max_interval);
+    memset(_demand_vector, 0x0, sizeof(TFlt) * _max_interval);
+    std::getline(_demand_file,_line); //skip the first line
+    for (int i=0; i < _num_OD; ++i){
+      std::getline(_demand_file,_line);
+      // std::cout << "Processing: " << _line << "\n";
+      _words = split(_line, ' ');
+      if (TInt(_words.size()) == (_max_interval + 2)) {
+        _O_ID = TInt(std::stoi(_words[0]));
+        _D_ID = TInt(std::stoi(_words[1]));
+        for(int j=0; j<_max_interval; ++j){
+          _demand_vector[j] = TFlt(std::stod(_words[j+2]));
         }
-        __origin = od_factory -> get_origin(__O_ID);
-        __dest = od_factory ->get_destination(__D_ID);
-        __origin -> add_dest_demand(__dest, __demand_vector);
+        _origin = od_factory -> get_origin(_O_ID);
+        _dest = od_factory ->get_destination(_D_ID);
+        _origin -> add_dest_demand(_dest, _demand_vector);
       }
       else{
         printf("Something wrong in build_demand!\n");
-        free(__demand_vector);
+        free(_demand_vector);
         exit(-1);
       }
     }
-    free(__demand_vector);
-    __demand_file.close();
+    free(_demand_vector);
+    _demand_file.close();
   }  
   return 0;
 }
@@ -461,7 +461,7 @@ int MNM_IO::build_vms_facotory(std::string file_folder, PNEGraph graph, TInt num
     std::getline(_vms_file,_line); //skip the first line
     for (int i=0; i < num_vms; ++i){
       std::getline(_vms_file,_line);
-      // std::cout << "Processing: " << __line << "\n";
+      // std::cout << "Processing: " << _line << "\n";
       _words = split(_line, ' ');
       if (TInt(_words.size()) == 2) {
         _vms_ID = TInt(std::stoi(trim(_words[0])));
@@ -498,7 +498,7 @@ int MNM_IO::read_int_float(std::string file_name, std::unordered_map<TInt, TFlt>
     printf("Total is %d\n", num_record());
     for (int i=0; i < num_record; ++i){
       std::getline(_file,_line);
-      // std::cout << "Processing: " << __line << "\n";
+      // std::cout << "Processing: " << _line << "\n";
       _words = split(_line, ' ');
       if (TInt(_words.size()) == 2) {
         _int = TInt(std::stoi(trim(_words[0])));
@@ -534,7 +534,7 @@ int MNM_IO::build_workzone_list(std::string file_folder, MNM_Workzone* workzone)
     TInt num_workzone = TInt(std::stoi(trim(_line)));
     for (int i=0; i < num_workzone; ++i){
       std::getline(_workzone_file,_line);
-      // std::cout << "Processing: " << __line << "\n";
+      // std::cout << "Processing: " << _line << "\n";
       _words = split(_line, ' ');
       if (TInt(_words.size()) == 1) {
         _link_ID = TInt(std::stoi(trim(_words[0])));

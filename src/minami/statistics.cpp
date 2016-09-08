@@ -64,80 +64,80 @@ int MNM_Statistics::init_record_value()
 
 int MNM_Statistics::init_record()
 {
-  TInt __link_ID;
-  std::string __file_name;
+  TInt _link_ID;
+  std::string _file_name;
   if (m_record_volume){
-    for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
-      __link_ID = __link_it -> first;
-      m_load_interval_volume.insert(std::pair<TInt, TFlt>(__link_ID, TFlt(0)));
-      m_record_interval_volume.insert(std::pair<TInt, TFlt>(__link_ID, TFlt(0)));
+    for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
+      _link_ID = _link_it -> first;
+      m_load_interval_volume.insert(std::pair<TInt, TFlt>(_link_ID, TFlt(0)));
+      m_record_interval_volume.insert(std::pair<TInt, TFlt>(_link_ID, TFlt(0)));
     }
 
     
     if (m_self_config -> get_int("volume_load_automatic_rec") == 1 || m_self_config -> get_int("volume_record_automatic_rec") == 1){
-      std::string __str;
-      for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
-        __str += std::to_string(__link_it -> first) + " ";
+      std::string _str;
+      for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
+        _str += std::to_string(_link_it -> first) + " ";
       }
-      __str.pop_back();
-      __str += "\n";
+      _str.pop_back();
+      _str += "\n";
 
       if (m_self_config -> get_int("volume_load_automatic_rec") == 1){
-        __file_name = m_file_folder + "/" + m_self_config -> get_string("rec_folder") + "/MNM_output_load_interval_volume";
-        m_load_interval_volume_file.open(__file_name, std::ofstream::out);   
+        _file_name = m_file_folder + "/" + m_self_config -> get_string("rec_folder") + "/MNM_output_load_interval_volume";
+        m_load_interval_volume_file.open(_file_name, std::ofstream::out);   
         if (!m_load_interval_volume_file.is_open()){
           printf("Error happens when open m_load_interval_volume_file\n");
           exit(-1);
         }
-        m_load_interval_volume_file << __str;
+        m_load_interval_volume_file << _str;
       }
 
       if (m_self_config -> get_int("volume_record_automatic_rec") == 1){
-        __file_name = m_file_folder + "/" + m_self_config -> get_string("rec_folder") + "/MNM_output_record_interval_volume";
-        m_record_interval_volume_file.open(__file_name, std::ofstream::out);     
+        _file_name = m_file_folder + "/" + m_self_config -> get_string("rec_folder") + "/MNM_output_record_interval_volume";
+        m_record_interval_volume_file.open(_file_name, std::ofstream::out);     
         if (!m_record_interval_volume_file.is_open()){
           printf("Error happens when open m_record_interval_volume_file\n");
           exit(-1);
         }
-        m_record_interval_volume_file << __str;
+        m_record_interval_volume_file << _str;
       }
     }
   }
 
   if (m_record_tt){
-    for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
-      __link_ID = __link_it -> first;
-      m_load_interval_tt.insert(std::pair<TInt, TFlt>(__link_ID, TFlt(0)));
-      m_record_interval_tt.insert(std::pair<TInt, TFlt>(__link_ID, TFlt(0)));
+    for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
+      _link_ID = _link_it -> first;
+      m_load_interval_tt.insert(std::pair<TInt, TFlt>(_link_ID, TFlt(0)));
+      m_record_interval_tt.insert(std::pair<TInt, TFlt>(_link_ID, TFlt(0)));
     }
 
     
     if (m_self_config -> get_int("tt_load_automatic_rec") == 1 || m_self_config -> get_int("tt_record_automatic_rec") == 1){
-      std::string __str;
-      for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
-        __str += std::to_string(__link_it -> first) + " ";
+      std::string _str;
+      for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
+        _str += std::to_string(_link_it -> first) + " ";
       }
-      __str.pop_back();
-      __str += "\n";
+      _str.pop_back();
+      _str += "\n";
 
       if (m_self_config -> get_int("tt_load_automatic_rec") == 1){
-        __file_name = m_file_folder + "/" + m_self_config -> get_string("rec_folder") + "/MNM_output_load_interval_tt";
-        m_load_interval_tt_file.open(__file_name, std::ofstream::out);   
+        _file_name = m_file_folder + "/" + m_self_config -> get_string("rec_folder") + "/MNM_output_load_interval_tt";
+        m_load_interval_tt_file.open(_file_name, std::ofstream::out);   
         if (!m_load_interval_tt_file.is_open()){
           printf("Error happens when open m_load_interval_tt_file\n");
           exit(-1);
         }
-        m_load_interval_tt_file << __str;
+        m_load_interval_tt_file << _str;
       }
 
       if (m_self_config -> get_int("tt_record_automatic_rec") == 1){
-        __file_name = m_file_folder + "/" + m_self_config -> get_string("rec_folder") + "/MNM_output_record_interval_tt";
-        m_record_interval_tt_file.open(__file_name, std::ofstream::out);     
+        _file_name = m_file_folder + "/" + m_self_config -> get_string("rec_folder") + "/MNM_output_record_interval_tt";
+        m_record_interval_tt_file.open(_file_name, std::ofstream::out);     
         if (!m_record_interval_tt_file.is_open()){
           printf("Error happens when open m_record_interval_tt_file\n");
           exit(-1);
         }
-        m_record_interval_tt_file << __str;
+        m_record_interval_tt_file << _str;
       }
     }
   }
@@ -152,30 +152,30 @@ int MNM_Statistics::init_record()
 
 int MNM_Statistics::record_loading_interval_condition(TInt timestamp)
 {
-  std::string __str;
-  MNM_Dlink *__link;
-  TFlt __flow,  __tt;
+  std::string _str;
+  MNM_Dlink *_link;
+  TFlt _flow,  _tt;
   if (m_record_volume && m_load_interval_volume_file.is_open()){
-    for (auto __link_it = m_link_order.begin(); __link_it != m_link_order.end(); __link_it++){
-      __link = *__link_it;
-      __flow = m_load_interval_volume.find(__link -> m_link_ID) -> second;
-      __str += std::to_string(__flow) + " ";
+    for (auto _link_it = m_link_order.begin(); _link_it != m_link_order.end(); _link_it++){
+      _link = *_link_it;
+      _flow = m_load_interval_volume.find(_link -> m_link_ID) -> second;
+      _str += std::to_string(_flow) + " ";
     }
-    __str.pop_back();
-    __str += "\n"; 
-    m_load_interval_volume_file << __str;    
+    _str.pop_back();
+    _str += "\n"; 
+    m_load_interval_volume_file << _str;    
   }
 
-  __str.clear();
+  _str.clear();
   if (m_record_tt && m_load_interval_tt_file.is_open()){
-    for (auto __link_it = m_link_order.begin(); __link_it != m_link_order.end(); __link_it++){
-      __link = *__link_it;
-      __tt = m_load_interval_tt.find(__link -> m_link_ID) -> second;
-      __str += std::to_string(__tt) + " ";
+    for (auto _link_it = m_link_order.begin(); _link_it != m_link_order.end(); _link_it++){
+      _link = *_link_it;
+      _tt = m_load_interval_tt.find(_link -> m_link_ID) -> second;
+      _str += std::to_string(_tt) + " ";
     }
-    __str.pop_back();
-    __str += "\n"; 
-    m_load_interval_tt_file << __str;    
+    _str.pop_back();
+    _str += "\n"; 
+    m_load_interval_tt_file << _str;    
   }
 
   return 0;
@@ -183,30 +183,30 @@ int MNM_Statistics::record_loading_interval_condition(TInt timestamp)
 
 int MNM_Statistics::record_record_interval_condition(TInt timestamp)
 {
-  std::string __str;
-  MNM_Dlink *__link;
-  TFlt __flow, __tt;
+  std::string _str;
+  MNM_Dlink *_link;
+  TFlt _flow, _tt;
   if (m_record_volume && m_record_interval_volume_file.is_open()){
-    for (auto __link_it = m_link_order.begin(); __link_it != m_link_order.end(); __link_it++){
-      __link = *__link_it;
-      __flow = m_record_interval_volume.find(__link -> m_link_ID) -> second;
-      __str += std::to_string(__flow) + " ";
+    for (auto _link_it = m_link_order.begin(); _link_it != m_link_order.end(); _link_it++){
+      _link = *_link_it;
+      _flow = m_record_interval_volume.find(_link -> m_link_ID) -> second;
+      _str += std::to_string(_flow) + " ";
     }
-    __str.pop_back();
-    __str += "\n"; 
-    m_record_interval_volume_file << __str;      
+    _str.pop_back();
+    _str += "\n"; 
+    m_record_interval_volume_file << _str;      
   }
-  __str.clear();
+  _str.clear();
 
   if (m_record_tt && m_record_interval_tt_file.is_open()){
-    for (auto __link_it = m_link_order.begin(); __link_it != m_link_order.end(); __link_it++){
-      __link = *__link_it;
-      __tt = m_record_interval_tt.find(__link -> m_link_ID) -> second;
-      __str += std::to_string(__tt) + " ";
+    for (auto _link_it = m_link_order.begin(); _link_it != m_link_order.end(); _link_it++){
+      _link = *_link_it;
+      _tt = m_record_interval_tt.find(_link -> m_link_ID) -> second;
+      _str += std::to_string(_tt) + " ";
     }
-    __str.pop_back();
-    __str += "\n"; 
-    m_record_interval_tt_file << __str;      
+    _str.pop_back();
+    _str += "\n"; 
+    m_record_interval_tt_file << _str;      
   }
   return 0;
 }
@@ -247,43 +247,43 @@ MNM_Statistics_Lrn::~MNM_Statistics_Lrn()
 
 int MNM_Statistics_Lrn::update_record(TInt timestamp)
 {
-  MNM_Dlink *__link;
-  TFlt __flow;
+  MNM_Dlink *_link;
+  TFlt _flow;
   if (m_record_volume){
     if ((timestamp) % m_n == 0 || timestamp == 0){
-      for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
-        __link = __link_it -> second;
-        __flow = __link -> get_link_flow();
-        m_load_interval_volume.find(__link -> m_link_ID) -> second = __flow;
-        m_record_interval_volume.find(__link -> m_link_ID) -> second = m_to_be_volume.find(__link -> m_link_ID) -> second + __flow/TFlt(m_n);
-        m_to_be_volume.find(__link -> m_link_ID) -> second = TFlt(0);
+      for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
+        _link = _link_it -> second;
+        _flow = _link -> get_link_flow();
+        m_load_interval_volume.find(_link -> m_link_ID) -> second = _flow;
+        m_record_interval_volume.find(_link -> m_link_ID) -> second = m_to_be_volume.find(_link -> m_link_ID) -> second + _flow/TFlt(m_n);
+        m_to_be_volume.find(_link -> m_link_ID) -> second = TFlt(0);
       }
     }
     else{
-      for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
-        __link = __link_it -> second;
-        __flow = __link -> get_link_flow();
-        m_load_interval_volume.find(__link -> m_link_ID) -> second = __flow;
-        m_to_be_volume.find(__link -> m_link_ID) -> second += __flow/TFlt(m_n);
+      for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
+        _link = _link_it -> second;
+        _flow = _link -> get_link_flow();
+        m_load_interval_volume.find(_link -> m_link_ID) -> second = _flow;
+        m_to_be_volume.find(_link -> m_link_ID) -> second += _flow/TFlt(m_n);
       }      
     }
   } 
   if (m_record_tt){
     if ((timestamp) % m_n == 0 || timestamp == 0){
-      for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
-        __link = __link_it -> second;
-        __flow = __link -> get_link_tt();
-        m_load_interval_tt.find(__link -> m_link_ID) -> second = __flow;
-        m_record_interval_tt.find(__link -> m_link_ID) -> second = m_to_be_tt.find(__link -> m_link_ID) -> second + __flow/TFlt(m_n);
-        m_to_be_tt.find(__link -> m_link_ID) -> second = TFlt(0);
+      for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
+        _link = _link_it -> second;
+        _flow = _link -> get_link_tt();
+        m_load_interval_tt.find(_link -> m_link_ID) -> second = _flow;
+        m_record_interval_tt.find(_link -> m_link_ID) -> second = m_to_be_tt.find(_link -> m_link_ID) -> second + _flow/TFlt(m_n);
+        m_to_be_tt.find(_link -> m_link_ID) -> second = TFlt(0);
       }
     }
     else{
-      for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
-        __link = __link_it -> second;
-        __flow = __link -> get_link_tt();
-        m_load_interval_tt.find(__link -> m_link_ID) -> second = __flow;
-        m_to_be_tt.find(__link -> m_link_ID) -> second += __flow/TFlt(m_n);
+      for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
+        _link = _link_it -> second;
+        _flow = _link -> get_link_tt();
+        m_load_interval_tt.find(_link -> m_link_ID) -> second = _flow;
+        m_to_be_tt.find(_link -> m_link_ID) -> second += _flow/TFlt(m_n);
       }      
     }
   } 
@@ -299,17 +299,17 @@ int MNM_Statistics_Lrn::update_record(TInt timestamp)
 int MNM_Statistics_Lrn::init_record()
 {
   MNM_Statistics::init_record();
-  TInt __link_ID;
+  TInt _link_ID;
   if (m_record_volume){
-    for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
-      __link_ID = __link_it -> first;
-      m_to_be_volume.insert(std::pair<TInt, TFlt>(__link_ID, TFlt(0)));
+    for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
+      _link_ID = _link_it -> first;
+      m_to_be_volume.insert(std::pair<TInt, TFlt>(_link_ID, TFlt(0)));
     }
   }
   if (m_record_tt){
-    for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
-      __link_ID = __link_it -> first;
-      m_to_be_tt.insert(std::pair<TInt, TFlt>(__link_ID, TFlt(0)));
+    for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
+      _link_ID = _link_it -> first;
+      m_to_be_tt.insert(std::pair<TInt, TFlt>(_link_ID, TFlt(0)));
     }
   }
   return 0;

@@ -1,7 +1,7 @@
 #include "shortest_path.h"
 #include "limits.h"
 
-
+#include <queue>
 
 
 int MNM_Shortest_Path::one_to_one(TInt origin_node_ID, TInt dest_node_ID, 
@@ -24,22 +24,25 @@ int MNM_Shortest_Path::all_to_one_Dijkstra(TInt dest_node_ID,
   std::unordered_map<TInt, TFlt> _dist = std::unordered_map<TInt, TFlt>();
   _dist.insert(std::pair<TInt, TFlt>(dest_node_ID, TFlt(0)));
   
-  std::deque<MNM_Cost*> m_Q = std::deque<MNM_Cost*>();
+  // std::deque<MNM_Cost*> m_Q = std::deque<MNM_Cost*>();
+  std::priority_queue<MNM_Cost*, std::vector<MNM_Cost*>, LessThanByCost> m_Q = std::priority_queue<MNM_Cost*, std::vector<MNM_Cost*>, LessThanByCost>();
   std::unordered_map<TInt, MNM_Cost*> m_Q_support = std::unordered_map<TInt, MNM_Cost*>();
   MNM_Cost *_cost = new MNM_Cost(dest_node_ID, TFlt(0));
-  m_Q.push_back(_cost);
+  // m_Q.push_back(_cost);
+  m_Q.push(_cost);
   m_Q_support.insert(std::pair<TInt, MNM_Cost*>(dest_node_ID, _cost));
 
   TInt _node_ID;
   for (auto _node_it = graph->BegNI(); _node_it < graph->EndNI(); _node_it++) {
     // printf("node id %d with out-degree %d and in-degree %d\n",
-      // __node_it.GetId(), __node_it.GetOutDeg(), __node_it.GetInDeg());
+      // _node_it.GetId(), _node_it.GetOutDeg(), _node_it.GetInDeg());
     _node_ID = _node_it.GetId();
     if (_node_ID != dest_node_ID){
       _dist.insert(std::pair<TInt, TFlt>(_node_ID, DBL_MAX));
       output_map.insert(std::pair<TInt, TInt>(_node_ID, -1));
       _cost = new MNM_Cost(_node_ID, DBL_MAX);
-      m_Q.push_back(_cost);
+      // m_Q.push_back(_cost);
+      m_Q.push(_cost);
       m_Q_support.insert(std::pair<TInt, MNM_Cost*>(_node_ID, _cost));
     }
   }
@@ -50,8 +53,9 @@ int MNM_Shortest_Path::all_to_one_Dijkstra(TInt dest_node_ID,
   while (m_Q.size() != 0){
     // _min_cost = m_Q.front();
     // m_Q.pop_front();
-    auto _pv = std::min_element(m_Q.begin(), m_Q.end(), CompareCostDecendSort);
-    _min_cost = *(_pv);
+    // auto _pv = std::min_element(m_Q.begin(), m_Q.end(), CompareCostDecendSort);
+    _min_cost = m_Q.top();
+    // _min_cost = *(_pv);
     _tmp_ID = _min_cost -> m_ID;
     auto _node_it = graph -> GetNI(_tmp_ID);
     _tmp_dist = _dist.find(_tmp_ID) -> second;
@@ -62,25 +66,27 @@ int MNM_Shortest_Path::all_to_one_Dijkstra(TInt dest_node_ID,
       _alt = _tmp_dist + cost_map.find(_in_link_ID) -> second;
       if (_alt < _dist.find(_in_node_ID) -> second){
         // m_Q.push_back(m_Q_support.find(_in_node_ID) -> second);
+        m_Q.push(m_Q_support.find(_in_node_ID) -> second);
         _dist.find(_in_node_ID) -> second = _alt;
         output_map.find(_in_node_ID) -> second = _in_link_ID;
         m_Q_support.find(_in_node_ID) -> second -> m_cost = _alt;
       }
     }
-    m_Q.erase(_pv);
+    // m_Q.erase(_pv);
+    m_Q.pop();
   }
 
-  for (auto _it = m_Q.begin(); _it != m_Q.end(); _it++){
-    free (*_it);
-  }
-  m_Q.clear();
+  // for (auto _it : m_Q){
+  //   free (*_it);
+  // }
+  // m_Q.clear();
   m_Q_support.clear();
   _dist.clear();
   return 0;
 }
 
 int MNM_Shortest_Path::all_to_one_FIFO(TInt dest_node_ID, 
-                      PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
+                      PNEGraph graph, const std::unordered_map<TInt, TFlt>& cost_map,
                       std::unordered_map<TInt, TInt> &output_map)
 {
   // if (output_map.size() != 0){
@@ -104,7 +110,7 @@ int MNM_Shortest_Path::all_to_one_FIFO(TInt dest_node_ID,
   TInt _node_ID;
   for (auto _node_it = graph->BegNI(); _node_it < graph->EndNI(); _node_it++) {
     // printf("node id %d with out-degree %d and in-degree %d\n",
-      // __node_it.GetId(), __node_it.GetOutDeg(), __node_it.GetInDeg());
+      // _node_it.GetId(), _node_it.GetOutDeg(), _node_it.GetInDeg());
     _node_ID = _node_it.GetId();
     if (_node_ID != dest_node_ID){
       _dist.insert(std::pair<TInt, TFlt>(_node_ID, DBL_MAX));
@@ -176,7 +182,7 @@ int MNM_Shortest_Path::all_to_one_LIFO(TInt dest_node_ID,
   TInt _node_ID;
   for (auto _node_it = graph->BegNI(); _node_it < graph->EndNI(); _node_it++) {
     // printf("node id %d with out-degree %d and in-degree %d\n",
-      // __node_it.GetId(), __node_it.GetOutDeg(), __node_it.GetInDeg());
+      // _node_it.GetId(), _node_it.GetOutDeg(), _node_it.GetInDeg());
     _node_ID = _node_it.GetId();
     if (_node_ID != dest_node_ID){
       _dist.insert(std::pair<TInt, TFlt>(_node_ID, DBL_MAX));

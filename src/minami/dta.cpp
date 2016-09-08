@@ -38,9 +38,9 @@ int MNM_Dta::initialize()
 
 int MNM_Dta::set_statistics()
 {
-  MNM_ConfReader *__record_config = new MNM_ConfReader(m_file_folder + "/config.conf", "STAT");
-  if (__record_config -> get_string("rec_mode") == "LRn"){
-    m_statistics = new MNM_Statistics_Lrn(m_file_folder, m_config, __record_config,
+  MNM_ConfReader *_record_config = new MNM_ConfReader(m_file_folder + "/config.conf", "STAT");
+  if (_record_config -> get_string("rec_mode") == "LRn"){
+    m_statistics = new MNM_Statistics_Lrn(m_file_folder, m_config, _record_config,
                                    m_od_factory, m_node_factory, m_link_factory);
   }
   printf("finished\n");
@@ -84,31 +84,31 @@ int MNM_Dta::build_from_files()
 
 int MNM_Dta::hook_up_node_and_link()
 {
-  TInt __node_ID;
-  MNM_Dnode *__node;
-  MNM_Dlink *__link;
+  TInt _node_ID;
+  MNM_Dnode *_node;
+  MNM_Dlink *_link;
   // hook up node to link
-  for (auto __node_it = m_graph->BegNI(); __node_it < m_graph->EndNI(); __node_it++) {
+  for (auto _node_it = m_graph->BegNI(); _node_it < m_graph->EndNI(); _node_it++) {
     // printf("node id %d with out-degree %d and in-degree %d\n",
-      // __node_it.GetId(), __node_it.GetOutDeg(), __node_it.GetInDeg());
-    __node_ID = __node_it.GetId();
-    __node = m_node_factory -> get_node(__node_ID);
-    for (int e = 0; e < __node_it.GetOutDeg(); ++e) {
-      // printf("Out: edge (%d %d)\n", __node_it.GetId(), __node_it.GetOutNId(e));
-      __link = m_link_factory -> get_link(__node_it.GetOutEId(e));
-      __node -> add_out_link(__link);
+      // _node_it.GetId(), _node_it.GetOutDeg(), _node_it.GetInDeg());
+    _node_ID = _node_it.GetId();
+    _node = m_node_factory -> get_node(_node_ID);
+    for (int e = 0; e < _node_it.GetOutDeg(); ++e) {
+      // printf("Out: edge (%d %d)\n", _node_it.GetId(), _node_it.GetOutNId(e));
+      _link = m_link_factory -> get_link(_node_it.GetOutEId(e));
+      _node -> add_out_link(_link);
     }
-    for (int e = 0; e < __node_it.GetInDeg(); ++e) {
-      // printf("In: edge (%d %d)\n", __node_it.GetInNId(e), __node_it.GetId());
-      __link = m_link_factory -> get_link(__node_it.GetInEId(e));
-      __node -> add_in_link(__link);
+    for (int e = 0; e < _node_it.GetInDeg(); ++e) {
+      // printf("In: edge (%d %d)\n", _node_it.GetInNId(e), _node_it.GetId());
+      _link = m_link_factory -> get_link(_node_it.GetInEId(e));
+      _node -> add_in_link(_link);
     }   
   }
   printf("Hook up link to node\n");
   // hook up link to node
-  for (auto __link_it = m_graph->BegEI(); __link_it < m_graph->EndEI(); __link_it++){
-    __link = m_link_factory -> get_link(__link_it.GetId());
-    __link -> hook_up_node(m_node_factory -> get_node(__link_it.GetSrcNId()), m_node_factory -> get_node(__link_it.GetDstNId()));
+  for (auto _link_it = m_graph->BegEI(); _link_it < m_graph->EndEI(); _link_it++){
+    _link = m_link_factory -> get_link(_link_it.GetId());
+    _link -> hook_up_node(m_node_factory -> get_node(_link_it.GetSrcNId()), m_node_factory -> get_node(_link_it.GetDstNId()));
   }
   return 0;
 }
@@ -119,72 +119,72 @@ int MNM_Dta::hook_up_node_and_link()
  */
 bool MNM_Dta::is_ok()
 {
-  bool __flag = true;
-  bool __temp_flag = true;
+  bool _flag = true;
+  bool _temp_flag = true;
   //Checks the graph data structure for internal consistency.
   //For each node in the graph check that its neighbors are also nodes in the graph.
   printf("Checking......Graph consistent!\n");
-  __temp_flag = m_graph -> IsOk(); 
-  __flag = __flag && __temp_flag;
-  if (__temp_flag)  printf("Passed!\n");
+  _temp_flag = m_graph -> IsOk(); 
+  _flag = _flag && _temp_flag;
+  if (_temp_flag)  printf("Passed!\n");
 
   //check node
   printf("Checking......Node consistent!\n");
-  __temp_flag = (m_graph -> GetNodes() == m_config -> get_int("num_of_node"))
+  _temp_flag = (m_graph -> GetNodes() == m_config -> get_int("num_of_node"))
                 && (m_graph -> GetNodes() == TInt(m_node_factory -> m_node_map.size()));
-  __flag = __flag && __temp_flag;
-  if (__temp_flag)  printf("Passed!\n");
+  _flag = _flag && _temp_flag;
+  if (_temp_flag)  printf("Passed!\n");
 
   //check link
   printf("Checking......Link consistent!\n");
-  __temp_flag = (m_graph -> GetEdges() == m_config -> get_int("num_of_link"))
+  _temp_flag = (m_graph -> GetEdges() == m_config -> get_int("num_of_link"))
                 && (m_graph -> GetEdges() == TInt(m_link_factory -> m_link_map.size()));
-  __flag = __flag && __temp_flag;
-  if (__temp_flag)  printf("Passed!\n");  
+  _flag = _flag && _temp_flag;
+  if (_temp_flag)  printf("Passed!\n");  
 
   //check OD node
   printf("Checking......OD consistent!\n");
-  TInt __node_ID;
-  __temp_flag = (TInt(m_od_factory -> m_origin_map.size()) == m_config -> get_int("num_of_O"))
+  TInt _node_ID;
+  _temp_flag = (TInt(m_od_factory -> m_origin_map.size()) == m_config -> get_int("num_of_O"))
                 && (TInt(m_od_factory -> m_destination_map.size()) == m_config -> get_int("num_of_D"));
-  std::unordered_map<TInt, MNM_Origin*>::iterator __origin_map_it;
-  for (__origin_map_it = m_od_factory->m_origin_map.begin();
-       __origin_map_it != m_od_factory->m_origin_map.end(); __origin_map_it++){
-    __node_ID = __origin_map_it -> second -> m_origin_node -> m_node_ID;
-    __temp_flag = __temp_flag && ((m_graph -> GetNI(__node_ID)).GetId() == __node_ID)
-                  && (m_graph -> GetNI(__node_ID).GetOutDeg() >= 1)
-                  && (m_graph -> GetNI(__node_ID).GetInDeg() == 0);
+  std::unordered_map<TInt, MNM_Origin*>::iterator _origin_map_it;
+  for (_origin_map_it = m_od_factory->m_origin_map.begin();
+       _origin_map_it != m_od_factory->m_origin_map.end(); _origin_map_it++){
+    _node_ID = _origin_map_it -> second -> m_origin_node -> m_node_ID;
+    _temp_flag = _temp_flag && ((m_graph -> GetNI(_node_ID)).GetId() == _node_ID)
+                  && (m_graph -> GetNI(_node_ID).GetOutDeg() >= 1)
+                  && (m_graph -> GetNI(_node_ID).GetInDeg() == 0);
   }
-  std::unordered_map<TInt, MNM_Destination*>::iterator __dest_map_it;
-  for (__dest_map_it = m_od_factory->m_destination_map.begin();
-       __dest_map_it != m_od_factory->m_destination_map.end(); __dest_map_it++){
-    __node_ID = __dest_map_it -> second -> m_dest_node -> m_node_ID;
-    __temp_flag = __temp_flag && ((m_graph -> GetNI(__node_ID)).GetId() == __node_ID)
-                  && (m_graph -> GetNI(__node_ID).GetOutDeg() == 0)
-                  && (m_graph -> GetNI(__node_ID).GetInDeg() >= 1);
+  std::unordered_map<TInt, MNM_Destination*>::iterator _dest_map_it;
+  for (_dest_map_it = m_od_factory->m_destination_map.begin();
+       _dest_map_it != m_od_factory->m_destination_map.end(); _dest_map_it++){
+    _node_ID = _dest_map_it -> second -> m_dest_node -> m_node_ID;
+    _temp_flag = _temp_flag && ((m_graph -> GetNI(_node_ID)).GetId() == _node_ID)
+                  && (m_graph -> GetNI(_node_ID).GetOutDeg() == 0)
+                  && (m_graph -> GetNI(_node_ID).GetInDeg() >= 1);
   }  
-  __flag = __flag && __temp_flag;
-  if (__temp_flag)  printf("Passed!\n");  
+  _flag = _flag && _temp_flag;
+  if (_temp_flag)  printf("Passed!\n");  
 
   printf("Checking......OD connectivity!\n");
-  __temp_flag = check_origin_destination_connectivity();
-  __flag = __flag && __temp_flag;
-  if (__temp_flag)  printf("Passed!\n");  
+  _temp_flag = check_origin_destination_connectivity();
+  _flag = _flag && _temp_flag;
+  if (_temp_flag)  printf("Passed!\n");  
 
-  return __flag;
+  return _flag;
 }
 
 int MNM_Dta::pre_loading()
 {
-  MNM_Dnode *__node;
+  MNM_Dnode *_node;
   printf("MNM: Prepare loading!\n");
   m_routing -> init_routing();
   // printf("Finish prepare routing\n");
   m_statistics -> init_record();
-  for (auto __node_it = m_node_factory -> m_node_map.begin(); __node_it != m_node_factory -> m_node_map.end(); __node_it++){
-    __node = __node_it -> second;
-    // printf("Node ID: %d\n", __node -> m_node_ID);
-    __node -> prepare_loading();
+  for (auto _node_it = m_node_factory -> m_node_map.begin(); _node_it != m_node_factory -> m_node_map.end(); _node_it++){
+    _node = _node_it -> second;
+    // printf("Node ID: %d\n", _node -> m_node_ID);
+    _node -> prepare_loading();
   }
   m_workzone -> init_workzone();
   return 0;
@@ -192,78 +192,78 @@ int MNM_Dta::pre_loading()
 
 int MNM_Dta::loading(bool verbose)
 {
-  TInt __cur_int = 0;
-  TInt __total_int = m_config ->get_int("total_interval");
-  MNM_Origin *__origin;
-  MNM_Dnode *__node;
-  MNM_Dlink *__link;
-  MNM_Destination *__dest;
+  TInt _cur_int = 0;
+  TInt _total_int = m_config ->get_int("total_interval");
+  MNM_Origin *_origin;
+  MNM_Dnode *_node;
+  MNM_Dlink *_link;
+  MNM_Destination *_dest;
   TInt _assign_inter = m_start_assign_interval;
 
   pre_loading();
-  while (__cur_int < __total_int){
-    printf("-------------------------------    Interval %d   ------------------------------ \n", (int)__cur_int);
+  while (_cur_int < _total_int){
+    printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_cur_int);
     // step 1: Origin release vehicle
     printf("Realsing!\n");
-    // for (auto __origin_it = m_od_factory -> m_origin_map.begin(); __origin_it != m_od_factory -> m_origin_map.end(); __origin_it++){
-    //   __origin = __origin_it -> second;
-    //   __origin -> release(m_veh_factory, __cur_int);
+    // for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){
+    //   _origin = _origin_it -> second;
+    //   _origin -> release(m_veh_factory, _cur_int);
     // }      
-    if (__cur_int % m_assign_freq == 0 || __cur_int==0){
+    if (_cur_int % m_assign_freq == 0 || _cur_int==0){
       for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){
-        __origin = _origin_it -> second;
+        _origin = _origin_it -> second;
         if (_assign_inter >= m_total_assign_inter) {
-          __origin -> release_one_interval(__cur_int, m_veh_factory, -1, TFlt(0));
+          _origin -> release_one_interval(_cur_int, m_veh_factory, -1, TFlt(0));
         }
         else{
-          __origin -> release_one_interval(__cur_int, m_veh_factory, _assign_inter, TFlt(0));
+          _origin -> release_one_interval(_cur_int, m_veh_factory, _assign_inter, TFlt(0));
         }
         // _assign_inter = _assign_inter % m_total_assign_inter;
-        // __origin -> release_one_interval(__cur_int, m_veh_factory, _assign_inter, TFlt(0));
+        // _origin -> release_one_interval(_cur_int, m_veh_factory, _assign_inter, TFlt(0));
       } 
       _assign_inter += 1;
     }
 
     printf("Routing!\n");
     // step 2: route the vehicle
-    m_routing -> update_routing(__cur_int);
+    m_routing -> update_routing(_cur_int);
 
     printf("Moving through node!\n");
     // step 3: move vehicles through node
-    for (auto __node_it = m_node_factory -> m_node_map.begin(); __node_it != m_node_factory -> m_node_map.end(); __node_it++){
-      __node = __node_it -> second;
-      __node -> evolve(__cur_int);
+    for (auto _node_it = m_node_factory -> m_node_map.begin(); _node_it != m_node_factory -> m_node_map.end(); _node_it++){
+      _node = _node_it -> second;
+      _node -> evolve(_cur_int);
     }
 
     printf("Moving through link\n");
     // step 4: move vehicles through link
-    for (auto __link_it = m_link_factory -> m_link_map.begin(); __link_it != m_link_factory -> m_link_map.end(); __link_it++){
-      __link = __link_it -> second;
-      // if (__link -> get_link_flow() > 0){
+    for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
+      _link = _link_it -> second;
+      // if (_link -> get_link_flow() > 0){
       //   printf("Current Link %d:, traffic flow %.4f, incomming %d, finished %d\n", 
-      //       __link -> m_link_ID(), __link -> get_link_flow()(), (int)__link -> m_incoming_array.size(),  (int)__link -> m_finished_array.size());
-      //   __link -> print_info();
+      //       _link -> m_link_ID(), _link -> get_link_flow()(), (int)_link -> m_incoming_array.size(),  (int)_link -> m_finished_array.size());
+      //   _link -> print_info();
       // }
       
-      __link -> clear_incoming_array();
-      __link -> evolve(__cur_int);
-      // __link -> print_info();
+      _link -> clear_incoming_array();
+      _link -> evolve(_cur_int);
+      // _link -> print_info();
     }
 
     printf("Receiving!\n");
     // step 5: Destination receive vehicle  
-    for (auto __dest_it = m_od_factory -> m_destination_map.begin(); __dest_it != m_od_factory -> m_destination_map.end(); __dest_it++){
-      __dest = __dest_it -> second;
-      __dest -> receive(__cur_int);
+    for (auto _dest_it = m_od_factory -> m_destination_map.begin(); _dest_it != m_od_factory -> m_destination_map.end(); _dest_it++){
+      _dest = _dest_it -> second;
+      _dest -> receive(_cur_int);
     }
 
     printf("Update record!\n");
     // step 5: update record
-    m_statistics -> update_record(__cur_int);
+    m_statistics -> update_record(_cur_int);
 
     MNM::print_vehicle_statistics(m_veh_factory);
     // test();
-    __cur_int ++;
+    _cur_int ++;
   }
 
   m_statistics -> post_record();

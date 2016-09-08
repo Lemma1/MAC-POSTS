@@ -121,7 +121,7 @@ int MNM_Realtime_Dta::run_from_screenshot(MNM_Dta_Screenshot* screenshot,
   // m_statistics -> init_record();
   for (auto _node_it = _node_factory -> m_node_map.begin(); _node_it != _node_factory -> m_node_map.end(); _node_it++){
     _node = _node_it -> second;
-    // printf("Node ID: %d\n", __node -> m_node_ID);
+    // printf("Node ID: %d\n", _node -> m_node_ID);
     _node -> prepare_loading();
   }
   while (_cur_inter < _total_inter){
@@ -168,7 +168,7 @@ int MNM_Realtime_Dta::run_from_screenshot(MNM_Dta_Screenshot* screenshot,
 
   //   // printf("Update record!\n");
   //   // // step 5: update record
-  //   // m_statistics -> update_record(__cur_int);
+  //   // m_statistics -> update_record(_cur_int);
 
     // _link_tt -> print_info();
     _cur_inter ++;
@@ -213,7 +213,7 @@ int MNM_Realtime_Dta::get_estimation_gradient(MNM_Dta_Screenshot* screenshot,
   // m_statistics -> init_record();
   for (auto _node_it = _node_factory -> m_node_map.begin(); _node_it != _node_factory -> m_node_map.end(); _node_it++){
     _node = _node_it -> second;
-    // printf("Node ID: %d\n", __node -> m_node_ID);
+    // printf("Node ID: %d\n", _node -> m_node_ID);
     _node -> prepare_loading();
   }
   while (_cur_inter < _total_inter){
@@ -343,7 +343,7 @@ int MNM_Realtime_Dta::get_optimization_gradient(MNM_Dta_Screenshot* screenshot,
   // m_statistics -> init_record();
   for (auto _node_it = _node_factory -> m_node_map.begin(); _node_it != _node_factory -> m_node_map.end(); _node_it++){
     _node = _node_it -> second;
-    // printf("Node ID: %d\n", __node -> m_node_ID);
+    // printf("Node ID: %d\n", _node -> m_node_ID);
     _node -> prepare_loading();
   }
   while (_cur_inter < _total_inter){
@@ -584,7 +584,7 @@ int MNM_Realtime_Dta::predict_next(TInt next_assign_inter)
   _statistics -> init_record();
   for (auto _node_it = _node_factory -> m_node_map.begin(); _node_it != _node_factory -> m_node_map.end(); _node_it++){
     _node = _node_it -> second;
-    // printf("Node ID: %d\n", __node -> m_node_ID);
+    // printf("Node ID: %d\n", _node -> m_node_ID);
     _node -> prepare_loading();
   }
   
@@ -705,31 +705,31 @@ int MNM_Dta_Screenshot::build_static_network()
 
 int MNM_Dta_Screenshot::hook_up_node_and_link()
 {
-  TInt __node_ID;
-  MNM_Dnode *__node;
-  MNM_Dlink *__link;
+  TInt _node_ID;
+  MNM_Dnode *_node;
+  MNM_Dlink *_link;
   // hook up node to link
-  for (auto __node_it = m_graph->BegNI(); __node_it < m_graph->EndNI(); __node_it++) {
+  for (auto _node_it = m_graph->BegNI(); _node_it < m_graph->EndNI(); _node_it++) {
     // printf("node id %d with out-degree %d and in-degree %d\n",
-      // __node_it.GetId(), __node_it.GetOutDeg(), __node_it.GetInDeg());
-    __node_ID = __node_it.GetId();
-    __node = m_node_factory -> get_node(__node_ID);
-    for (int e = 0; e < __node_it.GetOutDeg(); ++e) {
-      // printf("Out: edge (%d %d)\n", __node_it.GetId(), __node_it.GetOutNId(e));
-      __link = m_link_factory -> get_link(__node_it.GetOutEId(e));
-      __node -> add_out_link(__link);
+      // _node_it.GetId(), _node_it.GetOutDeg(), _node_it.GetInDeg());
+    _node_ID = _node_it.GetId();
+    _node = m_node_factory -> get_node(_node_ID);
+    for (int e = 0; e < _node_it.GetOutDeg(); ++e) {
+      // printf("Out: edge (%d %d)\n", _node_it.GetId(), _node_it.GetOutNId(e));
+      _link = m_link_factory -> get_link(_node_it.GetOutEId(e));
+      _node -> add_out_link(_link);
     }
-    for (int e = 0; e < __node_it.GetInDeg(); ++e) {
-      // printf("In: edge (%d %d)\n", __node_it.GetInNId(e), __node_it.GetId());
-      __link = m_link_factory -> get_link(__node_it.GetInEId(e));
-      __node -> add_in_link(__link);
+    for (int e = 0; e < _node_it.GetInDeg(); ++e) {
+      // printf("In: edge (%d %d)\n", _node_it.GetInNId(e), _node_it.GetId());
+      _link = m_link_factory -> get_link(_node_it.GetInEId(e));
+      _node -> add_in_link(_link);
     }   
   }
   // printf("Hook up link to node\n");
   // hook up link to node
-  for (auto __link_it = m_graph->BegEI(); __link_it < m_graph->EndEI(); __link_it++){
-    __link = m_link_factory -> get_link(__link_it.GetId());
-    __link -> hook_up_node(m_node_factory -> get_node(__link_it.GetSrcNId()), m_node_factory -> get_node(__link_it.GetDstNId()));
+  for (auto _link_it = m_graph->BegEI(); _link_it < m_graph->EndEI(); _link_it++){
+    _link = m_link_factory -> get_link(_link_it.GetId());
+    _link -> hook_up_node(m_node_factory -> get_node(_link_it.GetSrcNId()), m_node_factory -> get_node(_link_it.GetDstNId()));
   }
   return 0;
 }
