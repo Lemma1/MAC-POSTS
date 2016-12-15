@@ -1,0 +1,88 @@
+.. wiki documentation master file, created by
+   sphinx-quickstart on Thu Jul 14 17:01:20 2016.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to wiki's documentation!
+================================
+
+Contents:
+
+11111111
+========
+
+*fdsfa*
+
+**dfsdfsdf**
+
+``printf("ell")``
+
+fggggggggggggggggggggggg
+fdgsdfgdsgsdgds
+
+.. note::
+
+   This function is not suitable for sending spam e-mails.
+
+.. versionadded:: 2.5
+   The *spam* parameter.
+
+.. deprecated:: 3.1
+   Use :func:`spam` instead.
+
+.. cpp:class:: MyClass : public MyBase, MyOtherBase
+
+.. seealso::
+
+
+
+   `GNU tar manual, Basic Tar Format <http://link>`_
+      Documentation for tar archive files, including GNU tar extensions.
+
+.. hlist::
+   :columns: 1
+
+   * A list of
+   * short items
+   * that should be
+   * displayed
+   * horizontally`
+
+.. glossary::
+
+   environment
+      A structure where information about all documents under the root is
+      saved, and used for cross-referencing.  The environment is pickled
+      after the parsing stage, so that successive runs only need to read
+      and parse new and changed documents.
+
+   source directory
+      The directory which, including its subdirectories, contains all
+      source files for one Sphinx project.
+
+
+.. code-block:: cpp
+
+   Some Ruby code.
+
+.. _my-reference-label:
+
+Section to cross-reference
+--------------------------
+
+This is the text of the section.
+
+
+.. toctree::
+   :maxdepth: 2
+
+  test
+
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
