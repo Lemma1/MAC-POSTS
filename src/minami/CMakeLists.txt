@@ -32,6 +32,12 @@ target_link_libraries (dta_response LINK_PUBLIC Snap g3log ${CMAKE_THREAD_INIT})
 
 #target_link_libraries (exp_realtime LINK_PUBLIC Snap g3log ${CMAKE_THREAD_INIT})
 
-add_executable (test_sp test_sp.cpp path.cpp dta.cpp vehicle.cpp dlink.cpp od.cpp factory.cpp dnode.cpp ults.cpp io.cpp routing.cpp statistics.cpp shortest_path.cpp realtime_dta.cpp marginal_cost.cpp vms.cpp workzone.cpp)
+# add_executable (test_sp test_sp.cpp path.cpp dta.cpp vehicle.cpp dlink.cpp od.cpp factory.cpp dnode.cpp ults.cpp io.cpp routing.cpp statistics.cpp shortest_path.cpp realtime_dta.cpp marginal_cost.cpp vms.cpp workzone.cpp)
 
-target_link_libraries (test_sp LINK_PUBLIC Snap g3log ${CMAKE_THREAD_INIT})
+# target_link_libraries (test_sp LINK_PUBLIC Snap ${CMAKE_THREAD_INIT})
+
+# add_executable (test1 test.cpp)
+# target_link_libraries (test1 LINK_PUBLIC Snap ${CMAKE_THREAD_INIT})
+
+# add_executable (testGlib test_Glib.cpp)
+# target_link_libraries (testGlib PUBLIC Snap)

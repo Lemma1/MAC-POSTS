@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////
 // SNAP library
-#include "stdafx.h"
+// #include "stdafx.h"
 #include "Snap.h"
 
 #include "base.cpp"
@@ -10,7 +10,7 @@
 #include "gbase.cpp"
 #include "util.cpp"
 
-// graph data structures
+// // graph data structures
 #include "graph.cpp"         // graphs
 #include "network.cpp"       // networks
 #include "timenet.cpp"       // time evolving networks

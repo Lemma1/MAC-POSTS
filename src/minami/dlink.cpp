@@ -127,7 +127,7 @@ int MNM_Dlink_Ctm::init_cell_array( TFlt unit_time, TFlt std_cell_length, TFlt l
                          m_flow_scalar,
                          m_wave_ratio);
     if(aCell == NULL) {
-      LOG(WARNING) << "Fail to init the cell.";
+      // LOG(WARNING) << "Fail to init the cell.";
       exit(-1);
     };
     m_cell_array.push_back(aCell);
@@ -141,7 +141,7 @@ int MNM_Dlink_Ctm::init_cell_array( TFlt unit_time, TFlt std_cell_length, TFlt l
                          m_flow_scalar,
                          m_last_wave_ratio);
     if(aCell == NULL) {
-      LOG(WARNING) << "Fail to init the cell.";
+      // LOG(WARNING) << "Fail to init the cell.";
       exit(-1);
     }
     m_cell_array.push_back(aCell);
@@ -220,7 +220,7 @@ TFlt MNM_Dlink_Ctm::get_link_supply() {
 int MNM_Dlink_Ctm::clear_incoming_array() {
   // printf("link ID: %d, in comming: %d, supply : %d\n", (int )m_link_ID,(int)m_incoming_array.size(), (int) (get_link_supply() * m_flow_scalar) );
   if (get_link_supply() * m_flow_scalar < m_incoming_array.size()) {
-    LOG(WARNING) << "Wrong incoming array size";
+    // LOG(WARNING) << "Wrong incoming array size";
     exit(-1);
   }
   move_veh_queue(&m_incoming_array, &(m_cell_array[0] -> m_veh_queue), m_incoming_array.size());

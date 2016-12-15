@@ -1,5 +1,6 @@
 #include "dnode.h"
 
+#include <algorithm>
 
 MNM_Dnode::MNM_Dnode(TInt ID, TFlt flow_scalar)
 {
