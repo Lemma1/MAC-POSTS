@@ -17,5 +17,6 @@ add_subdirectory (glib-core)
 add_subdirectory (snap-core)
 add_subdirectory (3rdparty)
 add_subdirectory (minami)
+add_subdirectory (examples)
 
 
