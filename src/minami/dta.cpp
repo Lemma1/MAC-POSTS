@@ -193,7 +193,6 @@ int MNM_Dta::pre_loading()
 int MNM_Dta::loading(bool verbose)
 {
   TInt _cur_int = 0;
-  TInt _total_int = m_config ->get_int("total_interval");
   MNM_Origin *_origin;
   MNM_Dnode *_node;
   MNM_Dlink *_link;
@@ -201,7 +200,7 @@ int MNM_Dta::loading(bool verbose)
   TInt _assign_inter = m_start_assign_interval;
 
   pre_loading();
-  while (_cur_int < _total_int){
+  while (!finished_loading(_cur_int)){
     printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_cur_int);
     // step 1: Origin release vehicle
     printf("Realsing!\n");
@@ -295,6 +294,16 @@ int MNM_Dta::check_origin_destination_connectivity()
   return true;
 }
 
+bool MNM_Dta::finished_loading(int cur_int)
+{
+  TInt _total_int = m_config ->get_int("total_interval");
+  if (_total_int < 0){
+    return cur_int > _total_int;
+  }
+  else{
+    return !MNM::has_running_vehicle(m_veh_factory) && cur_int != 0;
+  }
+}
 
 // int MNM_Dta::test()
 // {
@@ -335,6 +344,18 @@ int print_vehicle_info(MNM_Veh_Factory *veh_factory)
             _veh -> get_current_link() -> m_link_ID(), _veh -> get_next_link() -> m_link_ID());
   }
   return 0;
+}
+
+bool has_running_vehicle(MNM_Veh_Factory *veh_factory)
+{
+  TInt _total_veh = TInt(veh_factory -> m_veh_map.size());
+  TInt _finished_veh = 0;
+  TInt _enroute_veh;
+  for (auto _map_it : veh_factory -> m_veh_map){
+    if (_map_it.second -> m_finish_time > 0) _finished_veh += 1;
+  }
+  _enroute_veh = _total_veh - _finished_veh;  
+  return _enroute_veh != 0;
 }
 
 }

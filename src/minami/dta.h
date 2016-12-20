@@ -26,6 +26,7 @@ public:
   int loading(bool verbose);
   int test();
 private:
+  bool finished_loading(int cur_int);
   int set_statistics();
   int set_routing();
   int build_workzone();
@@ -53,6 +54,7 @@ namespace MNM
 {
   int print_vehicle_statistics(MNM_Veh_Factory *veh_factory);
   int print_vehicle_info(MNM_Veh_Factory *veh_factory);
+  bool has_running_vehicle(MNM_Veh_Factory *veh_factory);
 }
 
 #endif
