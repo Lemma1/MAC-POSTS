@@ -1,9 +1,9 @@
-### MINAMI
+## MINAMI
 
-#### Multi-functIonal dyNAmic network Modeling tookIt
+### Multi-functIonal dyNAmic network Modeling tookIt
 
 By Wei Ma, Carnegie Mellon University. 
 
-Currently, I'm working on the dynamic traffic assigment model. The project is interface based, so new link/node/routing model can be added easily in the code. The DTA part will be finished in June.
+MINAMI is a mesoscopic traffic simulation software for dynamic network loading. It is interface based and is friendly to new node/link/routing models.
 
-UE, SO will be implemented in the near future.
+For any questions, please contact Lemma171@gmail.com
