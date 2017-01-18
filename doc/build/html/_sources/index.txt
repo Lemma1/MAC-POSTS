@@ -3,13 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to wiki's documentation!
-================================
+MINAMI
+======
 
-Contents:
 
-11111111
-========
+Introduction
+======================================
 
 *fdsfa*
 
@@ -74,7 +73,7 @@ This is the text of the section.
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
   test
 
