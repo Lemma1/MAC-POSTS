@@ -6,76 +6,64 @@
 MINAMI
 ======
 
-
 Introduction
 ------------
+      MINAMI is the abbreviation for *Multi-functIonal dyNAmic network Modeling tookIt*. It is a mesoscopic traffic simulation library for dynamic network loading. This library is interface based and is friendly to new node/link/routing models.
 
-*fdsfa*
+      The library mainly consists of three parts. One part is called component, which is the separated model such as dynamic node/link model, real-time routing model and so on. Each component has clear interfaces with other components, so we can implement each components with different actual models. Here are the components that we already implemented:
 
-**dfsdfsdf**
+      
 
-``printf("ell")``
+      .. hlist::
+         :columns: 1
 
-fggggggggggggggggggggggg
-fdgsdfgdsgsdgds
+         * Node
+         * Link
+         * Routing
 
-.. note::
+      The second part is algorithm, the algorithms take the components as input and output corresponding components. The difference between component and algorithm is that usually component comsume memory and algorithm does not (when the algorithm finishes). Here are the algorithms that we already implemented:
 
-   This function is not suitable for sending spam e-mails.
+      .. hlist::
+         :columns: 1
 
-.. versionadded:: 2.5
-   The *spam* parameter.
-
-.. deprecated:: 3.1
-   Use :func:`spam` instead.
-
-.. cpp:class:: MyClass : public MyBase, MyOtherBase
-
-.. seealso::
+         * All-to-one shortest path
+         * Computing SO marginal cost
 
 
 
-   `GNU tar manual, Basic Tar Format <http://link>`_
-      Documentation for tar archive files, including GNU tar extensions.
+      By combining different components and algorithms, we can develop complex transportation models. The types of models may vary a lot, and here are the models we implemented:
 
-.. hlist::
-   :columns: 1
+      .. hlist::
+         :columns: 1
 
-   * A list of
-   * short items
-   * that should be
-   * displayed
-   * horizontally`
+         * Dynamic traffic loading
+         * Real-time DTA     
 
-.. glossary::
-
-   environment
-      A structure where information about all documents under the root is
-      saved, and used for cross-referencing.  The environment is pickled
-      after the parsing stage, so that successive runs only need to read
-      and parse new and changed documents.
-
-   source directory
-      The directory which, including its subdirectories, contains all
-      source files for one Sphinx project.
-
-
-.. code-block:: cpp
-
-   Some Ruby code.
-
-.. _my-reference-label:
-
-Section to cross-reference
+Documents
 --------------------------
 
-This is the text of the section.
-
+We discuss components, algorithms and models in detail, we also provide basic instrutions on how to install the package.
 
 .. toctree::
    :maxdepth: 1
 
-  test
+   start
+   component
+   algorithm
+   model
+
+People
+--------------------------
+
+.. glossary::
+   Advisor:
+      Zhen (Sean) Qian
+
+   Contributors:
+      Wei Ma
+
+
+
 
 
 
