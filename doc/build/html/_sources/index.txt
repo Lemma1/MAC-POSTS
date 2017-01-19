@@ -39,7 +39,7 @@ Introduction
          * Dynamic traffic loading
          * Real-time DTA     
 
-Documents
+Documentation
 --------------------------
 
 We discuss components, algorithms and models in detail, we also provide basic instrutions on how to install the package.
@@ -51,6 +51,7 @@ We discuss components, algorithms and models in detail, we also provide basic in
    component
    algorithm
    model
+   utls
 
 People
 --------------------------
@@ -66,10 +67,9 @@ People
 
 
 
-
 Indices and tables
 ==================
 
+* `Home <index.html>`_
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`

@@ -66,3 +66,6 @@ We strongly recommend you to read the basic documents for CMake. Basically, you 
    :maxdepth: 1
 
 
+* `Home <index.html>`_
+* :ref:`genindex`
+* :ref:`search`

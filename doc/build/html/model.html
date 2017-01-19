@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Components &mdash; wiki 1.0 documentation</title>
+    <title>Models &mdash; wiki 1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,7 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="wiki 1.0 documentation" href="index.html" />
-    <link rel="prev" title="Components" href="algorithm.html" />
+    <link rel="next" title="Utilities and Enumerations" href="utls.html" />
+    <link rel="prev" title="Algorithms" href="algorithm.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -39,9 +40,32 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="components">
-<h1>Components<a class="headerlink" href="#components" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="models">
+<h1>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h1>
+<p>Model is the highest level of the library, it can be totally different for different purpose. It is usually the combinations of components and algorithms, and it is usualy based papers or project.</p>
+<div class="section" id="boston-dynamic-traffic-assignment">
+<h2>Boston dynamic traffic assignment<a class="headerlink" href="#boston-dynamic-traffic-assignment" title="Permalink to this headline">¶</a></h2>
+<p>In Boston DTA, the route choice of each traveler is based on the real time traffic infomation. The route of each vehicle is updated every one update interval, and each vehicle will follow the shortest path based on the current traffic network condition. The routing is not predictive, and the historical network condition can be determined differently.</p>
+<p>TO DO: we havn&#8217;t implment the hybrid routing, but will do shortly.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference external" href="http://link.springer.com/article/10.1007/s11067-012-9177-z">Hybrid DTA</a></p>
+</div>
+</div>
+<div class="section" id="online-dynamic-traffic-assignment">
+<h2>Online dynamic traffic assignment<a class="headerlink" href="#online-dynamic-traffic-assignment" title="Permalink to this headline">¶</a></h2>
+<p>The online DTA is due to the project we conduct. It takes the real-time speed feed and update the travelers&#8217; route choice. Also it will manage the Variable Message Signs (VMS) for the I-95 corridor.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference external" href="http://www.weima171.com/docs/WO004_final.pdf">Dynamic Network Analysis and Real-time Traffic Management for Philadelphia Metropolitan Area</a></p>
+</div>
 <div class="toctree-wrapper compound">
+</div>
+<ul class="simple">
+<li><a class="reference external" href="index.html">Home</a></li>
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
 </div>
 </div>
 
@@ -50,11 +74,21 @@
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Models</a><ul>
+<li><a class="reference internal" href="#boston-dynamic-traffic-assignment">Boston dynamic traffic assignment</a></li>
+<li><a class="reference internal" href="#online-dynamic-traffic-assignment">Online dynamic traffic assignment</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="algorithm.html" title="previous chapter">Components</a></li>
+      <li>Previous: <a href="algorithm.html" title="previous chapter">Algorithms</a></li>
+      <li>Next: <a href="utls.html" title="next chapter">Utilities and Enumerations</a></li>
   </ul></li>
 </ul>
 </div>

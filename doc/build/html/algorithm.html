@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Components &mdash; wiki 1.0 documentation</title>
+    <title>Algorithms &mdash; wiki 1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="wiki 1.0 documentation" href="index.html" />
-    <link rel="next" title="Components" href="model.html" />
+    <link rel="next" title="Models" href="model.html" />
     <link rel="prev" title="Components" href="component.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -40,9 +40,25 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="components">
-<h1>Components<a class="headerlink" href="#components" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="algorithms">
+<h1>Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h1>
+<p>The algorithms take several components as inputs and also output the components. They may allocate memory during the excution, but when the function finished, there should be no extra memory allocated. The algorithms are usually implemented as static functions.</p>
+<div class="section" id="all-to-one-shortest-path">
+<h2>All-to-one Shortest path<a class="headerlink" href="#all-to-one-shortest-path" title="Permalink to this headline">¶</a></h2>
+<p>We implement the all-to-one shortest path algorithm by FIFO/LIFO/Dijstra algorithm, it is also based on the label correction algorithm.</p>
+<dl class="function">
+<dt id="_CPPv215all_to_one_FIFO4TInt8PNEGraphRKNSt13unordered_mapI4TInt4TFltEERNSt13unordered_mapI4TInt4TIntEE">
+<span id="all_to_one_FIFO__TInt.PNEGraph.std::unordered_map:TInt.TFlt:CR.std::unordered_map:TInt.TInt:R"></span>int <em class="property">static</em> <code class="descclassname"></code><code class="descname">all_to_one_FIFO</code><span class="sig-paren">(</span>TInt <em>dest_node_ID</em>, PNEGraph <em>graph</em>, <em class="property">const</em> std::unordered_map&lt;TInt, TFlt&gt; &amp;<em>cost_map</em>, std::unordered_map&lt;TInt, TInt&gt; &amp;<em>output_map</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv215all_to_one_FIFO4TInt8PNEGraphRKNSt13unordered_mapI4TInt4TFltEERNSt13unordered_mapI4TInt4TIntEE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The all to one FIFO implemention takes the <em>graph</em> as the base graph, <em>dest_nonde_ID</em> as the destination and <em>cost_map</em> as the cost for each link, the hashmap is coded by &lt;link_ID, cost&gt;. Finally it will output the &lt;link_ID, next_link_ID&gt; pair which can be formulated as a tree.</p>
 <div class="toctree-wrapper compound">
+</div>
+<ul class="simple">
+<li><a class="reference external" href="index.html">Home</a></li>
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
 </div>
 </div>
 
@@ -51,12 +67,20 @@
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Algorithms</a><ul>
+<li><a class="reference internal" href="#all-to-one-shortest-path">All-to-one Shortest path</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="component.html" title="previous chapter">Components</a></li>
-      <li>Next: <a href="model.html" title="next chapter">Components</a></li>
+      <li>Next: <a href="model.html" title="next chapter">Models</a></li>
   </ul></li>
 </ul>
 </div>
