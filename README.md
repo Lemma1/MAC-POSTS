@@ -1,6 +1,9 @@
-## MINAMI
+## MAC-POSTS
 
-### Multi-functIonal dyNAmic network Modeling tookIt
+
+### Mobility Data Analytics Center - Prediction, Optimization, and Simulation toolkit for Transportation Systems
+
+In the codes, we also note it as MINAMI (MNM), which represents Multi-functIonal dyNAmic network Modeling tookIt
 
 By Wei Ma, Carnegie Mellon University. 
 
