@@ -115,6 +115,11 @@ int MNM_IO::build_link_factory(std::string file_folder, MNM_ConfReader *conf_rea
                                     _length, _ffs, _unit_time, _flow_scalar);
           continue;
         }
+        if (_type =="LQ"){
+          link_factory -> make_link(_link_ID, MNM_TYPE_LQ, _lane_hold_cap, _lane_flow_cap, _number_of_lane, 
+                                    _length, _ffs, _unit_time, _flow_scalar);
+          continue;
+        }
         printf("Wrong link type, %s\n", _type.c_str());
         exit(-1);
       }
@@ -502,7 +507,7 @@ int MNM_IO::read_int_float(std::string file_name, std::unordered_map<TInt, TFlt>
       _words = split(_line, ' ');
       if (TInt(_words.size()) == 2) {
         _int = TInt(std::stoi(trim(_words[0])));
-        _float = TInt(std::stoi(trim(_words[1])));
+        _float = TFlt(std::stof(trim(_words[1])));
         reader -> insert(std::pair<TInt, TFlt>(_int, _float));
       }
       else{

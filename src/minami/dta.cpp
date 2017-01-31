@@ -238,11 +238,11 @@ int MNM_Dta::loading(bool verbose)
     // step 4: move vehicles through link
     for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
       _link = _link_it -> second;
-      // if (_link -> get_link_flow() > 0){
-      //   printf("Current Link %d:, traffic flow %.4f, incomming %d, finished %d\n", 
-      //       _link -> m_link_ID(), _link -> get_link_flow()(), (int)_link -> m_incoming_array.size(),  (int)_link -> m_finished_array.size());
-      //   _link -> print_info();
-      // }
+      if (_link -> get_link_flow() > 0){
+        printf("Current Link %d:, traffic flow %.4f, incomming %d, finished %d\n", 
+            _link -> m_link_ID(), _link -> get_link_flow()(), (int)_link -> m_incoming_array.size(),  (int)_link -> m_finished_array.size());
+        _link -> print_info();
+      }
       
       _link -> clear_incoming_array();
       _link -> evolve(_cur_int);

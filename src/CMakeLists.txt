@@ -5,7 +5,7 @@ find_package(Threads)
 set (CMAKE_CXX_STANDARD 11)
 #set (CMAKE_CXX_COMPILER /path/to/cpp/compiler)
 set (CMAKE_CXX_COMPILER g++)
-set (CMAKE_CXX_FLAGS "-g -pg -fopenmp -std=c++11 -m64 -Wall -pthread")
+set (CMAKE_CXX_FLAGS "-g -fopenmp -std=c++11 -m64 -Wall -pthread")
 #set (CMAKE_CXX_FLAGS "${CMAKE CXX FLAGS} −pg")
 set (CMAKE_EXE_LIKKER_FLAGS "-pthread")
 

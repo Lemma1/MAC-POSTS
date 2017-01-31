@@ -14,7 +14,7 @@
 #include <string>
 
 #define SLEEP_TIME 100000
-#define RESET_THRESHOLD 500000
+#define RESET_THRESHOLD 5000000
 
 bool is_file_exist(const char *fileName)
 {

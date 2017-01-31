@@ -125,4 +125,46 @@ public:
   TFlt m_hold_cap;
   TInt m_max_stamp;
 };
+
+
+
+/**************************************************************************
+                          Link Queue
+**************************************************************************/
+class MNM_Dlink_Lq : public MNM_Dlink
+{
+public:
+  MNM_Dlink_Lq(TInt ID,
+               TFlt lane_hold_cap, 
+               TFlt lane_flow_cap, 
+               TInt number_of_lane,
+               TFlt length,
+               TFlt ffs,
+               TFlt unit_time,
+               TFlt flow_scalar);
+  ~MNM_Dlink_Lq();
+  int virtual evolve(TInt timestamp) override;
+  TFlt virtual get_link_supply() override;
+  int virtual clear_incoming_array() override;
+  void virtual print_info() override;
+  TFlt virtual get_link_flow() override;
+  TFlt virtual get_link_tt() override;
+// private:
+  std::deque<MNM_Veh*> m_veh_queue;
+  TInt m_volume; //vehicle number, without the flow scalar
+  TFlt m_lane_hold_cap;
+  TFlt m_lane_flow_cap;
+  TFlt m_flow_scalar;
+  TFlt m_hold_cap;
+  TFlt m_C;  //maximum free flow capacity
+  TFlt m_k_c; //maximum free flow density
+  TFlt m_unit_time;
+
+  TFlt get_flow_from_density(TFlt density);
+  TFlt get_demand();
+};
+
+
+
+
 #endif

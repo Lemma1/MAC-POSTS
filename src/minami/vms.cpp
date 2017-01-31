@@ -139,11 +139,11 @@ int generate_vms_instructions(std::string file_name, MNM_Vms_Factory* vms_factor
     MNM_Link_Vms *_vms = _map_it.second;
     _link = link_factory -> get_link(_vms -> m_detour_link_ID);
     if (_link -> m_ffs < TFlt(60.0 * 1600.0 / 3600.0)){
-      _info = std::string("Congestion ahead, take next exit to link ") + std::to_string(_vms -> m_detour_link_ID) + "\n";
+      _info = std::string("Congestion ahead, take next exit to link ") + std::to_string(_vms -> m_detour_link_ID) + "(The suggestion should be paired with DMS on the arterials guiding drivers).\n";
     }
     else{
       if (_link -> get_link_tt() > _link -> m_length / _link -> m_ffs){
-        _info = std::string("Congestion ahead, drive with care!\n");
+        _info = std::string("Congestion ahead, ") + std::to_string(static_cast<int>(_link -> get_link_tt()/60)) + std::string(" minutes to get to next exit.\n");
       }
       else{
         _info = std::string("Drive with care!\n");

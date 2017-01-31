@@ -336,7 +336,7 @@ MNM_Dlink_Pq::MNM_Dlink_Pq(   TInt ID,
   m_lane_flow_cap = lane_flow_cap;
   m_flow_scalar = flow_scalar;
   m_hold_cap = m_lane_hold_cap * TFlt(number_of_lane) * m_length;
-  m_max_stamp = TInt(floor(m_length/(m_ffs * unit_time)));
+  m_max_stamp = MNM_Ults::round(m_length/(m_ffs * unit_time));
   m_veh_queue = std::unordered_map<MNM_Veh*, TInt>();
   m_volume = TInt(0);
 }
@@ -353,14 +353,14 @@ TFlt MNM_Dlink_Pq::get_link_supply()
 }
 
 int MNM_Dlink_Pq::clear_incoming_array() {
-  TInt _num_veh_tomove = TInt(m_incoming_array.size()) < TInt(get_link_supply() * m_flow_scalar)
-                      ? TInt(m_incoming_array.size()) : TInt(get_link_supply() * m_flow_scalar);
+  TInt _num_veh_tomove = std::min(TInt(m_incoming_array.size()), TInt(get_link_supply() * m_flow_scalar));
   MNM_Veh *_veh;
   for (int i=0; i < _num_veh_tomove; ++i) {
     _veh = m_incoming_array.front();
     m_incoming_array.pop_front();
     m_veh_queue.insert(std::pair<MNM_Veh*, TInt>(_veh, TInt(0)));
   }
+  m_volume = TInt(m_finished_array.size() + m_veh_queue.size());
   // move_veh_queue(&m_incoming_array, , m_incoming_array.size());
 
   // m_cell_array[0] -> m_volume = m_cell_array[0] ->m_veh_queue.size();
@@ -379,17 +379,19 @@ int MNM_Dlink_Pq::evolve(TInt timestamp)
   std::unordered_map<MNM_Veh*, TInt>::iterator _que_it = m_veh_queue.begin();
   while (_que_it != m_veh_queue.end()) {
     if (_que_it -> second >= m_max_stamp) {
+      printf("PUshing!!!\n");
       m_finished_array.push_back(_que_it -> first);
       _que_it = m_veh_queue.erase(_que_it); //c++ 11
     }
     else {
+      printf("Moving veh!!!\n");
       _que_it -> second += 1;
-      _que_it++;
+      _que_it ++;
     }
   }
 
   /* volume */
-  m_volume = TInt(m_finished_array.size() + m_veh_queue.size());
+  // m_volume = TInt(m_finished_array.size() + m_veh_queue.size());
 
   return 0;
 }
@@ -425,3 +427,139 @@ TFlt MNM_Dlink_Pq::get_link_tt()
 
 
 
+/**************************************************************************
+                          Link Queue
+**************************************************************************/
+MNM_Dlink_Lq::MNM_Dlink_Lq(   TInt ID,
+                              TFlt lane_hold_cap, 
+                              TFlt lane_flow_cap, 
+                              TInt number_of_lane,
+                              TFlt length,
+                              TFlt ffs,
+                              TFlt unit_time,
+                              TFlt flow_scalar)
+  : MNM_Dlink::MNM_Dlink ( ID, number_of_lane, length, ffs )
+{
+  m_lane_hold_cap = lane_hold_cap;
+  m_lane_flow_cap = lane_flow_cap;
+  m_flow_scalar = flow_scalar;
+  m_hold_cap = m_lane_hold_cap * TFlt(number_of_lane) * m_length;
+  m_veh_queue = std::deque<MNM_Veh*>();
+  m_volume = TInt(0);
+  m_C = m_lane_flow_cap * TFlt(m_number_of_lane);
+  m_k_c = m_lane_flow_cap / m_ffs * TFlt(m_number_of_lane);
+  m_unit_time = unit_time;
+}
+
+MNM_Dlink_Lq::~MNM_Dlink_Lq()
+{
+  m_veh_queue.clear();
+}
+
+TFlt MNM_Dlink_Lq::get_link_supply()
+{
+  TFlt _cur_density = get_link_flow() / m_length;
+  return  _cur_density > m_k_c ? 
+          TFlt(get_flow_from_density(_cur_density) * m_unit_time)
+          : TFlt(m_C * m_unit_time);
+}
+
+int MNM_Dlink_Lq::clear_incoming_array() {
+  if (TInt(m_incoming_array.size()) > TInt(get_link_supply() * m_flow_scalar)){
+    printf("Error in MNM_Dlink_Lq::clear_incoming_array()\n");
+    exit(-1);
+  }
+  move_veh_queue(&m_incoming_array, &m_veh_queue, m_incoming_array.size());
+
+  m_volume = TInt(m_finished_array.size() + m_veh_queue.size());
+  return 0;
+}
+
+void MNM_Dlink_Lq::print_info()
+{
+  printf("Link Dynamic model: Link Queue\n");
+  printf("Real volume in the link: %.4f\n", (float)(m_volume/m_flow_scalar));
+  printf("Finished real volume in the link: %.2f\n", (float)(TFlt(m_finished_array.size())/m_flow_scalar));
+}
+
+int MNM_Dlink_Lq::evolve(TInt timestamp)
+{
+  TFlt _demand = get_demand();
+  if (_demand < TFlt(m_finished_array.size()) / m_flow_scalar){
+    // TInt _veh_to_reduce = TInt(m_finished_array.size()) - TInt(_demand / m_flow_scalar);
+    // _veh_to_reduce = TNM_Ults::min(_veh_to_reduce, TInt(m_finished_array.size()));
+    // for (size_t i=0; i<= _veh_to_reduce; ++i){
+    //   m_finished_array
+    // }
+    printf("LQ:Not updated!\n");
+  }
+  else {
+    printf("LQ: updated!\n");
+    TInt _veh_to_move = MNM_Ults::round(_demand * m_flow_scalar) - TInt(m_finished_array.size());
+    printf("demand %f, Veh queue size %d, finished size %d, to move %d \n", (float) _demand(), (int) m_veh_queue.size(), (int)m_finished_array.size(), _veh_to_move());
+
+    _veh_to_move = std::min(_veh_to_move, TInt(m_veh_queue.size()));
+    MNM_Veh *_veh;
+    for (int i=0; i< _veh_to_move; ++i){
+      _veh = m_veh_queue.front();
+      m_finished_array.push_back(_veh);
+      m_veh_queue.pop_front();
+    }
+  }
+  return 0;
+}
+
+TFlt MNM_Dlink_Lq::get_link_flow()
+{
+  return TFlt(m_volume) / m_flow_scalar;
+}
+
+
+TFlt MNM_Dlink_Lq::get_link_tt()
+{
+  TFlt _cost, _spd;
+  TFlt _rho  = get_link_flow()/m_number_of_lane/m_length;// get the density in veh/mile
+  TFlt _rhoj = m_lane_hold_cap; //get the jam density
+  TFlt _rhok = m_lane_flow_cap/m_ffs; //get the critical density
+  //  if (abs(rho - rhok) <= 0.0001) cost = POS_INF_INT;
+  if (_rho >= _rhoj) {
+    _cost = MNM_Ults::max_link_cost(); //sean: i think we should use rhoj, not rhok
+  } 
+  else {
+    if (_rho <= _rhok) {
+      _spd = m_ffs;
+    }
+    else {
+      _spd = MNM_Ults::max(DBL_EPSILON * m_ffs, m_lane_flow_cap *(_rhoj - _rho)/((_rhoj - _rhok)*_rho));
+    }
+    _cost = m_length/_spd;
+  } 
+  return _cost;
+}
+
+TFlt MNM_Dlink_Lq::get_flow_from_density(TFlt density)
+{
+  TFlt _flow;
+  if (density < m_k_c){
+    _flow = m_ffs * density;
+  }
+  else {
+    TFlt _w = m_lane_flow_cap / (m_lane_hold_cap - m_k_c);
+    _flow = _w * density;
+  }
+  return _flow; 
+}
+
+
+TFlt MNM_Dlink_Lq::get_demand()
+{
+  TFlt _density = get_link_flow() / m_length;
+  TFlt _demand;
+  if (_density < m_k_c){
+    _demand = get_flow_from_density(get_link_flow()/m_length);
+  }
+  else {
+    _demand = m_C;
+  }
+  return _demand * m_unit_time;
+}
