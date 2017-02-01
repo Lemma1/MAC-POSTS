@@ -1,6 +1,8 @@
 #include "dlink.h"
 #include "limits.h"
 
+#include <algorithm>
+
 MNM_Dlink::MNM_Dlink( TInt ID,
                       TInt number_of_lane,
                       TFlt length,
@@ -380,12 +382,10 @@ int MNM_Dlink_Pq::evolve(TInt timestamp)
   std::unordered_map<MNM_Veh*, TInt>::iterator _que_it = m_veh_queue.begin();
   while (_que_it != m_veh_queue.end()) {
     if (_que_it -> second >= m_max_stamp) {
-      printf("PUshing!!!\n");
       m_finished_array.push_back(_que_it -> first);
       _que_it = m_veh_queue.erase(_que_it); //c++ 11
     }
     else {
-      printf("Moving veh!!!\n");
       _que_it -> second += 1;
       _que_it ++;
     }
@@ -492,12 +492,10 @@ int MNM_Dlink_Lq::evolve(TInt timestamp)
     // for (size_t i=0; i<= _veh_to_reduce; ++i){
     //   m_finished_array
     // }
-    printf("LQ:Not updated!\n");
   }
   else {
-    printf("LQ: updated!\n");
     TInt _veh_to_move = MNM_Ults::round(_demand * m_flow_scalar) - TInt(m_finished_array.size());
-    printf("demand %f, Veh queue size %d, finished size %d, to move %d \n", (float) _demand(), (int) m_veh_queue.size(), (int)m_finished_array.size(), _veh_to_move());
+    // printf("demand %f, Veh queue size %d, finished size %d, to move %d \n", (float) _demand(), (int) m_veh_queue.size(), (int)m_finished_array.size(), _veh_to_move());
 
     _veh_to_move = std::min(_veh_to_move, TInt(m_veh_queue.size()));
     MNM_Veh *_veh;
@@ -564,3 +562,98 @@ TFlt MNM_Dlink_Lq::get_demand()
   }
   return _demand * m_unit_time;
 }
+
+
+/**************************************************************************
+                          Cumulative curve
+**************************************************************************/
+
+MNM_Cumulative_Curve::MNM_Cumulative_Curve()
+{
+  m_recorder =  std::vector<std::pair<TFlt, TFlt>>();
+}
+
+
+MNM_Cumulative_Curve::~MNM_Cumulative_Curve()
+{
+  m_recorder.clear();
+}
+
+
+bool pair_compare (std::pair<TFlt, TFlt> i,std::pair<TFlt, TFlt> j) 
+{
+  return (i.first<j.first); 
+}
+
+int MNM_Cumulative_Curve::arrange()
+{
+  std::sort(m_recorder.begin(), m_recorder.end(), pair_compare);
+  return 0;
+}
+
+int MNM_Cumulative_Curve::add_record(std::pair<TFlt, TFlt> r)
+{
+  m_recorder.push_back(r);
+  return 0;
+}
+
+int MNM_Cumulative_Curve::add_increment(std::pair<TFlt, TFlt> r)
+{
+  std::pair <TFlt, TFlt> _best = *std::max_element(m_recorder.begin(), m_recorder.end(), pair_compare);
+  r.second += _best.second;
+  printf("New r is <%lf, %lf>\n", r.first(), r.second());
+  m_recorder.push_back(r);
+  return 0;
+}
+
+
+TFlt MNM_Cumulative_Curve::get_result(TFlt time)
+{
+  arrange();
+  if (m_recorder.size() == 0){
+    printf("Unexpect operation in MNM_Cumulative_Curve::get_result\n");
+    exit(-1);
+  }
+  if (m_recorder.size() == 1){
+    return m_recorder[0].second;
+  }
+  if (m_recorder[0].first >= time){
+    return m_recorder[0].second;
+ }
+  for (size_t i=1; i<m_recorder.size(); ++i){
+    if (m_recorder[i].first >= time){
+      return m_recorder[i-1].second 
+          + (m_recorder[i].second - m_recorder[i-1].second)/(m_recorder[i].first - m_recorder[i-1].first)
+            * (time - m_recorder[i-1].first);
+    }
+  }
+  return m_recorder.back().second;
+}
+
+/**************************************************************************
+                          Link Transmission model
+**************************************************************************/
+// MNM_Dlink_Ltm::MNM_Dlink_Ltm(   TInt ID,
+//                               TFlt lane_hold_cap, 
+//                               TFlt lane_flow_cap, 
+//                               TInt number_of_lane,
+//                               TFlt length,
+//                               TFlt ffs,
+//                               TFlt unit_time,
+//                               TFlt flow_scalar)
+//   : MNM_Dlink::MNM_Dlink ( ID, number_of_lane, length, ffs )
+// {
+//   m_lane_hold_cap = lane_hold_cap;
+//   m_lane_flow_cap = lane_flow_cap;
+//   m_flow_scalar = flow_scalar;
+//   m_hold_cap = m_lane_hold_cap * TFlt(number_of_lane) * m_length;
+//   m_veh_queue = std::deque<MNM_Veh*>();
+//   m_volume = TInt(0);
+//   m_unit_time = unit_time;
+// }
+
+// MNM_Dlink_Ltm::~MNM_Dlink_Ltm()
+// {
+//   m_veh_queue.clear();
+// }
+
