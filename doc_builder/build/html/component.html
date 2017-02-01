@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Components &#8212; wiki 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="wiki 1.0 documentation" href="index.html" />
+    <link rel="next" title="Algorithms" href="algorithm.html" />
+    <link rel="prev" title="Getting Started" href="start.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="components">
+<h1>Components<a class="headerlink" href="#components" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>There are several components implemented, which form the essential parts of each traffic model in MINAMI. The components usually have a base class, and the acutal implementation will inherit the base class, thus ensuring the uniformness of the interface. Here is the list we implemented:</p>
+<table class="hlist"><tr><td><ul class="simple">
+<li>Vehicle</li>
+<li>Node</li>
+<li>Link</li>
+<li>Routing</li>
+</ul>
+</td></tr></table>
+</div>
+<div class="section" id="vehicle">
+<h2>Vehicle<a class="headerlink" href="#vehicle" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="_CPPv27MNM_Veh">
+<span id="MNM_Veh"></span><em class="property">class </em><code class="descclassname"></code><code class="descname">MNM_Veh</code><a class="headerlink" href="#_CPPv27MNM_Veh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Vehicle class represents the vehicle in real world, but it can be 1/100 of one actual vehicle, therefore it is able to simulate the continuous vehicle flow in flow theory.</p>
+<p>Current the vehicle class has in inheritance since we only implement the standard vehicle, the truck/bus will be implemented shortly. We describe the member variables in vehicle class as follows:</p>
+<dl class="member">
+<dt id="_CPPv26m_type">
+<span id="m_type__Vehicle_type"></span><a class="reference internal" href="utls.html#_CPPv212Vehicle_type" title="Vehicle_type">Vehicle_type</a> <code class="descclassname"></code><code class="descname">m_type</code><a class="headerlink" href="#_CPPv26m_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv214m_current_link">
+<span id="m_current_link__MNM_DlinkP"></span><a class="reference internal" href="#_CPPv29MNM_Dlink" title="MNM_Dlink">MNM_Dlink</a> *<code class="descclassname"></code><code class="descname">m_current_link</code><a class="headerlink" href="#_CPPv214m_current_link" title="Permalink to this definition">¶</a></dt>
+<dd><p>specify the current link of vehicle, initialized as NULL, will be the pointer to the dlink object.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv212m_start_time">
+<span id="m_start_time__TInt"></span>TInt <code class="descclassname"></code><code class="descname">m_start_time</code><a class="headerlink" href="#_CPPv212m_start_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>specify the realse time of the vehicle.</p>
+<dl class="member">
+<dt id="_CPPv213m_finish_time">
+<span id="m_finish_time__TInt"></span>TInt <code class="descclassname"></code><code class="descname">m_finish_time</code><a class="headerlink" href="#_CPPv213m_finish_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>specify the finish time of the vehicle, if not finished then set it as -1.</p>
+<dl class="member">
+<dt id="_CPPv211m_next_link">
+<span id="m_next_link__MNM_DlinkP"></span><a class="reference internal" href="#_CPPv29MNM_Dlink" title="MNM_Dlink">MNM_Dlink</a> *<code class="descclassname"></code><code class="descname">m_next_link</code><a class="headerlink" href="#_CPPv211m_next_link" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>determined by the routing model and used by the node model.</p>
+<dl class="member">
+<dt id="_CPPv26m_dest">
+<span id="m_dest__MNM_DestinationP"></span>MNM_Destination *<code class="descclassname"></code><code class="descname">m_dest</code><a class="headerlink" href="#_CPPv26m_dest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>the destination of the vehicle, determined when the vehicle is released.</p>
+<dl class="member">
+<dt id="_CPPv28m_origin">
+<span id="m_origin__MNM_OriginP"></span>MNM_Origin *<code class="descclassname"></code><code class="descname">m_origin</code><a class="headerlink" href="#_CPPv28m_origin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>the destination of the vehicle, determined when the vehicle is released.</p>
+</div>
+<div class="section" id="node">
+<h2>Node<a class="headerlink" href="#node" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="_CPPv29MNM_Dnode">
+<span id="MNM_Dnode"></span><em class="property">class </em><code class="descclassname"></code><code class="descname">MNM_Dnode</code><a class="headerlink" href="#_CPPv29MNM_Dnode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The node model will manage the vehicle movement, the node model is only responsible for the vehicles&#8217; merging/diverging behaviors, the path of each vehicle is determined by the routing model.</p>
+<dl class="member">
+<dt id="_CPPv29m_node_ID">
+<span id="m_node_ID__TInt"></span>TInt <code class="descclassname"></code><code class="descname">m_node_ID</code><a class="headerlink" href="#_CPPv29m_node_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>node ID is used to identify the node.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv216m_out_link_array">
+<span id="m_out_link_array__std::vector:MNM_DlinkP:"></span>std::vector&lt;<a class="reference internal" href="#_CPPv29MNM_Dlink" title="MNM_Dlink">MNM_Dlink</a> *&gt; <code class="descclassname"></code><code class="descname">m_out_link_array</code><a class="headerlink" href="#_CPPv216m_out_link_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>contains the pointers for the in links, determined when hooking up the node and link.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv215m_in_link_array">
+<span id="m_in_link_array__std::vector:MNM_DlinkP:"></span>std::vector&lt;<a class="reference internal" href="#_CPPv29MNM_Dlink" title="MNM_Dlink">MNM_Dlink</a> *&gt; <code class="descclassname"></code><code class="descname">m_in_link_array</code><a class="headerlink" href="#_CPPv215m_in_link_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>contains the pointers for the out links, determined when hooking up the node and link.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv213m_flow_scalar">
+<span id="m_flow_scalar__TFlt"></span>TFlt <code class="descclassname"></code><code class="descname">m_flow_scalar</code><a class="headerlink" href="#_CPPv213m_flow_scalar" title="Permalink to this definition">¶</a></dt>
+<dd><p>specify the quantity of one vehicle object, 2 means two <a class="reference internal" href="#_CPPv27MNM_Veh" title="MNM_Veh"><code class="xref cpp cpp-class docutils literal"><span class="pre">MNM_Veh</span></code></a> objects equal one actual vehicle.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="link">
+<h2>Link<a class="headerlink" href="#link" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="_CPPv29MNM_Dlink">
+<span id="MNM_Dlink"></span><em class="property">class </em><code class="descclassname"></code><code class="descname">MNM_Dlink</code><a class="headerlink" href="#_CPPv29MNM_Dlink" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv29m_link_ID">
+<span id="m_link_ID__TInt"></span>TInt <code class="descclassname"></code><code class="descname">m_link_ID</code><a class="headerlink" href="#_CPPv29m_link_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>link ID is used to identify the link</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv211m_from_node">
+<span id="m_from_node__MNM_DnodeP"></span><a class="reference internal" href="#_CPPv29MNM_Dnode" title="MNM_Dnode">MNM_Dnode</a> *<code class="descclassname"></code><code class="descname">m_from_node</code><a class="headerlink" href="#_CPPv211m_from_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>the tail of the directed link, determined when hooking up</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv29m_to_node">
+<span id="m_to_node__MNM_DnodeP"></span><a class="reference internal" href="#_CPPv29MNM_Dnode" title="MNM_Dnode">MNM_Dnode</a> *<code class="descclassname"></code><code class="descname">m_to_node</code><a class="headerlink" href="#_CPPv29m_to_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>the head of the directed link, determined when hooking up</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv216m_number_of_lane">
+<span id="m_number_of_lane__TInt"></span>TInt <code class="descclassname"></code><code class="descname">m_number_of_lane</code><a class="headerlink" href="#_CPPv216m_number_of_lane" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of the lane in one direction</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv28m_length">
+<span id="m_length__TFlt"></span>TFlt <code class="descclassname"></code><code class="descname">m_length</code><a class="headerlink" href="#_CPPv28m_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>lenght of the link, unit: meter</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv25m_ffs">
+<span id="m_ffs__TFlt"></span>TFlt <code class="descclassname"></code><code class="descname">m_ffs</code><a class="headerlink" href="#_CPPv25m_ffs" title="Permalink to this definition">¶</a></dt>
+<dd><p>free flow speed, unit: meter/second</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv216m_finished_array">
+<span id="m_finished_array__std::deque:MNM_VehP:"></span>std::deque&lt;<a class="reference internal" href="#_CPPv27MNM_Veh" title="MNM_Veh">MNM_Veh</a> *&gt; <code class="descclassname"></code><code class="descname">m_finished_array</code><a class="headerlink" href="#_CPPv216m_finished_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>after the loading, the finished vehicle will be pushed in the the finished array, and node model will take care of putting them to next link.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv216m_incoming_array">
+<span id="m_incoming_array__std::deque:MNM_VehP:"></span>std::deque&lt;<a class="reference internal" href="#_CPPv27MNM_Veh" title="MNM_Veh">MNM_Veh</a> *&gt; <code class="descclassname"></code><code class="descname">m_incoming_array</code><a class="headerlink" href="#_CPPv216m_incoming_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>before the loading, the incoming vehicles are stored here, and we need to clear the incoming array before loading.</p>
+</dd></dl>
+
+<p>If you want to see more detailed information for each implementation.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference external" href="comp_link.html">Implementation of different link model</a></p>
+</div>
+</div>
+<div class="section" id="routing">
+<h2>Routing<a class="headerlink" href="#routing" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="_CPPv211MNM_Routing">
+<span id="MNM_Routing"></span><em class="property">class </em><code class="descclassname"></code><code class="descname">MNM_Routing</code><a class="headerlink" href="#_CPPv211MNM_Routing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The routing class manages the paths of vehicles, it is the crutial part of the dynamic traffic assignment model. In our implementation, the routing model will take the network statistics as input and compute the routing for <em>all finished vehicles on each link</em>. Therefore the routing take place after the link loading but bofore the node loading.</p>
+<div class="toctree-wrapper compound">
+</div>
+<ul class="simple">
+<li><a class="reference external" href="index.html">Home</a></li>
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Components</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#vehicle">Vehicle</a></li>
+<li><a class="reference internal" href="#node">Node</a></li>
+<li><a class="reference internal" href="#link">Link</a></li>
+<li><a class="reference internal" href="#routing">Routing</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="start.html" title="previous chapter">Getting Started</a></li>
+      <li>Next: <a href="algorithm.html" title="next chapter">Algorithms</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/component.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Wei Ma.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/component.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
