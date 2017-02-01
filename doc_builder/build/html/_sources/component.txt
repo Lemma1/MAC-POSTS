@@ -51,7 +51,6 @@ the destination of the vehicle, determined when the vehicle is released.
 the destination of the vehicle, determined when the vehicle is released.
 
 
-
 Node
 ----------
 .. cpp:class:: MNM_Dnode 
@@ -116,8 +115,10 @@ Link
 
 If you want to see more detailed information for each implementation.
 
-.. note::
-  `Implementation of different link model <comp_link.html>`_
+.. toctree::
+   :maxdepth: 2
+
+   comp_link
 
 Routing
 ----------

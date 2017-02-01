@@ -30,21 +30,32 @@ The implementation scheme for PQ is: compute the maximum time stamp for each lin
 
 The supply is simply the capacity of the link, the link can hold infinitely many vehicles.
 
+.. seealso::
 
+  `Modelling network flow with and without link interactions: the cases of point queue, spatial queue and cell transmission model <http://www.tandfonline.com/doi/full/10.1080/21680566.2013.785921>`_
 
 Cell Transmission Model
 ------------------------
 Different from PQ, CTM is able to model the shock wave evolution.
 
 
+.. seealso::
+
+  `The cell transmission model: A dynamic representation of highway traffic consistent with the hydrodynamic theory <http://www.sciencedirect.com/science/article/pii/0191261594900027>`_
 
 Link Queue Model
 ------------------------
-
+.. seealso::
+  
+  `A link queue model of network traffic flow <https://arxiv.org/abs/1209.2361>`_
 
 Link Transmission Model
 -------------------------
 
+.. seealso::
+  
+  `The Link Transmission Model for Dynamic Network Loading <http://www.mech.kuleuven.be/cib/verkeer/dwn/pub/P2007A.pdf>`_
+  
 .. toctree::
    :maxdepth: 1
 
