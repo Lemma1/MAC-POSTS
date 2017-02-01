@@ -339,6 +339,7 @@ MNM_Dlink_Pq::MNM_Dlink_Pq(   TInt ID,
   m_max_stamp = MNM_Ults::round(m_length/(m_ffs * unit_time));
   m_veh_queue = std::unordered_map<MNM_Veh*, TInt>();
   m_volume = TInt(0);
+  m_unit_time = unit_time;
 }
 
 
@@ -349,7 +350,7 @@ MNM_Dlink_Pq::~MNM_Dlink_Pq()
 
 TFlt MNM_Dlink_Pq::get_link_supply()
 {
-  return m_hold_cap;
+  return m_lane_flow_cap * TFlt(m_number_of_lane) * m_unit_time;
 }
 
 int MNM_Dlink_Pq::clear_incoming_array() {
