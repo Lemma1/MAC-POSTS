@@ -217,6 +217,11 @@ public:
   TFlt m_flow_scalar;
   TFlt m_hold_cap;
   TFlt m_unit_time;
+  TInt m_current_timestamp; //used only in clear incoming array
+  TFlt m_w;
+  TFlt m_previous_finished_flow;
+
+  TFlt get_demand();
 };
 
 
