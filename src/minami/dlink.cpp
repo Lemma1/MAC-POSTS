@@ -602,9 +602,13 @@ int MNM_Cumulative_Curve::add_record(std::pair<TFlt, TFlt> r)
 
 int MNM_Cumulative_Curve::add_increment(std::pair<TFlt, TFlt> r)
 {
+  if (m_recorder.size() == 0){
+    add_record(r);
+    return 0;
+  }
   std::pair <TFlt, TFlt> _best = *std::max_element(m_recorder.begin(), m_recorder.end(), pair_compare);
   r.second += _best.second;
-  printf("New r is <%lf, %lf>\n", r.first(), r.second());
+  // printf("New r is <%lf, %lf>\n", r.first(), r.second());
   m_recorder.push_back(r);
   return 0;
 }
@@ -702,6 +706,7 @@ void MNM_Dlink_Ltm::print_info()
 
 
 int MNM_Dlink_Ltm::clear_incoming_array() {
+  // printf("MNM_Dlink_Ltm::clear_incoming_array\n");
   if (TInt(m_incoming_array.size()) > TInt(get_link_supply() * m_flow_scalar)){
     printf("Error in MNM_Dlink_Ltm::clear_incoming_array()\n");
     exit(-1);
@@ -710,11 +715,13 @@ int MNM_Dlink_Ltm::clear_incoming_array() {
   move_veh_queue(&m_incoming_array, &m_veh_queue, m_incoming_array.size());
 
   m_volume = TInt(m_finished_array.size() + m_veh_queue.size());
+  // printf("Finished clear\n");
   return 0;
 }
 
 TFlt MNM_Dlink_Ltm::get_link_supply()
 {
+  // printf("MNM_Dlink_Ltm::get_link_supply\n");
   TFlt _recv = m_N_out.get_result(TFlt(m_current_timestamp * m_unit_time + m_unit_time) - m_length / m_w)
                    + m_hold_cap
                    - m_N_in.get_result(TFlt(m_current_timestamp));
@@ -723,13 +730,18 @@ TFlt MNM_Dlink_Ltm::get_link_supply()
 
 int MNM_Dlink_Ltm::evolve(TInt timestamp)
 {
+  // printf("MNM_Dlink_Ltm::evolve\n");
   TFlt _demand = get_demand();
   MNM_Veh *_veh;
   if (_demand < TFlt(m_finished_array.size()) / m_flow_scalar){
     TInt _veh_to_reduce = TInt(m_finished_array.size()) - TInt(_demand * m_flow_scalar);
     _veh_to_reduce = std::min(_veh_to_reduce, TInt(m_finished_array.size()));
-    for (int i=0; i<= _veh_to_reduce; ++i){
+    for (int i=0; i < _veh_to_reduce; ++i){
       _veh = m_finished_array.back();
+      if (_veh == NULL){
+        printf("Error in MNM_Dlink_Ltm::evolve -> not enough in finish\n");
+        exit(-1);
+      }
       m_veh_queue.push_front(_veh);
       m_finished_array.pop_back();
     }
@@ -742,17 +754,23 @@ int MNM_Dlink_Ltm::evolve(TInt timestamp)
 
     for (int i=0; i< _veh_to_move; ++i){
       _veh = m_veh_queue.front();
+      if (_veh == NULL){
+        printf("Error in MNM_Dlink_Ltm::evolve -> not enough in veh_queue\n");
+        exit(-1);
+      }      
       m_finished_array.push_back(_veh);
       m_veh_queue.pop_front();
     }
   }
 
   m_current_timestamp += 1;
+  m_previous_finished_flow = TFlt(m_finished_array.size()) / m_flow_scalar;
   return 0;
 }
 
 TFlt MNM_Dlink_Ltm::get_demand()
 {
+  // printf("MNM_Dlink_Ltm::get_demand\n");
   TFlt _real_finished_flow = m_previous_finished_flow - TFlt(m_finished_array.size()) / m_flow_scalar;
   m_N_out.add_increment(std::pair<TFlt, TFlt>(TFlt(m_current_timestamp * m_unit_time), _real_finished_flow));
   TFlt _send = m_N_in.get_result(TFlt(m_current_timestamp * m_unit_time + m_unit_time) - m_length / m_ffs)

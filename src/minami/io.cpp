@@ -120,6 +120,11 @@ int MNM_IO::build_link_factory(std::string file_folder, MNM_ConfReader *conf_rea
                                     _length, _ffs, _unit_time, _flow_scalar);
           continue;
         }
+        if (_type =="LTM"){
+          link_factory -> make_link(_link_ID, MNM_TYPE_LTM, _lane_hold_cap, _lane_flow_cap, _number_of_lane, 
+                                    _length, _ffs, _unit_time, _flow_scalar);
+          continue;
+        }
         printf("Wrong link type, %s\n", _type.c_str());
         exit(-1);
       }

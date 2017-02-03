@@ -115,6 +115,9 @@ MNM_Dlink *MNM_Link_Factory::make_link( TInt ID,
     case MNM_TYPE_LQ:
       _link = new MNM_Dlink_Lq(ID, lane_hold_cap, lane_flow_cap, number_of_lane, length, ffs, unit_time, flow_scalar);
       break;
+    case MNM_TYPE_LTM:
+      _link = new MNM_Dlink_Ltm(ID, lane_hold_cap, lane_flow_cap, number_of_lane, length, ffs, unit_time, flow_scalar);
+      break;
     default:
       printf("Wrong link type.\n");
       exit(-1);
