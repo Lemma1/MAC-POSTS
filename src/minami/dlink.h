@@ -14,6 +14,23 @@
 class MNM_Veh;
 class MNM_Dnode;
 
+/**************************************************************************
+                          Cumulative curve
+**************************************************************************/
+class MNM_Cumulative_Curve
+{
+public:
+  MNM_Cumulative_Curve();
+  ~MNM_Cumulative_Curve();
+  std::vector<std::pair<TFlt, TFlt>> m_recorder;
+  int add_record(std::pair<TFlt, TFlt> r);
+  int add_increment(std::pair<TFlt, TFlt> r);
+  TFlt get_result(TFlt time);
+private:
+  int arrange();
+};
+
+
 class MNM_Dlink
 {
 public:
@@ -29,6 +46,8 @@ public:
   int hook_up_node(MNM_Dnode *from, MNM_Dnode *to);
   TFlt virtual get_link_flow() {return TFlt(0);};
   TFlt virtual get_link_tt() {return TFlt(0);};
+
+  int install_cumulative_curve();
 // protected:
   TInt m_link_ID;
   MNM_Dnode *m_from_node;
@@ -38,6 +57,8 @@ public:
   TFlt m_ffs;
   std::deque<MNM_Veh *> m_finished_array;
   std::deque<MNM_Veh *> m_incoming_array;
+  MNM_Cumulative_Curve *m_N_in;
+  MNM_Cumulative_Curve *m_N_out;
 
 protected:
   int move_veh_queue(std::deque<MNM_Veh*> *from_queue, std::deque<MNM_Veh*> *to_queue, TInt number_tomove);
@@ -167,24 +188,6 @@ public:
 
 
 
-
-/**************************************************************************
-                          Cumulative curve
-**************************************************************************/
-class MNM_Cumulative_Curve
-{
-public:
-  MNM_Cumulative_Curve();
-  ~MNM_Cumulative_Curve();
-  std::vector<std::pair<TFlt, TFlt>> m_recorder;
-  int add_record(std::pair<TFlt, TFlt> r);
-  int add_increment(std::pair<TFlt, TFlt> r);
-  TFlt get_result(TFlt time);
-private:
-  int arrange();
-};
-
-
 /**************************************************************************
                           Link Transmission model
 **************************************************************************/
@@ -209,8 +212,8 @@ public:
   TFlt virtual get_link_tt() override;
 // private:
   std::deque<MNM_Veh*> m_veh_queue;
-  MNM_Cumulative_Curve m_N_in;
-  MNM_Cumulative_Curve m_N_out;
+  MNM_Cumulative_Curve m_N_in2;
+  MNM_Cumulative_Curve m_N_out2;
   TInt m_volume; //vehicle number, without the flow scalar
   TFlt m_lane_hold_cap;
   TFlt m_lane_flow_cap;

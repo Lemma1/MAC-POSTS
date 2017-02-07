@@ -63,6 +63,9 @@ int MNM_DMOND::evolve(TInt timestamp)
   MNM_Veh *_veh;
   for (unsigned i=0; i<m_out_link_array.size(); ++i){
     _link = m_out_link_array[i];
+    if (_link -> m_N_in != NULL) {
+      _link -> m_N_in -> add_increment(std::pair<TFlt, TFlt>(TFlt(timestamp + 1), TFlt(m_out_volume.find(_link) -> second)/m_flow_scalar));
+    }
     if (m_in_veh_queue.size() != 0){
         // printf("In node %d, %d veh to move to link %d, total veh %d \n", m_node_ID, m_out_volume.find(_link) -> second, _link -> m_link_ID, m_in_veh_queue.size());  
     }
@@ -150,6 +153,9 @@ int MNM_DMDND::evolve(TInt timestamp)
   for (size_t i = 0; i<m_in_link_array.size(); ++i){
     _link = m_in_link_array[i];
     _size = _link->m_finished_array.size();
+    if (_link -> m_N_out != NULL) {
+      _link -> m_N_out -> add_increment(std::pair<TFlt, TFlt>(TFlt(timestamp + 1), TFlt(_size)/m_flow_scalar));
+    }
     for (size_t j=0; j<_size; ++j){
       _veh = _link->m_finished_array.front();
       if (_veh -> get_next_link() != NULL){
@@ -285,6 +291,43 @@ int MNM_Dnode_Inout::round_flow_to_vehicle()
   return 0;
 }
 
+
+int MNM_Dnode_Inout::record_cumulative_curve(TInt timestamp)
+{
+  TInt _num_to_move;
+  TInt _temp_sum;
+  MNM_Dlink *_in_link, *_out_link;
+  size_t _offset = m_out_link_array.size();
+
+  for (size_t j=0; j<m_out_link_array.size(); ++j){
+    _temp_sum = 0;
+    _out_link = m_out_link_array[j];
+    for (size_t i=0; i<m_in_link_array.size(); ++i) {
+      _in_link = m_in_link_array[i];
+      _num_to_move = m_veh_tomove[i * _offset + j];
+      _temp_sum += _num_to_move;
+    }
+    if (_out_link -> m_N_out != NULL) {
+      _out_link -> m_N_out -> add_increment(std::pair<TFlt, TFlt>(TFlt(timestamp+1), TFlt(_temp_sum)/m_flow_scalar));
+    }
+  }
+
+  for (size_t i=0; i<m_in_link_array.size(); ++i){
+    _temp_sum = 0;
+    _in_link = m_in_link_array[i];
+    for (size_t j=0; j<m_out_link_array.size(); ++j) {
+      _out_link = m_out_link_array[j];
+      _num_to_move = m_veh_tomove[i * _offset + j];
+      _temp_sum += _num_to_move;
+    }
+    if (_in_link -> m_N_in != NULL) {
+      _in_link -> m_N_in -> add_increment(std::pair<TFlt, TFlt>(TFlt(timestamp+1), TFlt(_temp_sum)/m_flow_scalar));
+    }
+  }
+  return 0;
+}
+
+
 int MNM_Dnode_Inout::move_vehicle()
 {
   // printf("MNM_Dnode_Inout::move_vehicle\n");
@@ -292,6 +335,7 @@ int MNM_Dnode_Inout::move_vehicle()
   MNM_Veh *_veh;
   size_t _offset = m_out_link_array.size();
   TInt _num_to_move;
+
   for (size_t j=0; j<m_out_link_array.size(); ++j){
     _out_link = m_out_link_array[j];
     for (size_t i=0; i<m_in_link_array.size(); ++i) {
@@ -373,6 +417,7 @@ int MNM_Dnode_Inout::evolve(TInt timestamp)
   // printf("3\n");
   round_flow_to_vehicle();
   // printf("4\n");
+  record_cumulative_curve(timestamp);
   move_vehicle();
   // printf("5\n");
   return 0;

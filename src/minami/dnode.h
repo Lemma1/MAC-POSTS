@@ -81,6 +81,7 @@ protected:
   int virtual compute_flow(){return 0;};
   int round_flow_to_vehicle();
   int move_vehicle();
+  int record_cumulative_curve(TInt timestamp);
   TFlt *m_demand; //2d array
   TFlt *m_supply; //1d array
   TFlt *m_veh_flow; //2d array

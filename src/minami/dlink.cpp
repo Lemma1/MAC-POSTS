@@ -29,12 +29,16 @@ MNM_Dlink::MNM_Dlink( TInt ID,
 
   m_finished_array = std::deque<MNM_Veh *>();
   m_incoming_array = std::deque<MNM_Veh *>();
+  m_N_in = NULL;
+  m_N_out = NULL;
 }
 
 MNM_Dlink::~MNM_Dlink()
 {
   m_finished_array.clear();
   m_incoming_array.clear();
+  if (m_N_out != NULL) delete m_N_out;
+  if (m_N_in != NULL) delete m_N_in;  
 }
 
 int MNM_Dlink::hook_up_node(MNM_Dnode *from, MNM_Dnode *to)
@@ -44,7 +48,14 @@ int MNM_Dlink::hook_up_node(MNM_Dnode *from, MNM_Dnode *to)
   return 0;
 }
 
-
+int MNM_Dlink::install_cumulative_curve()
+{
+  m_N_out = new MNM_Cumulative_Curve();
+  m_N_in = new MNM_Cumulative_Curve();
+  m_N_in -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
+  m_N_out -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
+  return 0;
+}
 
 
 int MNM_Dlink::move_veh_queue(std::deque<MNM_Veh*> *from_queue,
@@ -658,8 +669,8 @@ MNM_Dlink_Ltm::MNM_Dlink_Ltm(   TInt ID,
   m_current_timestamp = TInt(0);
   m_unit_time = unit_time;
   m_w = m_lane_flow_cap / (m_lane_hold_cap - m_lane_flow_cap / m_ffs);
-  m_N_in = MNM_Cumulative_Curve();
-  m_N_out = MNM_Cumulative_Curve();
+  m_N_in2 = MNM_Cumulative_Curve();
+  m_N_out2 = MNM_Cumulative_Curve();
   m_previous_finished_flow = TFlt(0);
 }
 
@@ -711,7 +722,7 @@ int MNM_Dlink_Ltm::clear_incoming_array() {
     printf("Error in MNM_Dlink_Ltm::clear_incoming_array()\n");
     exit(-1);
   }
-  m_N_in.add_increment(std::pair<TFlt, TFlt>(TFlt(m_current_timestamp * m_unit_time), TFlt(m_incoming_array.size())/m_flow_scalar));
+  m_N_in2.add_increment(std::pair<TFlt, TFlt>(TFlt(m_current_timestamp * m_unit_time), TFlt(m_incoming_array.size())/m_flow_scalar));
   move_veh_queue(&m_incoming_array, &m_veh_queue, m_incoming_array.size());
 
   m_volume = TInt(m_finished_array.size() + m_veh_queue.size());
@@ -722,9 +733,9 @@ int MNM_Dlink_Ltm::clear_incoming_array() {
 TFlt MNM_Dlink_Ltm::get_link_supply()
 {
   // printf("MNM_Dlink_Ltm::get_link_supply\n");
-  TFlt _recv = m_N_out.get_result(TFlt(m_current_timestamp * m_unit_time + m_unit_time) - m_length / m_w)
+  TFlt _recv = m_N_out2.get_result(TFlt(m_current_timestamp * m_unit_time + m_unit_time) - m_length / m_w)
                    + m_hold_cap
-                   - m_N_in.get_result(TFlt(m_current_timestamp));
+                   - m_N_in2.get_result(TFlt(m_current_timestamp));
   return MNM_Ults::min(_recv, m_lane_flow_cap * TFlt(m_number_of_lane) * m_unit_time);
 }
 
@@ -772,8 +783,8 @@ TFlt MNM_Dlink_Ltm::get_demand()
 {
   // printf("MNM_Dlink_Ltm::get_demand\n");
   TFlt _real_finished_flow = m_previous_finished_flow - TFlt(m_finished_array.size()) / m_flow_scalar;
-  m_N_out.add_increment(std::pair<TFlt, TFlt>(TFlt(m_current_timestamp * m_unit_time), _real_finished_flow));
-  TFlt _send = m_N_in.get_result(TFlt(m_current_timestamp * m_unit_time + m_unit_time) - m_length / m_ffs)
-               - m_N_out.get_result(TFlt(m_current_timestamp * m_unit_time));
+  m_N_out2.add_increment(std::pair<TFlt, TFlt>(TFlt(m_current_timestamp * m_unit_time), _real_finished_flow));
+  TFlt _send = m_N_in2.get_result(TFlt(m_current_timestamp * m_unit_time + m_unit_time) - m_length / m_ffs)
+               - m_N_out2.get_result(TFlt(m_current_timestamp * m_unit_time));
   return MNM_Ults::min(_send, m_lane_flow_cap * TFlt(m_number_of_lane) * m_unit_time);
 }
