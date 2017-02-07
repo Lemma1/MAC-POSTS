@@ -356,9 +356,9 @@ int MNM_Dnode_Inout::add_out_link(MNM_Dlink* out_link)
   return 0;
 }
 
-int MNM_Dnode_Inout::add_in_link(MNM_Dlink *link)
+int MNM_Dnode_Inout::add_in_link(MNM_Dlink *in_link)
 {
-  m_in_link_array.push_back(link);
+  m_in_link_array.push_back(in_link);
   return 0;
 }
 

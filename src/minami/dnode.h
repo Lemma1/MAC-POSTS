@@ -26,7 +26,7 @@ public:
   void virtual print_info(){};
   int virtual prepare_loading(){return 0;};
   int virtual add_out_link(MNM_Dlink* out_link){printf("Error!\n"); return 0;};
-  int virtual add_in_link(MNM_Dlink* int_link){printf("Error!\n"); return 0;};
+  int virtual add_in_link(MNM_Dlink* in_link){printf("Error!\n"); return 0;};
   std::vector<MNM_Dlink*> m_out_link_array;
   std::vector<MNM_Dlink*> m_in_link_array;
 protected:
@@ -75,7 +75,7 @@ public:
   void virtual print_info();
   int virtual prepare_loading() override;
   int virtual add_out_link(MNM_Dlink* out_link) override;
-  int virtual add_in_link(MNM_Dlink* int_link) override;
+  int virtual add_in_link(MNM_Dlink* in_link) override;
 protected:
   int prepare_supplyANDdemand();
   int virtual compute_flow(){return 0;};
