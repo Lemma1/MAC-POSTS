@@ -18,7 +18,7 @@ class MNM_IO
 {
 public:
   static int  build_node_factory(std::string file_folder, MNM_ConfReader *conf_reader, MNM_Node_Factory *node_factory);
-  static int  build_link_factory(std::string file_folder, MNM_ConfReader *conf_reader, MNM_Link_Factory *link_factory);
+  static int  build_link_factory(std::string file_folder, MNM_ConfReader *conf_reader, MNM_Link_Factory *link_factory, std::string file_name = "MNM_input_link");
   static int  build_od_factory(std::string file_folder, MNM_ConfReader *conf_reader, MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory);
   static int  build_od_factory(std::string file_folder, MNM_ConfReader *conf_reader, MNM_OD_Factory *od_factory);
   static int  hook_up_od_node(std::string file_folder, MNM_ConfReader *conf_reader, MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory);  
@@ -28,6 +28,7 @@ public:
   static int build_vms_facotory(std::string file_folder, PNEGraph graph, TInt num_vms, MNM_Vms_Factory *vms_factory);
   static int read_int_float(std::string file_name, std::unordered_map<TInt, TFlt>* reader);
   static int build_workzone_list(std::string file_folder, MNM_Workzone* workzone);
+  static int dump_cumulative_curve(std::string file_folder, MNM_Link_Factory *link_factory);
 
 private:
   static std::vector<std::string> split(const std::string &text, char sep);

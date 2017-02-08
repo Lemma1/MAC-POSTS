@@ -308,7 +308,7 @@ int MNM_Dnode_Inout::record_cumulative_curve(TInt timestamp)
       _temp_sum += _num_to_move;
     }
     if (_out_link -> m_N_out != NULL) {
-      _out_link -> m_N_out -> add_increment(std::pair<TFlt, TFlt>(TFlt(timestamp+1), TFlt(_temp_sum)/m_flow_scalar));
+      _out_link -> m_N_in -> add_increment(std::pair<TFlt, TFlt>(TFlt(timestamp+1), TFlt(_temp_sum)/m_flow_scalar));
     }
   }
 
@@ -321,7 +321,7 @@ int MNM_Dnode_Inout::record_cumulative_curve(TInt timestamp)
       _temp_sum += _num_to_move;
     }
     if (_in_link -> m_N_in != NULL) {
-      _in_link -> m_N_in -> add_increment(std::pair<TFlt, TFlt>(TFlt(timestamp+1), TFlt(_temp_sum)/m_flow_scalar));
+      _in_link -> m_N_out -> add_increment(std::pair<TFlt, TFlt>(TFlt(timestamp+1), TFlt(_temp_sum)/m_flow_scalar));
     }
   }
   return 0;

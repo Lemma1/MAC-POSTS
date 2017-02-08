@@ -647,6 +647,18 @@ TFlt MNM_Cumulative_Curve::get_result(TFlt time)
   return m_recorder.back().second;
 }
 
+
+std::string MNM_Cumulative_Curve::to_string()
+{
+  std::string _output = "";
+  arrange();
+  for (size_t i=0; i<m_recorder.size() - 1; ++i){
+    _output += std::to_string(m_recorder[i].first) + ":" + std::to_string(m_recorder[i].second) + ",";
+  }
+  _output += std::to_string(m_recorder[m_recorder.size() - 1].first) + ":" + std::to_string(m_recorder[m_recorder.size() - 1].second);
+  return _output;
+}
+
 /**************************************************************************
                           Link Transmission model
 **************************************************************************/

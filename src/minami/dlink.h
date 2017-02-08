@@ -26,6 +26,7 @@ public:
   int add_record(std::pair<TFlt, TFlt> r);
   int add_increment(std::pair<TFlt, TFlt> r);
   TFlt get_result(TFlt time);
+  std::string to_string();
 private:
   int arrange();
 };

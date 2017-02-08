@@ -25,7 +25,7 @@ public:
   int hook_up_node_and_link();
   int loading(bool verbose);
   int test();
-private:
+// private:
   bool finished_loading(int cur_int);
   int set_statistics();
   int set_routing();

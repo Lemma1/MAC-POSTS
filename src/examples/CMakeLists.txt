@@ -40,3 +40,7 @@ target_link_libraries (dta_response PUBLIC Snap g3log minami ${CMAKE_THREAD_INIT
 
 #add_executable (testCC test_cumulative_curve.cpp)
 #target_link_libraries (testCC PUBLIC Snap minami)
+
+
+add_executable (exp_link exp_link.cpp)
+target_link_libraries (exp_link PUBLIC Snap minami)

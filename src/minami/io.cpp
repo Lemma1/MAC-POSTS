@@ -58,10 +58,10 @@ int MNM_IO::build_node_factory(std::string file_folder, MNM_ConfReader *conf_rea
   return 0;
 }
 
-int MNM_IO::build_link_factory(std::string file_folder, MNM_ConfReader *conf_reader, MNM_Link_Factory *link_factory)
+int MNM_IO::build_link_factory(std::string file_folder, MNM_ConfReader *conf_reader, MNM_Link_Factory *link_factory, std::string file_name)
 {
   /* find file */
-  std::string _link_file_name = file_folder + "/MNM_input_link";
+  std::string _link_file_name = file_folder + "/" + file_name;
   std::ifstream _link_file;
   _link_file.open(_link_file_name, std::ios::in);
 
@@ -563,6 +563,29 @@ int MNM_IO::build_workzone_list(std::string file_folder, MNM_Workzone* workzone)
 
 }
 
+int MNM_IO::dump_cumulative_curve(std::string file_folder, MNM_Link_Factory *link_factory)
+{
+  /* find file */
+  std::string _cc_file_name = file_folder + "/cc_record";
+  std::ofstream _cc_file;
+  _cc_file.open(_cc_file_name, std::ios::out);  
+
+  MNM_Dlink *_link;
+  for (auto _link_it = link_factory -> m_link_map.begin(); _link_it != link_factory -> m_link_map.end(); _link_it++){
+    _link = _link_it -> second;
+    std::string _temp_s = std::to_string(_link -> m_link_ID) + ",";
+    if (_link -> m_N_in != NULL) {
+      std::string _temp_s_in = _temp_s + "in," + _link -> m_N_in -> to_string() + "\n";
+      _cc_file << _temp_s_in;
+    }
+    if (_link -> m_N_out != NULL) {
+      std::string _temp_s_out = _temp_s + "out," + _link -> m_N_out -> to_string() + "\n";
+      _cc_file << _temp_s_out;
+    }
+  }
+  _cc_file.close();
+  return 0;
+}
 
 std::vector<std::string> MNM_IO::split(const std::string &text, char sep) 
 {
