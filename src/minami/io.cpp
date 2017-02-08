@@ -37,6 +37,10 @@ int MNM_IO::build_node_factory(std::string file_folder, MNM_ConfReader *conf_rea
           node_factory -> make_node(_node_ID, MNM_TYPE_FWJ, _flow_scalar);
           continue;
         }
+        if (_type == "GRJ"){
+          node_factory -> make_node(_node_ID, MNM_TYPE_GRJ, _flow_scalar);
+          continue;
+        }
         if (_type =="DMOND"){
           node_factory -> make_node(_node_ID, MNM_TYPE_ORIGIN, _flow_scalar);
           continue;

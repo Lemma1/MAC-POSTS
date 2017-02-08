@@ -100,4 +100,22 @@ public:
   int virtual compute_flow() override;
 };
 
+/**************************************************************************
+                   General Road Junction node
+**************************************************************************/
+class MNM_Dnode_GRJ : public MNM_Dnode_Inout
+{
+public:
+  MNM_Dnode_GRJ(TInt ID, TFlt flow_scalar);
+  ~MNM_Dnode_GRJ();
+  void virtual print_info() override;
+  int virtual compute_flow() override;
+private:
+  TFlt get_theta();
+  int prepare_outflux();
+  TFlt *m_d_a; //1d array
+  TFlt *m_C_a; //1d array
+  template<typename T> std::vector<std::vector<T> > powerSet(const std::vector<T>& set);
+  std::vector<int> getOnLocations(int a);
+};
 #endif

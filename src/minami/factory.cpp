@@ -54,6 +54,9 @@ MNM_Dnode *MNM_Node_Factory::make_node(TInt ID, DNode_type node_type, TFlt flow_
     case MNM_TYPE_FWJ:
       _node = new MNM_Dnode_FWJ(ID, flow_scalar);
       break;
+    case MNM_TYPE_GRJ:
+      _node = new MNM_Dnode_GRJ(ID, flow_scalar);
+      break;
     case MNM_TYPE_ORIGIN:
       _node = new MNM_DMOND(ID, flow_scalar);
       break;

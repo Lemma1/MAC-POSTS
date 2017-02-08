@@ -249,13 +249,13 @@ int MNM_Dnode_Inout::prepare_supplyANDdemand()
   }
   // printf("Finished\n");
   /* calculated supply */
-  for (size_t i=0; i< m_out_link_array.size(); ++i){
-    _out_link = m_out_link_array[i];
+  for (size_t j=0; j< m_out_link_array.size(); ++j){
+    _out_link = m_out_link_array[j];
     // printf("Get link s\n");
     // printf("The out link is %d\n", _out_link -> m_link_ID);
-    m_supply[i] = _out_link -> get_link_supply();
+    m_supply[j] = _out_link -> get_link_supply();
     // printf(" get link s fin\n");
-    // printf("Link %d, supply is %.4f\n", _out_link -> m_link_ID, m_supply[i]);
+    // printf("Link %d, supply is %.4f\n", _out_link -> m_link_ID, m_supply[j]);
   } 
 
   return 0;
@@ -278,7 +278,7 @@ int MNM_Dnode_Inout::round_flow_to_vehicle()
       _to_move += m_veh_tomove[i * _offset + j];
       // printf("Rounding %d, %d the value %f to %d\n", i, j, m_veh_flow[i * _offset + j] * m_flow_scalar, m_veh_tomove[i * _offset + j]);
     }
-    // printf("Going to loop %d vs supply %f\n", _to_move, _out_link -> get_link_supply());
+    // printf("Going to loop %d vs supply %lf\n", _to_move, _out_link -> get_link_supply());
     while (TFlt(_to_move) > (_out_link -> get_link_supply() * m_flow_scalar)){
       _rand_idx = rand() % m_in_link_array.size();
       if (m_veh_tomove[_rand_idx * _offset + j] >= 1){
@@ -459,4 +459,129 @@ int MNM_Dnode_FWJ::compute_flow()
     }
   }
   return 0;
+}
+
+/**************************************************************************
+                   General Road Junction node
+**************************************************************************/
+MNM_Dnode_GRJ::MNM_Dnode_GRJ(TInt ID, TFlt flow_scalar)
+  : MNM_Dnode_Inout::MNM_Dnode_Inout(ID, flow_scalar)
+{
+  TInt _num_in = m_in_link_array.size();
+  m_d_a = (TFlt*) malloc(sizeof(TFlt) * _num_in);
+  memset(m_d_a, 0x0, sizeof(TFlt) * _num_in);
+  m_C_a = (TFlt*) malloc(sizeof(TFlt) * _num_in);
+  memset(m_C_a, 0x0, sizeof(TFlt) * _num_in);
+}
+
+MNM_Dnode_GRJ::~MNM_Dnode_GRJ()
+{
+  free(m_d_a);
+  free(m_C_a);
+}
+
+void MNM_Dnode_GRJ::print_info()
+{
+  ;
+}
+
+int MNM_Dnode_GRJ::compute_flow()
+{
+  TFlt _theta = get_theta();
+  size_t _offset = m_out_link_array.size();
+  TFlt _f_a;
+  for (size_t i=0; i< m_in_link_array.size(); ++i){
+    _f_a = MNM_Ults::min(m_d_a[i], _theta * m_C_a[i]);
+    // printf("f_a is %lf\n", _f_a);
+    for (size_t j=0; j< m_out_link_array.size(); ++j){
+      m_veh_flow[i * _offset + j] = _f_a * MNM_Ults::divide(m_demand[i * _offset + j], m_supply[j]);
+    }
+  }
+  return 0;
+}
+
+int MNM_Dnode_GRJ::prepare_outflux()
+{
+  MNM_Dlink *_link;
+  for (size_t i=0; i<m_in_link_array.size(); ++i){
+    _link = m_in_link_array[i];
+    m_d_a[i] = TFlt(_link -> m_finished_array.size()) / m_flow_scalar;
+    m_C_a[i] = MNM_Ults::max(m_d_a[i], _link -> get_link_supply());
+  }
+  return 0;
+}
+
+
+std::vector<int> MNM_Dnode_GRJ::getOnLocations(int a) 
+{
+  std::vector<int> result;
+  int place = 0;
+  while (a != 0) {
+    if (a & 1) {
+      result.push_back(place);
+    }
+    ++place;
+    a >>= 1;
+  }
+  return result;
+}
+
+template<typename T>
+std::vector<std::vector<T> > MNM_Dnode_GRJ::powerSet(const std::vector<T>& set) {
+  std::vector<std::vector<T> > result;
+  int numPowerSets = static_cast<int>(pow(2.0, static_cast<double>(set.size())));
+  for (int i = 0; i < numPowerSets; ++i) {
+    std::vector<int> onLocations = getOnLocations(i);
+    std::vector<T> subSet;
+    for (size_t j = 0; j < onLocations.size(); ++j) {
+      subSet.push_back(set.at(onLocations.at(j)));
+    }
+    result.push_back(subSet);
+  }
+  return result;
+}
+
+TFlt MNM_Dnode_GRJ::get_theta()
+{
+  prepare_outflux();
+  size_t _offset = m_out_link_array.size();
+  // part 1: max d_a/C_a
+  std::vector<TFlt> _temp1 = std::vector<TFlt>();
+  for (size_t i=0; i< m_in_link_array.size(); ++i){
+    _temp1.push_back(MNM_Ults::divide(m_d_a[i], m_C_a[i]));
+  }
+  TFlt _e1 = *max_element(_temp1.begin(), _temp1.end());
+
+  //part 2: min max
+  std::vector<TFlt> _temp2 = std::vector<TFlt>();
+  for (size_t j=0; j<m_out_link_array.size(); ++j){
+    std::vector<TFlt> _temp3 = std::vector<TFlt>();
+    std::vector<std::vector<MNM_Dlink*>> _pow = powerSet(m_in_link_array);
+    for (std::vector<MNM_Dlink*> v : _pow){
+      if (v.size() == 0) continue;
+      // for (MNM_Dlink *a : v){
+      //   printf("a -> m_link_ID is %d\n", a->m_link_ID());
+      // }
+      TFlt _up = TFlt(0);
+      TFlt _down = TFlt(0);
+      for (size_t i=0; i< m_in_link_array.size(); ++i){
+        if (std::find(v.begin(), v.end(), m_in_link_array[i]) != v.end()){
+          _down += m_C_a[i] * MNM_Ults::divide(m_demand[i * _offset + j], m_supply[j]);
+        }
+        else{
+          _up += m_d_a[i] * MNM_Ults::divide(m_demand[i * _offset + j], m_supply[j]);
+        }
+      }
+      // printf("for j is %d, the value of cal is %lf, s is %lf, up is %lf, down is %lf\n", 
+      //     j, (m_supply[j] - _up)/_down ,m_supply[j](), _up(), _down());
+      _temp3.push_back((m_supply[j] - _up)/_down);
+    }
+    _temp2.push_back(*max_element(_temp3.begin(), _temp3.end()));
+  }
+  TFlt _e2 = *min_element(_temp2.begin(), _temp2.end());
+
+  // printf("e1 is %lf, e2 is %lf\n", _e1(), _e2());
+  // total
+  TFlt _theta = MNM_Ults::min(_e1, _e2);
+  return _theta;
 }

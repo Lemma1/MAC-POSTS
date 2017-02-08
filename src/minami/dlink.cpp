@@ -748,7 +748,8 @@ TFlt MNM_Dlink_Ltm::get_link_supply()
   TFlt _recv = m_N_out2.get_result(TFlt(m_current_timestamp * m_unit_time + m_unit_time) - m_length / m_w)
                    + m_hold_cap
                    - m_N_in2.get_result(TFlt(m_current_timestamp));
-  return MNM_Ults::min(_recv, m_lane_flow_cap * TFlt(m_number_of_lane) * m_unit_time);
+  TFlt _res = MNM_Ults::min(_recv, m_lane_flow_cap * TFlt(m_number_of_lane) * m_unit_time);
+  return MNM_Ults::max(_res, TFlt(0));
 }
 
 int MNM_Dlink_Ltm::evolve(TInt timestamp)
