@@ -111,6 +111,7 @@ public:
   void virtual print_info() override;
   int virtual compute_flow() override;
 private:
+  std::vector<std::vector<MNM_Dlink*>> m_pow;
   TFlt get_theta();
   int prepare_outflux();
   TFlt *m_d_a; //1d array

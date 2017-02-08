@@ -543,6 +543,9 @@ std::vector<std::vector<T> > MNM_Dnode_GRJ::powerSet(const std::vector<T>& set) 
 
 TFlt MNM_Dnode_GRJ::get_theta()
 {
+  if (m_pow.size() == 0) {
+    m_pow = powerSet(m_in_link_array);
+  }
   prepare_outflux();
   size_t _offset = m_out_link_array.size();
   // part 1: max d_a/C_a
@@ -556,8 +559,8 @@ TFlt MNM_Dnode_GRJ::get_theta()
   std::vector<TFlt> _temp2 = std::vector<TFlt>();
   for (size_t j=0; j<m_out_link_array.size(); ++j){
     std::vector<TFlt> _temp3 = std::vector<TFlt>();
-    std::vector<std::vector<MNM_Dlink*>> _pow = powerSet(m_in_link_array);
-    for (std::vector<MNM_Dlink*> v : _pow){
+    
+    for (std::vector<MNM_Dlink*> v : m_pow){
       if (v.size() == 0) continue;
       // for (MNM_Dlink *a : v){
       //   printf("a -> m_link_ID is %d\n", a->m_link_ID());
