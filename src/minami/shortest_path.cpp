@@ -232,3 +232,36 @@ bool CompareCostDecendSort(MNM_Cost *lhs, MNM_Cost *rhs)
 {
   return lhs->m_cost < rhs->m_cost;
 }
+
+
+/*------------------------------------------------------------
+                          TDSP
+-------------------------------------------------------------*/
+int  MNM_Shortest_Path::all_to_one_TDSP(TInt dest_node_ID, 
+                        PNEGraph graph, std::unordered_map<TInt, TFlt*>& cost_map,
+                        std::unordered_map<TInt, TInt*> &output_map, TInt num_interval)
+{
+  return 0;
+}
+
+bool MNM_Shortest_Path::is_FIFO(PNEGraph graph, std::unordered_map<TInt, TFlt*>& cost_map, 
+                            TInt num_interval, TFlt unit_time)
+{
+  TInt _edge_ID;
+  TFlt *_cost_list;
+  for (auto _edge_it = graph->BegEI(); _edge_it < graph->EndEI(); _edge_it++) {
+    _edge_ID = _edge_it.GetId();
+    _cost_list = cost_map.find(_edge_ID) -> second;
+    for (int i=0; i<num_interval - 1; ++i){
+      if (_cost_list[i] > unit_time + _cost_list[i+1]){
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+
+
+
+

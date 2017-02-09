@@ -26,6 +26,14 @@ public:
   int static all_to_one_LIFO(TInt dest_node_ID, 
                         PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
                         std::unordered_map<TInt, TInt> &output_map);
+/*------------------------------------------------------------
+                          TDSP
+-------------------------------------------------------------*/
+  int static all_to_one_TDSP(TInt dest_node_ID, 
+                        PNEGraph graph, std::unordered_map<TInt, TFlt*>& cost_map,
+                        std::unordered_map<TInt, TInt*> &output_map, TInt num_interval);
+  bool static is_FIFO(PNEGraph graph, std::unordered_map<TInt, TFlt*>& cost_map, TInt num_interval,
+                      TFlt unit_time);
 };
 
 
