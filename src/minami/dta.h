@@ -24,6 +24,7 @@ public:
   bool is_ok();
   int hook_up_node_and_link();
   int loading(bool verbose);
+  int load_once(bool verbose, TInt load_int, TInt assign_int);
   int test();
 // private:
   bool finished_loading(int cur_int);

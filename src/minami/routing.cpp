@@ -128,7 +128,7 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
   TInt _dest_node_ID;
   std::unordered_map<TInt, TInt> *_shortest_path_tree;
   if ((timestamp) % m_routing_freq  == 0 || timestamp == 0) {
-    printf("Calculating the shortest path trees!\n");
+    // printf("Calculating the shortest path trees!\n");
     for (auto _it = m_od_factory -> m_destination_map.begin(); _it != m_od_factory -> m_destination_map.end(); _it++){
     // #pragma omp task firstprivate(_it)
       // {
@@ -144,7 +144,7 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
 
 
   /* route the vehicle in Origin nodes */
-  printf("Routing the vehicle!\n");
+  // printf("Routing the vehicle!\n");
   MNM_Origin *_origin;
   MNM_DMOND *_origin_node;
   TInt _node_ID, _next_link_ID;
@@ -232,7 +232,7 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
       }
     }
   }
-  printf("Finished Routing\n");
+  // printf("Finished Routing\n");
   return 0;
 }
 

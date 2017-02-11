@@ -42,5 +42,8 @@ target_link_libraries (dta_response PUBLIC Snap g3log minami ${CMAKE_THREAD_INIT
 #target_link_libraries (testCC PUBLIC Snap minami)
 
 
-add_executable (exp_link exp_link.cpp)
-target_link_libraries (exp_link PUBLIC Snap minami)
+#add_executable (exp_link exp_link.cpp)
+#target_link_libraries (exp_link PUBLIC Snap minami)
+
+add_executable (test_emission test_emission.cpp)
+target_link_libraries (test_emission PUBLIC Snap minami)

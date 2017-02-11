@@ -43,7 +43,7 @@ int MNM_Dta::set_statistics()
     m_statistics = new MNM_Statistics_Lrn(m_file_folder, m_config, _record_config,
                                    m_od_factory, m_node_factory, m_link_factory);
   }
-  printf("finished\n");
+  // printf("set_statistics finished\n");
   return 0;
 }
 
@@ -104,7 +104,7 @@ int MNM_Dta::hook_up_node_and_link()
       _node -> add_in_link(_link);
     }   
   }
-  printf("Hook up link to node\n");
+  // printf("Hook up link to node\n");
   // hook up link to node
   for (auto _link_it = m_graph->BegEI(); _link_it < m_graph->EndEI(); _link_it++){
     _link = m_link_factory -> get_link(_link_it.GetId());
@@ -177,7 +177,7 @@ bool MNM_Dta::is_ok()
 int MNM_Dta::pre_loading()
 {
   MNM_Dnode *_node;
-  printf("MNM: Prepare loading!\n");
+  // printf("MNM: Prepare loading!\n");
   m_routing -> init_routing();
   // printf("Finish prepare routing\n");
   m_statistics -> init_record();
@@ -195,6 +195,72 @@ int MNM_Dta::pre_loading()
   }
   return 0;
 }
+
+int MNM_Dta::load_once(bool verbose, TInt load_int, TInt assign_int)
+{
+  MNM_Origin *_origin;
+  MNM_Dnode *_node;
+  MNM_Dlink *_link;
+  MNM_Destination *_dest;
+  if(verbose) printf("-------------------------------    Interval %d   ------------------------------ \n", (int)load_int);
+  // step 1: Origin release vehicle
+  if(verbose) printf("Realsing!\n");
+  // for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){
+  //   _origin = _origin_it -> second;
+  //   _origin -> release(m_veh_factory, _cur_int);
+  // }      
+  if (load_int % m_assign_freq == 0 || load_int==0){
+    for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){
+      _origin = _origin_it -> second;
+      if (assign_int >= m_total_assign_inter) {
+        _origin -> release_one_interval(load_int, m_veh_factory, -1, TFlt(0));
+      }
+      else{
+        _origin -> release_one_interval(load_int, m_veh_factory, assign_int, TFlt(0));
+      }
+      // _assign_inter = _assign_inter % m_total_assign_inter;
+      // _origin -> release_one_interval(_cur_int, m_veh_factory, _assign_inter, TFlt(0));
+    } 
+  }
+
+  if(verbose) printf("Routing!\n");
+  // step 2: route the vehicle
+  m_routing -> update_routing(load_int);
+
+  if(verbose) printf("Moving through node!\n");
+  // step 3: move vehicles through node
+  for (auto _node_it = m_node_factory -> m_node_map.begin(); _node_it != m_node_factory -> m_node_map.end(); _node_it++){
+    _node = _node_it -> second;
+    _node -> evolve(load_int);
+  }
+
+  if(verbose) printf("Moving through link\n");
+  // step 4: move vehicles through link
+  for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
+    _link = _link_it -> second;
+    // if (_link -> get_link_flow() > 0){
+    //   printf("Current Link %d:, traffic flow %.4f, incomming %d, finished %d\n", 
+    //       _link -> m_link_ID(), _link -> get_link_flow()(), (int)_link -> m_incoming_array.size(),  (int)_link -> m_finished_array.size());
+    //   _link -> print_info();
+    // }
+    
+    _link -> clear_incoming_array();
+    _link -> evolve(load_int);
+    // _link -> print_info();
+  }
+
+  if(verbose) printf("Receiving!\n");
+  // step 5: Destination receive vehicle  
+  for (auto _dest_it = m_od_factory -> m_destination_map.begin(); _dest_it != m_od_factory -> m_destination_map.end(); _dest_it++){
+    _dest = _dest_it -> second;
+    _dest -> receive(load_int);
+  }
+
+  if(verbose) MNM::print_vehicle_statistics(m_veh_factory);
+  // test();  
+  return 0;
+}
+
 
 int MNM_Dta::loading(bool verbose)
 {
