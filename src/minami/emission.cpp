@@ -50,10 +50,10 @@ TFlt MNM_Cumulative_Emission::calculate_CO2_rate(TFlt v)
 
 TFlt MNM_Cumulative_Emission::calculate_HC_rate(TFlt v)
 {
-  TFlt _HC_rate = 1.61479076909784 * 1e-13 * pow(v,8) - 1.27884474982285 * 1e-10 * pow(v,7)
-                + 2.92924270300974 * 1e-8 * pow(v,6) - 3.23670086149171 * 1e-6 * pow(v,5)
-                + 0.000201135990745703 * pow(v,4) - 0.00737871178398462 * pow(v,3)
-                + 0.15792241257931 * pow(v,2) - 1.82687242201925 * v + 9.84559996919605;
+  TFlt _HC_rate = 1.61479076909784e-13 * pow(v,8.0) - 1.27884474982285e-10 * pow(v,7.0)
+                + 2.92924270300974e-8 * pow(v,6.0) - 3.23670086149171e-6 * pow(v,5.0)
+                + 0.000201135990745703 * pow(v,4.0) - 0.00737871178398462 * pow(v,3.0)
+                + 0.15792241257931 * pow(v,2.0) - 1.82687242201925 * v + 9.84559996919605;
   // printf("HC rate is %lf\n", _HC_rate());
   return MNM_Ults::max(_HC_rate, TFlt(0));
 }
@@ -80,10 +80,13 @@ TFlt MNM_Cumulative_Emission::calculate_NOX_rate(TFlt v)
 
 int MNM_Cumulative_Emission::update()
 {
+  // printf("CO2 is %lf, HC is %lf\n",m_CO2(), m_HC());
   m_counter += 1;
   // printf("ce counter is now %d\n", m_counter());
   TFlt _v;
   TFlt _v_converted;
+  _v_converted = MNM_Ults::max(_v_converted, TFlt(5));
+  _v_converted = MNM_Ults::min(_v_converted, TFlt(65));
   for (MNM_Dlink *link : m_link_vector){
     _v = link -> m_length / link -> get_link_tt(); // m/s
     _v_converted = _v * TFlt(3600) / TFlt(1600); // mile / hour
@@ -101,8 +104,11 @@ int MNM_Cumulative_Emission::update()
               * link -> get_link_flow();
     m_NOX += calculate_NOX_rate(_v_converted) 
               * (_v * m_unit_time / TFlt(1600))  
-              * link -> get_link_flow();              
+              * link -> get_link_flow();
+    // printf("link ID is %d, flow is :%lf, _v is %lf, CO2 is %lf, HC is %lf\n",
+    //       (link -> m_link_ID)(), link -> get_link_flow()(), _v(), m_CO2(), m_HC());              
   }
+  // printf("%lf, %lf, %lf, %lf, %lf\n", m_fuel(), m_CO2(), m_HC(), m_CO(), m_NOX());
   // printf("m_counter is %d and freq is %d\n", m_counter(), m_freq());
   if (m_counter == m_freq){
     // printf("CE update: output\n");
