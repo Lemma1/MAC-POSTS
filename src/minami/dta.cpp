@@ -188,11 +188,11 @@ int MNM_Dta::pre_loading()
   }
   m_workzone -> init_workzone();
 
-  MNM_Dlink *_link;
-  for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
-    _link = _link_it -> second;
-    // _link -> install_cumulative_curve();
-  }
+  // MNM_Dlink *_link;
+  // for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
+  //   _link = _link_it -> second;
+  //   _link -> install_cumulative_curve();
+  // }
   return 0;
 }
 
