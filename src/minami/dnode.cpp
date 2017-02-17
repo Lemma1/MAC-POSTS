@@ -206,7 +206,7 @@ int MNM_Dnode_Inout::prepare_loading()
 {
   TInt _num_in = m_in_link_array.size();
   TInt _num_out = m_out_link_array.size();
-  // printf("num_in: %d, num_out: %d\n", _num_in, _num_out);
+  // printf("node id %d, num_in: %d, num_out: %d\n",m_node_ID(), _num_in(), _num_out());
   m_demand = (TFlt*) malloc(sizeof(TFlt) * _num_in * _num_out);
   memset(m_demand, 0x0, sizeof(TFlt) * _num_in * _num_out);
   m_supply = (TFlt*) malloc(sizeof(TFlt) * _num_out);
@@ -230,12 +230,12 @@ int MNM_Dnode_Inout::prepare_supplyANDdemand()
 
   for (size_t i=0; i < m_in_link_array.size(); ++i){
     _in_link = m_in_link_array[i];
-    // for (_veh_it = _in_link -> m_finished_array.begin(); _veh_it != _in_link -> m_finished_array.end(); _veh_it++){
-    //   if (std::find(m_out_link_array.begin(), m_out_link_array.end(), (*_veh_it) -> get_next_link()) == m_out_link_array.end()) {
-    //     printf("Vehicle in the wrong node, no exit!\n");
-    //     exit(-1);
-    //   }
-    // }
+    for (_veh_it = _in_link -> m_finished_array.begin(); _veh_it != _in_link -> m_finished_array.end(); _veh_it++){
+      if (std::find(m_out_link_array.begin(), m_out_link_array.end(), (*_veh_it) -> get_next_link()) == m_out_link_array.end()) {
+        printf("Vehicle in the wrong node, no exit!\n");
+        exit(-1);
+      }
+    }
     for (size_t j=0; j< m_out_link_array.size(); ++j){
       _out_link = m_out_link_array[j];
       // printf("Current out link is %d\n", _out_link -> m_link_ID);
@@ -375,12 +375,12 @@ int MNM_Dnode_Inout::move_vehicle()
           break; // break the inner most structure
         }
       }
-      if (_num_to_move != 0){
-        printf("Something wrong during the vehicle moving, remaining to move %d\n", (int)_num_to_move);
-        printf("The finished veh queue is now %d size\n", (int)_in_link->m_finished_array.size());
-        printf("But it is heading to %d\n", (int)_in_link->m_finished_array.front() -> get_next_link() -> m_link_ID);
-        exit(-1);
-      }
+      // if (_num_to_move != 0){
+      //   printf("Something wrong during the vehicle moving, remaining to move %d\n", (int)_num_to_move);
+      //   printf("The finished veh queue is now size %d\n", (int)_in_link->m_finished_array.size());
+      //   printf("But it is heading to %d\n", (int)_in_link->m_finished_array.front() -> get_next_link() -> m_link_ID);
+      //   exit(-1);
+      // }
     }
     // make the queue randomly perturbed, may not be true in signal controlled intersection
     // TODO 
@@ -418,6 +418,7 @@ int MNM_Dnode_Inout::evolve(TInt timestamp)
   round_flow_to_vehicle();
   // printf("4\n");
   record_cumulative_curve(timestamp);
+  // // printf("4.1\n");
   move_vehicle();
   // printf("5\n");
   return 0;
@@ -467,17 +468,25 @@ int MNM_Dnode_FWJ::compute_flow()
 MNM_Dnode_GRJ::MNM_Dnode_GRJ(TInt ID, TFlt flow_scalar)
   : MNM_Dnode_Inout::MNM_Dnode_Inout(ID, flow_scalar)
 {
+  m_d_a = NULL;
+  m_C_a = NULL;
+}
+
+MNM_Dnode_GRJ::~MNM_Dnode_GRJ()
+{
+  if (m_d_a != NULL) free(m_d_a);
+  if (m_C_a != NULL) free(m_C_a);
+}
+
+int MNM_Dnode_GRJ::prepare_loading()
+{
+  MNM_Dnode_Inout::prepare_loading();
   TInt _num_in = m_in_link_array.size();
   m_d_a = (TFlt*) malloc(sizeof(TFlt) * _num_in);
   memset(m_d_a, 0x0, sizeof(TFlt) * _num_in);
   m_C_a = (TFlt*) malloc(sizeof(TFlt) * _num_in);
   memset(m_C_a, 0x0, sizeof(TFlt) * _num_in);
-}
-
-MNM_Dnode_GRJ::~MNM_Dnode_GRJ()
-{
-  free(m_d_a);
-  free(m_C_a);
+  return 0;
 }
 
 void MNM_Dnode_GRJ::print_info()
@@ -487,16 +496,23 @@ void MNM_Dnode_GRJ::print_info()
 
 int MNM_Dnode_GRJ::compute_flow()
 {
+  if (m_in_link_array.size() == 0 || m_out_link_array.size() == 0){
+    return 0;
+  }
+  // printf("MNM_Dnode_GRJ ID %d::compute_flow()\n", m_node_ID());
   TFlt _theta = get_theta();
   size_t _offset = m_out_link_array.size();
   TFlt _f_a;
   for (size_t i=0; i< m_in_link_array.size(); ++i){
+    // printf("3\n");
     _f_a = MNM_Ults::min(m_d_a[i], _theta * m_C_a[i]);
     // printf("f_a is %lf\n", _f_a);
     for (size_t j=0; j< m_out_link_array.size(); ++j){
       m_veh_flow[i * _offset + j] = _f_a * MNM_Ults::divide(m_demand[i * _offset + j], m_supply[j]);
+      // printf("to link %d the flow is %.4f\n", m_out_link_array[j] -> m_link_ID, m_veh_flow[i * _offset + j]);
     }
   }
+  // printf("return\n");
   return 0;
 }
 
@@ -507,6 +523,7 @@ int MNM_Dnode_GRJ::prepare_outflux()
     _link = m_in_link_array[i];
     m_d_a[i] = TFlt(_link -> m_finished_array.size()) / m_flow_scalar;
     m_C_a[i] = MNM_Ults::max(m_d_a[i], _link -> get_link_supply());
+    // printf("mda is %lf, mca is %lf\n", m_d_a[i](), m_C_a[i]());
   }
   return 0;
 }
@@ -546,6 +563,7 @@ TFlt MNM_Dnode_GRJ::get_theta()
   if (m_pow.size() == 0) {
     m_pow = powerSet(m_in_link_array);
   }
+  // printf("s1\n");
   prepare_outflux();
   size_t _offset = m_out_link_array.size();
   // part 1: max d_a/C_a
@@ -553,13 +571,15 @@ TFlt MNM_Dnode_GRJ::get_theta()
   for (size_t i=0; i< m_in_link_array.size(); ++i){
     _temp1.push_back(MNM_Ults::divide(m_d_a[i], m_C_a[i]));
   }
+
   TFlt _e1 = *max_element(_temp1.begin(), _temp1.end());
 
+  
+  // printf("s2\n");
   //part 2: min max
   std::vector<TFlt> _temp2 = std::vector<TFlt>();
   for (size_t j=0; j<m_out_link_array.size(); ++j){
     std::vector<TFlt> _temp3 = std::vector<TFlt>();
-    
     for (std::vector<MNM_Dlink*> v : m_pow){
       if (v.size() == 0) continue;
       // for (MNM_Dlink *a : v){
@@ -576,15 +596,19 @@ TFlt MNM_Dnode_GRJ::get_theta()
         }
       }
       // printf("for j is %d, the value of cal is %lf, s is %lf, up is %lf, down is %lf\n", 
-      //     j, (m_supply[j] - _up)/_down ,m_supply[j](), _up(), _down());
+          // j, (m_supply[j] - _up)/_down ,m_supply[j](), _up(), _down());
       _temp3.push_back((m_supply[j] - _up)/_down);
     }
     _temp2.push_back(*max_element(_temp3.begin(), _temp3.end()));
   }
-  TFlt _e2 = *min_element(_temp2.begin(), _temp2.end());
+  // printf("s3\n");
+  // printf("_temp2 size %d\n", _temp2.size());
+  TFlt _e2 = *max_element(_temp2.begin(), _temp2.end());
+
 
   // printf("e1 is %lf, e2 is %lf\n", _e1(), _e2());
   // total
   TFlt _theta = MNM_Ults::min(_e1, _e2);
+  // printf("return\n");
   return _theta;
 }

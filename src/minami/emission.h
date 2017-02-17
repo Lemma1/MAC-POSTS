@@ -30,6 +30,7 @@ public:
   TFlt m_unit_time;
   TInt m_freq;
   TInt m_counter;
+  TFlt m_VMT;
 };
 
 

@@ -496,18 +496,22 @@ void MNM_Dlink_Lq::print_info()
 
 int MNM_Dlink_Lq::evolve(TInt timestamp)
 {
+  // printf("1\n");
   TFlt _demand = get_demand();
   MNM_Veh *_veh;
   if (_demand < TFlt(m_finished_array.size()) / m_flow_scalar){
+    // printf("2\n");
     TInt _veh_to_reduce = TInt(m_finished_array.size()) - TInt(_demand * m_flow_scalar);
     _veh_to_reduce = std::min(_veh_to_reduce, TInt(m_finished_array.size()));
-    for (int i=0; i<= _veh_to_reduce; ++i){
+    // printf("_veh_to_reduce %d, finished size is %d\n", _veh_to_reduce(), (int)m_finished_array.size());
+    for (int i=0; i< _veh_to_reduce; ++i){
       _veh = m_finished_array.back();
       m_veh_queue.push_front(_veh);
       m_finished_array.pop_back();
     }
   }
   else {
+    // printf("3\n");
     TInt _veh_to_move = MNM_Ults::round(_demand * m_flow_scalar) - TInt(m_finished_array.size());
     // printf("demand %f, Veh queue size %d, finished size %d, to move %d \n", (float) _demand(), (int) m_veh_queue.size(), (int)m_finished_array.size(), _veh_to_move());
 
@@ -584,7 +588,7 @@ TFlt MNM_Dlink_Lq::get_demand()
 
 MNM_Cumulative_Curve::MNM_Cumulative_Curve()
 {
-  m_recorder =  std::vector<std::pair<TFlt, TFlt>>();
+  m_recorder =  std::deque<std::pair<TFlt, TFlt>>();
 }
 
 
@@ -608,6 +612,18 @@ int MNM_Cumulative_Curve::arrange()
 int MNM_Cumulative_Curve::add_record(std::pair<TFlt, TFlt> r)
 {
   m_recorder.push_back(r);
+  return 0;
+}
+
+
+int MNM_Cumulative_Curve::shrink(TInt number)
+{
+  if (TInt(m_recorder.size()) > number){
+    arrange();
+    while(TInt(m_recorder.size()) > number){
+      m_recorder.pop_back();
+    }
+  }
   return 0;
 }
 
@@ -684,6 +700,7 @@ MNM_Dlink_Ltm::MNM_Dlink_Ltm(   TInt ID,
   m_N_in2 = MNM_Cumulative_Curve();
   m_N_out2 = MNM_Cumulative_Curve();
   m_previous_finished_flow = TFlt(0);
+  m_record_size = TInt(MNM_Ults::max(m_length/m_w, m_length/m_ffs) / m_unit_time) + 1;
 }
 
 MNM_Dlink_Ltm::~MNM_Dlink_Ltm()
@@ -755,6 +772,9 @@ TFlt MNM_Dlink_Ltm::get_link_supply()
 int MNM_Dlink_Ltm::evolve(TInt timestamp)
 {
   // printf("MNM_Dlink_Ltm::evolve\n");
+  m_N_in2.shrink(m_record_size);
+  m_N_out2.shrink(m_record_size);
+  // printf("target is %d, n in size %d, n out size %d\n",m_record_size(), m_N_in2.m_recorder.size(), m_N_out2.m_recorder.size());
   TFlt _demand = get_demand();
   MNM_Veh *_veh;
   if (_demand < TFlt(m_finished_array.size()) / m_flow_scalar){

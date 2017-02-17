@@ -22,11 +22,12 @@ class MNM_Cumulative_Curve
 public:
   MNM_Cumulative_Curve();
   ~MNM_Cumulative_Curve();
-  std::vector<std::pair<TFlt, TFlt>> m_recorder;
+  std::deque<std::pair<TFlt, TFlt>> m_recorder;
   int add_record(std::pair<TFlt, TFlt> r);
   int add_increment(std::pair<TFlt, TFlt> r);
   TFlt get_result(TFlt time);
   std::string to_string();
+  int shrink(TInt number);
 private:
   int arrange();
 };
@@ -224,6 +225,7 @@ public:
   TInt m_current_timestamp; //used only in clear incoming array
   TFlt m_w;
   TFlt m_previous_finished_flow;
+  TInt m_record_size;
 
   TFlt get_demand();
 };

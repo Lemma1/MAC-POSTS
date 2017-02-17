@@ -13,6 +13,7 @@ MNM_Cumulative_Emission::MNM_Cumulative_Emission(TFlt unit_time, TInt freq)
   m_HC = TFlt(0);
   m_CO = TFlt(0);
   m_NOX = TFlt(0);
+  m_VMT = TFlt(0);
   m_counter = 0;
   m_link_vector = std::vector<MNM_Dlink*>();
 }
@@ -105,6 +106,8 @@ int MNM_Cumulative_Emission::update()
     m_NOX += calculate_NOX_rate(_v_converted) 
               * (_v * m_unit_time / TFlt(1600))  
               * link -> get_link_flow();
+    m_VMT += (_v * m_unit_time / TFlt(1600))  
+              * link -> get_link_flow();
     // printf("link ID is %d, flow is :%lf, _v is %lf, CO2 is %lf, HC is %lf\n",
     //       (link -> m_link_ID)(), link -> get_link_flow()(), _v(), m_CO2(), m_HC());              
   }
@@ -118,6 +121,7 @@ int MNM_Cumulative_Emission::update()
     m_HC = TFlt(0);
     m_CO = TFlt(0);
     m_NOX = TFlt(0);
+    m_VMT = TFlt(0);
     m_counter = 0;
   }
   return 0;
@@ -126,7 +130,7 @@ int MNM_Cumulative_Emission::update()
 int MNM_Cumulative_Emission::output()
 {
   printf("The emission stats are: ");
-  printf("%lf, %lf, %lf, %lf, %lf\n", m_fuel(), m_CO2(), m_HC(), m_CO(), m_NOX());
+  printf("%d, %lf, %lf, %lf, %lf, %lf, %lf\n", m_link_vector[0] -> m_link_ID(), m_fuel(), m_CO2(), m_HC(), m_CO(), m_NOX(), m_VMT());
   return 0;
 }
 

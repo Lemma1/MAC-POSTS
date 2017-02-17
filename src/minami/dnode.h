@@ -110,6 +110,7 @@ public:
   ~MNM_Dnode_GRJ();
   void virtual print_info() override;
   int virtual compute_flow() override;
+  int virtual prepare_loading() override;
 private:
   std::vector<std::vector<MNM_Dlink*>> m_pow;
   TFlt get_theta();
