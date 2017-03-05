@@ -50,13 +50,9 @@ int DijkstraBinaryHeapWithVisitedLabel(TInt destination_ID,
         }
       }
     }
-    else{
-      continue;
-    }
+    delete _min_cost;
   }
 
-  dist_to_dest.clear();
-  visited.clear();
   return 0;
 }
 
@@ -107,8 +103,13 @@ int main(int argc, char const *argv[])
                           Test different algorithm
 **************************************************************************/
   startTime = clock();
+  // int tot_dest = 0;
+  // int tot_count1 = 0;
+  // int tot_count2 = 0;
+  // int tot_count3 = 0;
   for (auto _it = m_od_factory -> m_destination_map.begin(); _it != m_od_factory -> m_destination_map.end(); _it++){
-  	_dest = _it -> second;
+  	// tot_dest++;
+    _dest = _it -> second;
     _dest_node_ID = _dest -> m_dest_node -> m_node_ID;
     output_map.clear();
     DijkstraBinaryHeapWithVisitedLabel(_dest_node_ID, m_graph, cost_map, output_map);
@@ -116,50 +117,59 @@ int main(int argc, char const *argv[])
     // MNM_Shortest_Path::all_to_one_Dijkstra(_dest_node_ID, m_graph, cost_map, output_map2);
     // output_map3.clear();
     // MNM_Shortest_Path::all_to_one_FIFO(_dest_node_ID, m_graph, cost_map, output_map3);
-    
-    // int count1 = 0;
-    // int count2 = 0;
-    // int count3 = 0;
-    // for (auto _it = output_map.begin(); _it!=output_map.end(); _it++){
-    //   TInt _node_id = _it->first;
-    //   TInt _link_id = _it->second;
-    //   if (output_map2[_node_id] != _link_id){
-    //     count1++;
-    //     // printf("node %d: [head to %d]; [head to %d]\n", _node_id, _link_id, output_map2[_node_id]);
-    //   }
-    // }
-    // printf("dijkstra-pxd vs dijkstra: %d difference\n", count1); 
-    // printf("=====================================================================\n");
-    // for (auto _it = output_map.begin(); _it!=output_map.end(); _it++){
-    //   TInt _node_id = _it->first;
-    //   TInt _link_id = _it->second;
-    //   if (output_map3[_node_id] != _link_id){
-    //     count2++;
-    //     // printf("node %d: [head to %d]; [head to %d]\n", _node_id, _link_id, output_map3[_node_id]);
-    //   }
-    // }
-    // printf("dijkstra-pxd vs LC-FIFO: %d difference\n", count2); 
-    // printf("=====================================================================\n");
-    // for (auto _it = output_map2.begin(); _it!=output_map2.end(); _it++){
-    //   TInt _node_id = _it->first;
-    //   TInt _link_id = _it->second;
-    //   if (output_map3[_node_id] != _link_id){
-    //     count3++;
-    //     // printf("node %d: [head to %d]; [head to %d]\n", _node_id, _link_id, output_map3[_node_id]);
-    //   }
-    // }
-    // printf("dijkstra vs LC-FIFO: %d difference\n", count3);
-    // printf("=====================================================================\n"); 
+    // printf("Testing for the %d-th Destination with ID: %d\n", tot_dest, _dest_node_ID); 
 
-    // for (auto _it = output_map.begin(); _it!=output_map.end(); _it++){
-    //   printf("For node %d, it should head to %d\n", _it -> first, _it -> second);
-    // }
-    // break;
+  //   int count1 = 0;
+  //   int count2 = 0;
+  //   int count3 = 0;
+  //   for (auto _it = output_map.begin(); _it!=output_map.end(); _it++){
+  //     TInt _node_id = _it->first;
+  //     TInt _link_id = _it->second;
+  //     if (output_map2[_node_id] != _link_id){
+  //       count1++;
+  //       // printf("node %d: [head to %d]; [head to %d]\n", _node_id, _link_id, output_map2[_node_id]);
+  //     }
+  //   }
+  //   tot_count1 += count1;
+  //   printf("dijkstra-withvisitlabel vs dijkstra: %d difference\n", count1); 
+  //   printf("=====================================================================\n");
+  //   for (auto _it = output_map.begin(); _it!=output_map.end(); _it++){
+  //     TInt _node_id = _it->first;
+  //     TInt _link_id = _it->second;
+  //     if (output_map3[_node_id] != _link_id){
+  //       count2++;
+  //       // printf("node %d: [head to %d]; [head to %d]\n", _node_id, _link_id, output_map3[_node_id]);
+  //     }
+  //   }
+  //   tot_count2 += count2;
+  //   printf("dijkstra-withvisitlabel vs LC-FIFO: %d difference\n", count2); 
+  //   printf("=====================================================================\n");
+  //   for (auto _it = output_map2.begin(); _it!=output_map2.end(); _it++){
+  //     TInt _node_id = _it->first;
+  //     TInt _link_id = _it->second;
+  //     if (output_map3[_node_id] != _link_id){
+  //       count3++;
+  //       // printf("node %d: [head to %d]; [head to %d]\n", _node_id, _link_id, output_map3[_node_id]);
+  //     }
+  //   }
+  //   tot_count3 += count3;
+  //   printf("dijkstra vs LC-FIFO: %d difference\n", count3);
+  //   printf("=====================================================================\n\n\n"); 
+
+  //   // break;
   }
+  // printf("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+  // printf("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+  // printf("\n+                 Difference for all %d destinations:              +\n", tot_dest);
+  // printf("\n+          dijkstra-withvisitlabel vs dijkstra: %d difference        +\n", tot_count1);
+  // printf("\n+          dijkstra-withvisitlabel vs LC-FIFO: %d difference         +\n", tot_count2);
+  // printf("\n+                dijkstra vs LC-FIFO: %d difference                  +\n", tot_count3);
+  // printf("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+  // printf("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
   endTime = clock();
   clockTicksTaken = endTime - startTime;
   timeInSeconds = TFlt(clockTicksTaken / (double) CLOCKS_PER_SEC);
-  printf("The time using for dijkstra-pxd is %f seconds.\n", timeInSeconds());
+  printf("The time using for dijkstra-withvisitlabel is %f seconds.\n", timeInSeconds());
 
 
   startTime = clock();
@@ -168,10 +178,6 @@ int main(int argc, char const *argv[])
     _dest_node_ID = _dest -> m_dest_node -> m_node_ID;
     output_map.clear();
     MNM_Shortest_Path::all_to_one_Dijkstra(_dest_node_ID, m_graph, cost_map, output_map);
-    // for (auto _it = output_map.begin(); _it!=output_map.end(); _it++){
-    //   printf("For node %d, it should head to %d\n", _it -> first, _it -> second);
-    // }
-    // break;
   }
   endTime = clock();
   clockTicksTaken = endTime - startTime;
@@ -185,29 +191,11 @@ int main(int argc, char const *argv[])
     _dest_node_ID = _dest -> m_dest_node -> m_node_ID;
     output_map.clear();
     MNM_Shortest_Path::all_to_one_FIFO(_dest_node_ID, m_graph, cost_map, output_map);
-    // for (auto _it = output_map.begin(); _it!=output_map.end(); _it++){
-    //   printf("For node %d, it should head to %d\n", _it -> first, _it -> second);
-    // }
-    // break;
   }
   endTime = clock();
   clockTicksTaken = endTime - startTime;
   timeInSeconds = TFlt(clockTicksTaken / (double) CLOCKS_PER_SEC);
   printf("The time using for FIFO is %f seconds.\n", timeInSeconds());
-
-
-  // startTime = clock();
-  // for (auto _it = m_od_factory -> m_destination_map.begin(); _it != m_od_factory -> m_destination_map.end(); _it++){
-  // 	_dest = _it -> second;
-  //   _dest_node_ID = _dest -> m_dest_node -> m_node_ID;
-  //   output_map.clear();
-  //   // printf("Current ID is:%d\n", _dest_node_ID());
-  //   MNM_Shortest_Path::all_to_one_LIFO(_dest_node_ID, m_graph, cost_map, output_map);
-  // }
-  // endTime = clock();
-  // clockTicksTaken = endTime - startTime;
-  // timeInSeconds = TFlt(clockTicksTaken / (double) CLOCKS_PER_SEC);
-  // printf("The time using for LIFO is %f seconds.\n", timeInSeconds());
 
 
   return 0;

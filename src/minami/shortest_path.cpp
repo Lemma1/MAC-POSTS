@@ -22,26 +22,30 @@ int MNM_Shortest_Path::all_to_one_Dijkstra(TInt destination_ID,
   m_Q.push(dest_cost);
 
   std::unordered_map<TInt, TFlt> dist_to_dest = std::unordered_map<TInt, TFlt>();
-  // std::unordered_map<TInt, bool> visited = std::unordered_map<TInt, bool>();
 
   for (auto _node_it = graph->BegNI(); _node_it < graph->EndNI(); _node_it++){
     TInt _node_id = _node_it.GetId();
     if (_node_id != destination_ID){
       dist_to_dest.insert({_node_id, TFlt(std::numeric_limits<double>::max())});
-      output_map.insert({_node_id, -1});
+      output_map.insert({_node_id, -1});  // If the destination is not accessible the output remains -1
     }
-    // visited.insert({_node_id, false});
   }
   dist_to_dest[destination_ID] = TFlt(0);
 
+  // Initializaiton above. Dijkstra with binary min-heap below:
+
+  // NOTE: Since C++ std::priority_queue does not have decrease_key() function, 
+  // we insert [pointer to new MNM_cost object] to the min-heap every time when
+  // the dist_to_dest[] changes for some node. So there could be duplicated elements
+  // in the min-heap for the same nodes with different distance values. But the duplication
+  // doesn't affect the correctness of algorithm. (visited label for eliminating the 
+  // duplication is also tested, but slower than not using it, kind of weird.)
   while (m_Q.size() != 0){
     MNM_Cost *_min_cost = m_Q.top();
     m_Q.pop();
     TInt _node_id = _min_cost->m_ID;
     auto _node_it = graph->GetNI(_node_id);
     TFlt _tmp_dist = dist_to_dest[_node_id]; 
-    // if (not visited[_node_id]){
-      // visited[_node_id] = true;
       for (int e = 0; e < _node_it.GetInDeg(); e++){
         TInt _in_node_id = _node_it.GetInNId(e);
         TInt _in_link_id = graph->GetEI(_in_node_id, _node_id).GetId();
@@ -52,14 +56,9 @@ int MNM_Shortest_Path::all_to_one_Dijkstra(TInt destination_ID,
           output_map[_in_node_id] = _in_link_id;
         }
       }
-    // }
-    // else{
-      // continue;
-    // }
+    delete _min_cost;
   }
 
-  dist_to_dest.clear();
-  // visited.clear();
   return 0;
 }
 
