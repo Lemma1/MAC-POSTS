@@ -20,6 +20,9 @@ public:
   int static all_to_one_Dijkstra(TInt dest_node_ID, 
                         PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
                         std::unordered_map<TInt, TInt> &output_map);
+  int static all_to_one_Dijkstra_deprecated(TInt dest_node_ID, 
+                        PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
+                        std::unordered_map<TInt, TInt> &output_map);
   int static all_to_one_FIFO(TInt dest_node_ID, 
                         PNEGraph graph, const std::unordered_map<TInt, TFlt>& cost_map,
                         std::unordered_map<TInt, TInt> &output_map);

@@ -3,6 +3,7 @@
 #include "path.h"
 #include "io.h"
 #include "shortest_path.h"
+#include "ults.h"
 
 #include <ctime>
 #include <omp.h>
@@ -34,7 +35,7 @@ int main()
 
   std::unordered_map<TInt, TFlt> cost_map = std::unordered_map<TInt, TFlt>();
   for (auto _it = m_link_factory -> m_link_map.begin(); _it != m_link_factory -> m_link_map.end(); ++_it){
-    cost_map.insert(std::pair<TInt, TFlt>(_it -> first, TFlt(100)));
+    cost_map.insert(std::pair<TInt, TFlt>(_it -> first, MNM_Ults::rand_flt()));
   }
 
 

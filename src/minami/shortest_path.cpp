@@ -12,7 +12,59 @@ int MNM_Shortest_Path::one_to_one(TInt origin_node_ID, TInt dest_node_ID,
 }
 
 
-int MNM_Shortest_Path::all_to_one_Dijkstra(TInt dest_node_ID, 
+int MNM_Shortest_Path::all_to_one_Dijkstra(TInt destination_ID, 
+                        PNEGraph graph, std::unordered_map<TInt, TFlt> &cost_map,
+                        std::unordered_map<TInt, TInt> &output_map)
+{
+  std::priority_queue<MNM_Cost*, std::vector<MNM_Cost*>, LessThanByCost> m_Q \
+  = std::priority_queue<MNM_Cost*, std::vector<MNM_Cost*>, LessThanByCost>();
+  MNM_Cost *dest_cost = new MNM_Cost(destination_ID, TFlt(0));
+  m_Q.push(dest_cost);
+
+  std::unordered_map<TInt, TFlt> dist_to_dest = std::unordered_map<TInt, TFlt>();
+  // std::unordered_map<TInt, bool> visited = std::unordered_map<TInt, bool>();
+
+  for (auto _node_it = graph->BegNI(); _node_it < graph->EndNI(); _node_it++){
+    TInt _node_id = _node_it.GetId();
+    if (_node_id != destination_ID){
+      dist_to_dest.insert({_node_id, TFlt(std::numeric_limits<double>::max())});
+      output_map.insert({_node_id, -1});
+    }
+    // visited.insert({_node_id, false});
+  }
+  dist_to_dest[destination_ID] = TFlt(0);
+
+  while (m_Q.size() != 0){
+    MNM_Cost *_min_cost = m_Q.top();
+    m_Q.pop();
+    TInt _node_id = _min_cost->m_ID;
+    auto _node_it = graph->GetNI(_node_id);
+    TFlt _tmp_dist = dist_to_dest[_node_id]; 
+    // if (not visited[_node_id]){
+      // visited[_node_id] = true;
+      for (int e = 0; e < _node_it.GetInDeg(); e++){
+        TInt _in_node_id = _node_it.GetInNId(e);
+        TInt _in_link_id = graph->GetEI(_in_node_id, _node_id).GetId();
+        TFlt _alt = _tmp_dist + cost_map[_in_link_id];
+        if (_alt < dist_to_dest[_in_node_id]){
+          dist_to_dest[_in_node_id] = _alt;
+          m_Q.push(new MNM_Cost(_in_node_id, _alt));
+          output_map[_in_node_id] = _in_link_id;
+        }
+      }
+    // }
+    // else{
+      // continue;
+    // }
+  }
+
+  dist_to_dest.clear();
+  // visited.clear();
+  return 0;
+}
+
+
+int MNM_Shortest_Path::all_to_one_Dijkstra_deprecated(TInt dest_node_ID, 
                       PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
                       std::unordered_map<TInt, TInt> &output_map)
 {
