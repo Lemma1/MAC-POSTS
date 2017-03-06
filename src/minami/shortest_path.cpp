@@ -32,7 +32,7 @@ int MNM_Shortest_Path::all_to_one_Dijkstra(TInt destination_ID,
   }
   dist_to_dest[destination_ID] = TFlt(0);
 
-  // Initializaiton above. Dijkstra with binary min-heap below:
+  // Initializaiton above. Dijkstra with binary min-heap (std::prioitiry_queue) below:
 
   // NOTE: Since C++ std::priority_queue does not have decrease_key() function, 
   // we insert [pointer to new MNM_cost object] to the min-heap every time when
