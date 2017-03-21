@@ -23,8 +23,6 @@ public:
   int initialize();
   int build_path_table();
   MNM_Statistics *get_statistics(MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
-  int run_from_screenshot(MNM_Dta_Screenshot* screenshot,
-                          TInt max_inter, TInt assign_inter, Path_Table *path_table);
   int get_estimation_gradient(MNM_Dta_Screenshot* screenshot,
                               TInt max_inter, TInt assign_inter, Path_Table *path_table, 
                               std::unordered_map<TInt, TFlt> *link_spd_map);
@@ -80,6 +78,9 @@ public:
 
 namespace MNM
 {
+  int run_from_screenshot(MNM_Dta_Screenshot* screenshot, MNM_ConfReader data_config,
+                          TInt max_inter, TInt assign_inter, Path_Table *path_table,
+                          MNM_OD_Factory *od_factory, std::string file_folder);
   MNM_Dta_Screenshot *make_screenshot(std::string file_folder, MNM_ConfReader* config, MNM_OD_Factory *od_factory,
                                   MNM_Link_Factory *link_factory, MNM_Node_Factory *node_factory, PNEGraph graph, 
                                   MNM_Routing_Fixed *old_routing);

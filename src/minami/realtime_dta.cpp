@@ -96,89 +96,6 @@ int MNM_Realtime_Dta::build_path_table()
 }
 
 
-int MNM_Realtime_Dta::run_from_screenshot(MNM_Dta_Screenshot* screenshot,
-                                            TInt max_inter, TInt assign_inter, Path_Table *path_table)
-{
-  TInt _cur_inter = 0;
-  TInt _total_inter = max_inter;
-  TInt _real_inter;
-  MNM_Origin *_origin;
-  MNM_Dnode *_node;
-  MNM_Dlink *_link;
-  MNM_Destination *_dest;
-
-  MNM_Node_Factory *_node_factory = screenshot -> m_node_factory;
-  MNM_Link_Factory *_link_factory = screenshot -> m_link_factory;
-  MNM_Veh_Factory *_veh_factory = screenshot -> m_veh_factory;
-  MNM_Routing *_routing = screenshot -> m_routing;
-
-  MNM_Link_Tt *_link_tt = new MNM_Link_Tt(_link_factory, m_dta_config -> get_float("unit_time"));
-
-  // printf("MNM: Prepare loading!\n");
-  _routing -> init_routing(path_table);
-  MNM_IO::hook_up_od_node(m_file_folder, m_dta_config, m_od_factory, _node_factory);  
-  // printf("Finish prepare routing\n");
-  // m_statistics -> init_record();
-  for (auto _node_it = _node_factory -> m_node_map.begin(); _node_it != _node_factory -> m_node_map.end(); _node_it++){
-    _node = _node_it -> second;
-    // printf("Node ID: %d\n", _node -> m_node_ID);
-    _node -> prepare_loading();
-  }
-  while (_cur_inter < _total_inter){
-    _real_inter = _cur_inter;
-    // printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_real_inter);
-    // step 1: Origin release vehicle
-
-    // printf("Realsing!\n");
-    if (_cur_inter == 0){
-      for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){
-        _origin = _origin_it -> second;
-        _origin -> release_one_interval(_real_inter, _veh_factory, assign_inter, TFlt(0));
-      }       
-    }
-
-    // printf("Routing!\n");
-    // step 2: route the vehicle
-    _routing -> update_routing(_real_inter);
-
-    // printf("Moving through node!\n");
-    // step 3: move vehicles through node
-    for (auto _node_it = _node_factory -> m_node_map.begin(); _node_it != _node_factory -> m_node_map.end(); _node_it++){
-      _node = _node_it -> second;
-      _node -> evolve(_real_inter);
-    }
-
-    _link_tt -> update_tt(_real_inter);
-    // printf("Moving through link\n");
-    // step 4: move vehicles through link
-    for (auto _link_it = _link_factory -> m_link_map.begin(); _link_it != _link_factory -> m_link_map.end(); _link_it++){
-      _link = _link_it -> second;
-      // printf("Current Link %d:, incomming %d, finished %d\n", _link -> m_link_ID, _link -> m_incoming_array.size(),  _link -> m_finished_array.size());
-      _link -> clear_incoming_array();
-      _link -> evolve(_real_inter);
-      // _link -> print_info();
-    }
-
-    // printf("Receiving!\n");
-    // step 5: Destination receive vehicle  
-    for (auto _dest_it = m_od_factory -> m_destination_map.begin(); _dest_it != m_od_factory -> m_destination_map.end(); _dest_it++){
-      _dest = _dest_it -> second;
-      _dest -> receive(_real_inter);
-    }
-
-  //   // printf("Update record!\n");
-  //   // // step 5: update record
-  //   // m_statistics -> update_record(_cur_int);
-
-    // _link_tt -> print_info();
-    _cur_inter ++;
-  }
-
-  // // m_statistics -> post_record();
-  delete _link_tt;
-  return 0;
-}
-
 int MNM_Realtime_Dta::get_estimation_gradient(MNM_Dta_Screenshot* screenshot,
                                             TInt max_inter, TInt assign_inter, Path_Table *path_table, 
                                             std::unordered_map<TInt, TFlt> *link_spd_map)
@@ -736,6 +653,87 @@ int MNM_Dta_Screenshot::hook_up_node_and_link()
 
 namespace MNM
 {
+int run_from_screenshot(MNM_Dta_Screenshot* screenshot, MNM_ConfReader *dta_config,
+                        TInt max_inter, TInt assign_inter, Path_Table *path_table,
+                        MNM_OD_Factory *od_factory, std::string file_folder)
+{
+  TInt _cur_inter = 0;
+  TInt _total_inter = max_inter;
+  TInt _real_inter;
+  MNM_Origin *_origin;
+  MNM_Dnode *_node;
+  MNM_Dlink *_link;
+  MNM_Destination *_dest;
+
+  MNM_Node_Factory *_node_factory = screenshot -> m_node_factory;
+  MNM_Link_Factory *_link_factory = screenshot -> m_link_factory;
+  MNM_Veh_Factory *_veh_factory = screenshot -> m_veh_factory;
+  MNM_Routing *_routing = screenshot -> m_routing;
+
+  // printf("MNM: Prepare loading!\n");
+  _routing -> init_routing(path_table);
+  MNM_IO::hook_up_od_node(file_folder, dta_config, od_factory, _node_factory);  
+  // printf("Finish prepare routing\n");
+  // m_statistics -> init_record();
+  for (auto _node_it = _node_factory -> m_node_map.begin(); _node_it != _node_factory -> m_node_map.end(); _node_it++){
+    _node = _node_it -> second;
+    // printf("Node ID: %d\n", _node -> m_node_ID);
+    _node -> prepare_loading();
+  }
+  while (_cur_inter < _total_inter){
+    _real_inter = _cur_inter;
+    // printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_real_inter);
+    // step 1: Origin release vehicle
+
+    // printf("Realsing!\n");
+    if (_cur_inter == 0){
+      for (auto _origin_it = od_factory -> m_origin_map.begin(); _origin_it != od_factory -> m_origin_map.end(); _origin_it++){
+        _origin = _origin_it -> second;
+        _origin -> release_one_interval(_real_inter, _veh_factory, assign_inter, TFlt(0));
+      }       
+    }
+
+    // printf("Routing!\n");
+    // step 2: route the vehicle
+    _routing -> update_routing(_real_inter);
+
+    // printf("Moving through node!\n");
+    // step 3: move vehicles through node
+    for (auto _node_it = _node_factory -> m_node_map.begin(); _node_it != _node_factory -> m_node_map.end(); _node_it++){
+      _node = _node_it -> second;
+      _node -> evolve(_real_inter);
+    }
+
+    // _link_tt -> update_tt(_real_inter);
+    // printf("Moving through link\n");
+    // step 4: move vehicles through link
+    for (auto _link_it = _link_factory -> m_link_map.begin(); _link_it != _link_factory -> m_link_map.end(); _link_it++){
+      _link = _link_it -> second;
+      // printf("Current Link %d:, incomming %d, finished %d\n", _link -> m_link_ID, _link -> m_incoming_array.size(),  _link -> m_finished_array.size());
+      _link -> clear_incoming_array();
+      _link -> evolve(_real_inter);
+      // _link -> print_info();
+    }
+
+    // printf("Receiving!\n");
+    // step 5: Destination receive vehicle  
+    for (auto _dest_it = od_factory -> m_destination_map.begin(); _dest_it != od_factory -> m_destination_map.end(); _dest_it++){
+      _dest = _dest_it -> second;
+      _dest -> receive(_real_inter);
+    }
+
+  //   // printf("Update record!\n");
+  //   // // step 5: update record
+  //   // m_statistics -> update_record(_cur_int);
+
+    // _link_tt -> print_info();
+    _cur_inter ++;
+  }
+
+  // // m_statistics -> post_record();
+
+  return 0;
+}
 
 MNM_Dta_Screenshot *make_screenshot(std::string file_folder, MNM_ConfReader* config, MNM_OD_Factory *od_factory,
                                             MNM_Link_Factory *link_factory, MNM_Node_Factory *node_factory, PNEGraph graph,
