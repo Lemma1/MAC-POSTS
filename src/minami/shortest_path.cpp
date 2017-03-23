@@ -64,6 +64,51 @@ int MNM_Shortest_Path::all_to_one_Dijkstra(TInt destination_ID,
   return 0;
 }
 
+int MNM_Shortest_Path::all_to_one_Dijkstra(TInt destination_ID, 
+                        PNEGraph graph, std::unordered_map<TInt, TFlt*> &cost_map,
+                        std::unordered_map<TInt, TFlt*> &dist_to_dest,
+                        std::unordered_map<TInt, TInt*> &output_map,
+                        TInt cost_position, TInt dist_position, TInt output_position)
+{
+  std::priority_queue<MNM_Cost*, std::vector<MNM_Cost*>, LessThanByCost> m_Q \
+  = std::priority_queue<MNM_Cost*, std::vector<MNM_Cost*>, LessThanByCost>();
+  MNM_Cost *dest_cost = new MNM_Cost(destination_ID, TFlt(0));
+  m_Q.push(dest_cost);
+
+  // std::unordered_map<TInt, TFlt> dist_to_dest = std::unordered_map<TInt, TFlt>();
+
+  for (auto _node_it = graph->BegNI(); _node_it < graph->EndNI(); _node_it++){
+    TInt _node_id = _node_it.GetId();
+    if (_node_id != destination_ID){
+      dist_to_dest[_node_id][dist_position] =  TFlt(std::numeric_limits<double>::max());
+      output_map[_node_id][output_position] = -1;  // If the destination is not accessible the output remains -1
+    }
+  }
+  dist_to_dest[destination_ID][dist_position] = TFlt(0);
+
+  // Initializaiton above. Dijkstra with binary min-heap (std::prioitiry_queue) below:
+
+  while (m_Q.size() != 0){
+    MNM_Cost *_min_cost = m_Q.top();
+    m_Q.pop();
+    TInt _node_id = _min_cost->m_ID;
+    auto _node_it = graph->GetNI(_node_id);
+    TFlt _tmp_dist = dist_to_dest[_node_id][dist_position]; 
+      for (int e = 0; e < _node_it.GetInDeg(); e++){
+        TInt _in_node_id = _node_it.GetInNId(e);
+        TInt _in_link_id = graph->GetEI(_in_node_id, _node_id).GetId();
+        TFlt _alt = _tmp_dist + cost_map[_in_link_id][cost_position];
+        if (_alt < dist_to_dest[_in_node_id][dist_position]){
+          dist_to_dest[_in_node_id][dist_position] = _alt;
+          m_Q.push(new MNM_Cost(_in_node_id, _alt));
+          output_map[_in_node_id][output_position] = _in_link_id;
+        }
+      }
+    delete _min_cost;
+  }
+
+  return 0;
+}
 
 int MNM_Shortest_Path::all_to_one_Dijkstra_deprecated(TInt dest_node_ID, 
                       PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
@@ -294,6 +339,8 @@ int  MNM_Shortest_Path::all_to_one_TDSP(TInt dest_node_ID,
                         PNEGraph graph, std::unordered_map<TInt, TFlt*>& cost_map,
                         std::unordered_map<TInt, TInt*> &output_map, TInt num_interval)
 {
+  // std::unordered_map<TInt, TFlt*> _dist = std::unordered_map<TInt, TFlt*>();
+  // _dist.insert(std::pair<TInt, TFlt>(dest_node_ID, TFlt(0)));
   return 0;
 }
 
@@ -315,6 +362,97 @@ bool MNM_Shortest_Path::is_FIFO(PNEGraph graph, std::unordered_map<TInt, TFlt*>&
 }
 
 
+/*------------------------------------------------------------
+                  TDSP  one destination tree
+-------------------------------------------------------------*/
+MNM_TDSP_Tree::MNM_TDSP_Tree(TInt dest_node_ID, PNEGraph graph, TInt max_interval)
+{
+  m_dist = std::unordered_map<TInt, TFlt*>();
+  m_tree = std::unordered_map<TInt, TInt*>();
+  m_dest_node_ID = dest_node_ID;
+  m_graph = graph;
+  m_max_interval = max_interval;
+}
 
+MNM_TDSP_Tree::~MNM_TDSP_Tree()
+{
+  TInt _node_ID;
+  for (auto _node_it = m_graph->BegNI(); _node_it < m_graph->EndNI(); _node_it++) {
+    _node_ID = _node_it.GetId();
+    if (m_dist[_node_ID] != NULL) delete m_dist[_node_ID];
+    if (m_tree[_node_ID] != NULL) delete m_tree[_node_ID];    
+  }
+  m_dist.clear();
+  m_tree.clear();
+}
+
+
+int MNM_TDSP_Tree::initialize()
+{
+  TInt _node_ID;
+  for (auto _node_it = m_graph->BegNI(); _node_it < m_graph->EndNI(); _node_it++) {
+    _node_ID = _node_it.GetId();
+    m_dist.insert({_node_ID, new TFlt [m_max_interval]});
+    m_tree.insert({_node_ID, new TInt [m_max_interval]});
+  }
+  return 0;
+}
+
+int MNM_TDSP_Tree::update_tree(std::unordered_map<TInt, TFlt*>& cost_map)
+{
+  // init tree and cost
+  TInt _node_ID;
+  for (auto _node_it = m_graph->BegNI(); _node_it < m_graph->EndNI(); _node_it++) {
+    for (int t=0; t<m_max_interval; ++t){
+      _node_ID = _node_it.GetId();
+      m_dist[_node_ID][t] = _node_ID == m_dest_node_ID ? TFlt(0) : TFlt(std::numeric_limits<double>::max());
+      m_tree[_node_ID][t] = -1;
+    }
+  }
+
+  // run last time interval
+  MNM_Shortest_Path::all_to_one_Dijkstra(m_dest_node_ID, m_graph, cost_map, m_dist, m_tree,
+                                        m_max_interval-1, m_max_interval-1, m_max_interval-1);
+
+  // main loop for t = M-2 down to 0
+  TFlt _temp_cost, _edge_cost;
+  TInt _src_node, _dst_node;
+  for (int t=m_max_interval-2; t > -1; t--){
+    for (auto _edge_it = m_graph->BegEI(); _edge_it < m_graph -> EndEI(); _edge_it++){
+      _dst_node = _edge_it.GetDstNId();
+      _src_node = _edge_it.GetSrcNId();
+      _edge_cost = cost_map[_edge_it.GetId()][t];
+      _temp_cost = _edge_cost + get_distance_to_destination(_dst_node, TFlt(t) + _edge_cost);
+      if (m_dist[_src_node][t] > _temp_cost){
+        m_dist[_src_node][t] = _temp_cost;
+        m_tree[_src_node][t] = _edge_it.GetId();
+      }
+    }
+  }
+  return 0;
+}
+
+int MNM_TDSP_Tree::get_tdsp(TInt src_node_ID, TInt time, MNM_Path* path)
+{
+  TInt _cur_node_ID = src_node_ID;
+  TInt _cur_link_ID;
+  while (_cur_node_ID != m_dest_node_ID){
+    path -> m_node_vec.push_back(_cur_node_ID);
+    _cur_link_ID = m_tree[_cur_node_ID][t];
+    path -> m_link_vec.push_back(_cur_link_ID);
+    _cur_node_ID = m_graph -> GetEI(_cur_link_ID).GetDstNId();
+  }
+  path -> m_node_vec.push_back(src_node_ID);  
+  return 0;
+}
+
+
+TFlt MNM_TDSP_Tree::get_distance_to_destination(TInt node_ID, TFlt time_stamp)
+{
+  if (time_stamp >= TFlt(m_max_interval - 1)){
+    return m_dist[node_ID][m_max_interval - 1];
+  }
+  return m_dist[node_ID][int(time_stamp) + 1];
+}
 
 

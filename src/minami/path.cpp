@@ -93,7 +93,7 @@ MNM_Path *extract_path(TInt origin_ID, TInt dest_ID, std::unordered_map<TInt, TI
   TInt _current_link_ID = -1;
   MNM_Path *_path = new MNM_Path();
   while(_current_node_ID != dest_ID){
-    _current_link_ID = output_map.find(_current_node_ID) -> second;
+    _current_link_ID = output_map[_current_node_ID];
     _path -> m_node_vec.push_back(_current_node_ID);
     _path -> m_link_vec.push_back(_current_link_ID);
     _current_node_ID = graph -> GetEI(_current_link_ID).GetDstNId();
