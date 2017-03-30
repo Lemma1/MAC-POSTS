@@ -65,6 +65,58 @@ int MNM_Shortest_Path::all_to_one_Dijkstra(TInt destination_ID,
 }
 
 int MNM_Shortest_Path::all_to_one_Dijkstra(TInt destination_ID, 
+                        PNEGraph graph, 
+                        std::unordered_map<TInt, TFlt> &dist_to_dest,
+                        std::unordered_map<TInt, TFlt> &cost_map,
+                        std::unordered_map<TInt, TInt> &output_map)
+{
+  std::priority_queue<MNM_Cost*, std::vector<MNM_Cost*>, LessThanByCost> m_Q \
+  = std::priority_queue<MNM_Cost*, std::vector<MNM_Cost*>, LessThanByCost>();
+  MNM_Cost *dest_cost = new MNM_Cost(destination_ID, TFlt(0));
+  m_Q.push(dest_cost);
+
+  // std::unordered_map<TInt, TFlt> dist_to_dest = std::unordered_map<TInt, TFlt>();
+  dist_to_dest.clear();
+  for (auto _node_it = graph->BegNI(); _node_it < graph->EndNI(); _node_it++){
+    TInt _node_id = _node_it.GetId();
+    if (_node_id != destination_ID){
+      dist_to_dest.insert({_node_id, TFlt(std::numeric_limits<double>::max())});
+      output_map.insert({_node_id, -1});  // If the destination is not accessible the output remains -1
+    }
+  }
+  dist_to_dest[destination_ID] = TFlt(0);
+
+  // Initializaiton above. Dijkstra with binary min-heap (std::prioitiry_queue) below:
+
+  // NOTE: Since C++ std::priority_queue does not have decrease_key() function, 
+  // we insert [pointer to new MNM_cost object] to the min-heap every time when
+  // the dist_to_dest[] changes for some node. So there could be duplicated elements
+  // in the min-heap for the same nodes with different distance values. But the duplication
+  // doesn't affect the correctness of algorithm. (visited label for eliminating the 
+  // duplication is also tested, but slower than not using it, kind of weird.)
+  while (m_Q.size() != 0){
+    MNM_Cost *_min_cost = m_Q.top();
+    m_Q.pop();
+    TInt _node_id = _min_cost->m_ID;
+    auto _node_it = graph->GetNI(_node_id);
+    TFlt _tmp_dist = dist_to_dest[_node_id]; 
+      for (int e = 0; e < _node_it.GetInDeg(); e++){
+        TInt _in_node_id = _node_it.GetInNId(e);
+        TInt _in_link_id = graph->GetEI(_in_node_id, _node_id).GetId();
+        TFlt _alt = _tmp_dist + cost_map[_in_link_id];
+        if (_alt < dist_to_dest[_in_node_id]){
+          dist_to_dest[_in_node_id] = _alt;
+          m_Q.push(new MNM_Cost(_in_node_id, _alt));
+          output_map[_in_node_id] = _in_link_id;
+        }
+      }
+    delete _min_cost;
+  }
+
+  return 0;
+}
+
+int MNM_Shortest_Path::all_to_one_Dijkstra(TInt destination_ID, 
                         PNEGraph graph, std::unordered_map<TInt, TFlt*> &cost_map,
                         std::unordered_map<TInt, TFlt*> &dist_to_dest,
                         std::unordered_map<TInt, TInt*> &output_map,
@@ -331,6 +383,11 @@ bool CompareCostDecendSort(MNM_Cost *lhs, MNM_Cost *rhs)
   return lhs->m_cost < rhs->m_cost;
 }
 
+/*------------------------------------------------------------
+                  TDSP  one destination tree
+-------------------------------------------------------------*/
+
+
 
 /*------------------------------------------------------------
                           TDSP
@@ -339,8 +396,6 @@ int  MNM_Shortest_Path::all_to_one_TDSP(TInt dest_node_ID,
                         PNEGraph graph, std::unordered_map<TInt, TFlt*>& cost_map,
                         std::unordered_map<TInt, TInt*> &output_map, TInt num_interval)
 {
-  // std::unordered_map<TInt, TFlt*> _dist = std::unordered_map<TInt, TFlt*>();
-  // _dist.insert(std::pair<TInt, TFlt>(dest_node_ID, TFlt(0)));
   return 0;
 }
 
@@ -438,7 +493,7 @@ int MNM_TDSP_Tree::get_tdsp(TInt src_node_ID, TInt time, MNM_Path* path)
   TInt _cur_link_ID;
   while (_cur_node_ID != m_dest_node_ID){
     path -> m_node_vec.push_back(_cur_node_ID);
-    _cur_link_ID = m_tree[_cur_node_ID][t];
+    _cur_link_ID = m_tree[_cur_node_ID][time];
     path -> m_link_vec.push_back(_cur_link_ID);
     _cur_node_ID = m_graph -> GetEI(_cur_link_ID).GetDstNId();
   }

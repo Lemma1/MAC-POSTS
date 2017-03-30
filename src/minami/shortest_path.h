@@ -23,6 +23,11 @@ public:
                         PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
                         std::unordered_map<TInt, TInt> &output_map);
   int static all_to_one_Dijkstra(TInt destination_ID, 
+                        PNEGraph graph, 
+                        std::unordered_map<TInt, TFlt> &dist_to_dest,
+                        std::unordered_map<TInt, TFlt> &cost_map,
+                        std::unordered_map<TInt, TInt> &output_map);
+  int static all_to_one_Dijkstra(TInt destination_ID, 
                         PNEGraph graph, std::unordered_map<TInt, TFlt*> &cost_map,
                         std::unordered_map<TInt, TFlt*> &dist_to_dest,
                         std::unordered_map<TInt, TInt*> &output_map,
@@ -47,6 +52,20 @@ public:
                       TFlt unit_time);
 };
 
+/*------------------------------------------------------------
+                  shortest path one destination tree
+-------------------------------------------------------------*/
+// class MNM_SP_Tree
+// {
+//   MNM_SP_Tree(TInt dest_node_ID, PNEGraph graph);
+//   ~MNM_SP_Tree();
+
+//   int initialize();
+//   int update_tree(std::unordered_map<TInt, TFlt>& cost_map);
+//   TFlt get_distance_to_destination(TInt node_ID);
+//   int get_next_link_ID(TInt node_ID);
+
+// };
 
 
 /*------------------------------------------------------------
@@ -77,6 +96,7 @@ public:
 class MNM_Cost
 {
 public:
+  MNM_Cost(){;};
   MNM_Cost(TInt ID, TFlt cost){m_ID = ID; m_cost = cost;};
   TInt m_ID;
   TFlt m_cost;

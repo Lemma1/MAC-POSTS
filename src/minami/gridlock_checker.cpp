@@ -46,7 +46,7 @@ bool MNM_Gridlock_Checker::has_cycle(PNEGraph graph)
     _link_queue.push_back(*(_remained_link_set.begin()));
     while (_link_queue.size() != 0){
       _temp_link_ID = _link_queue.front();
-      _remained_link_set.erase(_temp_dest_node_ID);
+      _remained_link_set.erase(_temp_link_ID);
       _link_queue.pop_front();
       _temp_dest_node_ID = graph -> GetEI(_temp_link_ID).GetDstNId();
       TNEGraph::TNodeI _node_it = graph -> GetNI(_temp_dest_node_ID);
