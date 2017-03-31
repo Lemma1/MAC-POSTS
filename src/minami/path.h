@@ -28,7 +28,13 @@ public:
   for (size_t i=0; i<rhs.m_link_vec.size(); ++i){if (rhs.m_link_vec[i] != m_link_vec[i]) return false;} return true;}
 };
 
-
+struct LessByPathP
+{
+  bool operator()(const MNM_Path* lhs, const  MNM_Path* rhs) const
+  {
+    return lhs -> m_p >= rhs -> m_p;
+  }
+};
 
 class MNM_Pathset
 {

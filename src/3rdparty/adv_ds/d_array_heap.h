@@ -140,11 +140,11 @@ public:
     with_free = other.with_free;
   }
 
-  void insert(const T& value) {
+  node *insert(const T& value) {
     if (root == nullptr) {
       root = new node(value, cost_fn(value));
       with_free = root;
-      return;
+      return root;
     }
 
     node *np = with_free->add(value, cost_fn(value));
@@ -159,6 +159,7 @@ public:
         with_free = root->lowest_leftmost();
       }
     }
+    return np;
   };
 
   bool empty() const {
