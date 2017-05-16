@@ -280,7 +280,7 @@ int MNM_Dta::loading(bool verbose)
   while (!finished_loading(_cur_int)){
     printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_cur_int);
     // step 1: Origin release vehicle
-    printf("Realsing!\n");
+    if(verbose) printf("Realsing!\n");
     // for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){
     //   _origin = _origin_it -> second;
     //   _origin -> release(m_veh_factory, _cur_int);
@@ -300,18 +300,18 @@ int MNM_Dta::loading(bool verbose)
       _assign_inter += 1;
     }
 
-    printf("Routing!\n");
+    if(verbose) printf("Routing!\n");
     // step 2: route the vehicle
     m_routing -> update_routing(_cur_int);
 
-    printf("Moving through node!\n");
+    if(verbose) printf("Moving through node!\n");
     // step 3: move vehicles through node
     for (auto _node_it = m_node_factory -> m_node_map.begin(); _node_it != m_node_factory -> m_node_map.end(); _node_it++){
       _node = _node_it -> second;
       _node -> evolve(_cur_int);
     }
 
-    printf("Moving through link\n");
+    if(verbose) printf("Moving through link\n");
     // step 4: move vehicles through link
     for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
       _link = _link_it -> second;
@@ -326,18 +326,18 @@ int MNM_Dta::loading(bool verbose)
       // _link -> print_info();
     }
 
-    printf("Receiving!\n");
+    if(verbose) printf("Receiving!\n");
     // step 5: Destination receive vehicle  
     for (auto _dest_it = m_od_factory -> m_destination_map.begin(); _dest_it != m_od_factory -> m_destination_map.end(); _dest_it++){
       _dest = _dest_it -> second;
       _dest -> receive(_cur_int);
     }
 
-    printf("Update record!\n");
+    if(verbose) printf("Update record!\n");
     // step 5: update record
     m_statistics -> update_record(_cur_int);
 
-    MNM::print_vehicle_statistics(m_veh_factory);
+    if(verbose) MNM::print_vehicle_statistics(m_veh_factory);
     // test();
     _cur_int ++;
   }
@@ -375,11 +375,11 @@ int MNM_Dta::check_origin_destination_connectivity()
 bool MNM_Dta::finished_loading(int cur_int)
 {
   TInt _total_int = m_config ->get_int("total_interval");
-  if (_total_int < 0){
-    return cur_int > _total_int;
+  if (_total_int > 0){
+    return cur_int >= _total_int;
   }
   else{
-    return !MNM::has_running_vehicle(m_veh_factory) && cur_int != 0;
+    return !(MNM::has_running_vehicle(m_veh_factory) && cur_int != 0);
   }
 }
 

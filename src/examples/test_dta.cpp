@@ -14,15 +14,16 @@ int main()
   // test_dta -> m_graph  -> Dump();
   // MNM_Dta *test_dta = new MNM_Dta("../../data/input_files_new_philly");
   // MNM_Dta *test_dta = new MNM_Dta("../../data/input_files_SR41");
-  MNM_Dta *test_dta = new MNM_Dta("../../data/input_files_7link");
+  // MNM_Dta *test_dta = new MNM_Dta("../../data/input_files_7link");
   // MNM_Dta *test_dta = new MNM_Dta("../../data/input_files_1link");
   // MNM_Dta *test_dta = new MNM_Dta("../../data/input_files_PGH");
+  MNM_Dta *test_dta = new MNM_Dta(".");
   test_dta -> build_from_files();
   printf("Hooking......\n");
   test_dta -> hook_up_node_and_link();
   // printf("Checking......\n");
   // test_dta -> is_ok();
-  test_dta -> loading(true);
+  test_dta -> loading(false);
 
 
   delete test_dta;
