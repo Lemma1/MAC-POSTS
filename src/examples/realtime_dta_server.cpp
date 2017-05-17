@@ -22,9 +22,16 @@ bool is_file_exist(const char *fileName)
     return infile.good();
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-
+  if (argc != 2){
+    printf("Usage: ./server /home/hzn/project/dataproject/manage.py (do not forget the second argument)\n");
+    return -1;
+  }
+  printf("Position of manage.py is......\n");
+  std::string manage_temp(argv[1]);
+  std::cout << manage_temp << std::endl;
+  // std::string file_folder(argv[1]);
   std::string file_folder = ".";
   std::string instruction_file_name = file_folder + "/instruction";
 
@@ -69,8 +76,11 @@ int main()
     }
 
     std::remove(instruction_file_name.c_str());
-
-    system("python /home/hzn/project/dataproject/manage.py import_online_congestion");
+    std::string command = "python ";
+    
+    command = command + manage_temp + " import_online_congestion";
+    //"python /home/hzn/project/dataproject/manage.py import_online_congestion"
+    std::cout << system(command.c_str());
   }
   return 0;
 }

@@ -1,7 +1,7 @@
 #include "dta.h"
 #include "workzone.h"
 
-int main()
+int main(int argc, char *argv[])
 {
   // MNM_IO::build_node_factory(test_dta -> m_file_folder, test_dta->m_config, test_dta->m_node_factory);
   // std::cout << test_dta -> m_node_factory -> m_node_map.size() << "\n";
@@ -17,7 +17,14 @@ int main()
   // MNM_Dta *test_dta = new MNM_Dta("../../data/input_files_7link");
   // MNM_Dta *test_dta = new MNM_Dta("../../data/input_files_1link");
   // MNM_Dta *test_dta = new MNM_Dta("../../data/input_files_PGH");
-  MNM_Dta *test_dta = new MNM_Dta(".");
+  if (argc != 2){
+    printf("Usage: ./dta_response . (do not forget the second argument)\n");
+    return -1;
+  }
+  printf("Current working directory is......\n");
+  std::cout << argv[1] << std::endl;
+  std::string path_name(argv[1]);
+  MNM_Dta *test_dta = new MNM_Dta(path_name);
   test_dta -> build_from_files();
   printf("Hooking......\n");
   test_dta -> hook_up_node_and_link();

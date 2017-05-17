@@ -342,7 +342,7 @@ int MNM_Dta::loading(bool verbose)
     _cur_int ++;
   }
 
-  MNM_IO::dump_cumulative_curve(m_file_folder, m_link_factory);
+  // MNM_IO::dump_cumulative_curve(m_file_folder, m_link_factory);
   m_statistics -> post_record();
   return 0;
 }

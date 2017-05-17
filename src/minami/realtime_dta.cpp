@@ -135,7 +135,7 @@ int MNM_Realtime_Dta::get_estimation_gradient(MNM_Dta_Screenshot* screenshot,
   }
   while (_cur_inter < _total_inter){
     _real_inter = _cur_inter;
-    // printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_real_inter);
+    printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_real_inter);
     // step 1: Origin release vehicle
 
     // printf("Realsing!\n");
@@ -265,7 +265,7 @@ int MNM_Realtime_Dta::get_optimization_gradient(MNM_Dta_Screenshot* screenshot,
   }
   while (_cur_inter < _total_inter){
     _real_inter = _cur_inter;
-    // printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_real_inter);
+    printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_real_inter);
     // step 1: Origin release vehicle
 
     // printf("Realsing!\n");
@@ -753,14 +753,14 @@ MNM_Dta_Screenshot *make_screenshot(std::string file_folder, MNM_ConfReader* con
 
     for (MNM_Veh* _veh : _dlink -> m_finished_array){
       _new_veh = _new_veh_factory -> make_veh(_veh -> m_start_time, _veh -> m_type);
-      copy_veh(_veh, _new_veh);
+      copy_veh(_veh, _new_veh, _shot);
       _new_dlink -> m_finished_array.push_back(_new_veh);
       _shot -> m_routing -> add_veh_path(_new_veh, old_routing -> m_tracker.find(_veh) -> second);
     }
 
     for (MNM_Veh* _veh : _dlink -> m_incoming_array){
       _new_veh = _new_veh_factory -> make_veh(_veh -> m_start_time, _veh -> m_type);
-      copy_veh(_veh, _new_veh);
+      copy_veh(_veh, _new_veh, _shot);
       _new_dlink -> m_incoming_array.push_back(_new_veh);
       _shot -> m_routing -> add_veh_path(_new_veh, old_routing -> m_tracker.find(_veh) -> second);
     }
@@ -773,7 +773,7 @@ MNM_Dta_Screenshot *make_screenshot(std::string file_folder, MNM_ConfReader* con
         _new_cell = _new_ctm -> m_cell_array[i];
         for (MNM_Veh* _veh : _cell -> m_veh_queue){
           _new_veh = _new_veh_factory -> make_veh(_veh -> m_start_time, _veh -> m_type);
-          copy_veh(_veh, _new_veh);
+          copy_veh(_veh, _new_veh, _shot);
           _new_cell -> m_veh_queue.push_back(_new_veh);
           _shot -> m_routing -> add_veh_path(_new_veh, old_routing -> m_tracker.find(_veh) -> second);
         }
@@ -784,7 +784,7 @@ MNM_Dta_Screenshot *make_screenshot(std::string file_folder, MNM_ConfReader* con
       for (auto _veh_it = _pq -> m_veh_queue.begin(); _veh_it != _pq -> m_veh_queue.end(); _veh_it++){
         MNM_Veh *_veh = _veh_it -> first;
         _new_veh = _new_veh_factory -> make_veh(_veh -> m_start_time, _veh -> m_type);
-        copy_veh(_veh, _new_veh);
+        copy_veh(_veh, _new_veh, _shot);
         _new_pq -> m_veh_queue.insert(std::pair<MNM_Veh*, TInt>(_new_veh, _veh_it->second));
         _shot -> m_routing -> add_veh_path(_new_veh, old_routing -> m_tracker.find(_veh) -> second);
       }

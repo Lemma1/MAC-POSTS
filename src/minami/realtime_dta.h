@@ -92,11 +92,11 @@ namespace MNM
 }
 
 
-void static inline copy_veh(MNM_Veh* _veh, MNM_Veh *_new_veh){
-  _new_veh -> m_current_link = _veh -> m_current_link;
+void static inline copy_veh(MNM_Veh* _veh, MNM_Veh *_new_veh, MNM_Dta_Screenshot *_shot){
+  _new_veh -> m_current_link = _shot -> m_link_factory -> get_link(_veh -> m_current_link -> m_link_ID);
   _new_veh -> m_start_time = _veh -> m_start_time;
-  _new_veh -> m_next_link = _veh -> m_next_link;
-  _new_veh -> set_destination(_veh -> get_destination());
-  _new_veh -> set_origin(_veh -> get_origin());
+  _new_veh -> m_next_link = _shot -> m_link_factory -> get_link(_veh -> m_next_link -> m_link_ID);
+  _new_veh -> set_destination(_shot -> m_od_factory -> get_destination(_veh -> get_destination() -> m_Dest_ID));
+  _new_veh -> set_origin(_shot -> m_od_factory -> get_origin(_veh -> get_origin() -> m_Origin_ID));
 };
 #endif

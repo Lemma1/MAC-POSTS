@@ -233,6 +233,7 @@ int MNM_Dnode_Inout::prepare_supplyANDdemand()
     for (_veh_it = _in_link -> m_finished_array.begin(); _veh_it != _in_link -> m_finished_array.end(); _veh_it++){
       if (std::find(m_out_link_array.begin(), m_out_link_array.end(), (*_veh_it) -> get_next_link()) == m_out_link_array.end()) {
         printf("Vehicle in the wrong node, no exit!\n");
+        printf("Vehicle is on link %d, node %d, next link ID is: %d\n", _in_link -> m_link_ID(), m_node_ID(), (*_veh_it) -> get_next_link() -> m_link_ID());
         exit(-1);
       }
     }
@@ -375,12 +376,12 @@ int MNM_Dnode_Inout::move_vehicle()
           break; // break the inner most structure
         }
       }
-      // if (_num_to_move != 0){
-      //   printf("Something wrong during the vehicle moving, remaining to move %d\n", (int)_num_to_move);
-      //   printf("The finished veh queue is now size %d\n", (int)_in_link->m_finished_array.size());
-      //   printf("But it is heading to %d\n", (int)_in_link->m_finished_array.front() -> get_next_link() -> m_link_ID);
-      //   exit(-1);
-      // }
+      if (_num_to_move != 0){
+        printf("Something wrong during the vehicle moving, remaining to move %d\n", (int)_num_to_move);
+        printf("The finished veh queue is now size %d\n", (int)_in_link->m_finished_array.size());
+        printf("But it is heading to %d\n", (int)_in_link->m_finished_array.front() -> get_next_link() -> m_link_ID);
+        exit(-1);
+      }
     }
     // make the queue randomly perturbed, may not be true in signal controlled intersection
     // TODO 
