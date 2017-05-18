@@ -25,7 +25,7 @@ bool is_file_exist(const char *fileName)
 int main(int argc, char *argv[])
 {
   if (argc != 2){
-    printf("Usage: ./server /home/hzn/project/dataproject/manage.py (do not forget the second argument)\n");
+    printf("Usage: ./server path/to/manage.py (do not forget the second argument)\n");
     return -1;
   }
   printf("Position of manage.py is......\n");
@@ -78,8 +78,9 @@ int main(int argc, char *argv[])
     std::remove(instruction_file_name.c_str());
     std::string command = "python ";
     
-    command = command + manage_temp + " import_online_congestion";
+    command = command + manage_temp + " runscript storing_online_values";
     //"python /home/hzn/project/dataproject/manage.py import_online_congestion"
+    std::cout << "Excuting: " << command << std::endl;
     std::cout << system(command.c_str());
   }
   return 0;
