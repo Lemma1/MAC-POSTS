@@ -2,7 +2,10 @@
 
 #target_link_libraries (pathDemo LINK_PUBLIC Snap g3log ${CMAKE_THREAD_INIT})
 
-#add_executable (ctm test_ctm.cpp vehicle.cpp dlink.cpp od.cpp factory.cpp dnode.cpp ults.cpp dta.cpp)
+#add_executable (ctm test_ctm.cpp)
+
+#target_link_libraries (ctm Snap g3log minami ${CMAKE_THREAD_INIT})
+
 
 add_executable (dta_response test_dta.cpp)
 
