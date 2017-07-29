@@ -14,7 +14,7 @@ int main()
   PNEGraph graph = MNM_IO::build_graph(file_folder, conf_reader);
   // TInt dest_node_ID = graph -> GetRndNId();
   TInt dest_node_ID = 6;
-  TInt max_interval = 10;
+  TInt max_interval = 50;
 
   std::unordered_map<TInt, TFlt*> cost_map = std::unordered_map<TInt, TFlt*>();
   TFlt *tmp;

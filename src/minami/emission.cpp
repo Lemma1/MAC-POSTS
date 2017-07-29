@@ -29,7 +29,19 @@ int MNM_Cumulative_Emission::register_link(MNM_Dlink *link){
   return 0;
 }
 
+
 TFlt MNM_Cumulative_Emission:: calculate_fuel_rate(TFlt v)
+{
+  TFlt _fule_eco =  1.19102380 * 1e-07 * pow(v, 5) 
+                  - 2.67383161 * 1e-05 * pow(v, 4)
+                  + 2.35409750 * 1e-03 * pow(v, 3) 
+                  - 1.11752399 * 1e-01 * pow(v, 2)
+                  + 2.96137050 * pow(v, 1) -1.51623933;
+  // printf("fuel rate is %lf\n", 1.0/_fule_eco());
+  return MNM_Ults::max(TFlt(1)/_fule_eco, TFlt(0));
+}
+
+TFlt MNM_Cumulative_Emission:: calculate_fuel_rate_deprecated(TFlt v)
 {
   TFlt _fule_eco = -1.47718733159777 * 1e-13 * pow(v, 10) 
                   + 6.8247176456893 * 1e-11 * pow(v, 9)
@@ -43,6 +55,14 @@ TFlt MNM_Cumulative_Emission:: calculate_fuel_rate(TFlt v)
 }
 
 TFlt MNM_Cumulative_Emission::calculate_CO2_rate(TFlt v)
+{
+  TFlt _fuel_rate = calculate_fuel_rate(v);
+  // printf("CO2 rate is %lf\n", _fuel_rate * TFlt(8875)());
+  return MNM_Ults::max(_fuel_rate * TFlt(8887), TFlt(0));
+}
+
+
+TFlt MNM_Cumulative_Emission::calculate_CO2_rate_deprecated(TFlt v)
 {
   TFlt _fuel_rate = calculate_fuel_rate(v);
   // printf("CO2 rate is %lf\n", _fuel_rate * TFlt(8875)());
@@ -86,11 +106,11 @@ int MNM_Cumulative_Emission::update()
   // printf("ce counter is now %d\n", m_counter());
   TFlt _v;
   TFlt _v_converted;
-  _v_converted = MNM_Ults::max(_v_converted, TFlt(5));
-  _v_converted = MNM_Ults::min(_v_converted, TFlt(65));
   for (MNM_Dlink *link : m_link_vector){
     _v = link -> m_length / link -> get_link_tt(); // m/s
     _v_converted = _v * TFlt(3600) / TFlt(1600); // mile / hour
+    _v_converted = MNM_Ults::max(_v_converted, TFlt(5));
+    _v_converted = MNM_Ults::min(_v_converted, TFlt(65));
     m_fuel += calculate_fuel_rate(_v_converted) 
               * (_v * m_unit_time / TFlt(1600))  
               * link -> get_link_flow();
