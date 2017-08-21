@@ -52,7 +52,15 @@ int MNM_Dta::set_routing()
   if (m_config -> get_string("routing_type") == "Hybrid"){
     m_routing = new MNM_Routing_Hybrid(m_file_folder, m_graph, m_statistics,
                                    m_od_factory, m_node_factory, m_link_factory);
+  }else if(m_config ->get_string("routing_type")=="Predetermined"){
+    
+    Path_Table *_path_table = MNM::build_pathset(m_graph, m_od_factory, m_link_factory);
+    MNM_Pre_Routing *_pre_routing = new MNM_Pre_Routing(_path_table,m_od_factory);
+    m_routing = new MNM_Routing_Predetermined(m_graph,m_od_factory,m_node_factory
+      ,m_link_factory,_path_table,_pre_routing);
   }
+
+
   // m_routing = new MNM_Routing_Random(m_graph, m_statistics, m_od_factory, m_node_factory, m_link_factory);
 
   return 0;  
