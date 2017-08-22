@@ -41,18 +41,18 @@ TFlt MNM_Cumulative_Emission:: calculate_fuel_rate(TFlt v)
   return MNM_Ults::max(TFlt(1)/_fule_eco, TFlt(0));
 }
 
-TFlt MNM_Cumulative_Emission:: calculate_fuel_rate_deprecated(TFlt v)
-{
-  TFlt _fule_eco = -1.47718733159777 * 1e-13 * pow(v, 10) 
-                  + 6.8247176456893 * 1e-11 * pow(v, 9)
-                  - 1.38867659079602 * 1e-8 * pow(v, 8) 
-                  + 1.63502795565324 * 1e-6 * pow(v, 7)
-                  - 0.000123021415999858 * pow(v,6) + 0.00616148672549657 * pow(v,5)
-                  - 0.207343000174098 * pow(v,4) + 4.61456181374348 * pow(v,3)
-                  - 64.856033832593 * pow(v,2) + 519.768517199759 * v - 1780.82307640254;
-  // printf("fuel rate is %lf\n", 1.0/_fule_eco());
-  return MNM_Ults::max(TFlt(1)/_fule_eco, TFlt(0));
-}
+// TFlt MNM_Cumulative_Emission:: calculate_fuel_rate_deprecated(TFlt v)
+// {
+//   TFlt _fule_eco = -1.47718733159777 * 1e-13 * pow(v, 10) 
+//                   + 6.8247176456893 * 1e-11 * pow(v, 9)
+//                   - 1.38867659079602 * 1e-8 * pow(v, 8) 
+//                   + 1.63502795565324 * 1e-6 * pow(v, 7)
+//                   - 0.000123021415999858 * pow(v,6) + 0.00616148672549657 * pow(v,5)
+//                   - 0.207343000174098 * pow(v,4) + 4.61456181374348 * pow(v,3)
+//                   - 64.856033832593 * pow(v,2) + 519.768517199759 * v - 1780.82307640254;
+//   // printf("fuel rate is %lf\n", 1.0/_fule_eco());
+//   return MNM_Ults::max(TFlt(1)/_fule_eco, TFlt(0));
+// }
 
 TFlt MNM_Cumulative_Emission::calculate_CO2_rate(TFlt v)
 {
@@ -62,12 +62,12 @@ TFlt MNM_Cumulative_Emission::calculate_CO2_rate(TFlt v)
 }
 
 
-TFlt MNM_Cumulative_Emission::calculate_CO2_rate_deprecated(TFlt v)
-{
-  TFlt _fuel_rate = calculate_fuel_rate(v);
-  // printf("CO2 rate is %lf\n", _fuel_rate * TFlt(8875)());
-  return MNM_Ults::max(_fuel_rate * TFlt(8875), TFlt(0));
-}
+// TFlt MNM_Cumulative_Emission::calculate_CO2_rate_deprecated(TFlt v)
+// {
+//   TFlt _fuel_rate = calculate_fuel_rate(v);
+//   // printf("CO2 rate is %lf\n", _fuel_rate * TFlt(8875)());
+//   return MNM_Ults::max(_fuel_rate * TFlt(8875), TFlt(0));
+// }
 
 TFlt MNM_Cumulative_Emission::calculate_HC_rate(TFlt v)
 {

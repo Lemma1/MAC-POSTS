@@ -48,8 +48,8 @@
 #add_executable (exp_link exp_link.cpp)
 #target_link_libraries (exp_link PUBLIC Snap minami)
 
-add_executable (test_emission test_emission.cpp)
-target_link_libraries (test_emission PUBLIC Snap minami)
+#add_executable (test_emission test_emission.cpp)
+#target_link_libraries (test_emission PUBLIC Snap minami)
 
 #add_executable (test_misc test_misc.cpp)
 #target_link_libraries (test_misc PUBLIC Snap minami)
@@ -59,3 +59,6 @@ target_link_libraries (test_emission PUBLIC Snap minami)
 
 #add_executable (test_tdsp test_tdsp.cpp)
 #target_link_libraries (test_tdsp Snap minami adv_ds)
+
+add_executable (test_due test_due.cpp)
+target_link_libraries (test_due Snap minami adv_ds)

@@ -3,8 +3,9 @@
 
 #include "radix_heap.h"
 
-#include <queue>
+#include <math.h>
 
+#include <queue>
 
 int MNM_Shortest_Path::one_to_one(TInt origin_node_ID, TInt dest_node_ID, 
                       PNEGraph graph, std::unordered_map<TInt, TFlt>& cost_map,
@@ -455,35 +456,42 @@ int MNM_TDSP_Tree::initialize()
 
 int MNM_TDSP_Tree::update_tree(std::unordered_map<TInt, TFlt*>& cost_map)
 {
+  printf("Init in update tree\n");
   // init tree and cost
   TInt _node_ID;
   for (auto _node_it = m_graph->BegNI(); _node_it < m_graph->EndNI(); _node_it++) {
     for (int t=0; t<m_max_interval; ++t){
       _node_ID = _node_it.GetId();
-      m_dist[_node_ID][t] = _node_ID == m_dest_node_ID ? TFlt(0) : TFlt(std::numeric_limits<double>::max());
+      m_dist[_node_ID][t] = _node_ID == m_dest_node_ID ?
+                             TFlt(0) : 
+                             TFlt(std::numeric_limits<double>::max());
       m_tree[_node_ID][t] = -1;
     }
   }
 
+  printf("SP in last t\n");
   // run last time interval
   MNM_Shortest_Path::all_to_one_Dijkstra(m_dest_node_ID, m_graph, cost_map, m_dist, m_tree,
                                         m_max_interval-1, m_max_interval-1, m_max_interval-1);
-
+  printf("Process M-2 to 0\n");
   // main loop for t = M-2 down to 0
   TFlt _temp_cost, _edge_cost;
   TInt _src_node, _dst_node;
   for (int t=m_max_interval-2; t > -1; t--){
+    // printf("%d\n", t);
     for (auto _edge_it = m_graph->BegEI(); _edge_it < m_graph -> EndEI(); _edge_it++){
       _dst_node = _edge_it.GetDstNId();
       _src_node = _edge_it.GetSrcNId();
       _edge_cost = cost_map[_edge_it.GetId()][t];
       _temp_cost = _edge_cost + get_distance_to_destination(_dst_node, TFlt(t) + _edge_cost);
       if (m_dist[_src_node][t] > _temp_cost){
+        // printf("At time %d, src %d to des %d\n", t, _src_node(), _edge_it.GetDstNId());
         m_dist[_src_node][t] = _temp_cost;
         m_tree[_src_node][t] = _edge_it.GetId();
       }
     }
   }
+  printf("Finished update tree\n");
   return 0;
 }
 
@@ -504,7 +512,13 @@ int MNM_TDSP_Tree::get_tdsp(TInt src_node_ID, TInt time, MNM_Path* path)
 
 TFlt MNM_TDSP_Tree::get_distance_to_destination(TInt node_ID, TFlt time_stamp)
 {
+  IAssert(m_dist.find(node_ID) != m_dist.end());
+  IAssert(m_dist[node_ID] != NULL);
+  IAssert(time_stamp >= 0);
+  // printf("Current time stamp is %lf, %d\n", time_stamp, int(time_stamp)+ 1);
+
   if (time_stamp >= TFlt(m_max_interval - 1)){
+    // printf("Enter if\n");
     return m_dist[node_ID][m_max_interval - 1];
   }
   return m_dist[node_ID][int(time_stamp) + 1];
