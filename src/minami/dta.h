@@ -11,6 +11,7 @@
 #include "statistics.h"
 #include "routing.h"
 #include "shortest_path.h"
+#include "pre_routing.h"
 
 #include <string>
 

@@ -54,8 +54,8 @@
 #add_executable (test_misc test_misc.cpp)
 #target_link_libraries (test_misc PUBLIC Snap minami)
 
-#add_executable (test_ksp test_ksp.cpp)
-#target_link_libraries (test_ksp PUBLIC Snap minami adv_ds)
+add_executable (test_ksp test_ksp.cpp)
+target_link_libraries (test_ksp PUBLIC Snap minami adv_ds)
 
 #add_executable (test_tdsp test_tdsp.cpp)
 #target_link_libraries (test_tdsp Snap minami adv_ds)
