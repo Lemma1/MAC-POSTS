@@ -33,3 +33,6 @@ build/
 *.exe
 *.out
 *.app
+
+# macOS desktop service store files
+*.DS_Store

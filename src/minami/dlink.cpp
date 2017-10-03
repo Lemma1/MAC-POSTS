@@ -215,7 +215,7 @@ int MNM_Dlink_Ctm::evolve(TInt timestamp)
 
   /* update volume */
   // printf("update volume\n");
-  if(m_num_cells > 1) {
+  if (m_num_cells > 1) {
     for (int i = 0; i < m_num_cells - 1; ++i) {
       m_cell_array[i] -> m_volume = m_cell_array[i] -> m_veh_queue.size();
     }
