@@ -45,7 +45,7 @@ class MNM_Dlink_Ctm_Multiclass : public MNM_Dlink
 	TFlt m_wave_ratio;
 	TFlt m_last_wave_ratio;
 	std::vector<Ctm_Cell*> m_cell_array;
-};
+}
 
 class MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass
 {
