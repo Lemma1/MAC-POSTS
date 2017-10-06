@@ -104,7 +104,7 @@ MNM_Dlink_Ctm::MNM_Dlink_Ctm( TInt ID,
   m_cell_array = std::vector<Ctm_Cell*>();
   TFlt _std_cell_length = m_ffs * unit_time;
   m_num_cells = TInt(floor(m_length/_std_cell_length)); 
-  if(m_num_cells == 0) {
+  if (m_num_cells == 0) {
     m_num_cells = 1;
   }
   TFlt _lane_hold_cap_last_cell = MNM_Ults::max(((m_length - TFlt(m_num_cells - 1) * _std_cell_length) / _std_cell_length) * m_lane_hold_cap,  m_lane_hold_cap);
@@ -134,12 +134,12 @@ int MNM_Dlink_Ctm::init_cell_array( TFlt unit_time, TFlt std_cell_length, TFlt l
 {
 
   Ctm_Cell *aCell = NULL;
-  for(int i = 0; i<m_num_cells - 1; ++i) {
+  for (int i = 0; i<m_num_cells - 1; ++i) {
     aCell = new Ctm_Cell(TFlt(m_number_of_lane) * std_cell_length * m_lane_hold_cap, 
                          TFlt(m_number_of_lane) * m_lane_flow_cap * unit_time,
                          m_flow_scalar,
                          m_wave_ratio);
-    if(aCell == NULL) {
+    if (aCell == NULL) {
       // LOG(WARNING) << "Fail to init the cell.";
       exit(-1);
     };
@@ -148,12 +148,12 @@ int MNM_Dlink_Ctm::init_cell_array( TFlt unit_time, TFlt std_cell_length, TFlt l
   }
   
   //since the last cell is a non-standard cell
-  if(m_length > 0.0) {
+  if (m_length > 0.0) {
     aCell = new Ctm_Cell(TFlt(m_number_of_lane) * std_cell_length * lane_hold_cap_last_cell, 
                          TFlt(m_number_of_lane) * m_lane_flow_cap * unit_time,
                          m_flow_scalar,
                          m_last_wave_ratio);
-    if(aCell == NULL) {
+    if (aCell == NULL) {
       // LOG(WARNING) << "Fail to init the cell.";
       exit(-1);
     }
@@ -180,7 +180,7 @@ void MNM_Dlink_Ctm::print_info() {
 int MNM_Dlink_Ctm::update_out_veh()
 {
   TFlt _temp_out_flux, _supply, _demand;
-  if(m_num_cells > 1) // if only one cell, no update is needed
+  if (m_num_cells > 1) // if only one cell, no update is needed
   {
     for (int i = 0; i < m_num_cells - 1; ++i)
     {
@@ -201,7 +201,7 @@ int MNM_Dlink_Ctm::evolve(TInt timestamp)
   TInt _num_veh_tomove;
   // printf("move previou cells\n");
   /* previous cells */
-  if(m_num_cells > 1) {
+  if (m_num_cells > 1) {
     for (int i = 0; i < m_num_cells - 1; ++i) {
       _num_veh_tomove = m_cell_array[i] -> m_out_veh;
       move_veh_queue(&(m_cell_array[i] -> m_veh_queue),
@@ -293,7 +293,7 @@ TFlt MNM_Dlink_Ctm::Ctm_Cell::get_supply()
     // _real_volume = m_hold_cap;
     return TFlt(0.0);
   }
-  if(m_wave_ratio <= 1.0) //this one is quite tricky, why not just _min(flwCap, hldCap - curDensity)*wvRatio? 
+  if (m_wave_ratio <= 1.0) //this one is quite tricky, why not just _min(flwCap, hldCap - curDensity)*wvRatio? 
     return m_flow_cap > _real_volume ? m_flow_cap: TFlt((m_hold_cap - _real_volume) * m_wave_ratio);  //flowCap equals to critical density
   else 
     return std::min(m_flow_cap, TFlt(m_hold_cap - _real_volume));
