@@ -5,8 +5,14 @@
 #include <algorithm>
 
 
-/**************************************************************************
-						Multiclass CTM Functions
+/******************************************************************************************************************
+*******************************************************************************************************************
+												Link Models
+*******************************************************************************************************************
+******************************************************************************************************************/
+
+
+/*						Multiclass CTM Functions
 **************************************************************************/
 
 MNM_Dlink_Ctm_Multiclass::MNM_Dlink_Ctm_Multiclass(TInt ID,
@@ -82,6 +88,7 @@ int MNM_Dlink_Ctm_Multiclass::init_cell_array(TFlt unit_time,
 											  TFlt std_cell_length, 
 											  TFlt lane_hold_cap_last_cell)
 {
+	// previous cells
 	Ctm_Cell_Multiclass *cell = NULL;
 	for (int i = 0; i < m_num_cells - 1; ++i){
 		cell = new Ctm_Cell_Multiclass(TFlt(m_number_of_lane) * std_cell_length * m_lane_hold_cap,
@@ -90,6 +97,19 @@ int MNM_Dlink_Ctm_Multiclass::init_cell_array(TFlt unit_time,
 							m_wave_ratio);
 		if (cell == NULL) {
 			printf("Fail to init the cell.\n");
+			exit(-1);
+		}
+		m_cell_array.push_back(cell);
+	}
+
+	// last cell
+	if (m_length > 0.0) {
+		cell = new Ctm_Cell_Multiclass(TFlt(m_number_of_lane) * std_cell_length * lane_hold_cap_last_cell,
+									   TFlt(m_number_of_lane) * m_lane_flow_cap * unit_time,
+									   m_flow_scalar,
+									   m_last_wave_ratio);
+		if (cell == NULL) {
+			printf("Fail to init the last cell.\n");
 			exit(-1);
 		}
 		m_cell_array.push_back(cell);
@@ -164,7 +184,7 @@ int MNM_Dlink_Ctm_Multiclass::move_last_cell()
 	TInt _num_veh_tomove;
 	_num_veh_tomove = m_cell_array[m_num_cells - 1] -> m_out_veh;
 	MNM_Veh* _veh;
-	std::map<TInt, std::deque<MNM_Veh*>*>::iterator _que_it;
+	// std::map<TInt, std::deque<MNM_Veh*>*>::iterator _que_it;
 	for (int i = 0; i < _num_veh_tomove; ++i)
 	{
 		_veh = m_cell_array[m_num_cells - 1] -> m_veh_queue.front();
@@ -237,9 +257,7 @@ TFlt MNM_Dlink_Ctm_Multiclass::get_link_tt()
 }
 
 
-
-/**************************************************************************
-							Multiclass CTM Cells
+/*							Multiclass CTM Cells
 **************************************************************************/
 
 MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::Ctm_Cell_Multiclass(TFlt hold_cap, 
@@ -278,6 +296,15 @@ TFlt MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::get_supply()
 	else
 		return std::min(m_flow_cap, TFlt(m_hold_cap - _real_volume));
 }
+
+
+
+/******************************************************************************************************************
+*******************************************************************************************************************
+												Node Models
+*******************************************************************************************************************
+******************************************************************************************************************/
+
 
 
 
