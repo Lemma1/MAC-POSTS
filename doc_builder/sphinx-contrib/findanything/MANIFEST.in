@@ -1,0 +1,4 @@
+include README.rst
+include LICENSE.txt
+include sphinxcontrib/findanything/css/*
+include sphinxcontrib/findanything/javascript/*

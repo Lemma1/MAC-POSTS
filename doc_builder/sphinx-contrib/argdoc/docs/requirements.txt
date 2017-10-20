@@ -1,0 +1,4 @@
+sphinx
+sphinxcontrib-argdoc
+numpydoc
+nose>=1.0

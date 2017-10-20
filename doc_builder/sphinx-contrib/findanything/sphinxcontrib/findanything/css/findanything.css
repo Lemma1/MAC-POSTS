@@ -1,0 +1,64 @@
+.fuzzy-finder form input {
+	width: 100%;
+}
+
+.fuzzy-finder {
+	padding: 0.3em;
+	background-color: white;
+	border: 1px solid;
+}
+
+.fuzzy-find-results ul {
+	margin: 0;
+	padding: 0;
+}
+
+.fuzzy-find-results li {
+	list-style: none;
+	position: relative;
+	padding: 0.5em;
+	margin: 0 0.3em;
+	/* height: 2.5em; */
+	/* border-left: 2px solid rgba(0, 0, 0, 1); */
+	border-left: 2px solid white;
+}
+
+.fuzzy-find-results .name {
+	/* font-size: 120%; */
+}
+
+.fuzzy-find-results .path {
+	font-size: 66%;
+/*	display: none; */
+	display: block;
+}
+
+.fuzzy-find-results .info {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	font-size: 90%;
+	top: 0.5em;
+}
+
+.fuzzy-find-results .detail {
+	font-size: 66%;
+}
+
+
+.fuzzy-find-results li.selected {
+	border-left: 2px solid blue;
+}
+
+.fuzzy-find-results .rating {
+    font-size: 66%;
+    position: absolute;
+    right: 0;
+    bottom: 0.5em;
+}
+
+
+.fuzzy-find-results .num-results {
+	font-size: 66%;
+	text-align: center;
+}

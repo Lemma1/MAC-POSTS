@@ -1,0 +1,21 @@
+Release 0.2.2 (2014-12-08)
+--------------------------
+- Fixed the dependency installation
+
+Release 0.2.1 (2014-12-07)
+--------------------------
+- Fixed the missing dependencies
+- Improved documentation
+
+Release 0.2.0 (2014-12-06)
+--------------------------
+- Added support for python 3.x. Should also with python 2.6 and 2.7
+- Fixed some minor issues
+- Updated documentation
+
+Release 0.1.0 (2011-08-28)
+--------------------------
+Initial release, under the name: :mod:`sphinxcontrib.exceltable`. Initially the extension was introduced as a part of
+Rusty_
+
+.. :mode=rest:

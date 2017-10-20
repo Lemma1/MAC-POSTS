@@ -1,0 +1,4 @@
+/* Make interface headings green, but not subheadings */
+@import url("sphinxdoc.css");
+
+dl.interface > dt { background-color: #33FF33; } /* Websafe colour */

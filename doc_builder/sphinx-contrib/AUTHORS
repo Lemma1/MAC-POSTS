@@ -1,0 +1,164 @@
+This file lists all extensions in this package and their authors.
+
+aafig:
+   Leandro Lucarella <llucax@gmail.com>
+
+argdoc:
+    Joshua Griffin Dunn <joshua.g.dunn@gmail.com>
+
+autorun:
+   Vadim Gubergrits <vadim.gubergrits@gmail.com>
+
+cheader:
+   Arto Bendiken <arto@bendiken.net>
+
+context:
+   Wei-Wei Guo <wwguocn@gmail.com>
+
+feed:
+   Dan MacKinlay <sphinx@email.possumpalace.org>
+
+gnuplot:
+   Vadim Gubergrits <vadim.gubergrits@gmail.com>
+
+httpdomain:
+   Hong Minhee <hongminhee@member.fsf.org>
+
+lilypond:
+   Wei-Wei Guo <wwguocn@gmail.com>
+
+mscgen:
+   Leandro Lucarella <llucax@gmail.com>
+
+napoleon:
+   Rob Ruana <rob@robruana.com>
+
+rubydomain:
+   SHIBUKAWA Yoshiki <yoshiki@shibu.jp>
+
+sword:
+   Wei-Wei Guo <wwguocn@gmail.com>
+
+sdedit:
+   SHIBUKAWA Yoshiki <yoshiki@shibu.jp>
+
+traclinks:
+   Kevin Horn <kevin.horn@gmail.com>
+
+zopeext:
+   Michael McNeil Forbes <mforbes@alum.mit.edu>
+
+googleanalytics:
+   Domen Kožar <domen@dev.si>
+
+doxylink
+   Matt Williams <matt@milliams.com>
+
+ansi:
+   Sebastian Wiesner <lunaryorn@googlemail.com>
+
+cheeseshop:
+   Richard Jones <r1chardj0n3s@gmail.com>
+   Georg Brandl <georg@python.org>
+
+plantuml:
+   Yuya Nishihara <yuya@tcha.org>
+
+sadisplay:
+   Evgeniy Tatarkin <tatarkin.evg@gmail.com>
+
+blockdiag:
+   Takeshi KOMIYA <i.tkomiya@gmail.com>
+
+seqdiag:
+   Takeshi KOMIYA <i.tkomiya@gmail.com>
+
+actdiag:
+   Takeshi KOMIYA <i.tkomiya@gmail.com>
+
+nwdiag:
+   Takeshi KOMIYA <i.tkomiya@gmail.com>
+
+googlechart:
+   Takeshi KOMIYA <i.tkomiya@gmail.com>
+
+googlemaps:
+   Takeshi KOMIYA <i.tkomiya@gmail.com>
+
+nicovideo:
+   Takeshi KOMIYA <i.tkomiya@gmail.com>
+
+slide:
+   Takeshi KOMIYA <i.tkomiya@gmail.com>
+
+cacoo:
+   Takeshi KOMIYA <i.tkomiya@gmail.com>
+
+astah:
+   Takeshi KOMIYA <i.tkomiya@gmail.com>
+
+requirements:
+   Andrey Mikhaylenko <neithere@gmail.com>
+
+hyphenator:
+   Björn Müller <diehose@freenet.de>
+
+youtube:
+   Chris Pickel <sfiera@gmail.com>
+
+clearquest:
+   Robin Jarry <robin.jarry@gmail.com>
+
+rawfiles:
+   Takumi IINO <trot.thunder@gmail.com>
+
+tikz:
+   Christoph Reller <christoph.reller@gmail.com>
+
+mockautodoc:
+   Evgeniy Tatarkin <tatarkin.evg@gmail.com>
+
+matlabdomain:
+   Mark Mikofski <bwana.marko@yahoo.com>
+
+swf:
+   Kay-Uwe (Kiwi) Lorenz <kiwi@franka.dyndns.org>
+
+findanything:
+   Kay-Uwe (Kiwi) Lorenz <kiwi@franka.dyndns.org>
+
+domaintools:
+   Kay-Uwe (Kiwi) Lorenz <kiwi@franka.dyndns.org>
+
+makedomain:
+   Kay-Uwe (Kiwi) Lorenz <kiwi@franka.dyndns.org>
+
+cmakedomain:
+   Kay-Uwe (Kiwi) Lorenz <kiwi@franka.dyndns.org>
+
+inlinesyntaxhighlight:
+   Kay-Uwe (Kiwi) Lorenz <kiwi@franka.dyndns.org>
+
+restbuilder:
+   Freek Dijkstra <software@macfreek.nl>
+
+lassodomain:
+   Eric Knibbe <eric@lassosoft.com>
+
+py_directive:
+   Bill Purcell <william@whpiv.net>
+
+autoprogram:
+   Hong Minhee <hongminhee@member.fsf.org>
+
+examplecode:
+    Serge Domkowski <sergedomk@gmail.com>
+
+autoanysrc:
+   Evgeniy Tatarkin <tatarkin.evg@gmail.com>
+
+cf3domain:
+   Jimmy Thrasibule <jimmy.thrasibule@gmail.com>
+
+documentedlist:
+   Chintalagiri Shashank <shashank@chintal.in>
