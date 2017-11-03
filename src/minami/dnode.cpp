@@ -45,7 +45,7 @@ int MNM_DMOND::evolve(TInt timestamp)
     m_out_volume.find(_link) -> second = 0;
   }  
 
-  /* compute our flow */
+  /* compute out flow */
   std::deque<MNM_Veh*>::iterator _que_it = m_in_veh_queue.begin();
   while (_que_it != m_in_veh_queue.end()) {
     _link = (*_que_it) -> get_next_link();
@@ -85,7 +85,7 @@ int MNM_DMOND::evolve(TInt timestamp)
         }
       }
       else{
-        break; //break whill loop
+        break; //break while loop
       }
 
     }

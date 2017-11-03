@@ -16,39 +16,62 @@
 **************************************************************************/
 
 MNM_Dlink_Ctm_Multiclass::MNM_Dlink_Ctm_Multiclass(TInt ID,
-												   TFlt lane_hold_cap,
-												   TFlt lane_flow_cap,
 												   TInt number_of_lane,
 												   TFlt length,
-												   TFlt ffs,
+												   TFlt lane_hold_cap_car,
+												   TFlt lane_hold_cap_truck,
+												   TFlt lane_flow_cap_car,
+												   TFlt lane_flow_cap_truck,
+												   TFlt ffs_car,
+												   TFlt ffs_truck,
 												   TFlt unit_time,
 												   TFlt flow_scalar)
-	: MNM_Dlink::MNM_Dlink(ID, number_of_lane, length, ffs)
+	: MNM_Dlink::MNM_Dlink(ID, number_of_lane, length) // Note: m_ffs is not used in child class
 {
-	if (lane_hold_cap < 0){
-		printf("lane_hold_cap can't be less than zero, current link ID is %d\n", m_link_ID());
+	// Jam density for private cars and trucks cannot be negative
+	if ((lane_hold_cap_car < 0) || (lane_hold_cap_truck < 0)){
+		printf("lane_hold_cap can't be negative, current link ID is %d\n", m_link_ID());
 		exit(-1);
 	}
-
-	if (lane_hold_cap > TFlt(300) / TFlt(1600)){
+	// Jam density for private cars cannot be too large
+	if (lane_hold_cap_car > TFlt(300) / TFlt(1600)){
 		// "lane_hold_cap is too large, set to 300 veh/mile
-		lane_hold_cap = TFlt(300) / TFlt(1600);
+		lane_hold_cap_car = TFlt(300) / TFlt(1600);
+	}
+	// Jam density for trucks cannot be too large !!!NEED CHECK FOR THRESHOLD!!!
+	if (lane_hold_cap_truck > TFlt(300) / TFlt(1600)){
+		// "lane_hold_cap is too large, set to 300 veh/mile
+		lane_hold_cap_truck = TFlt(300) / TFlt(1600);
 	}
 
+	// Maximum flux for private cars and trucks cannot be negative
 	if (lane_flow_cap < 0){
 		printf("lane_flow_cap can't be less than zero, current link ID is %d\n", m_link_ID());
 		exit(-1);
 	}
-
-	if (lane_flow_cap > TFlt(3500) / TFlt(3600)){
+	// Maximum flux for private cars cannot be too large
+	if (lane_flow_cap_car > TFlt(3500) / TFlt(3600)){
 		// lane_flow_cap is too large, set to 3500 veh/hour
-		lane_flow_cap = TFlt(3500) / TFlt(3600);
+		lane_flow_cap_car = TFlt(3500) / TFlt(3600);
+	}
+	// Maximum flux for trucks cannot be too large !!!NEED CHECK FOR THRESHOLD!!!
+	if (lane_flow_cap_car > TFlt(3500) / TFlt(3600)){
+		// lane_flow_cap is too large, set to 3500 veh/hour
+		lane_flow_cap_car = TFlt(3500) / TFlt(3600);
 	}
 
-	m_lane_flow_cap = lane_flow_cap;
+	m_lane_flow_cap_car = lane_flow_cap_car;
+	m_lane_flow_cap_truck = lane_flow_cap_truck;	
+	m_lane_hold_cap_car = lane_hold_cap_car;
+	m_lane_hold_cap_truck = lane_hold_cap_truck;
+	m_ffs_car = ffs_car;
+	m_ffs_truck = ffs_truck;
 	m_flow_scalar = flow_scalar;
+
 	m_cell_array = std::vector<Ctm_Cell_Multiclass*>();
-	TFlt _std_cell_length = m_ffs * unit_time;
+
+	// Note m_ffs_car > m_ffs_truck, so use ffs_car to define the cell length
+	TFlt _std_cell_length = m_ffs_car * unit_time;
 	m_num_cells = TInt(floor(m_length / _std_cell_length));
 	if (m_num_cells == 0){
 		m_num_cells = 1;
@@ -139,7 +162,7 @@ int MNM_Dlink_Ctm_Multiclass::update_out_veh()
 	if (m_num_cells > 1){
 		for (int i = 0; i < m_num_cells - 1; ++i){
 			_demand = m_cell_array[i] -> get_demand();
-			_supply = m_cell_array[i] -> get_supply();
+			_supply = m_cell_array[i + 1] -> get_supply();
 			_temp_out_flux = MNM_Ults::min(_demand, _supply) * m_flow_scalar;
 			m_cell_array[i] -> m_out_veh = MNM_Ults::round(_temp_out_flux);
 		}

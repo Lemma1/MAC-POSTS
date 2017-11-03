@@ -11,11 +11,14 @@ class MNM_Dlink_Ctm_Multiclass : public MNM_Dlink
 {
 public:
 	MNM_Dlink_Ctm_Multiclass(TInt ID,
-							 TFlt lane_hold_cap,
-							 TFlt lane_flow_cap,
 							 TInt number_of_lane,
 							 TFlt length,
-							 TFlt ffs,
+							 TFlt lane_hold_cap_car,
+							 TFlt lane_hold_cap_truck,
+							 TFlt lane_flow_cap_car,
+							 TFlt lane_flow_cap_truck,
+							 TFlt ffs_car,
+							 TFlt ffs_truck,
 							 TFlt unit_time,
 							 TFlt flow_scalar);
 	~MNM_Dlink_Ctm_Multiclass();
@@ -31,8 +34,12 @@ public:
 	int update_out_veh();
 	int move_last_cell();
 	TInt m_num_cells;
-	TFlt m_lane_hold_cap;
-	TFlt m_lane_flow_cap;
+	TFlt m_ffs_car;
+	TFlt m_ffs_truck;
+	TFlt m_lane_hold_cap_car;
+	TFlt m_lane_hold_cap_truck;
+	TFlt m_lane_flow_cap_car;
+	TFlt m_lane_flow_cap_truck;
 	TFlt m_flow_scalar;
 	TFlt m_wave_ratio;
 	TFlt m_last_wave_ratio;
