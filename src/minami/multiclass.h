@@ -3,7 +3,6 @@
 
 #include "dlink.h"
 
-
 /**************************************************************************
 							Multiclass CTM
 			(currently only for car & truck two classes)

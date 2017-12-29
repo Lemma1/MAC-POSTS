@@ -28,8 +28,11 @@ public:
   int finish(TInt finish_time);
   MNM_Origin *get_origin();
   int set_origin(MNM_Origin * origin);
+  Vehicle_class get_vehicle_class();
+  int set_vehicle_class(Vehicle_class v_class);
 // private:
   Vehicle_type m_type;
+  Vehicle_class m_class;
   MNM_Dlink *m_current_link;
   TInt m_start_time;
   TInt m_finish_time;

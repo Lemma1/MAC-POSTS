@@ -69,3 +69,14 @@ int MNM_Veh::set_origin(MNM_Origin * origin)
   m_origin = origin;
   return 0;
 }
+
+Vehicle_class MNM_Veh::get_vehicle_class()
+{
+  return m_class;
+}
+
+int set_vehicle_class(Vehicle_class v_class)
+{
+  m_class = v_class;
+  return 0;
+}
