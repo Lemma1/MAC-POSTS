@@ -117,6 +117,42 @@ public:
 *******************************************************************************************************************
 ******************************************************************************************************************/
 
-class MNM_Dnode_Inout
+class MNM_Dnode_Inout_Multiclass : public MNM_Dnode
+{
+public:
+	MNM_Dnode_Inout_Multiclass(TInt ID, TFlt flow_scalar);
+	~MNM_Dnode();
+	int virtual evolve(TInt timestamp) override;
+	void virtual print_info();
+	int virtual prepare_loading() override;
+	int virtual add_out_link(MNM_Dlink* out_link) override;
+	int virtual add_in_link(MNM_Dlink* in_link) override;
+protected:
+	int prepare_supplyANDdemand();
+	int virtual compute_flow(){return 0;};
+	int round_flow_to_vehicle();
+	int move_vehicle();
+	int record_cumulative_curve(TInt timestamp);
+	TFlt *m_demand; //2d
+	TFlt *m_supply; //1d
+	TFlt *m_veh_flow; //2d
+	TFlt *m_veh_tomove; //2d
+};
+
+/**************************************************************************
+                              FWJ node
+**************************************************************************/
+class MNM_Dnode_FWJ_Multiclass : public MNM_Dnode_Inout_Multiclass
+{
+public:
+	MNM_Dnode_FWJ_Multiclass(TInt ID, TFlt flow_scalar);
+	~MNM_Dnode_FWJ_Multiclass();
+	void virtual print_info() override;
+	int virtual compute_flow() override;
+};
+
+
+
+
 
 #endif
