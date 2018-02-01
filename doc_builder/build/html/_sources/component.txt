@@ -5,7 +5,7 @@ Components
 Introduction
 ------------
 
-There are several components implemented, which form the essential parts of each traffic model in MINAMI. The components usually have a base class, and the acutal implementation will inherit the base class, thus ensuring the uniformness of the interface. Here is the list we implemented:
+There are several components implemented, which form the essential parts of each traffic model in MAC-POSTS. The components usually have a base class, and the acutal implementation will inherit the base class, thus ensuring the uniformness of the interface. Here is the list we implemented:
 
 .. hlist::
   :columns: 1

@@ -3,12 +3,17 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-MINAMI
+MAC-POSTS
 ======
+
+
+Note For Users:
+------------
+This domain has been reserved by Mobility Data Analytics Center at Carnegie Mellon University for further development. Please check back later.
 
 Introduction
 ------------
-      MINAMI is the abbreviation for *Multi-functIonal dyNAmic network Modeling tookIt*. It is a mesoscopic traffic simulation library for dynamic network loading. This library is interface based and is friendly to new node/link/routing models.
+      MAC-POSTS is the abbreviation for *Mobility Data Analytics Center - Prediction, Optimization, and Simulation toolkit for Transportation Systems*. It is a mesoscopic traffic simulation library for dynamic network loading. This library is interface based and is friendly to new node/link/routing models.
 
       The library mainly consists of three parts. One part is called component, which is the separated model such as dynamic node/link model, real-time routing model and so on. Each component has clear interfaces with other components, so we can implement each components with different actual models. Here are the components that we already implemented:
 
@@ -58,10 +63,11 @@ People
 
 .. glossary::
    Advisor:
-      Zhen (Sean) Qian
+      * Zhen (Sean) Qian
 
    Contributors:
-      Wei Ma
+      * Wei Ma
+      * Xidong Pi
 
 
 
