@@ -758,3 +758,41 @@ int MNM_Dnode_FWJ_Multiclass::compute_flow()
 
 	return 0;
 }
+
+
+/**************************************************************************
+                   General Road Junction node
+**************************************************************************/
+MNM_Dnode_GRJ_Multiclass::MNM_Dnode_GRJ_Multiclass(TInt ID, TFlt flow_scalar)
+  : MNM_Dnode_Inout::MNM_Dnode_Inout(ID, flow_scalar)
+{
+  m_d_a = NULL;
+  m_C_a = NULL;
+}
+
+MNM_Dnode_GRJ_Multiclass::~MNM_Dnode_GRJ_Multiclass()
+{
+  if (m_d_a != NULL) free(m_d_a);
+  if (m_C_a != NULL) free(m_C_a);
+}
+
+int MNM_Dnode_GRJ_Multiclass::prepare_loading()
+{
+  MNM_Dnode_Inout::prepare_loading();
+  TInt _num_in = m_in_link_array.size();
+  m_d_a = (TFlt*) malloc(sizeof(TFlt) * _num_in);
+  memset(m_d_a, 0x0, sizeof(TFlt) * _num_in);
+  m_C_a = (TFlt*) malloc(sizeof(TFlt) * _num_in);
+  memset(m_C_a, 0x0, sizeof(TFlt) * _num_in);
+  return 0;
+}
+
+void MNM_Dnode_GRJ_Multiclass::print_info()
+{
+  ;
+}
+
+int MNM_Dnode_GRJ_Multiclass::compute_flow()
+{
+	
+}

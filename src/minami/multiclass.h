@@ -151,8 +151,26 @@ public:
 	int virtual compute_flow() override;
 };
 
-
-
+/**************************************************************************
+                   General Road Junction node
+**************************************************************************/
+class MNM_Dnode_GRJ_Multiclass : public MNM_Dnode_Inout_Multiclass
+{
+public:
+  MNM_Dnode_GRJ_Multiclass(TInt ID, TFlt flow_scalar);
+  ~MNM_Dnode_GRJ_Multiclass();
+  void virtual print_info() override;
+  int virtual compute_flow() override;
+  int virtual prepare_loading() override;
+private:
+  std::vector<std::vector<MNM_Dlink*>> m_pow;
+  TFlt get_theta();
+  int prepare_outflux();
+  TFlt *m_d_a; //1d array
+  TFlt *m_C_a; //1d array
+  template<typename T> std::vector<std::vector<T> > powerSet(const std::vector<T>& set);
+  std::vector<int> getOnLocations(int a);
+};
 
 
 #endif
