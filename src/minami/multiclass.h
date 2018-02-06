@@ -5,7 +5,6 @@
 #include "dnode.h"
 
 
-
 /******************************************************************************************************************
 *******************************************************************************************************************
 												Link Models
@@ -31,6 +30,7 @@ public:
 							 TFlt ffs_car,
 							 TFlt ffs_truck,
 							 TFlt unit_time,
+							 TFlt veh_convert_factor,
 							 TFlt flow_scalar);
 	~MNM_Dlink_Ctm_Multiclass();
 	int virtual evolve(TInt timestamp) override;
@@ -54,6 +54,7 @@ public:
 	TFlt m_lane_rho_1_N;
 	TFlt m_lane_flow_cap_car;
 	TFlt m_lane_flow_cap_truck;
+	TFlt m_veh_convert_factor,
 	TFlt m_flow_scalar;
 	TFlt m_wave_speed_car;
 	TFlt m_wave_speed_truck;
@@ -130,7 +131,7 @@ public:
 protected:
 	int prepare_supplyANDdemand();
 	int virtual compute_flow(){return 0;};
-	int round_flow_to_vehicle();
+	// int flow_to_vehicle();
 	int move_vehicle();
 	int record_cumulative_curve(TInt timestamp);
 	TFlt *m_demand; //2d

@@ -33,8 +33,8 @@ For every time doing the evolution of link and node flow, the following steps ar
 
 * Nodes:
 
-	#. Calculated demand of each upstream link to every downstream link. Basically count the number of vehicles in **(4) Finished array** of each upstream link. (Q: should we covert 1 truck to (1+c)*car?)
-	#. Calculated supply of each downstream link, which is decided by the volume of vehicles in the first cell of each downstream link.
+	#. Calculated demand of each upstream link to every downstream link. Basically count the number of vehicles in **(4) Finished array** of each upstream link. Note 1 truck should be counted as (1+c)*car.
+	#. Calculated supply of each downstream link, which is decided by the volume of vehicles in the first cell of each downstream link. Similarly, 1 truck should be counted as (1+c)*car.
 	#. Using the *uncontrolled junction* model to compute the flux from each upstream link to each downstream link.
 	#. Move vehicles from **(4) Finished array** of each upstream link to **(3) Incoming array** of each downstream link.
 
