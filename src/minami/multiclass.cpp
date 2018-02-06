@@ -655,7 +655,6 @@ int MNM_Dnode_Inout_Multiclass::prepare_supplyANDdemand()
 //			_to_move += m_veh_tomove[i * _offset + j];
 // 		}
 // 	}
-
 // 	return 0;
 // }
 
