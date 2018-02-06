@@ -38,7 +38,7 @@ For every time doing the evolution of link and node flow, the following steps ar
 	#. Using the *uncontrolled junction* model to compute the flux from each upstream link to each downstream link.
 	#. Move vehicles from **(4) Finished array** of each upstream link to **(3) Incoming array** of each downstream link.
 
-Note on links the private cars and trucks are FIFO separately but not FIFO aggregately. At nodes the traffic is generally not FIFO.
+Note on links the private cars and trucks are FIFO separately but not FIFO aggregately. At nodes the traffic is FIFO for vehicles with same route.
 
 .. toctree::
    :maxdepth: 1

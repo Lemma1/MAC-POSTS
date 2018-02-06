@@ -645,12 +645,14 @@ int MNM_Dnode_Inout_Multiclass::prepare_supplyANDdemand()
 // {
 // 	size_t _offset = m_out_link_array.size();
 // 	MNM_Dlink *_out_link;
+//  TFlt _to_move;
 // 	size_t _rand_idx;
 // 	for (size_t j = 0; j < m_out_link_array.size(); ++j){
 // 		_to_move = 0;
 // 		_out_link = m_out_link_array[j];
 // 		for (size_t i = 0; i < m_in_link_array.size(); ++i){
 // 			m_veh_tomove[i * _offset + j] = m_veh_flow[i * _offset + j] * m_flow_scalar;
+//			_to_move += m_veh_tomove[i * _offset + j];
 // 		}
 // 	}
 
@@ -721,6 +723,8 @@ int MNM_Dnode_Inout_Multiclass::move_vehicle()
 	        				_equiv_num = _in_link -> m_veh_convert_factor;
 	        			}
 	        			if (_to_move < _equiv_num) {
+	        				// randomly decide to move or not in this case 
+	        				// base on the probability = _to_move/_equiv_num < 1
 	        				_r = TFlt((double) rand() / (RAND_MAX));
 	        				if (_r <= _to_move/_equiv_num){
 	        					_out_link -> m_incoming_array.push_back(_veh);
