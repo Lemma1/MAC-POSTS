@@ -19,7 +19,7 @@ int main()
 	d -> m_Dest_ID = 11;
 
 	std::cout << "Add a new link\n";
-	MNM_Dlink *l = new MNM_Dlink_Ctm(0, 0.125, 0.611, 2, 500, 13.33, 5, 1);
+	MNM_Dlink *l = new MNM_Dlink_Ctm_Multiclass(0, 2, 500, 0.125, 0.611, 0.125, 0.611, 13.33, 13.33, 5, 3, 1);
 	l -> print_info();
 
 	std::cout << "Add a new origin node and hook up origin\n";
@@ -43,7 +43,7 @@ int main()
 
 	std::cout << "Test ctm evolve\n";
 	l -> clear_incoming_array();
-	for (int i =0; i < 2; ++i) {
+	for (int i = 0 ; i < 2; ++i) {
 		l -> evolve(i);
 		l -> print_info();
 		for (int j = 0; j < 4; ++j) {
