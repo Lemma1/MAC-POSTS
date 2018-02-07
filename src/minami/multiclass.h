@@ -3,6 +3,7 @@
 
 #include "dlink.h"
 #include "dnode.h"
+#include "vehicle.h"
 
 
 /******************************************************************************************************************
@@ -58,7 +59,7 @@ public:
 	TFlt m_lane_rho_1_N;
 	TFlt m_lane_flow_cap_car;
 	TFlt m_lane_flow_cap_truck;
-	TFlt m_veh_convert_factor,
+	TFlt m_veh_convert_factor;
 	TFlt m_flow_scalar;
 	TFlt m_wave_speed_car;
 	TFlt m_wave_speed_truck;
@@ -132,7 +133,7 @@ class MNM_Dnode_Inout_Multiclass : public MNM_Dnode
 {
 public:
 	MNM_Dnode_Inout_Multiclass(TInt ID, TFlt flow_scalar);
-	~MNM_Dnode();
+	~MNM_Dnode_Inout_Multiclass();
 	int virtual evolve(TInt timestamp) override;
 	void virtual print_info();
 	int virtual prepare_loading() override;
@@ -182,6 +183,23 @@ private:
   TFlt *m_C_a; //1d array
   template<typename T> std::vector<std::vector<T> > powerSet(const std::vector<T>& set);
   std::vector<int> getOnLocations(int a);
+};
+
+
+
+/******************************************************************************************************************
+*******************************************************************************************************************
+												Vehicle Class
+*******************************************************************************************************************
+******************************************************************************************************************/
+
+class MNM_Veh_Multiclass : public MNM_Veh
+{
+public:
+  MNM_Veh_Multiclass(TInt ID, TInt vehicle_class, TInt start_time);
+  ~MNM_Veh_Multiclass();
+
+  TInt m_class;
 };
 
 

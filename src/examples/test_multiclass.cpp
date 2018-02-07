@@ -4,6 +4,7 @@
 #include "dnode.h"
 #include "od.h"
 #include "factory.h"
+#include "multiclass.h"
 
 #include <deque>
 #include <iostream>

@@ -16,7 +16,7 @@ class MNM_Veh
 {
 public:
   MNM_Veh(TInt ID, TInt start_time);
-  ~MNM_Veh();
+  virtual ~MNM_Veh();
   TInt m_veh_ID;
   int set_current_link(MNM_Dlink *link);
   MNM_Dlink *get_current_link();
@@ -28,11 +28,8 @@ public:
   int finish(TInt finish_time);
   MNM_Origin *get_origin();
   int set_origin(MNM_Origin * origin);
-  Vehicle_class get_vehicle_class();
-  int set_vehicle_class(Vehicle_class v_class);
 // private:
   Vehicle_type m_type;
-  Vehicle_class m_class;
   MNM_Dlink *m_current_link;
   TInt m_start_time;
   TInt m_finish_time;
