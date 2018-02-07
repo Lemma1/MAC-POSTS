@@ -40,10 +40,14 @@ public:
 	TFlt virtual get_link_flow() override;
 	TFlt virtual get_link_tt() override;
 
+	// use this one instead of the one in Dlink class
+	int install_cumulative_curve_multiclass();
+
 	class Ctm_Cell_Multiclass;
 	int init_cell_array(TFlt unit_time, TFlt std_cell_length, TFlt last_cell_length);
 	int update_out_veh();
 	int move_last_cell();
+
 	TInt m_num_cells;
 	TFlt m_ffs_car;
 	TFlt m_ffs_truck;
@@ -59,6 +63,12 @@ public:
 	TFlt m_wave_speed_car;
 	TFlt m_wave_speed_truck;
 	std::vector<Ctm_Cell_Multiclass*> m_cell_array;
+
+	// Two seperate N-curves for private cars and trucks
+	MNM_Cumulative_Curve *m_N_in_car;
+  	MNM_Cumulative_Curve *m_N_out_car;
+  	MNM_Cumulative_Curve *m_N_in_truck;
+  	MNM_Cumulative_Curve *m_N_out_truck;
 };
 
 class MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass
@@ -137,7 +147,8 @@ protected:
 	TFlt *m_demand; //2d
 	TFlt *m_supply; //1d
 	TFlt *m_veh_flow; //2d
-	TFlt *m_veh_tomove; //2d
+	TFlt *m_veh_moved_car; //2d
+	TFlt *m_veh_moved_truck; //2d
 };
 
 /**************************************************************************
