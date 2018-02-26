@@ -56,8 +56,9 @@ int MNM_Dta::set_routing()
     
     Path_Table *_path_table = MNM::build_pathset(m_graph, m_od_factory, m_link_factory);
     MNM_Pre_Routing *_pre_routing = new MNM_Pre_Routing(_path_table,m_od_factory);
-    m_routing = new MNM_Routing_Predetermined(m_graph,m_od_factory,m_node_factory
-      ,m_link_factory,_path_table,_pre_routing);
+    m_routing = new MNM_Routing_Predetermined(m_graph,m_od_factory,m_node_factory,
+                    m_link_factory, _path_table,_pre_routing, 
+                    m_total_assign_inter);
   }
 
 
@@ -185,7 +186,7 @@ bool MNM_Dta::is_ok()
 int MNM_Dta::pre_loading()
 {
   MNM_Dnode *_node;
-  // printf("MNM: Prepare loading!\n");
+  printf("MNM: Prepare loading!\n");
   m_routing -> init_routing();
   // printf("Finish prepare routing\n");
   m_statistics -> init_record();

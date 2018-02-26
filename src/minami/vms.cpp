@@ -62,9 +62,9 @@ TInt MNM_Link_Vms::generate_detour_link(Path_Table *path_table, TInt next_assign
     _tmp_real = 0;
     for (MNM_Path* _path : *_map_it.second){
       // printf("prabablity is %f\n", _path -> buffer[2] );
-      _tmp_optimal += _path -> buffer[2] 
+      _tmp_optimal += _path -> m_buffer[2] 
                       * MNM::get_demand_bynode(_path -> m_node_vec.front(), _path -> m_node_vec.back(), next_assign_inter, node_factory);
-      _tmp_real += _path -> buffer[0] 
+      _tmp_real += _path -> m_buffer[0] 
                       * MNM::get_demand_bynode(_path -> m_node_vec.front(), _path -> m_node_vec.back(), next_assign_inter, node_factory);
     }
     if (_tmp_optimal - _tmp_real > _largest_diff){

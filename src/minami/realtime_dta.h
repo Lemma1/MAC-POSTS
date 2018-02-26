@@ -78,7 +78,7 @@ public:
 
 namespace MNM
 {
-  int run_from_screenshot(MNM_Dta_Screenshot* screenshot, MNM_ConfReader data_config,
+  int run_from_screenshot(MNM_Dta_Screenshot* screenshot, MNM_ConfReader *data_config,
                           TInt max_inter, TInt assign_inter, Path_Table *path_table,
                           MNM_OD_Factory *od_factory, std::string file_folder);
   MNM_Dta_Screenshot *make_screenshot(std::string file_folder, MNM_ConfReader* config, MNM_OD_Factory *od_factory,

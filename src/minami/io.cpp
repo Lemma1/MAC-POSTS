@@ -555,6 +555,42 @@ int MNM_IO::read_int(std::string file_name, std::vector<TInt>* reader)
   return 0;
 }
 
+
+int MNM_IO::read_float(std::string file_name, std::vector<TFlt*>* reader)
+{
+  /* find file */
+  std::ifstream _file;
+  _file.open(file_name, std::ios::in);   
+
+  std::string _line;
+  std::vector<std::string> _words;
+  TFlt _flt;
+  TInt _len;
+  TFlt *_tmp_flt;
+  if (_file.is_open())
+  {
+    printf("Start read float file.\n");
+    std::getline(_file,_line);
+    std::cout << "Processing: " << _line << "\n";
+    TInt num_record = TInt(std::stoi(trim(_line)));
+    printf("Total is %d\n", num_record());
+    for (int i=0; i < num_record; ++i){
+      std::getline(_file,_line);
+      _words = split(_line, ' ');
+      _len = TInt(_words.size());
+      _tmp_flt = (TFlt*) malloc(sizeof(TFlt) * _len);
+      // std::cout << "Processing: " << _line << "\n";
+      for (int j=0; j<_len; ++j){
+        _flt = TFlt(std::stof(trim(_words[j])));
+        _tmp_flt[j] = _flt;
+      }
+      reader -> push_back(_tmp_flt);
+    }
+    _file.close();
+  }  
+  return 0;
+}
+
 int MNM_IO::build_workzone_list(std::string file_folder, MNM_Workzone* workzone)
 {
   /* find file */

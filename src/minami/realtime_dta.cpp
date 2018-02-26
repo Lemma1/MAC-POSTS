@@ -67,7 +67,7 @@ int MNM_Realtime_Dta::init_running()
   for(auto _it : *m_path_table){
     for (auto _it_it : *(_it.second)){
       for (MNM_Path* _path : _it_it.second -> m_path_vec){
-        memset(_path -> buffer, 0x0, sizeof(TFlt) * 4);
+        memset(_path -> m_buffer, 0x0, sizeof(TFlt) * 4);
         _path -> m_p = 0;
       }
     }
@@ -196,7 +196,7 @@ int MNM_Realtime_Dta::get_estimation_gradient(MNM_Dta_Screenshot* screenshot,
   for(auto _it : *path_table){
     for (auto _it_it : *(_it.second)){
       for (MNM_Path* _path : _it_it.second -> m_path_vec){
-        _path -> buffer[_grad_position] = 0;
+        _path -> m_buffer[_grad_position] = 0;
       }
     }
   } 
@@ -217,7 +217,7 @@ int MNM_Realtime_Dta::get_estimation_gradient(MNM_Dta_Screenshot* screenshot,
                        * MNM::calculate_link_mc(_link_factory->get_link(_link_ID), _tmp_tt)
                        , _demand * num_link);
         }
-        _path -> buffer[_grad_position] = _tmp_grad;
+        _path -> m_buffer[_grad_position] = _tmp_grad;
         // printf("grad is %.4f\n", _tmp_grad);
       }
     }
@@ -318,7 +318,7 @@ int MNM_Realtime_Dta::get_optimization_gradient(MNM_Dta_Screenshot* screenshot,
   for(auto _it : *path_table){
     for (auto _it_it : *(_it.second)){
       for (MNM_Path* _path : _it_it.second -> m_path_vec){
-        _path -> buffer[_grad_position] = 0;
+        _path -> m_buffer[_grad_position] = 0;
       }
     }
   } 
@@ -340,7 +340,7 @@ int MNM_Realtime_Dta::get_optimization_gradient(MNM_Dta_Screenshot* screenshot,
                        * _link -> get_link_flow()
                        , _demand * num_link);
         }
-        _path -> buffer[_grad_position] = _tmp_grad;
+        _path -> m_buffer[_grad_position] = _tmp_grad;
         // printf("grad is %.4f\n", _tmp_grad);
       }
     }
@@ -390,7 +390,7 @@ int MNM_Realtime_Dta::update_compliance_ratio(TInt assign_inter)
       _link_ID = _link_path_it.first;
       if (_link_ID != _vms -> m_detour_link_ID && _vms -> m_detour_link_ID > 0){
         for (MNM_Path* _path : *_link_path_it.second){
-          _est_flow = _path -> buffer[0] 
+          _est_flow = _path -> m_buffer[0] 
               * MNM::get_demand_bynode(_path -> m_node_vec.front(), _path -> m_node_vec.back(), assign_inter, m_before_shot -> m_node_factory);
           _real_flow = _path -> m_p
               * MNM::get_demand_bynode(_path -> m_node_vec.front(), _path -> m_node_vec.back(), assign_inter, m_before_shot -> m_node_factory);
@@ -653,7 +653,7 @@ int MNM_Dta_Screenshot::hook_up_node_and_link()
 
 namespace MNM
 {
-int run_from_screenshot(MNM_Dta_Screenshot* screenshot, MNM_ConfReader *dta_config,
+int run_from_screenshot(MNM_Dta_Screenshot *screenshot, MNM_ConfReader *dta_config,
                         TInt max_inter, TInt assign_inter, Path_Table *path_table,
                         MNM_OD_Factory *od_factory, std::string file_folder)
 {
@@ -818,7 +818,7 @@ int update_path_p(Path_Table *path_table, TInt col, TFlt step_size)
     for (auto _it_it : *(_it.second)){
       for (MNM_Path* _path : _it_it.second -> m_path_vec){
         // printf("Before m_p is %lf\n", _path -> m_p);
-        if (_path -> buffer[col] > 0){
+        if (_path -> m_buffer[col] > 0){
           _path -> m_p /= (1 + step_size);
         }
         else {
@@ -835,5 +835,5 @@ int update_path_p(Path_Table *path_table, TInt col, TFlt step_size)
   return 0; 
 }
 
-}// end namespace MNM_Dta
+}// end namespace MNM
 

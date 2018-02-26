@@ -28,6 +28,7 @@ public:
   static int build_vms_facotory(std::string file_folder, PNEGraph graph, TInt num_vms, MNM_Vms_Factory *vms_factory);
   static int read_int_float(std::string file_name, std::unordered_map<TInt, TFlt>* reader);
   static int read_int(std::string file_name, std::vector<TInt>* reader);
+  static int read_float(std::string file_name, std::vector<TFlt*>* reader);
   static int build_workzone_list(std::string file_folder, MNM_Workzone* workzone);
   static int dump_cumulative_curve(std::string file_folder, MNM_Link_Factory *link_factory);
 
