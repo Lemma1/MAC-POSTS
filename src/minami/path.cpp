@@ -201,9 +201,18 @@ Path_Table *build_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_
 }
 
 
-int save_path_table(Path_Table *path_table, MNM_OD_Factory *od_factory)
+int save_path_table(Path_Table *path_table, MNM_OD_Factory *od_factory, bool w_buffer)
 {
   std::string _file_name = "path_table";
+  std::ofstream _path_buffer_file;
+  if (w_buffer){
+    std::string _data_file_name = "path_table_buffer";
+    _path_buffer_file.open(_data_file_name, std::ofstream::out);     
+    if (!_path_buffer_file.is_open()){
+      printf("Error happens when open _path_buffer_file\n");
+      exit(-1);
+    }
+  }
   std::ofstream _path_table_file;
   _path_table_file.open(_file_name, std::ofstream::out);     
   if (!_path_table_file.is_open()){
@@ -217,43 +226,50 @@ int save_path_table(Path_Table *path_table, MNM_OD_Factory *od_factory)
       _origin_node_ID = _o_it -> second -> m_origin_node -> m_node_ID;
       for (auto &_path : path_table -> find(_origin_node_ID) -> second -> find(_dest_node_ID) -> second -> m_path_vec){
         _path_table_file << _path -> node_vec_to_string();
+        if (w_buffer){
+          _path_buffer_file << _path -> buffer_to_string();
+        }
       }
     }
   }
   _path_table_file.close();
+  if (w_buffer){
+    _path_buffer_file.close();
+  }
   return 0;
 }
 
 
-int save_path_table_w_buffer(Path_Table *path_table, MNM_OD_Factory *od_factory)
-{
-  std::string _file_name = "path_table";
-  std::string _data_file_name = "path_buffer";
-  std::ofstream _path_table_file, _path_buffer_file;
-  _path_table_file.open(_file_name, std::ofstream::out);     
-  if (!_path_table_file.is_open()){
-    printf("Error happens when open _path_table_file\n");
-    exit(-1);
-  }
-  _path_buffer_file.open(_data_file_name, std::ofstream::out);     
-  if (!_path_buffer_file.is_open()){
-    printf("Error happens when open _path_buffer_file\n");
-    exit(-1);
-  }
-  TInt _dest_node_ID, _origin_node_ID;
-  for (auto _d_it = od_factory -> m_destination_map.begin(); _d_it != od_factory -> m_destination_map.end(); _d_it++){
-    _dest_node_ID = _d_it -> second -> m_dest_node -> m_node_ID;
-    for (auto _o_it = od_factory -> m_origin_map.begin(); _o_it != od_factory -> m_origin_map.end(); _o_it++){
-      _origin_node_ID = _o_it -> second -> m_origin_node -> m_node_ID;
-      for (auto &_path : path_table -> find(_origin_node_ID) -> second -> find(_dest_node_ID) -> second -> m_path_vec){
-        _path_table_file << _path -> node_vec_to_string();
-        _path_buffer_file << _path -> buffer_to_string();
-      }
-    }
-  }
-  _path_table_file.close();
-  return 0;
-}
+// int save_path_table_w_buffer(Path_Table *path_table, MNM_OD_Factory *od_factory)
+// {
+//   std::string _file_name = "path_table";
+//   std::string _data_file_name = "path_buffer";
+//   std::ofstream _path_table_file, _path_buffer_file;
+//   _path_table_file.open(_file_name, std::ofstream::out);     
+//   if (!_path_table_file.is_open()){
+//     printf("Error happens when open _path_table_file\n");
+//     exit(-1);
+//   }
+//   _path_buffer_file.open(_data_file_name, std::ofstream::out);     
+//   if (!_path_buffer_file.is_open()){
+//     printf("Error happens when open _path_buffer_file\n");
+//     exit(-1);
+//   }
+//   TInt _dest_node_ID, _origin_node_ID;
+//   for (auto _d_it = od_factory -> m_destination_map.begin(); _d_it != od_factory -> m_destination_map.end(); _d_it++){
+//     _dest_node_ID = _d_it -> second -> m_dest_node -> m_node_ID;
+//     for (auto _o_it = od_factory -> m_origin_map.begin(); _o_it != od_factory -> m_origin_map.end(); _o_it++){
+//       _origin_node_ID = _o_it -> second -> m_origin_node -> m_node_ID;
+//       for (auto &_path : path_table -> find(_origin_node_ID) -> second -> find(_dest_node_ID) -> second -> m_path_vec){
+//         _path_table_file << _path -> node_vec_to_string();
+//         _path_buffer_file << _path -> buffer_to_string();
+//       }
+//     }
+//   }
+//   _path_table_file.close();
+//   _path_buffer_file.close();
+//   return 0;
+// }
 
 int allocate_path_table_buffer(Path_Table *path_table, TInt num)
 {
