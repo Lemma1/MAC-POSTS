@@ -11,9 +11,9 @@
 
 #target_link_libraries (dta_response Snap g3log minami ${CMAKE_THREAD_INIT})
 
-# add_executable (path test_path.cpp path.cpp dta.cpp vehicle.cpp dlink.cpp od.cpp factory.cpp dnode.cpp ults.cpp io.cpp routing.cpp statistics.cpp shortest_path.cpp)
+add_executable (path test_path.cpp)
 
-#target_link_libraries (path LINK_PUBLIC Snap g3log ${CMAKE_THREAD_INIT})
+target_link_libraries (path PUBLIC Snap minami adv_ds)
 
 #add_executable (realtime test_realtime.cpp path.cpp dta.cpp vehicle.cpp dlink.cpp od.cpp factory.cpp dnode.cpp ults.cpp io.cpp routing.cpp statistics.cpp shortest_path.cpp realtime_dta.cpp marginal_cost.cpp vms.cpp workzone.cpp)
 
@@ -54,11 +54,14 @@
 #add_executable (test_misc test_misc.cpp)
 #target_link_libraries (test_misc PUBLIC Snap minami)
 
-add_executable (test_ksp test_ksp.cpp)
-target_link_libraries (test_ksp PUBLIC Snap minami adv_ds)
+#add_executable (test_ksp test_ksp.cpp)
+#target_link_libraries (test_ksp PUBLIC Snap minami adv_ds)
 
 #add_executable (test_tdsp test_tdsp.cpp)
 #target_link_libraries (test_tdsp Snap minami adv_ds)
 
-add_executable (test_due test_due.cpp)
-target_link_libraries (test_due Snap minami adv_ds)
+#add_executable (test_due test_due.cpp)
+#target_link_libraries (test_due Snap minami adv_ds)
+
+add_executable (test_detNL test_determined_routing.cpp)
+target_link_libraries (test_detNL Snap minami adv_ds)

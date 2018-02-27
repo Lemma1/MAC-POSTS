@@ -1,3 +1,4 @@
+MESSAGE( STATUS "HELLP")
 cmake_minimum_required (VERSION 2.8)
 project (MINAMI C CXX)
 
@@ -20,5 +21,6 @@ add_subdirectory (snap-core)
 add_subdirectory (3rdparty)
 add_subdirectory (minami)
 add_subdirectory (examples)
+add_subdirectory (pybinder)
 
 
