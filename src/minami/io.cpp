@@ -407,6 +407,7 @@ Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph,
 {
   printf("Loading Path Table!\n");
   TInt Num_Path = num_path;
+  printf("Number of path %d\n", Num_Path());
 
   std::ifstream _path_table_file, _buffer_file;
   std::string _buffer_file_name;
@@ -433,6 +434,7 @@ Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph,
         std::getline(_buffer_file,_buffer_line);
         _buffer_words = split(_buffer_line, ' ');
       }
+      // std::cout << "Processing: " << _line << "\n";
       _words = split(_line, ' ');
       if (_words.size() >= 2){
         _origin_node_ID = TInt(std::stoi(_words[0]));
@@ -459,6 +461,7 @@ Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph,
 
         if (w_buffer && (_buffer_words.size() > 0)){
           TInt _buffer_len = TInt(_buffer_words.size());
+          // printf("Buffer len %d\n", _buffer_len());
           _path -> allocate_buffer(_buffer_len);
           for (int i=0; i < _buffer_len(); ++i){
             _path -> m_buffer[i] = TFlt(std::stof(trim(_buffer_words[i])));
@@ -477,7 +480,8 @@ Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph,
     printf("Can't open path table file!\n");
     exit(-1);
   }
-   printf("Finish Loading Path Table!\n");
+  printf("Finish Loading Path Table!\n");
+  // printf("path table %p\n", _path_table);
   return _path_table;
 }
 

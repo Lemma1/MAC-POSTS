@@ -120,7 +120,7 @@ MNM_Path *extract_path(TInt origin_ID, TInt dest_ID, std::unordered_map<TInt, TI
 Path_Table *build_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_Factory *link_factory)
 {
   /* setting */
-  size_t MaxIter = 3;
+  size_t MaxIter = 10;
   TFlt Mid_Scale = 3;
   TFlt Heavy_Scale = 6;
 
@@ -307,6 +307,9 @@ int copy_p_to_buffer(Path_Table *path_table, TInt col)
 
 int copy_buffer_to_p(Path_Table *path_table, TInt col)
 {
+  // printf("Entering MNM::copy_buffer_to_p\n");
+  // printf("path table is %p\n", path_table);
+
   for(auto _it : *path_table){
     for (auto _it_it : *(_it.second)){
       for (MNM_Path* _path : _it_it.second -> m_path_vec){
