@@ -7,9 +7,9 @@
 #target_link_libraries (ctm Snap g3log minami ${CMAKE_THREAD_INIT})
 
 
-#add_executable (dta_response test_dta.cpp)
+add_executable (dta_response test_dta.cpp)
 
-#target_link_libraries (dta_response Snap g3log minami ${CMAKE_THREAD_INIT})
+target_link_libraries (dta_response Snap g3log minami ${CMAKE_THREAD_INIT})
 
 add_executable (path test_path.cpp)
 

@@ -1,7 +1,8 @@
 #cmake_minimum_required(VERSION 2.8.12)
-#project(cmake_example)
 
 add_subdirectory(pybind11)
 
-pybind11_add_module(cmake_example src/main.cpp)
-target_link_libraries (cmake_example Snap)
+file(GLOB_RECURSE mimamiapi_src "src/*.cpp" "src/*.h")
+
+pybind11_add_module(MNMAPI ${mimamiapi_src})
+target_link_libraries (MNMAPI Snap minami)

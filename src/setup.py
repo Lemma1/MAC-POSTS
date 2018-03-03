@@ -58,13 +58,13 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
 setup(
-    name='cmake_example',
+    name='MNMAPI',
     version='0.0.1',
-    author='Dean Moldovan',
-    author_email='dean0x7d@gmail.com',
-    description='A test project using pybind11 and CMake',
+    author='Wei Ma',
+    author_email='lemma171@gmail.com',
+    description='A API library for MAC-POSTS (MNM)',
     long_description='',
-    ext_modules=[CMakeExtension('cmake_example')],
+    ext_modules=[CMakeExtension('MNMAPI')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
 )
