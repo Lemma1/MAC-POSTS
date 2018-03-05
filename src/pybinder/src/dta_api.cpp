@@ -1,7 +1,7 @@
 #include <pybind11/pybind11.h>
 #include "dta_api.h"
 
-#include "dta.h"
+namespace py = pybind11;
 
 int run_dta(std::string folder) {
   printf("Current working directory is......\n");
@@ -21,7 +21,49 @@ int run_dta(std::string folder) {
   return 0;
 }
 
-namespace py = pybind11;
+
+Dta_Api::Dta_Api()
+{
+
+}
+
+Dta_Api::~Dta_Api()
+{
+  
+}
+
+int Dta_Api::initialize(std::string)
+{
+  return 0;
+}
+
+int Dta_Api::run_once()
+{
+  return 0;
+}
+
+int Dta_Api::run_whole()
+{
+  return 0;
+}
+
+int Dta_Api::register_links(py::array_t<int> links)
+{
+  return 0;
+}
+
+int Dta_Api::register_paths(py::array_t<int> paths)
+{
+  return 0;
+}
+
+py::array_t<double> Dta_Api::get_link_inflow()
+{
+   auto result = py::array_t<double>();
+   return result;
+}
+
+
 
 PYBIND11_MODULE(MNMAPI, m) {
     m.doc() = R"pbdoc(
