@@ -4,6 +4,7 @@
 MNM_Dta::MNM_Dta(std::string file_folder)
 {
   m_file_folder = file_folder;
+  m_current_loading_interval = TInt(0);
   initialize();
 }
 
@@ -352,7 +353,7 @@ int MNM_Dta::loading(bool verbose)
         }
         // _assign_inter = _assign_inter % m_total_assign_inter;
         // _origin -> release_one_interval(_cur_int, m_veh_factory, _assign_inter, TFlt(0));
-      } 
+      }
       _assign_inter += 1;
     }
 
@@ -400,6 +401,7 @@ int MNM_Dta::loading(bool verbose)
 
   // MNM_IO::dump_cumulative_curve(m_file_folder, m_link_factory);
   m_statistics -> post_record();
+  m_current_loading_interval = _cur_int;
   return 0;
 }
 

@@ -1,5 +1,6 @@
 #include "dta_gradient_utls.h"
 
+#include "limits.h"
 #include "path.h"
 
 namespace MNM_DTA_GRADIENT
@@ -40,8 +41,11 @@ TFlt get_travel_time(MNM_Dlink* link, TFlt start_time)
     throw std::runtime_error("Error, get_travel_time link cummulative curve is not installed");
   }
   TFlt _cc_flow = link -> m_N_in -> get_result(start_time);
+  if (_cc_flow <= DBL_EPSILON){
+    return link -> get_link_tt();
+  }
   TFlt _end_time = link -> m_N_out -> get_time(_cc_flow);
-  if (_end_time() != -1){
+  if (_end_time() < 0 || (_end_time - start_time < 0)){
     return _end_time - start_time;
   }
   else{
