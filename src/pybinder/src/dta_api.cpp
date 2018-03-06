@@ -1,6 +1,8 @@
 #include <pybind11/pybind11.h>
 #include "dta_api.h"
 
+#include "dta_gradient_utls.h"
+
 namespace py = pybind11;
 
 int run_dta(std::string folder) {
@@ -24,16 +26,25 @@ int run_dta(std::string folder) {
 
 Dta_Api::Dta_Api()
 {
-
+  m_dta = NULL;
+  m_link_vec = std::vector<MNM_Dlink*>();
+  m_path_vec = std::vector<MNM_Path*>();
 }
 
 Dta_Api::~Dta_Api()
 {
+  if (m_dta != NULL){
+    delete m_dta;
+  }
   
 }
 
-int Dta_Api::initialize(std::string)
+int Dta_Api::initialize(std::string folder)
 {
+  m_dta = new MNM_Dta(folder);
+  m_dta -> build_from_files();
+  m_dta -> hook_up_node_and_link();
+  m_dta -> is_ok();
   return 0;
 }
 
@@ -44,11 +55,20 @@ int Dta_Api::run_once()
 
 int Dta_Api::run_whole()
 {
+  m_dta -> loading(false);
   return 0;
 }
 
 int Dta_Api::register_links(py::array_t<int> links)
 {
+  auto links_buf = links.request();
+  if (links_buf.ndim != 1){
+    throw std::runtime_error("Number of dimensions must be one");
+  }
+  int *links_ptr = (int *) links_buf.ptr;
+  for (int i = 0; i < links_buf.shape[0]; i++){
+    m_link_vec.push_back(m_dta -> m_link_factory -> get_link(TInt(links_ptr[i])));
+  }
   return 0;
 }
 
@@ -59,8 +79,15 @@ int Dta_Api::register_paths(py::array_t<int> paths)
 
 py::array_t<double> Dta_Api::get_link_inflow()
 {
-   auto result = py::array_t<double>();
-   return result;
+  auto result = py::array_t<double>(m_link_vec.size() * 5);
+  auto result_buf = result.request();
+  double *result_prt = (double *) result_buf.ptr;
+  for (int t = 0; t < 5; ++t){
+    for (size_t i = 0; i<m_link_vec.size(); ++i){
+      result_prt[i + 5 * t] = MNM_DTA_GRADIENT::get_link_inflow(m_link_vec[i], TFlt(t), TFlt(t+1));
+    }
+  }
+  return result;
 }
 
 
@@ -89,6 +116,12 @@ PYBIND11_MODULE(MNMAPI, m) {
 
     //     Some other explanation about the subtract function.
     // )pbdoc");
+    py::class_<Dta_Api> (m, "dta_api")
+            .def(py::init<>())
+            .def("initialize", &Dta_Api::initialize)
+            .def("run_whole", &Dta_Api::run_whole)
+            .def("register_links", &Dta_Api::register_links)
+            .def("get_link_inflow", &Dta_Api::get_link_inflow);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;

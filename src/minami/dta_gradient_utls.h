@@ -3,13 +3,19 @@
 
 #include "Snap.h"
 #include "dlink.h"
+#include "path.h"
+#include "factory.h"
 
-int get_link_inflow(double **output, std::vector<MNM_Dlink*> links, 
-                    std::vector<TInt> intervals);
+namespace MNM_DTA_GRADIENT
+{
+TFlt get_link_inflow(MNM_Dlink* link, 
+                    TFlt start_time, TFlt end_time);
+TFlt get_link_inflow(MNM_Dlink* link, 
+                    TInt start_time, TInt end_time);
 
-int get_travel_time(double **output, std::vector<MNM_Dlink*> links, 
-                    std::vector<TInt> intervals);
+TFlt get_travel_time(MNM_Dlink* link, TFlt start_time);
 
 int get_dar_matrix(double **output, std::vector<MNM_Dlink*> links, 
-                    std::vector<MNM_Path*> paths, MNM_Veh_Factory *veh_factory)
+                    std::vector<MNM_Path*> paths, MNM_Veh_Factory *veh_factory);
+};
 #endif

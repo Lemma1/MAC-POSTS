@@ -16,13 +16,15 @@ class Dta_Api
 public:
   Dta_Api();
   ~Dta_Api();
-  int initialize(std::string);
+  int initialize(std::string folder);
   int run_once();
   int run_whole();
   int register_links(py::array_t<int> links);
   int register_paths(py::array_t<int> paths);
   py::array_t<double> get_link_inflow(); 
   MNM_Dta *m_dta;
+  std::vector<MNM_Dlink*> m_link_vec;
+  std::vector<MNM_Path*> m_path_vec;
 };
 
 
