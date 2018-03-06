@@ -36,6 +36,8 @@ Dta_Api::~Dta_Api()
   if (m_dta != NULL){
     delete m_dta;
   }
+  m_link_vec.clear();
+  m_path_vec.clear();
   
 }
 
@@ -53,8 +55,17 @@ int Dta_Api::run_once()
   return 0;
 }
 
+int Dta_Api::install_cc()
+{
+  for (size_t i = 0; i<m_link_vec.size(); ++i){
+    m_link_vec[i] -> install_cumulative_curve();
+  }
+  return 0;
+}
+
 int Dta_Api::run_whole()
 {
+
   m_dta -> loading(false);
   return 0;
 }
@@ -66,8 +77,15 @@ int Dta_Api::register_links(py::array_t<int> links)
     throw std::runtime_error("Number of dimensions must be one");
   }
   int *links_ptr = (int *) links_buf.ptr;
+  MNM_Dlink *_link;
   for (int i = 0; i < links_buf.shape[0]; i++){
-    m_link_vec.push_back(m_dta -> m_link_factory -> get_link(TInt(links_ptr[i])));
+    _link = m_dta -> m_link_factory -> get_link(TInt(links_ptr[i]));
+    if(std::find(m_link_vec.begin(), m_link_vec.end(), _link) != m_link_vec.end()) {
+      throw std::runtime_error("Error, Dta_Api::register_links, link exists");
+    } 
+    else {
+      m_link_vec.push_back(_link);
+    }
   }
   return 0;
 }
@@ -120,6 +138,7 @@ PYBIND11_MODULE(MNMAPI, m) {
             .def(py::init<>())
             .def("initialize", &Dta_Api::initialize)
             .def("run_whole", &Dta_Api::run_whole)
+            .def("install_cc", &Dta_Api::install_cc)
             .def("register_links", &Dta_Api::register_links)
             .def("get_link_inflow", &Dta_Api::get_link_inflow);
 

@@ -17,6 +17,7 @@ public:
   Dta_Api();
   ~Dta_Api();
   int initialize(std::string folder);
+  int install_cc();
   int run_once();
   int run_whole();
   int register_links(py::array_t<int> links);

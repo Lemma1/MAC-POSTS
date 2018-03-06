@@ -50,6 +50,12 @@ int MNM_Dlink::hook_up_node(MNM_Dnode *from, MNM_Dnode *to)
 
 int MNM_Dlink::install_cumulative_curve()
 {
+  if (m_N_out != NULL){
+    delete m_N_out;
+  }
+  if (m_N_in != NULL){
+    delete m_N_in;
+  }
   m_N_out = new MNM_Cumulative_Curve();
   m_N_in = new MNM_Cumulative_Curve();
   m_N_in -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
