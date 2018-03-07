@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include "dta_api.h"
 
+
 #include "dta_gradient_utls.h"
 
 namespace py = pybind11;
@@ -126,8 +127,8 @@ py::array_t<double> Dta_Api::get_link_inflow(py::array_t<int>start_intervals, py
         throw std::runtime_error("Error, Dta_Api::get_link_inflow, loaded data not enough");
       }
 
-      result_prt[i * l + t] = MNM_DTA_GRADIENT::get_link_inflow(m_link_vec[i], TFlt(start_prt[t]), TFlt(end_prt[t]));
-      printf("i %d, t %d, %f\n", i, t, result_prt[i * l + t]);
+      result_prt[i * l + t] = MNM_DTA_GRADIENT::get_link_inflow(m_link_vec[i], TFlt(start_prt[t]), TFlt(end_prt[t]))();
+      // printf("i %d, t %d, %f\n", i, t, result_prt[i * l + t]);
     }
   }
   return result;
@@ -151,7 +152,7 @@ py::array_t<double> Dta_Api::get_link_tt(py::array_t<int>start_intervals)
       if (start_prt[i] > get_cur_loading_interval()){
         throw std::runtime_error("Error, Dta_Api::get_link_tt, loaded data not enough");
       }
-      result_prt[i * l + t] = MNM_DTA_GRADIENT::get_travel_time(m_link_vec[i], TFlt(start_prt[t]));
+      result_prt[i * l + t] = MNM_DTA_GRADIENT::get_travel_time(m_link_vec[i], TFlt(start_prt[t]))();
     }
   }
   return result;
@@ -159,6 +160,9 @@ py::array_t<double> Dta_Api::get_link_tt(py::array_t<int>start_intervals)
 
 py::array_t<double> Dta_Api::get_link_in_cc(int link_ID)
 {
+  if (m_dta -> m_link_factory -> get_link(TInt(link_ID)) -> m_N_in == NULL){
+    throw std::runtime_error("Error, Dta_Api::get_link_in_cc, cc not installed");
+  }
   std::deque<std::pair<TFlt, TFlt>> _record = m_dta -> m_link_factory -> get_link(TInt(link_ID)) -> m_N_in -> m_recorder;
   int new_shape [2] = { (int) _record.size(), 2}; 
   auto result = py::array_t<double>(new_shape);
@@ -173,6 +177,9 @@ py::array_t<double> Dta_Api::get_link_in_cc(int link_ID)
 
 py::array_t<double> Dta_Api::get_link_out_cc(int link_ID)
 {
+  if (m_dta -> m_link_factory -> get_link(TInt(link_ID)) -> m_N_out == NULL){
+    throw std::runtime_error("Error, Dta_Api::get_link_out_cc, cc not installed");
+  }
   std::deque<std::pair<TFlt, TFlt>> _record = m_dta -> m_link_factory -> get_link(TInt(link_ID)) -> m_N_out -> m_recorder;
   int new_shape [2] = { (int) _record.size(), 2}; 
   auto result = py::array_t<double>(new_shape);

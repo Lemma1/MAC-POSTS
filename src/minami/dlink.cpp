@@ -650,7 +650,8 @@ int MNM_Cumulative_Curve::add_increment(std::pair<TFlt, TFlt> r)
     add_record(r);
     return 0;
   }
-  std::pair <TFlt, TFlt> _best = *std::max_element(m_recorder.begin(), m_recorder.end(), pair_compare);
+  // std::pair <TFlt, TFlt> _best = *std::max_element(m_recorder.begin(), m_recorder.end(), pair_compare);
+  std::pair <TFlt, TFlt> _best = m_recorder[m_recorder.size() - 1];
   r.second += _best.second;
   // printf("New r is <%lf, %lf>\n", r.first(), r.second());
   m_recorder.push_back(r);
@@ -660,7 +661,7 @@ int MNM_Cumulative_Curve::add_increment(std::pair<TFlt, TFlt> r)
 
 TFlt MNM_Cumulative_Curve::get_result(TFlt time)
 {
-  arrange();
+  // arrange();
   if (m_recorder.size() == 0){
     return TFlt(0);
   }
@@ -682,7 +683,7 @@ TFlt MNM_Cumulative_Curve::get_result(TFlt time)
 
 TFlt MNM_Cumulative_Curve::get_time(TFlt result)
 {
-  arrange2();
+  // arrange2();
   if (m_recorder.size() == 0){
     return TFlt(-1);
   }
