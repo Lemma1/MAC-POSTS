@@ -76,7 +76,7 @@ MNM_Dnode *MNM_Node_Factory::get_node(TInt ID)
   auto _node_it = m_node_map.find(ID);
   if (_node_it == m_node_map.end()) {
     printf("No such node ID %d\n", (int) ID);
-    return NULL;
+    throw std::runtime_error("Error, MNM_Node_Factory::get_node, node not exists");
   }
   return _node_it -> second;
 }
@@ -131,7 +131,11 @@ MNM_Dlink *MNM_Link_Factory::make_link( TInt ID,
 
 MNM_Dlink *MNM_Link_Factory::get_link(TInt ID)
 {
-  return m_link_map.find(ID) -> second;
+  auto _link_it = m_link_map.find(ID);
+  if (_link_it == m_link_map.end()){
+    throw std::runtime_error("Error, MNM_Link_Factory::get_link, link not exists");
+  }
+  return _link_it -> second;
 }
 
 
@@ -186,10 +190,18 @@ MNM_Origin *MNM_OD_Factory::make_origin(TInt ID, TInt max_interval, TFlt flow_sc
 
 MNM_Destination *MNM_OD_Factory::get_destination(TInt ID)
 {
-  return m_destination_map.find(ID) -> second;
+  auto _d_it = m_destination_map.find(ID);
+  if (_d_it == m_destination_map.end()){
+    throw std::runtime_error("Error, MNM_OD_Factory::get_destination, destination not exists");
+  }
+  return _d_it -> second;
 }
 
 MNM_Origin *MNM_OD_Factory::get_origin(TInt ID)
 {
-  return m_origin_map.find(ID) -> second;
+  auto _o_it = m_origin_map.find(ID);
+  if (_o_it == m_origin_map.end()){
+    throw std::runtime_error("Error, MNM_OD_Factory::get_origin, origin not exists");
+  }
+  return _o_it -> second;
 }

@@ -62,7 +62,8 @@ class MNM_Routing_Fixed : public MNM_Routing
 {
 public:
   MNM_Routing_Fixed(PNEGraph &graph,
-              MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
+              MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, 
+              MNM_Link_Factory *link_factory, TInt route_frq = TInt(-1));
   ~MNM_Routing_Fixed();
   int virtual init_routing(Path_Table *path_table=NULL);
   int virtual update_routing(TInt timestamp);
@@ -70,12 +71,15 @@ public:
   int set_path_table(Path_Table *path_table);
   int register_veh(MNM_Veh* veh);
   int add_veh_path(MNM_Veh* veh, std::deque<TInt> *link_que);
+  int change_choice_portion(TInt interval);
   Path_Table *m_path_table;
   std::unordered_map<MNM_Veh*, std::deque<TInt>*> m_tracker;
+  bool m_buffer_as_p;
+  TInt m_routing_freq;
+  // TInt m_cur_routing_interval;
 };
 
 // ==================== For SO-DTA, by pinchao =========================//
-
 
 
 class MNM_Routing_Predetermined : public MNM_Routing
@@ -83,19 +87,19 @@ class MNM_Routing_Predetermined : public MNM_Routing
 public:
   MNM_Routing_Predetermined(PNEGraph &graph,
               MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory
-              ,Path_Table *p_table, MNM_Pre_Routing *pre_routing);
+              ,Path_Table *p_table, MNM_Pre_Routing *pre_routing, TInt max_int);
   ~MNM_Routing_Predetermined();
   int virtual init_routing(Path_Table *path_table=NULL);
   int virtual update_routing(TInt timestamp);
+  // MNM_Pre_Routing* virtual get_routing_table(){return m_pre_routing;};
   // private:
   // int set_path_table(Path_Table *path_table);
   // int register_veh(MNM_Veh* veh);
   // int add_veh_path(MNM_Veh* veh, std::deque<TInt> *link_que);
+  TInt m_total_assign_inter;
   Path_Table *m_path_table;
   MNM_Pre_Routing *m_pre_routing;
   std::unordered_map<MNM_Veh*, std::deque<TInt>*> m_tracker;
-  // std::unordered_map<MNM_Veh*, std::deque<TInt>*> m_tracker;
 
 };
-
 #endif

@@ -1,0 +1,48 @@
+New BSD License
+---------------
+
+Copyright (c) 2013, Kay-Uwe (Kiwi) Lorenz
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL "Kay-Uwe (Kiwi) Lorenz" BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Other Licenses
+--------------
+
+There are some jQuery plugins bundled with this package:
+
+* jQuery v@1.8.0 http://jquery.com: http://jquery.org/license
+* `jQuery Cookie Plugin v1.3.1`_: `MIT license`_
+* `jQuery Cursor Plugin`_: `MIT license`_ or `GPL license`_
+* `jQuery Keymap Plugin`_: `MIT license`_ or `GPL license`_
+* `jQuery FuzzyFind Plugin`_: `MIT license`_ or `GPL license`_
+* `jQuery SimpleModal 1.4.3`_: `MIT license`_ or `GPL license`_
+
+.. _jQuery Cookie Plugin v1.3.1: https://github.com/carhartl/jquery-cookie
+.. _jQuery Cursor Plugin: https://bitbucket.org/klorenz/jquery-cursor
+.. _jQuery Keymap Plugin: https://bitbucket.org/klorenz/jquery-keymap
+.. _jQuery FuzzyFind Plugin: https://bitbucket.org/klorenz/jquery-fuzzyfind
+.. _MIT license: http://www.opensource.org/licenses/mit-license.php
+.. _GPL license: http://www.gnu.org/licenses/gpl.html
+.. _jQuery SimpleModal 1.4.3: http://simplemodal.com/
+

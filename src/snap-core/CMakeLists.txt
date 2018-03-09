@@ -1,4 +1,4 @@
-add_library (Snap STATIC Snap.cpp)
+add_library (Snap SHARED Snap.cpp)
 
 target_link_libraries (Snap Glib)
 

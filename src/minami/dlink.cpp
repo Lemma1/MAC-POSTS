@@ -50,6 +50,12 @@ int MNM_Dlink::hook_up_node(MNM_Dnode *from, MNM_Dnode *to)
 
 int MNM_Dlink::install_cumulative_curve()
 {
+  if (m_N_out != NULL){
+    delete m_N_out;
+  }
+  if (m_N_in != NULL){
+    delete m_N_in;
+  }
   m_N_out = new MNM_Cumulative_Curve();
   m_N_in = new MNM_Cumulative_Curve();
   m_N_in -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
@@ -603,9 +609,20 @@ bool pair_compare (std::pair<TFlt, TFlt> i,std::pair<TFlt, TFlt> j)
   return (i.first<j.first); 
 }
 
+bool pair_compare2 (std::pair<TFlt, TFlt> i,std::pair<TFlt, TFlt> j) 
+{
+  return (i.second<j.second); 
+}
+
 int MNM_Cumulative_Curve::arrange()
 {
   std::sort(m_recorder.begin(), m_recorder.end(), pair_compare);
+  return 0;
+}
+
+int MNM_Cumulative_Curve::arrange2()
+{
+  std::sort(m_recorder.begin(), m_recorder.end(), pair_compare2);
   return 0;
 }
 
@@ -633,7 +650,8 @@ int MNM_Cumulative_Curve::add_increment(std::pair<TFlt, TFlt> r)
     add_record(r);
     return 0;
   }
-  std::pair <TFlt, TFlt> _best = *std::max_element(m_recorder.begin(), m_recorder.end(), pair_compare);
+  // std::pair <TFlt, TFlt> _best = *std::max_element(m_recorder.begin(), m_recorder.end(), pair_compare);
+  std::pair <TFlt, TFlt> _best = m_recorder[m_recorder.size() - 1];
   r.second += _best.second;
   // printf("New r is <%lf, %lf>\n", r.first(), r.second());
   m_recorder.push_back(r);
@@ -643,7 +661,7 @@ int MNM_Cumulative_Curve::add_increment(std::pair<TFlt, TFlt> r)
 
 TFlt MNM_Cumulative_Curve::get_result(TFlt time)
 {
-  arrange();
+  // arrange();
   if (m_recorder.size() == 0){
     return TFlt(0);
   }
@@ -652,7 +670,7 @@ TFlt MNM_Cumulative_Curve::get_result(TFlt time)
   }
   if (m_recorder[0].first >= time){
     return m_recorder[0].second;
- }
+  }
   for (size_t i=1; i<m_recorder.size(); ++i){
     if (m_recorder[i].first >= time){
       return m_recorder[i-1].second 
@@ -661,6 +679,28 @@ TFlt MNM_Cumulative_Curve::get_result(TFlt time)
     }
   }
   return m_recorder.back().second;
+}
+
+TFlt MNM_Cumulative_Curve::get_time(TFlt result)
+{
+  // arrange2();
+  if (m_recorder.size() == 0){
+    return TFlt(-1);
+  }
+  if (m_recorder[0].second >= result){
+    return TFlt(-1);
+  }
+  if (m_recorder.size() == 1){
+    return TFlt(-1);
+  }
+  for (size_t i= m_recorder.size() - 1; i >= 0; --i){
+    if (m_recorder[i].second <= result){
+      return m_recorder[i].first 
+          + (m_recorder[i+1].first - m_recorder[i].first)/(m_recorder[i+1].second - m_recorder[i].second)
+            * (result - m_recorder[i].second);
+    }
+  }
+  return TFlt(-1);
 }
 
 

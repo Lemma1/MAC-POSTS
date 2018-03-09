@@ -49,6 +49,7 @@ public:
   MNM_Statistics *m_statistics;
   MNM_Routing *m_routing;
   MNM_Workzone *m_workzone;
+  TInt m_current_loading_interval;
 };               
 
 

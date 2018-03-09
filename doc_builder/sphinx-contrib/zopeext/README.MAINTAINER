@@ -1,0 +1,28 @@
+.. -*- rst -*- -*- restructuredtext -*-
+
+========================
+Maintainer documentation
+========================
+
+This document contains notes for developers and packagers. End users probably
+want to read ``README``.
+
+
+PyPi Release
+============
+
+1. Make sure the repository is up-to date.
+2. Ensure the version is incremented:
+   - ``sphinxcontrib/zopeext/__init__.py``  must be updated
+   - ``CHANGES``  must contain a summary of the changes
+3. Make sure all changes are committed, including the version number changes.
+4. Tag the sources with ``hg tag -m 'Tag zopeext-X.Y' zopeext-X.Y``.
+5. Don't forget to ``hg push``.
+6. Temporarily modify the ``setup.cfg`` file to comment out the variables
+   ``tag_build = dev`` and ``tag_date = true`` (do **not** commit this
+   changes).
+7. Register and upload the new release ``python setup.py register sdist
+   upload``.
+8. Generate the documentation with ``make -C doc zip``.
+9. Upload the new documentation (``doc/_build/sphinxcontrib-zopeext-doc.zip``) to
+   PyPi: http://pypi.python.org/pypi?%3Aaction=pkg_edit&name=sphinxcontrib-zopeext

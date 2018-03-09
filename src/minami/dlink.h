@@ -26,10 +26,12 @@ public:
   int add_record(std::pair<TFlt, TFlt> r);
   int add_increment(std::pair<TFlt, TFlt> r);
   TFlt get_result(TFlt time);
+  TFlt get_time(TFlt result);
   std::string to_string();
   int shrink(TInt number);
 private:
   int arrange();
+  int arrange2();
 };
 
 

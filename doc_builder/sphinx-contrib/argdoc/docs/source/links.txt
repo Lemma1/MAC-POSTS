@@ -1,0 +1,17 @@
+.. Python/Sphinx/documentation/formatting
+.. _Python: https://python.org
+.. _Sphinx: http://sphinx-doc.org
+.. _autodoc: http://sphinx-doc.org/ext/autodoc.html
+.. _sphinx-apidoc : http://sphinx-doc.org/man/sphinx-apidoc.html
+.. _numpy documentation guide: https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt i
+.. _reStructuredText: http://docutils.sourceforge.net/docs/user/rst/quickref.html
+.. _PEP8:   https://www.python.org/dev/peps/pep-0008
+.. _PEP257: https://www.python.org/dev/peps/pep-0257
+.. _directive: http://docutils.sourceforge.net/docs/ref/rst/directives.html
+.. _prefix characters: https://docs.python.org/3/library/argparse.html#prefix-chars
+
+.. Other
+.. _bash: http://en.wikipedia.org/wiki/Bash_(Unix_shell)
+.. _sphinx-argparse: https://sphinx-argparse.readthedocs.org/en/latest/
+.. _pip: https://readthedocs.org/projects/pip/
+.. _nose: phttps://nose.readthedocs.org/en/latest/
