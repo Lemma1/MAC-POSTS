@@ -48,6 +48,7 @@ int main(){
   for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
     _link = _link_it -> second;
     _link -> install_cumulative_curve();
+    _link -> install_cumulative_curve_tree();
   }
 
   TInt _cur_int = 0;
@@ -65,18 +66,28 @@ int main(){
 
 
   
-  TFlt _flow;
-  for (int i =0; i< _cur_int() - 1; ++i){
-    printf("1\n");
-    for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
-      _link = _link_it -> second;
-      printf("2\n");
-      _flow = MNM_DTA_GRADIENT::get_link_inflow(_link, TFlt(i), TFlt(i+1));
-      printf("Start time %d, end time %d, link ID %d, flow %f\n", i, i+1, _link -> m_link_ID(), _flow());
-      // _link -> print_info();
+  // TFlt _flow;
+  // for (int i =0; i< _cur_int() - 1; ++i){
+  //   printf("1\n");
+  //   for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
+  //     _link = _link_it -> second;
+  //     printf("2\n");
+  //     _flow = MNM_DTA_GRADIENT::get_link_inflow(_link, TFlt(i), TFlt(i+1));
+  //     printf("Start time %d, end time %d, link ID %d, flow %f\n", i, i+1, _link -> m_link_ID(), _flow());
+  //     // _link -> print_info();
+  //   }
+  // }
+
+
+  for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
+    _link = _link_it -> second;
+    for (auto outer_it : _link -> m_N_in_tree -> m_record){
+      for (auto inner_it : outer_it.second){
+        printf("Path flow %d, departing time %d\n", outer_it.first -> m_path_ID(), inner_it.first());
+        std::cout << inner_it.second -> to_string() << std::endl;
+      }
     }
   }
-
 
   return 0;
 }
