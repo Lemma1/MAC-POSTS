@@ -31,6 +31,8 @@ MNM_Dlink::MNM_Dlink( TInt ID,
   m_incoming_array = std::deque<MNM_Veh *>();
   m_N_in = NULL;
   m_N_out = NULL;
+  m_N_in_tree = NULL;
+  m_N_out_tree = NULL;
 }
 
 MNM_Dlink::~MNM_Dlink()
@@ -38,7 +40,9 @@ MNM_Dlink::~MNM_Dlink()
   m_finished_array.clear();
   m_incoming_array.clear();
   if (m_N_out != NULL) delete m_N_out;
-  if (m_N_in != NULL) delete m_N_in;  
+  if (m_N_in != NULL) delete m_N_in;
+  if (m_N_in_tree != NULL) delete m_N_in_tree;
+  if (m_N_out_tree != NULL) delete m_N_out_tree;  
 }
 
 int MNM_Dlink::hook_up_node(MNM_Dnode *from, MNM_Dnode *to)
@@ -63,6 +67,19 @@ int MNM_Dlink::install_cumulative_curve()
   return 0;
 }
 
+
+int MNM_Dlink::install_cumulative_curve_tree()
+{
+  if (m_N_in_tree != NULL){
+    delete m_N_in_tree;
+  }
+  if (m_N_out_tree != NULL){
+    delete m_N_out_tree;
+  }
+  m_N_in_tree = new MNM_Tree_Cumulative_Curve();
+  m_N_out_tree = new MNM_Tree_Cumulative_Curve();
+  return 0;
+}
 
 int MNM_Dlink::move_veh_queue(std::deque<MNM_Veh*> *from_queue,
                                   std::deque<MNM_Veh*> *to_queue, 
@@ -652,9 +669,18 @@ int MNM_Cumulative_Curve::add_increment(std::pair<TFlt, TFlt> r)
   }
   // std::pair <TFlt, TFlt> _best = *std::max_element(m_recorder.begin(), m_recorder.end(), pair_compare);
   std::pair <TFlt, TFlt> _best = m_recorder[m_recorder.size() - 1];
-  r.second += _best.second;
-  // printf("New r is <%lf, %lf>\n", r.first(), r.second());
-  m_recorder.push_back(r);
+  if (r.first < _best.first){
+    throw std::runtime_error("Error, MNM_Cumulative_Curve::add_increment, early time index");
+  }
+  if (r.first == _best.first){
+    m_recorder[m_recorder.size() - 1].second += r.second;
+  }
+  else{
+    r.second += _best.second;
+    // printf("New r is <%lf, %lf>\n", r.first(), r.second());
+    m_recorder.push_back(r); 
+  }
+
   return 0;
 }
 

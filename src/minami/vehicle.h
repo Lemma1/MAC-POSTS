@@ -11,6 +11,7 @@
 class MNM_Destination;
 class MNM_Origin;
 class MNM_Dlink;
+class MNM_Path;
 
 class MNM_Veh
 {
@@ -36,6 +37,9 @@ public:
   MNM_Dlink *m_next_link;
   MNM_Destination *m_dest;
   MNM_Origin *m_origin;
+  // m_path will only be used in Fixed routing (didn't find a better way to encode)
+  MNM_Path* m_path; 
+  TInt m_assign_interval;
 };
 
 
