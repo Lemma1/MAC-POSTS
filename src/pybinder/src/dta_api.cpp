@@ -192,6 +192,7 @@ py::array_t<double> Dta_Api::get_link_out_cc(int link_ID)
   return result;
 }
 
+
 PYBIND11_MODULE(MNMAPI, m) {
     m.doc() = R"pbdoc(
         Pybind11 example plugin

@@ -329,7 +329,7 @@ int MNM_Dnode_Inout::record_cumulative_curve(TInt timestamp)
 }
 
 
-int MNM_Dnode_Inout::move_vehicle()
+int MNM_Dnode_Inout::move_vehicle(TInt timestamp)
 {
   // printf("MNM_Dnode_Inout::move_vehicle\n");
   MNM_Dlink *_in_link, *_out_link;
@@ -366,7 +366,13 @@ int MNM_Dnode_Inout::move_vehicle()
             _out_link ->m_incoming_array.push_back(_veh);
             _veh -> set_current_link(_out_link);
             _veh_it = _in_link->m_finished_array.erase(_veh_it); //c++ 11
-            _num_to_move -= 1; 
+            _num_to_move -= 1;
+            if (_out_link -> m_N_out_tree != NULL) {
+              _out_link -> m_N_out_tree -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+            }
+            if (_in_link -> m_N_in_tree != NULL) {
+              _in_link -> m_N_in_tree -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+            }
           }
           else {
             _veh_it++;
@@ -420,7 +426,7 @@ int MNM_Dnode_Inout::evolve(TInt timestamp)
   // printf("4\n");
   record_cumulative_curve(timestamp);
   // // printf("4.1\n");
-  move_vehicle();
+  move_vehicle(timestamp);
   // printf("5\n");
   return 0;
 }

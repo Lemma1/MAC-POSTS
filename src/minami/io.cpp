@@ -403,8 +403,11 @@ int MNM_IO::build_demand(std::string file_folder, MNM_ConfReader *conf_reader, M
 
 
 Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph, 
-                  TInt num_path, bool w_buffer)
+                  TInt num_path, bool w_buffer, bool w_ID)
 {
+  if (w_ID){
+    throw std::runtime_error("Error, MNM_IO::load_path_table, with ID loading not implemented");
+  }
   printf("Loading Path Table!\n");
   TInt Num_Path = num_path;
   printf("Number of path %d\n", Num_Path());
@@ -427,6 +430,7 @@ Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph,
   MNM_Pathset *_pathset;
   MNM_Path *_path;
   TInt _from_ID, _to_ID, _link_ID;
+  TInt _path_ID_counter = 0;
   if (_path_table_file.is_open()){
     for (int i=0; i<Num_Path; ++i){
       std::getline(_path_table_file,_line);
@@ -448,6 +452,8 @@ Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph,
           _path_table -> find(_origin_node_ID) -> second -> insert(std::pair<TInt, MNM_Pathset*>(_dest_node_ID, _pathset));
         }
         _path = new MNM_Path();
+        _path -> m_path_ID = _path_ID_counter;
+        _path_ID_counter += 1;
         for (std::string _s_node_ID : _words){
           _node_ID = TInt(std::stoi(_s_node_ID));
           _path -> m_node_vec.push_back(_node_ID);

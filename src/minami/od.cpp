@@ -71,6 +71,7 @@ int MNM_Origin::release_one_interval(TInt current_interval, MNM_Veh_Factory* veh
       }
       _veh -> set_destination(_demand_it -> first);
       _veh -> set_origin(this);
+      _veh -> m_assign_interval = assign_interval;
       m_origin_node -> m_in_veh_queue.push_back(_veh); 
     }
   }
