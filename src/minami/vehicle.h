@@ -16,7 +16,7 @@ class MNM_Veh
 {
 public:
   MNM_Veh(TInt ID, TInt start_time);
-  ~MNM_Veh();
+  virtual ~MNM_Veh();
   TInt m_veh_ID;
   int set_current_link(MNM_Dlink *link);
   MNM_Dlink *get_current_link();

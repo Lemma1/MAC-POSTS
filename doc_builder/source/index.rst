@@ -4,11 +4,11 @@
    contain the root `toctree` directive.
 
 MAC-POSTS
-======
+==========
 
 
 Note For Users:
-------------
+-----------------
 This domain has been reserved by Mobility Data Analytics Center at Carnegie Mellon University for further development. Please check back later.
 
 Introduction
@@ -56,6 +56,7 @@ We discuss components, algorithms and models in detail, we also provide basic in
    component
    algorithm
    model
+   extension
    utls
 
 People

@@ -1,5 +1,6 @@
 #folder
 build/
+doc_builder/build/
 
 # Prerequisites
 *.d
@@ -33,3 +34,6 @@ build/
 *.exe
 *.out
 *.app
+
+# macOS desktop service store files
+*.DS_Store
