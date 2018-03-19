@@ -4,6 +4,7 @@
 #include "dlink.h"
 #include "dnode.h"
 #include "vehicle.h"
+#include "dta.h"
 
 
 /******************************************************************************************************************
@@ -189,7 +190,7 @@ private:
 
 /******************************************************************************************************************
 *******************************************************************************************************************
-												Vehicle Class
+												Multiclass Vehicle
 *******************************************************************************************************************
 ******************************************************************************************************************/
 
@@ -202,5 +203,84 @@ public:
   TInt m_class;
 };
 
+/******************************************************************************************************************
+*******************************************************************************************************************
+												Multiclass Factory
+*******************************************************************************************************************
+******************************************************************************************************************/
+class MNM_Veh_Factory_Multiclass
+{
+public:
+	MNM_Veh_Factory_Multiclass();
+	~MNM_Veh_Factory_Multiclass();
+	MNM_Veh_Multiclass* make_veh(TInt timestamp, Vehicle_type veh_type, TInt vehicle_cls);
+	TInt m_num_veh;
+	std::unordered_map<TInt, MNM_Veh_Multiclass*> m_veh_map;
+}
 
-#endif
+class MNM_Node_Factory_Multiclass
+{
+public:
+  MNM_Node_Factory_Multiclass();
+  ~MNM_Node_Factory_Multiclass();
+  MNM_Dnode *make_node(TInt ID, DNode_type_multiclass node_type, TFlt flow_scalar);
+  MNM_Dnode *get_node(TInt ID);
+  std::unordered_map<TInt, MNM_Dnode*> m_node_map;
+};
+
+
+class MNM_Link_Factory_Multiclass
+{
+public:
+  MNM_Link_Factory_Multiclass();
+  ~MNM_Link_Factory_Multiclass();
+  MNM_Dlink *make_link( TInt ID,
+                        DLink_type_multiclass link_type,
+						TInt number_of_lane,
+						TFlt length,
+						TFlt lane_hold_cap_car,
+						TFlt lane_hold_cap_truck,
+						TFlt lane_flow_cap_car,
+						TFlt lane_flow_cap_truck,
+						TFlt ffs_car,
+						TFlt ffs_truck,
+						TFlt unit_time,
+						TFlt veh_convert_factor,
+						TFlt flow_scalar);
+  MNM_Dlink *get_link(TInt ID);
+  int delete_link(TInt ID);
+  std::unordered_map<TInt, MNM_Dlink*> m_link_map;
+};
+
+
+class MNM_OD_Factory_Multiclass
+{
+public:
+  MNM_OD_Factory_Multiclass();
+  ~MNM_OD_Factory_Multiclass();
+  MNM_Destination *make_destination(TInt ID);
+  MNM_Origin *make_origin(TInt ID, TInt max_interval, TFlt flow_scalar, TInt frequency);
+  MNM_Destination *get_destination(TInt ID);
+  MNM_Origin *get_origin(TInt ID);
+  std::unordered_map<TInt, MNM_Origin*> m_origin_map;
+  std::unordered_map<TInt, MNM_Destination*> m_destination_map;
+};
+
+
+
+/******************************************************************************************************************
+*******************************************************************************************************************
+												Multiclass DTA
+*******************************************************************************************************************
+******************************************************************************************************************/
+class MNM_Dta_Multiclass : public MNM_Dta
+{
+public:
+  MNM_Dta_Multiclass(std::string file_folder);
+  ~MNM_Dta_Multiclass();
+}; 
+
+
+
+
+#endif              

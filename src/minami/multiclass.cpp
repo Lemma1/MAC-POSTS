@@ -10,12 +10,11 @@
 *******************************************************************************************************************
 ******************************************************************************************************************/
 
-
-/*						Multiclass CTM Functions
+/*************************************************************************					
+						Multiclass CTM Functions
 			(currently only for car & truck two classes)
 	(see: Z. (Sean) Qian et al./Trans. Res. Part B 99 (2017) 183-204)			
 **************************************************************************/
-
 MNM_Dlink_Ctm_Multiclass::MNM_Dlink_Ctm_Multiclass(TInt ID,
 												   TInt number_of_lane,
 												   TFlt length, // (m)
@@ -466,7 +465,6 @@ TFlt MNM_Dlink_Ctm_Multiclass::get_link_tt()
 
 /*							Multiclass CTM Cells
 **************************************************************************/
-
 MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::Ctm_Cell_Multiclass(TFlt cell_length,
 														TFlt unit_time,
 														TFlt hold_cap_car,
@@ -590,12 +588,16 @@ TFlt MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::get_perceived_supply(TInt ve
 
 
 
+
 /******************************************************************************************************************
 *******************************************************************************************************************
 												Node Models
 *******************************************************************************************************************
 ******************************************************************************************************************/
 
+/**************************************************************************
+                   In-out node
+**************************************************************************/
 MNM_Dnode_Inout_Multiclass::MNM_Dnode_Inout_Multiclass(TInt ID, TFlt flow_scalar)
 	: MNM_Dnode::MNM_Dnode(ID, flow_scalar)
 {
@@ -853,7 +855,6 @@ int MNM_Dnode_Inout_Multiclass::evolve(TInt timestamp)
 /**************************************************************************
                               FWJ node
 **************************************************************************/
-
 MNM_Dnode_FWJ_Multiclass::MNM_Dnode_FWJ_Multiclass(TInt ID, TFlt flow_scalar)
   : MNM_Dnode_Inout_Multiclass::MNM_Dnode_Inout_Multiclass(ID, flow_scalar)
 {
@@ -886,7 +887,6 @@ int MNM_Dnode_FWJ_Multiclass::compute_flow()
 
 	return 0;
 }
-
 
 /**************************************************************************
                    General Road Junction node
@@ -930,10 +930,9 @@ int MNM_Dnode_GRJ_Multiclass::compute_flow()
 
 /******************************************************************************************************************
 *******************************************************************************************************************
-												Vehicle Class
+												Multiclass Vehicle
 *******************************************************************************************************************
 ******************************************************************************************************************/
-
 MNM_Veh_Multiclass::MNM_Veh_Multiclass(TInt ID, TInt vehicle_class, TInt start_time)
 	: MNM_Veh::MNM_Veh(ID, start_time)
 {
@@ -942,5 +941,197 @@ MNM_Veh_Multiclass::MNM_Veh_Multiclass(TInt ID, TInt vehicle_class, TInt start_t
 
 MNM_Veh_Multiclass::~MNM_Veh_Multiclass()
 {
+	m_current_link = NULL;
+  	m_next_link = NULL;
+}
+
+
+
+/******************************************************************************************************************
+*******************************************************************************************************************
+												Multiclass Factory
+*******************************************************************************************************************
+******************************************************************************************************************/
+
+/**************************************************************************
+                          Vehicle Factory
+**************************************************************************/
+MNM_Veh_Factory_Multiclass::MNM_Veh_Factory_Multiclass()
+{
+  m_veh_map = std::unordered_map<TInt, MNM_Veh_Multiclass*>();
+  m_num_veh = TInt(0);
+}
+
+MNM_Veh_Factory_Multiclass::~MNM_Veh_Factory_Multiclass()
+{
+  MNM_Veh_Multiclass *_veh;
+  for (auto _veh_it : m_veh_map){
+    _veh = _veh_it.second;
+    delete _veh;
+  }
+  m_veh_map.clear();
+}
+
+MNM_Veh_Multiclass* MNM_Veh_Factory_Multiclass::make_veh(TInt timestamp, 
+														 Vehicle_type veh_type,
+														 TInt vehicle_cls)
+{
+  // printf("A vehicle is produce at time %d, ID is %d\n", (int)timestamp, (int)m_num_veh + 1);
+  MNM_Veh_Multiclass *_veh = new MNM_Veh_Multiclass(m_num_veh + 1, vehicle_cls, timestamp);
+  _veh -> m_type = veh_type;
+  m_veh_map.insert(std::pair<TInt, MNM_Veh_Multiclass*>(m_num_veh + 1, _veh));
+  m_num_veh += 1;
+  return _veh;
+}
+
+/**************************************************************************
+                          Node factory
+**************************************************************************/
+
+MNM_Node_Factory_Multiclass::MNM_Node_Factory_Multiclass()
+{
+  m_node_map = std::unordered_map<TInt, MNM_Dnode*>();
+}
+
+MNM_Node_Factory_Multiclass::~MNM_Node_Factory_Multiclass()
+{
+  for (auto _map_it = m_node_map.begin(); _map_it!= m_node_map.end(); _map_it++){
+    delete _map_it -> second;
+  }
+  m_node_map.clear();
+}
+
+MNM_Dnode *MNM_Node_Factory_Multiclass::make_node(TInt ID, 
+												  DNode_type_multiclass node_type, 
+												  TFlt flow_scalar)
+{
+  MNM_Dnode *_node;
+  switch (node_type){
+    case MNM_TYPE_FWJ_MULTICLASS:
+      _node = new MNM_Dnode_FWJ_Multiclass(ID, flow_scalar);
+      break;
+    case MNM_TYPE_ORIGIN_MULTICLASS:
+      _node = new MNM_DMOND_Multiclass(ID, flow_scalar);
+      break;
+    case MNM_TYPE_DEST_MULTICLASS:
+      _node = new MNM_DMDND_Multiclass(ID, flow_scalar);
+      break;
+    default:
+      printf("Wrong node type.\n");
+      exit(-1);
+  }
+  m_node_map.insert({ID, _node});
+  return _node;
+}
+
+MNM_Dnode *MNM_Node_Factory_Multiclass::get_node(TInt ID)
+{
+  auto _node = m_node_map[ID];
+  if (_node == m_node_map.end()) {
+    printf("No such node ID %d\n", (int) ID);
+    throw std::runtime_error("Error, MNM_Node_Factory::get_node, node not exists");
+  }
+  return _node;
+}
+
+/**************************************************************************
+                          Link factory
+**************************************************************************/
+MNM_Link_Factory_Multiclass::MNM_Link_Factory_Multiclass()
+{
+  m_link_map = std::unordered_map<TInt, MNM_Dlink*>();
+}
+
+MNM_Link_Factory_Multiclass::~MNM_Link_Factory_Multiclass()
+{
+  for (auto _map_it = m_link_map.begin(); _map_it!= m_link_map.end(); _map_it++){
+    delete _map_it -> second;
+  }  
+  m_link_map.clear();
+}
+
+MNM_Dlink *MNM_Link_Factory_Multiclass::make_link(  TInt ID,
+							                        DLink_type_multiclass link_type,
+													TInt number_of_lane,
+													TFlt length,
+													TFlt lane_hold_cap_car,
+													TFlt lane_hold_cap_truck,
+													TFlt lane_flow_cap_car,
+													TFlt lane_flow_cap_truck,
+													TFlt ffs_car,
+													TFlt ffs_truck,
+													TFlt unit_time,
+													TFlt veh_convert_factor,
+													TFlt flow_scalar)
+{
+  MNM_Dlink *_link;
+  switch (link_type){
+    case MNM_TYPE_CTM:
+      _link = new MNM_Dlink_Ctm(ID, lane_hold_cap, lane_flow_cap, number_of_lane, length, ffs, unit_time, flow_scalar);
+      break;
+    case MNM_TYPE_PQ:
+      _link = new MNM_Dlink_Pq(ID, lane_hold_cap, lane_flow_cap, number_of_lane, length, ffs, unit_time, flow_scalar);
+      break;
+    case MNM_TYPE_LQ:
+      _link = new MNM_Dlink_Lq(ID, lane_hold_cap, lane_flow_cap, number_of_lane, length, ffs, unit_time, flow_scalar);
+      break;
+    case MNM_TYPE_LTM:
+      _link = new MNM_Dlink_Ltm(ID, lane_hold_cap, lane_flow_cap, number_of_lane, length, ffs, unit_time, flow_scalar);
+      break;
+    default:
+      printf("Wrong link type.\n");
+      exit(-1);
+  }
+  m_link_map.insert(std::pair<TInt, MNM_Dlink*>(ID, _link));
+  return _link;
+}
+
+MNM_Dlink *MNM_Link_Factory::get_link(TInt ID)
+{
+  auto _link_it = m_link_map.find(ID);
+  if (_link_it == m_link_map.end()){
+    throw std::runtime_error("Error, MNM_Link_Factory::get_link, link not exists");
+  }
+  return _link_it -> second;
+}
+
+
+int MNM_Link_Factory::delete_link(TInt ID)
+{
+  auto _map_it = m_link_map.find(ID);
+  if (_map_it == m_link_map.end()){
+    printf("Can't delete link!\n");
+    exit(-1);
+  }
+  m_link_map.erase(_map_it);
+  return 0;
+}
+
+
+
+
+
+/******************************************************************************************************************
+*******************************************************************************************************************
+												Multiclass DTA
+*******************************************************************************************************************
+******************************************************************************************************************/
+
+MNM_Dta_Multiclass::MNM_Dta_Multiclass(std::string file_folder)
+	: MNM_Dta::MNM::Dta(file_folder)
+{
 	;
+}
+
+MNM_Dta_Multiclass::~MNM_Dta_Multiclass()
+{
+  delete m_veh_factory;
+  delete m_node_factory;
+  delete m_link_factory;
+  delete m_od_factory;
+  delete m_config;
+  delete m_routing;
+  delete m_statistics;
+  delete m_workzone;
+  m_graph -> Clr();  
 }

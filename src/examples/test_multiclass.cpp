@@ -1,61 +1,32 @@
-#include "Snap.h"
-#include "dlink.h"
-#include "vehicle.h"
-#include "dnode.h"
-#include "od.h"
-#include "factory.h"
-#include "multiclass.h"
+#include "dta.h"
+#include "io.h"
 
-#include <deque>
-#include <iostream>
+#include <vector>
 
 int main()
 {
-	std::cout << "BEGIN multiclass TEST!\n";
+	printf("BEGIN multiclass test!\n");
 
-	std::cout << "Add a new destination\n";
-	MNM_Destination *d = new MNM_Destination(1);
-	std::cout << "Add a new origin\n";
-	MNM_Origin *o = new MNM_Origin(1, 1, 5, 1);
-	d -> m_Dest_ID = 11;
+	std::string folder = "../../data/input_files_7link_flx";
+	MNM_Dta_Multiclass *test_dta = new MMN_Dta_Multiclass(folder);
+	printf("DTA set\n");
+	test_dta -> build_from_files();
+	printf("Finished initialization\n");
 
-	std::cout << "Add a new link\n";
-	MNM_Dlink *l = new MNM_Dlink_Ctm_Multiclass(0, 2, 500, 0.125, 0.611, 0.125, 0.611, 13.33, 13.33, 5, 3, 1);
-	l -> print_info();
+	test_dta -> hook_up_node_and_link();
+	TInt _current_inter = 0;
+	TInt _assign_inter = test_dta -> m_start_assign_interval;
+	test_dta -> pre_loading();
 
-	std::cout << "Add a new origin node and hook up origin\n";
-	MNM_DMOND *o_node = new MNM_DMOND(1, 5);
-	o_node -> hook_up_origin(o);
-	o_node -> evolve(4);
-
-	std::cout << "Add a new destination node and hook up destination\n";
-	MNM_DMDND *d_node = new MNM_DMDND(1, 5);
-	d_node -> hook_up_destination(d);
-	d_node -> evolve(4);
-
-	std::cout << "Loop build link\n";
-	MNM_Veh *v;
-	for (int i = 0; i < 4; ++i) {
-		v = new MNM_Veh(i, 0);
-		v -> set_current_link(l);
-		v -> set_destination(d);
-		l -> m_incoming_array.push_back(v);
-	}
-
-	std::cout << "Test ctm evolve\n";
-	l -> clear_incoming_array();
-	for (int i = 0 ; i < 2; ++i) {
-		l -> evolve(i);
-		l -> print_info();
-		for (int j = 0; j < 4; ++j) {
-			v = new MNM_Veh(j, i);
-			v -> set_current_link(l);
-			v -> set_destination(d);
-			l -> m_incoming_array.push_back(v);
+	printf("Start loading!\n");
+	while (!test_dta -> finished_loading(_current_inter)){
+		printf("Current interval: %d\n", _current_inter());
+		test_dta -> load_once(true, _current_inter, _assign_inter);
+		if (_current_inter % test_dta -> m_assign_freq == 0 || _current_inter == 0){
+			_assign_inter += 1;
 		}
-		l -> clear_incoming_array();
+		_current_inter += 1;
 	}
-	std::cout << "End test\n";
 
 	return 0;
 }
