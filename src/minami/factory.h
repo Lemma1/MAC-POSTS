@@ -22,8 +22,8 @@ class MNM_Veh_Factory
 {
 public:
   MNM_Veh_Factory();
-  ~MNM_Veh_Factory();
-  MNM_Veh * make_veh(TInt timestamp, Vehicle_type veh_type);
+  virtual ~MNM_Veh_Factory();
+  MNM_Veh* make_veh(TInt timestamp, Vehicle_type veh_type);
   TInt m_num_veh;
   std::unordered_map<TInt, MNM_Veh*> m_veh_map;
 };
@@ -34,7 +34,7 @@ class MNM_Node_Factory
 {
 public:
   MNM_Node_Factory();
-  ~MNM_Node_Factory();
+  virtual ~MNM_Node_Factory();
   MNM_Dnode *make_node(TInt ID, DNode_type node_type, TFlt flow_scalar);
   MNM_Dnode *get_node(TInt ID);
   std::unordered_map<TInt, MNM_Dnode*> m_node_map;
@@ -45,7 +45,7 @@ class MNM_Link_Factory
 {
 public:
   MNM_Link_Factory();
-  ~MNM_Link_Factory();
+  virtual ~MNM_Link_Factory();
   MNM_Dlink *make_link( TInt ID,
                         DLink_type link_type,
                         TFlt lane_hold_cap, 
@@ -65,7 +65,7 @@ class MNM_OD_Factory
 {
 public:
   MNM_OD_Factory();
-  ~MNM_OD_Factory();
+  virtual ~MNM_OD_Factory();
   MNM_Destination *make_destination(TInt ID);
   MNM_Origin *make_origin(TInt ID, TInt max_interval, TFlt flow_scalar, TInt frequency);
   MNM_Destination *get_destination(TInt ID);

@@ -9,10 +9,8 @@ enum Record_type {MNM_TYPE_LRN};
 
 enum DNode_type_multiclass {MNM_TYPE_ORIGIN_MULTICLASS, 
 							MNM_TYPE_DEST_MULTICLASS, 
-							MNM_TYPE_FWJ_MULTICLASS, 
-							MNM_TYPE_GRJ_MULTICLASS};
+							MNM_TYPE_FWJ_MULTICLASS};
 enum DLink_type_multiclass {MNM_TYPE_CTM_MULTICLASS, 
-							MNM_TYPE_PQ_MULTICLASS, 
-							MNM_TYPE_LQ_MULTICLASS};
+							MNM_TYPE_PQ_MULTICLASS};
 
 #endif
