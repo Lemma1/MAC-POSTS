@@ -408,6 +408,7 @@ int MNM_Routing_Fixed::register_veh(MNM_Veh* veh)
   std::copy(_route_path -> m_link_vec.begin(), _route_path -> m_link_vec.end(), std::back_inserter(*_link_queue));
   // printf("old link q is %d, New link queuq is %d\n", _route_path -> m_link_vec.size(), _link_queue -> size());
   m_tracker.insert(std::pair<MNM_Veh*, std::deque<TInt>*>(veh, _link_queue));
+  veh -> m_path = _route_path;
   return 0;
 }
 

@@ -20,6 +20,7 @@ public:
   std::string buffer_to_string();
   std::deque<TInt> m_link_vec;
   std::deque<TInt> m_node_vec;
+  TInt m_path_ID;
   TFlt m_p;
   TFlt *m_buffer;
   TInt m_buffer_length;

@@ -4,6 +4,7 @@
 #include "vehicle.h"
 #include "ults.h"
 
+
 // #include "g3log/g3log.hpp"
 // #include "g3log/logworker.hpp"
 
@@ -13,6 +14,7 @@
 
 class MNM_Veh;
 class MNM_Dnode;
+class MNM_Path;
 
 /**************************************************************************
                           Cumulative curve
@@ -34,6 +36,20 @@ private:
   int arrange2();
 };
 
+//will majorly used to construct DAR matrix
+class MNM_Tree_Cumulative_Curve
+{
+public:
+  MNM_Tree_Cumulative_Curve();
+  ~MNM_Tree_Cumulative_Curve();
+  std::unordered_map<MNM_Path*, std::unordered_map<TInt, MNM_Cumulative_Curve*>> m_record;
+  int add_flow(TFlt timestamp, TFlt flow, MNM_Path* path, TInt departing_int);
+};
+
+
+/**************************************************************************
+                          Dlink family
+**************************************************************************/
 
 class MNM_Dlink
 {
@@ -52,6 +68,7 @@ public:
   TFlt virtual get_link_tt() {return TFlt(0);};
 
   int install_cumulative_curve();
+  int install_cumulative_curve_tree();
 // protected:
   TInt m_link_ID;
   MNM_Dnode *m_from_node;
@@ -61,8 +78,11 @@ public:
   TFlt m_ffs;
   std::deque<MNM_Veh *> m_finished_array;
   std::deque<MNM_Veh *> m_incoming_array;
+
   MNM_Cumulative_Curve *m_N_in;
   MNM_Cumulative_Curve *m_N_out;
+  MNM_Tree_Cumulative_Curve *m_N_in_tree;
+  MNM_Tree_Cumulative_Curve *m_N_out_tree;
 
 protected:
   int move_veh_queue(std::deque<MNM_Veh*> *from_queue, std::deque<MNM_Veh*> *to_queue, TInt number_tomove);

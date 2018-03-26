@@ -1,0 +1,18 @@
+#ifndef CC_TREE_H
+#define CC_TREE_H
+
+#include "Snap.h"
+#include "path.h"
+#include "dlink.h"
+
+class MNM_Tree_Cumulative_Curve
+{
+public:
+  MNM_Tree_Cumulative_Curve();
+  ~MNM_Tree_Cumulative_Curve();
+  std::unordered_map<MNM_Path*, std::unordered_map<TInt, MNM_Cumulative_Curve*>> m_record;
+  int add_flow(TFlt timestamp, TFlt flow, MNM_Path* path, TInt departing_int);
+};
+
+
+#endif
