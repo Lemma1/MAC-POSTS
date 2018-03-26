@@ -2,7 +2,8 @@
 #include "multiclass.h"
 
 #include <algorithm>
-
+#include <fstream>
+#include <iostream>
 
 /******************************************************************************************************************
 *******************************************************************************************************************
@@ -291,7 +292,7 @@ int MNM_Dlink_Ctm_Multiclass::evolve(TInt timestamp)
 		}
 	}
 
-	std::deque<MNM_Veh_Multiclass*>::iterator _veh_it;
+	std::deque<MNM_Veh*>::iterator _veh_it;
 	TInt _count_car = 0;
 	TInt _count_truck = 0;
 	// m_class: 0 - private car, 1 - truck
@@ -640,9 +641,9 @@ int MNM_Dlink_Pq_Multiclass::clear_incoming_array() {
 	TFlt _to_be_moved = get_link_supply() * m_flow_scalar;
 	while (!m_incoming_array.empty()) {
 		if ( _to_be_moved > 0){
-			_veh = m_incoming_array.front();
+			_veh = dynamic_cast<MNM_Veh_Multiclass *>(m_incoming_array.front())
 			m_incoming_array.pop_front();
-			m_veh_queue.insert(std::pair<MNM_Veh_Multiclass*, TInt>(_veh, TInt(0)));
+			m_veh_queue.insert({_veh, TInt(0)});
 			if (_veh -> m_class == 0) {
 				m_volume_car += 1;
 				_to_be_moved -= 1;
@@ -747,6 +748,7 @@ MNM_DMOND_Multiclass::~MNM_DMOND_Multiclass()
 int MNM_DMOND_Multiclass::evolve(TInt timestamp)
 {
   	MNM_Dlink *_link, *_to_link;
+  	MNM_Veh_Multiclass *_veh;
 
   	for (unsigned i = 0; i < m_out_link_array.size(); ++i){
     	_link = m_out_link_array[i];
@@ -756,7 +758,7 @@ int MNM_DMOND_Multiclass::evolve(TInt timestamp)
   	/* compute out flow */
   	std::deque<MNM_Veh*>::iterator _que_it = m_in_veh_queue.begin();
   	while (_que_it != m_in_veh_queue.end()) {
-  		MNM_Veh_Multiclass *_veh = dynamic_cast<MNM_Veh_Multiclass *>(*_que_it);
+  		_veh = dynamic_cast<MNM_Veh_Multiclass *>(*_que_it);
     	_link = _veh -> get_next_link();
     	if (_veh -> m_class == 0){
     		m_out_volume[_link] += 1;
@@ -774,7 +776,6 @@ int MNM_DMOND_Multiclass::evolve(TInt timestamp)
   	}
 
   	/* move vehicle */
-  	MNM_Veh_Multiclass *_veh;
   	TInt _moved_car, _moved_truck;
   	for (unsigned i = 0; i < m_out_link_array.size(); ++i){
 	    _link = m_out_link_array[i];
@@ -1252,7 +1253,7 @@ int MNM_Origin_Multiclass::release(MNM_Veh_Factory* veh_factory, TInt current_in
 	    for (auto _demand_it = m_demand_car.begin(); _demand_it != m_demand_car.end(); _demand_it++) {
 	    	_veh_to_release = TInt(MNM_Ults::round((_demand_it -> second)[m_current_assign_interval] * m_flow_scalar));
 	      	for (int i = 0; i < _veh_to_release; ++i) {
-		        _veh = _vfactory -> make_veh(current_interval, MNM_TYPE_ADAPTIVE, TInt(0));
+		        _veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(0));
 		        _veh -> set_destination(_demand_it -> first);
 		        _veh -> set_origin(this);
 		        m_origin_node -> m_in_veh_queue.push_back(_veh);
@@ -1262,7 +1263,7 @@ int MNM_Origin_Multiclass::release(MNM_Veh_Factory* veh_factory, TInt current_in
 	    for (auto _demand_it = m_demand_truck.begin(); _demand_it != m_demand_truck.end(); _demand_it++) {
 	    	_veh_to_release = TInt(MNM_Ults::round((_demand_it -> second)[m_current_assign_interval] * m_flow_scalar));
 	      	for (int i = 0; i < _veh_to_release; ++i) {
-		        _veh = _vfactory -> make_veh(current_interval, MNM_TYPE_ADAPTIVE, TInt(1));
+		        _veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(1));
 		        _veh -> set_destination(_demand_it -> first);
 		        _veh -> set_origin(this);
 		        m_origin_node -> m_in_veh_queue.push_back(_veh);
@@ -1278,6 +1279,48 @@ int MNM_Origin_Multiclass::release_one_interval(TInt current_interval,
 												TInt assign_interval, 
 												TFlt adaptive_ratio)
 {
+	if (assign_interval < 0) return 0;
+	TInt _veh_to_release;
+	MNM_Veh_Multiclass *_veh;
+	MNM_Veh_Factory_Multiclass *_vfactory = dynamic_cast<MNM_Veh_Factory_Multiclass *>(veh_factory)
+	// release all car
+	for (auto _demand_it = m_demand_car.begin(); _demand_it != m_demand_car.end(); _demand_it++) {
+		_veh_to_release = TInt(MNM_Ults::round((_demand_it -> second)[assign_interval] * m_flow_scalar));
+		for (int i = 0; i < _veh_to_release; ++i) {
+			if (adaptive_ratio == TFlt(0)){
+				_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_STATIC, TInt(0));
+			}
+			else if (adaptive_ratio == TFlt(1)){
+				_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(0));
+			}
+			else{
+				printf("HyBrid assign, not implemented!\n");
+				exit(-1);
+			}
+			_veh -> set_destination(_demand_it -> first);
+			_veh -> set_origin(this);
+			m_origin_node -> m_in_veh_queue.push_back(_veh);
+		}
+	}
+	// release all truck
+	for (auto _demand_it = m_demand_truck.begin(); _demand_it != m_demand_truck.end(); _demand_it++) {
+		_veh_to_release = TInt(MNM_Ults::round((_demand_it -> second)[assign_interval] * m_flow_scalar));
+		for (int i = 0; i < _veh_to_release; ++i) {
+			if (adaptive_ratio == TFlt(0)){
+				_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_STATIC, TInt(0));
+			}
+			else if (adaptive_ratio == TFlt(1)){
+				_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(0));
+			}
+			else{
+				printf("HyBrid assign, not implemented!\n");
+				exit(-1);
+			}
+			_veh -> set_destination(_demand_it -> first);
+			_veh -> set_origin(this);
+			m_origin_node -> m_in_veh_queue.push_back(_veh);
+		}
+	}
  	return 0;
 }
 
@@ -1285,34 +1328,15 @@ int MNM_Origin_Multiclass::release_one_interval(TInt current_interval,
                           		Destination
 **************************************************************************/
 MNM_Destination_Multiclass::MNM_Destination_Multiclass(TInt ID)
+	: MNM_Destination::MNM_Destination(ID)
 {
-	m_Dest_ID = ID;
+	;
 }
 
 
 MNM_Destination_Multiclass::~MNM_Destination_Multiclass()
 {
 	;
-}
-
-int MNM_Destination_Multiclass::receive(TInt current_interval)
-{
-	MNM_Veh_Multiclass *_veh;
-	size_t _num_to_receive = m_dest_node -> m_out_veh_queue.size();
-	for (size_t i = 0; i < _num_to_receive; ++i){
-		_veh = m_dest_node -> m_out_veh_queue.front();
-		if (_veh -> get_destination() != this){
-			printf("The veh is heading to %d, but we are %d\n", 
-					(int)_veh -> get_destination() -> m_dest_node -> m_node_ID, 
-					(int)m_dest_node -> m_node_ID);
-			printf("MNM_Destination_Multiclass::receive: Something wrong!\n");
-			exit(-1);
-		}
-		_veh -> finish(current_interval);
-		// printf("Receive Vehicle ID: %d, origin node is %d, destination node is %d\n", _veh -> m_veh_ID(), _veh -> get_origin() -> m_origin_node -> m_node_ID(), _veh -> get_destination() -> m_dest_node -> m_node_ID());
-		m_dest_node -> m_out_veh_queue.pop_front();
-	}
-	return 0;
 }
 
 
@@ -1486,9 +1510,9 @@ MNM_Dlink *MNM_Link_Factory_Multiclass::make_link_multiclass(TInt ID,
                           OD factory
 **************************************************************************/
 MNM_OD_Factory_Multiclass::MNM_OD_Factory()
+	: MNM_OD_Factory::MNM_OD_Factory()
 {
-	m_origin_map = std::unordered_map<TInt, MNM_Origin_Multiclass*>();
-	m_destination_map = std::unordered_map<TInt, MNM_Destination_Multiclass*>();
+	;
 }
 
 MNM_OD_Factory_Multiclass::~MNM_OD_Factory()
@@ -1546,6 +1570,235 @@ MNM_Origin_Multiclass *MNM_OD_Factory_Multiclass::get_origin(TInt ID)
 
 /******************************************************************************************************************
 *******************************************************************************************************************
+												Multiclass IO Functions
+*******************************************************************************************************************
+******************************************************************************************************************/
+int MNM_IO_Multiclass::build_node_factory_multiclass(std::string file_folder, 
+											MNM_ConfReader *conf_reader, 
+											MNM_Node_Factory_Multiclass *node_factory)
+{
+	/* find file */
+	std::string _node_file_name = file_folder + "/MNM_input_node";
+	std::ifstream _node_file;
+	_node_file.open(_node_file_name, std::ios::in);
+
+	/* read config */
+	TInt _num_of_node = conf_reader -> get_int("num_of_node");
+	TFlt _flow_scalar = conf_reader -> get_float("flow_scalar");
+
+	/* read file */
+	std::string _line;
+	std::vector<std::string> _words;
+	TInt _node_ID;
+	std::string _type;
+
+	if (_node_file.is_open())
+	{
+		std::getline(_node_file,_line); //skip the first line
+		for (int i=0; i < _num_of_node; ++i){
+			std::getline(_node_file,_line);
+			_words = split(_line, ' ');
+			if (_words.size() == 2) {
+				_node_ID = TInt(std::stoi(_words[0]));
+				_type = trim(_words[1]);
+				if (_type == "FWJ"){
+					node_factory -> make_node_multiclass(_node_ID, 
+														MNM_TYPE_FWJ_MULTICLASS, 
+														_flow_scalar);
+					continue;
+				}				
+				if (_type =="DMOND"){
+					node_factory -> make_node_multiclass(_node_ID, 
+														MNM_TYPE_ORIGIN_MULTICLASS, 
+														_flow_scalar);
+					continue;
+				}
+				if (_type =="DMDND"){
+					node_factory -> make_node_multiclass(_node_ID, 
+														MNM_TYPE_DEST_MULTICLASS, 
+														_flow_scalar);
+					continue;
+				}
+				printf("Wrong node type, %s\n", _type.c_str());
+				exit(-1);
+			}
+			else {
+				printf("MNM_IO_Multiclass::build_node_factory_Multiclass: Wrong length of line.\n");
+				exit(-1);
+			}
+		}
+		_node_file.close();
+	}
+	return 0;
+}
+
+int MNM_IO_Multiclass::build_link_factory_multiclass(std::string file_folder, 
+										MNM_ConfReader *conf_reader, 
+										MNM_Link_Factory_Multiclass *link_factory, 
+										std::string file_name)
+{
+	/* find file */
+	std::string _link_file_name = file_folder + "/" + file_name;
+	std::ifstream _link_file;
+	_link_file.open(_link_file_name, std::ios::in);
+
+	/* read config */
+	TInt _num_of_link = conf_reader -> get_int("num_of_link");
+	TFlt _flow_scalar = conf_reader -> get_float("flow_scalar");
+	TFlt _unit_time = conf_reader -> get_float("unit_time");
+
+	/* read file */
+	std::string _line;
+	std::vector<std::string> _words;
+	TInt _link_ID;
+	TFlt _lane_hold_cap_car;
+	TFlt _lane_flow_cap_car;
+	TInt _number_of_lane;
+	TFlt _length;
+	TFlt _ffs_car;
+	std::string _type;
+	// new in multiclass vehicle case
+	TFlt _lane_hold_cap_truck;
+	TFlt _lane_flow_cap_truck;
+	TFlt _ffs_truck;
+	TFlt _veh_convert_factor;
+
+	if (_link_file.is_open())
+	{
+		// printf("Start build link factory.\n");
+		std::getline(_link_file,_line); //skip the first line
+		for (int i = 0; i < _num_of_link; ++i){
+			std::getline(_link_file,_line);
+			_words = split(_line, ' ');
+			if (_words.size() == 11) {
+				_link_ID = TInt(std::stoi(_words[0]));
+				_type = trim(_words[1]);
+				_length = TFlt(std::stod(_words[2]));
+				_ffs_car = TFlt(std::stod(_words[3]));
+				_lane_flow_cap_car = TFlt(std::stod(_words[4]));
+				_lane_hold_cap_car = TFlt(std::stod(_words[5]));
+				_number_of_lane = TInt(std::stoi(_words[6]));
+				// new in multiclass vehicle case
+				_ffs_truck = TFlt(std::stod(_words[7]));
+				_lane_flow_cap_truck = TFlt(std::stod(_words[8]));
+				_lane_hold_cap_truck = TFlt(std::stod(_words[9]));
+				_veh_convert_factor = TFlt(std::stod(_words[10]));
+
+				/* unit conversion */
+				_length = _length * TFlt(1600);
+				_ffs_car = _ffs_car * TFlt(1600) / TFlt(3600);
+				_lane_flow_cap_car = _lane_flow_cap_car / TFlt(3600);
+				_lane_hold_cap_car = _lane_hold_cap_car / TFlt(1600);
+				_ffs_truck = _ffs_truck * TFlt(1600) / TFlt(3600);
+				_lane_flow_cap_truck = _lane_flow_cap_truck / TFlt(3600);
+				_lane_hold_cap_truck = _lane_hold_cap_truck / TFlt(1600);
+
+				/* build */
+				if (_type == "PQ"){
+					link_factory -> make_link_multiclass(_link_ID,
+														MNM_TYPE_PQ_MULTICLASS,
+														_number_of_lane,
+														_length,
+														_lane_hold_cap_car,
+														_lane_hold_cap_truck,
+														_lane_flow_cap_car,
+														_lane_flow_cap_truck,
+														_ffs_car,
+														_ffs_truck,
+														_unit_time,
+														_veh_convert_factor,
+														_flow_scalar);					
+					continue;
+				}
+				if (_type =="CTM"){
+					link_factory -> make_link_multiclass(_link_ID,
+														MNM_TYPE_CTM_MULTICLASS,
+														_number_of_lane,
+														_length,
+														_lane_hold_cap_car,
+														_lane_hold_cap_truck,
+														_lane_flow_cap_car,
+														_lane_flow_cap_truck,
+														_ffs_car,
+														_ffs_truck,
+														_unit_time,
+														_veh_convert_factor,
+														_flow_scalar);
+					continue;
+				}
+				printf("Wrong link type, %s\n", _type.c_str());
+				exit(-1);
+			}
+			else{
+				printf("MNM_IO::build_link_factory::Wrong length of line.\n");
+				exit(-1);
+			}
+		}
+		_link_file.close();
+	}
+	return 0;
+}
+
+
+int MNM_IO_Multiclass::build_demand_multiclass(std::string file_folder, 
+ 											MNM_ConfReader *conf_reader, 
+ 											MNM_OD_Factory_Multiclass *od_factory)
+{
+	/* find file */
+	std::string _demand_file_name = file_folder + "/MNM_input_demand";
+	std::ifstream _demand_file;
+	_demand_file.open(_demand_file_name, std::ios::in);
+
+	/* read config */
+	TInt _max_interval = conf_reader -> get_int("max_interval"); 
+	TInt _num_OD = conf_reader -> get_int("OD_pair");
+
+	/* build */
+	TInt _O_ID, _D_ID;
+	MNM_Origin_Multiclass *_origin;
+	MNM_Destination_Multiclass *_dest;
+	std::string _line;
+	std::vector<std::string> _words;
+	if (_demand_file.is_open())
+	{
+		// printf("Start build demand profile.\n");
+		TFlt *_demand_vector_car = (TFlt*) malloc(sizeof(TFlt) * _max_interval);
+		TFlt *_demand_vector_truck = (TFlt*) malloc(sizeof(TFlt) * _max_interval);
+		memset(_demand_vector, 0x0, sizeof(TFlt) * _max_interval);
+		std::getline(_demand_file,_line); //skip the first line
+		for (int i = 0; i < _num_OD; ++i){
+			std::getline(_demand_file,_line);
+			// std::cout << "Processing: " << _line << "\n";
+			_words = split(_line, ' ');
+			if (TInt(_words.size()) == (_max_interval * 2 + 2)) {
+				_O_ID = TInt(std::stoi(_words[0]));
+				_D_ID = TInt(std::stoi(_words[1]));
+				for (int j = 0; j < _max_interval; ++j) {
+					_demand_vector_car[j] = TFlt(std::stod(_words[j + 2]));
+					_demand_vector_truck[j] = TFlt(std::stod(_words[j + _max_interval + 2]));
+				}
+				_origin = od_factory -> get_origin(_O_ID);
+				_dest = od_factory -> get_destination(_D_ID);
+				_origin -> add_dest_demand_multiclass(_dest, _demand_vector, _demand_vector_truck);
+			}
+			else{
+				printf("Something wrong in build_demand!\n");
+				free(_demand_vector);
+				exit(-1);
+			}
+		}
+		free(_demand_vector_car);
+		free(_demand_vector_truck);
+		_demand_file.close();
+	}
+	return 0;
+}
+
+
+
+
+/******************************************************************************************************************
+*******************************************************************************************************************
 												Multiclass DTA
 *******************************************************************************************************************
 ******************************************************************************************************************/
@@ -1582,4 +1835,17 @@ int MNM_Dta_Multiclass::initialize()
   m_total_assign_inter = m_config ->  get_int("max_interval");
 
   return 0;
+}
+
+int MNM_Dta_Multiclass::build_from_files()
+{
+  MNM_IO_Multiclass::build_node_factory_multiclass(m_file_folder, m_config, m_node_factory);
+  MNM_IO_Multiclass::build_link_factory_multiclass(m_file_folder, m_config, m_link_factory);
+  MNM_IO_Multiclass::build_od_factory_multiclass(m_file_folder, m_config, m_od_factory, m_node_factory);
+  m_graph = MNM_IO_Multiclass::build_graph(m_file_folder, m_config);
+  MNM_IO_Multiclass::build_demand_multiclass(m_file_folder, m_config, m_od_factory);
+  build_workzone();
+  set_statistics();
+  set_routing();
+  return 0;  
 }

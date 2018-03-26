@@ -21,7 +21,7 @@ public:
   MNM_Dta(std::string file_folder);
   virtual ~MNM_Dta();
   int virtual initialize();
-  int build_from_files();
+  int virtual build_from_files();
   bool is_ok();
   int hook_up_node_and_link();
   int loading(bool verbose);

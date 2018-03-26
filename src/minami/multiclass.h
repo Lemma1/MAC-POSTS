@@ -281,15 +281,11 @@ public:
 	std::unordered_map<MNM_Destination_Multiclass*, TFlt*> m_demand_truck;
 };
 
-class MNM_Destination_Multiclass : public
+class MNM_Destination_Multiclass : public MNM_Destination
 {
 public:
 	MNM_Destination_Multiclass(TInt ID);
 	~MNM_Destination_Multiclass();
-	TInt m_Dest_ID;
-	TFlt m_flow_scalar;
-	MNM_DMDND_Multiclass *m_dest_node;
-	int receive(TInt current_interval);
 };
 
 
@@ -365,13 +361,42 @@ class MNM_OD_Factory_Multiclass : public MNM_OD_Factory
 public:
 	MNM_OD_Factory_Multiclass();
 	~MNM_OD_Factory_Multiclass();
-	MNM_Destination_Multiclass *make_destination(TInt ID);
-	MNM_Origin_Multiclass *make_origin(TInt ID, TInt max_interval, TFlt flow_scalar, TInt frequency);
-	MNM_Destination_Multiclass *get_destination(TInt ID);
-	MNM_Origin_Multiclass *get_origin(TInt ID);
-	std::unordered_map<TInt, MNM_Origi_Multiclassn*> m_origin_map;
-	std::unordered_map<TInt, MNM_Destination_Multiclass*> m_destination_map;
+	MNM_Destination_Multiclass* virtual make_destination(TInt ID) override;
+	MNM_Origin_Multiclass* virtual make_origin(TInt ID, 
+											TInt max_interval, 
+											TFlt flow_scalar, 
+											TInt frequency) override;
+	MNM_Destination_Multiclass* virtual get_destination(TInt ID) override;
+	MNM_Origin_Multiclass* virtual get_origin(TInt ID) override;
 };
+
+
+
+
+/******************************************************************************************************************
+*******************************************************************************************************************
+												Multiclass IO Functions
+*******************************************************************************************************************
+******************************************************************************************************************/
+class MNM_IO_Multiclass : public MNM_IO
+{
+	static int build_node_factory_multiclass(std::string file_folder, 
+											MNM_ConfReader *conf_reader, 
+											MNM_Node_Factory_Multiclass *node_factory);
+ 	static int build_link_factory_multiclass(std::string file_folder, 
+ 											MNM_ConfReader *conf_reader, 
+ 											MNM_Link_Factory_Multiclass *link_factory, 
+ 											std::string file_name = "MNM_input_link");
+ 	static int build_od_factory_multiclass(std::string file_folder, 
+ 											MNM_ConfReader *conf_reader, 
+ 											MNM_OD_Factory_Multiclass *od_factory, 
+ 											MNM_Node_Factory_Multiclass *node_factory) {
+ 		return build_od_factory(file_folder, conf_reader, od_factory, node_factory)
+ 	}
+ 	static int build_demand_multiclass(std::string file_folder, 
+ 									MNM_ConfReader *conf_reader, 
+ 									MNM_OD_Factory_Multiclass *od_factory);
+}
 
 
 
@@ -387,6 +412,7 @@ public:
 	MNM_Dta_Multiclass(std::string file_folder);
 	~MNM_Dta_Multiclass();
 	int virtual initialize() override;
+	int virtual build_from_files() override;
 }; 
 
 

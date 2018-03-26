@@ -32,7 +32,7 @@ public:
   static int build_workzone_list(std::string file_folder, MNM_Workzone* workzone);
   static int dump_cumulative_curve(std::string file_folder, MNM_Link_Factory *link_factory);
 
-private:
+//private:
   static std::vector<std::string> split(const std::string &text, char sep);
   static  std::string inline &ltrim(std::string &s) {s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
         return s;}
