@@ -66,10 +66,10 @@ class MNM_OD_Factory
 public:
   MNM_OD_Factory();
   virtual ~MNM_OD_Factory();
-  MNM_Destination* virtual make_destination(TInt ID);
-  MNM_Origin* virtual make_origin(TInt ID, TInt max_interval, TFlt flow_scalar, TInt frequency);
-  MNM_Destination* virtual get_destination(TInt ID);
-  MNM_Origin* virtual get_origin(TInt ID);
+  virtual MNM_Destination* make_destination(TInt ID);
+  virtual MNM_Origin* make_origin(TInt ID, TInt max_interval, TFlt flow_scalar, TInt frequency);
+  virtual MNM_Destination* get_destination(TInt ID);
+  virtual MNM_Origin* get_origin(TInt ID);
   std::unordered_map<TInt, MNM_Origin*> m_origin_map;
   std::unordered_map<TInt, MNM_Destination*> m_destination_map;
 };

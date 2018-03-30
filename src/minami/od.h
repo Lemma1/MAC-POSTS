@@ -38,7 +38,7 @@ class MNM_Destination
 {
 public:
   MNM_Destination(TInt ID);
-  ~MNM_Destination();
+  virtual ~MNM_Destination();
   TInt m_Dest_ID;
   TFlt m_flow_scalar;
   MNM_DMDND *m_dest_node;

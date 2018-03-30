@@ -6,6 +6,8 @@
 #include "vehicle.h"
 #include "dta.h"
 
+class MNM_Destination_Multiclass;
+
 
 /******************************************************************************************************************
 *******************************************************************************************************************
@@ -118,8 +120,8 @@ public:
 	TFlt m_perceived_density_truck;
 	TInt m_out_veh_car;
 	TInt m_out_veh_truck;
-	std::deque<MNM_Veh_Multiclass*> m_veh_queue_car;
-	std::deque<MNM_Veh_Multiclass*> m_veh_queue_truck;
+	std::deque<MNM_Veh*> m_veh_queue_car;
+	std::deque<MNM_Veh*> m_veh_queue_truck;
 };
 
 /**************************************************************************
@@ -151,7 +153,7 @@ public:
 	// use this one instead of the one in Dlink class
 	int install_cumulative_curve_multiclass();
 
-	std::unordered_map<MNM_Veh_Multiclass*, TInt> m_veh_pool;
+	std::unordered_map<MNM_Veh*, TInt> m_veh_pool;
 	TInt m_volume_car; //vehicle number, without the flow scalar
 	TInt m_volume_truck; //vehicle number, without the flow scalar
 	TFlt m_lane_hold_cap;
@@ -160,7 +162,7 @@ public:
 	TFlt m_hold_cap;
 	TInt m_max_stamp;
 	TFlt m_unit_time;
-	TFlt m_veh_convert_factor
+	TFlt m_veh_convert_factor;
 
 	// Two seperate N-curves for private cars and trucks
 	MNM_Cumulative_Curve *m_N_in_car;
@@ -322,7 +324,7 @@ public:
 
 	// use this one instead of make_veh in the base class
 	MNM_Veh_Multiclass* make_veh_multiclass(TInt timestamp, Vehicle_type veh_type, TInt vehicle_cls);
-}
+};
 
 class MNM_Node_Factory_Multiclass : public MNM_Node_Factory
 {
@@ -361,13 +363,11 @@ class MNM_OD_Factory_Multiclass : public MNM_OD_Factory
 public:
 	MNM_OD_Factory_Multiclass();
 	~MNM_OD_Factory_Multiclass();
-	MNM_Destination_Multiclass* virtual make_destination(TInt ID) override;
-	MNM_Origin_Multiclass* virtual make_origin(TInt ID, 
+	virtual MNM_Destination_Multiclass* make_destination(TInt ID) override;
+	virtual MNM_Origin_Multiclass* make_origin(TInt ID, 
 											TInt max_interval, 
 											TFlt flow_scalar, 
 											TInt frequency) override;
-	MNM_Destination_Multiclass* virtual get_destination(TInt ID) override;
-	MNM_Origin_Multiclass* virtual get_origin(TInt ID) override;
 };
 
 
@@ -380,23 +380,24 @@ public:
 ******************************************************************************************************************/
 class MNM_IO_Multiclass : public MNM_IO
 {
+public:
 	static int build_node_factory_multiclass(std::string file_folder, 
 											MNM_ConfReader *conf_reader, 
-											MNM_Node_Factory_Multiclass *node_factory);
+											MNM_Node_Factory *node_factory);
  	static int build_link_factory_multiclass(std::string file_folder, 
  											MNM_ConfReader *conf_reader, 
- 											MNM_Link_Factory_Multiclass *link_factory, 
+ 											MNM_Link_Factory *link_factory, 
  											std::string file_name = "MNM_input_link");
  	static int build_od_factory_multiclass(std::string file_folder, 
  											MNM_ConfReader *conf_reader, 
- 											MNM_OD_Factory_Multiclass *od_factory, 
- 											MNM_Node_Factory_Multiclass *node_factory) {
- 		return build_od_factory(file_folder, conf_reader, od_factory, node_factory)
- 	}
+ 											MNM_OD_Factory *od_factory, 
+ 											MNM_Node_Factory *node_factory) {
+ 		return build_od_factory(file_folder, conf_reader, od_factory, node_factory);
+ 	};
  	static int build_demand_multiclass(std::string file_folder, 
  									MNM_ConfReader *conf_reader, 
- 									MNM_OD_Factory_Multiclass *od_factory);
-}
+ 									MNM_OD_Factory *od_factory);
+};
 
 
 
