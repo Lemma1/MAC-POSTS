@@ -1,5 +1,5 @@
-#include "dta.h"
 #include "io.h"
+#include "multiclass.h"
 
 #include <vector>
 
@@ -8,7 +8,7 @@ int main()
 	printf("BEGIN multiclass test!\n");
 
 	std::string folder = "../../data/input_files_7link_multiclass";
-	MNM_Dta_Multiclass *test_dta = new MMN_Dta_Multiclass(folder);
+	/MNM_Dta_Multiclass *test_dta = new MNM_Dta_Multiclass(folder);
 	printf("================================ DTA set! ================================\n");
 	test_dta -> build_from_files();
 	printf("Finished initialization!\n");
