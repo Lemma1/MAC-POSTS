@@ -1774,7 +1774,8 @@ int MNM_IO_Multiclass::build_demand_multiclass(std::string file_folder,
 MNM_Dta_Multiclass::MNM_Dta_Multiclass(std::string file_folder)
 	: MNM_Dta::MNM_Dta(file_folder)
 {
-	;
+	// Re-run the multiclass version of initialize();
+	initialize();
 }
 
 MNM_Dta_Multiclass::~MNM_Dta_Multiclass()
