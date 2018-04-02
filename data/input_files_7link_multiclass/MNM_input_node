@@ -1,7 +1,7 @@
-#ID Type
-1 DMOND
-2 FWJ
-3 FWJ
-4 FWJ
-5 FWJ
-6 DMDND
+#ID Type Convert_factor(only for Inout node)
+1 DMOND 2.1
+2 FWJ 2.1
+3 FWJ 2.1
+4 FWJ 2.1
+5 FWJ 2.1
+6 DMDND 2.1

@@ -15,12 +15,31 @@ class MNM_Destination_Multiclass;
 *******************************************************************************************************************
 ******************************************************************************************************************/
 
+class MNM_Dlink_Multiclass : public MNM_Dlink
+{
+public:
+	MNM_Dlink_Multiclass(TInt ID,
+						TInt number_of_lane,
+						TFlt length);
+	~MNM_Dlink_Multiclass();
+
+	// use this one instead of the one in Dlink class
+	int install_cumulative_curve_multiclass();
+
+	// Two seperate N-curves for private cars and trucks
+	MNM_Cumulative_Curve *m_N_in_car;
+  	MNM_Cumulative_Curve *m_N_out_car;
+  	MNM_Cumulative_Curve *m_N_in_truck;
+  	MNM_Cumulative_Curve *m_N_out_truck;
+};
+
+
 /**************************************************************************
 							Multiclass CTM
 			(currently only for car & truck two classes)
 	(see: Z. (Sean) Qian et al./Trans. Res. Part B 99 (2017) 183-204)
 **************************************************************************/
-class MNM_Dlink_Ctm_Multiclass : public MNM_Dlink
+class MNM_Dlink_Ctm_Multiclass : public MNM_Dlink_Multiclass
 {
 public:
 	MNM_Dlink_Ctm_Multiclass(TInt ID,
@@ -43,9 +62,6 @@ public:
 	TFlt virtual get_link_flow() override;
 	TFlt virtual get_link_tt() override;
 
-	// use this one instead of the one in Dlink class
-	int install_cumulative_curve_multiclass();
-
 	class Ctm_Cell_Multiclass;
 	int init_cell_array(TFlt unit_time, TFlt std_cell_length, TFlt last_cell_length);
 	int update_out_veh();
@@ -66,12 +82,6 @@ public:
 	TFlt m_wave_speed_car;
 	TFlt m_wave_speed_truck;
 	std::vector<Ctm_Cell_Multiclass*> m_cell_array;
-
-	// Two seperate N-curves for private cars and trucks
-	MNM_Cumulative_Curve *m_N_in_car;
-  	MNM_Cumulative_Curve *m_N_out_car;
-  	MNM_Cumulative_Curve *m_N_in_truck;
-  	MNM_Cumulative_Curve *m_N_out_truck;
 };
 
 class MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass
@@ -127,7 +137,7 @@ public:
 /**************************************************************************
 							Multiclass Point-Queue Model
 **************************************************************************/
-class MNM_Dlink_Pq_Multiclass : public MNM_Dlink
+class MNM_Dlink_Pq_Multiclass : public MNM_Dlink_Multiclass
 {
 public:
 	MNM_Dlink_Pq_Multiclass(TInt ID,
@@ -150,9 +160,6 @@ public:
 	TFlt virtual get_link_flow() override;
 	TFlt virtual get_link_tt() override;
 
-	// use this one instead of the one in Dlink class
-	int install_cumulative_curve_multiclass();
-
 	std::unordered_map<MNM_Veh*, TInt> m_veh_pool;
 	TInt m_volume_car; //vehicle number, without the flow scalar
 	TInt m_volume_truck; //vehicle number, without the flow scalar
@@ -163,12 +170,6 @@ public:
 	TInt m_max_stamp;
 	TFlt m_unit_time;
 	TFlt m_veh_convert_factor;
-
-	// Two seperate N-curves for private cars and trucks
-	MNM_Cumulative_Curve *m_N_in_car;
-  	MNM_Cumulative_Curve *m_N_out_car;
-  	MNM_Cumulative_Curve *m_N_in_truck;
-  	MNM_Cumulative_Curve *m_N_out_truck;
 };
 
 
@@ -186,9 +187,10 @@ public:
 class MNM_DMOND_Multiclass : public MNM_DMOND
 {
 public:
-	MNM_DMOND_Multiclass(TInt ID, TFlt flow_scalar);
+	MNM_DMOND_Multiclass(TInt ID, TFlt flow_scalar, TFlt veh_convert_factor);
 	~MNM_DMOND_Multiclass();
 	int virtual evolve(TInt timestamp) override;
+	TFlt m_veh_convert_factor;
 };
 
 /**************************************************************************
@@ -197,9 +199,10 @@ public:
 class MNM_DMDND_Multiclass : public MNM_DMDND
 {
 public:
-	MNM_DMDND_Multiclass(TInt ID, TFlt flow_scalar);
+	MNM_DMDND_Multiclass(TInt ID, TFlt flow_scalar, TFlt veh_convert_factor);
 	~MNM_DMDND_Multiclass();
 	int virtual evolve(TInt timestamp) override;
+	TFlt m_veh_convert_factor;
 };
 
 /**************************************************************************
@@ -208,7 +211,7 @@ public:
 class MNM_Dnode_Inout_Multiclass : public MNM_Dnode
 {
 public:
-	MNM_Dnode_Inout_Multiclass(TInt ID, TFlt flow_scalar);
+	MNM_Dnode_Inout_Multiclass(TInt ID, TFlt flow_scalar, TFlt veh_convert_factor);
 	~MNM_Dnode_Inout_Multiclass();
 	int virtual evolve(TInt timestamp) override;
 	int virtual prepare_loading() override;
@@ -225,6 +228,7 @@ protected:
 	TFlt *m_veh_flow; //2d
 	TFlt *m_veh_moved_car; //2d
 	TFlt *m_veh_moved_truck; //2d
+	TFlt m_veh_convert_factor;
 };
 
 /*                           FWJ node
@@ -232,7 +236,7 @@ protected:
 class MNM_Dnode_FWJ_Multiclass : public MNM_Dnode_Inout_Multiclass
 {
 public:
-	MNM_Dnode_FWJ_Multiclass(TInt ID, TFlt flow_scalar);
+	MNM_Dnode_FWJ_Multiclass(TInt ID, TFlt flow_scalar, TFlt veh_convert_factor);
 	~MNM_Dnode_FWJ_Multiclass();
 	int virtual compute_flow() override;
 };
@@ -242,7 +246,7 @@ public:
 class MNM_Dnode_GRJ_Multiclass : public MNM_Dnode_Inout_Multiclass
 {
 public:
-	MNM_Dnode_GRJ_Multiclass(TInt ID, TFlt flow_scalar);
+	MNM_Dnode_GRJ_Multiclass(TInt ID, TFlt flow_scalar, TFlt veh_convert_factor);
 	~MNM_Dnode_GRJ_Multiclass();
 	int virtual compute_flow() override;
 	int virtual prepare_loading() override;
@@ -333,7 +337,7 @@ public:
 	~MNM_Node_Factory_Multiclass();
 
 	// use this one instead of make_node in the base class
-	MNM_Dnode *make_node_multiclass(TInt ID, DNode_type_multiclass node_type, TFlt flow_scalar);
+	MNM_Dnode *make_node_multiclass(TInt ID, DNode_type_multiclass node_type, TFlt flow_scalar, TFlt veh_convert_factor);
 };
 
 class MNM_Link_Factory_Multiclass : public MNM_Link_Factory

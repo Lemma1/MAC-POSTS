@@ -11,6 +11,40 @@
 *******************************************************************************************************************
 ******************************************************************************************************************/
 
+MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(TInt ID,
+										TInt number_of_lane,
+										TFlt length)
+	: MNM_Dlink::MNM_Dlink(ID, number_of_lane, length, 0.0) // Note: m_ffs is not used in child class, so let it be 0.0
+{
+	m_N_in_car = NULL;
+  	m_N_out_car = NULL;
+  	m_N_in_truck = NULL;
+  	m_N_out_truck = NULL;
+
+  	install_cumulative_curve_multiclass();
+}
+
+MNM_Dlink_Multiclass::~MNM_Dlink_Multiclass()
+{
+	if (m_N_out_car != NULL) delete m_N_out_car;
+  	if (m_N_in_car != NULL) delete m_N_in_car;
+  	if (m_N_out_truck != NULL) delete m_N_out_truck;
+  	if (m_N_in_truck != NULL) delete m_N_in_truck;
+}
+
+int MNM_Dlink_Multiclass::install_cumulative_curve_multiclass()
+{
+	m_N_in_car = new MNM_Cumulative_Curve();
+  	m_N_out_car = new MNM_Cumulative_Curve();
+  	m_N_in_truck = new MNM_Cumulative_Curve();
+  	m_N_out_truck = new MNM_Cumulative_Curve();
+  	m_N_in_car -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
+  	m_N_out_car -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
+  	m_N_in_truck -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
+  	m_N_out_truck -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
+  	return 0;
+}
+
 /*************************************************************************					
 						Multiclass CTM Functions
 			(currently only for car & truck two classes)
@@ -29,7 +63,7 @@ MNM_Dlink_Ctm_Multiclass::MNM_Dlink_Ctm_Multiclass(TInt ID,
 												   TFlt veh_convert_factor, // 1 * truck = c * private cars 
 												   							// when compute node demand
 												   TFlt flow_scalar) // flow_scalar can be 2.0, 5.0, 10.0, etc.
-	: MNM_Dlink::MNM_Dlink(ID, number_of_lane, length, 0.0) // Note: m_ffs is not used in child class, so let it be 0.0
+	: MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(ID, number_of_lane, length)
 {
 	// Jam density for private cars and trucks cannot be negative
 	if ((lane_hold_cap_car < 0) || (lane_hold_cap_truck < 0)){
@@ -92,11 +126,6 @@ MNM_Dlink_Ctm_Multiclass::MNM_Dlink_Ctm_Multiclass(TInt ID,
 	m_veh_convert_factor = veh_convert_factor;
 	m_flow_scalar = flow_scalar;
 
-	m_N_in_car = NULL;
-  	m_N_out_car = NULL;
-  	m_N_in_truck = NULL;
-  	m_N_out_truck = NULL;
-
 	m_cell_array = std::vector<Ctm_Cell_Multiclass*>();
 
 	// Note m_ffs_car > m_ffs_truck, use ffs_car to define the standard cell length
@@ -135,25 +164,6 @@ MNM_Dlink_Ctm_Multiclass::~MNM_Dlink_Ctm_Multiclass()
 		delete _cell;
 	}
 	m_cell_array.clear();
-
-	if (m_N_out_car != NULL) delete m_N_out_car;
-  	if (m_N_in_car != NULL) delete m_N_in_car;
-  	if (m_N_out_truck != NULL) delete m_N_out_truck;
-  	if (m_N_in_truck != NULL) delete m_N_in_truck;
-}
-
-// use this one instead of the one in Dlink class
-int MNM_Dlink_Ctm_Multiclass::install_cumulative_curve_multiclass()
-{
-	m_N_in_car = new MNM_Cumulative_Curve();
-  	m_N_out_car = new MNM_Cumulative_Curve();
-  	m_N_in_truck = new MNM_Cumulative_Curve();
-  	m_N_out_truck = new MNM_Cumulative_Curve();
-  	m_N_in_car -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
-  	m_N_out_car -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
-  	m_N_in_truck -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
-  	m_N_out_truck -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
-  	return 0;
 }
 
 int MNM_Dlink_Ctm_Multiclass::init_cell_array(TFlt unit_time, 
@@ -598,7 +608,7 @@ MNM_Dlink_Pq_Multiclass::MNM_Dlink_Pq_Multiclass(TInt ID,
 												TFlt unit_time,
 												TFlt veh_convert_factor,
 												TFlt flow_scalar)
-  : MNM_Dlink::MNM_Dlink(ID, number_of_lane, length, 0.0)
+  : MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(ID, number_of_lane, length)
 {
 	m_lane_hold_cap = lane_hold_cap_car;
 	m_lane_flow_cap = lane_flow_cap_car;
@@ -615,20 +625,6 @@ MNM_Dlink_Pq_Multiclass::MNM_Dlink_Pq_Multiclass(TInt ID,
 MNM_Dlink_Pq_Multiclass::~MNM_Dlink_Pq_Multiclass()
 {
 	m_veh_pool.clear();
-}
-
-// use this one instead of the one in Dlink class
-int MNM_Dlink_Pq_Multiclass::install_cumulative_curve_multiclass()
-{
-	m_N_in_car = new MNM_Cumulative_Curve();
-  	m_N_out_car = new MNM_Cumulative_Curve();
-  	m_N_in_truck = new MNM_Cumulative_Curve();
-  	m_N_out_truck = new MNM_Cumulative_Curve();
-  	m_N_in_car -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
-  	m_N_out_car -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
-  	m_N_in_truck -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
-  	m_N_out_truck -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
-  	return 0;
 }
 
 TFlt MNM_Dlink_Pq_Multiclass::get_link_supply()
@@ -733,10 +729,10 @@ TFlt MNM_Dlink_Pq_Multiclass::get_link_tt()
 /**************************************************************************
                               Origin node
 **************************************************************************/
-MNM_DMOND_Multiclass::MNM_DMOND_Multiclass(TInt ID, TFlt flow_scalar)
+MNM_DMOND_Multiclass::MNM_DMOND_Multiclass(TInt ID, TFlt flow_scalar, TFlt veh_convert_factor)
 	: MNM_DMOND::MNM_DMOND(ID, flow_scalar)
 {
-	;
+	m_veh_convert_factor = veh_convert_factor;
 }
 
 MNM_DMOND_Multiclass::~MNM_DMOND_Multiclass()
@@ -824,10 +820,10 @@ int MNM_DMOND_Multiclass::evolve(TInt timestamp)
 /**************************************************************************
                               Destination node
 **************************************************************************/
-MNM_DMDND_Multiclass::MNM_DMDND_Multiclass(TInt ID, TFlt flow_scalar)
+MNM_DMDND_Multiclass::MNM_DMDND_Multiclass(TInt ID, TFlt flow_scalar, TFlt veh_convert_factor)
 	: MNM_DMDND::MNM_DMDND(ID, flow_scalar)
 {
-	;
+	m_veh_convert_factor = veh_convert_factor;
 }
 
 MNM_DMDND_Multiclass::~MNM_DMDND_Multiclass()
@@ -879,7 +875,7 @@ int MNM_DMDND_Multiclass::evolve(TInt timestamp)
 /**************************************************************************
                    				In-out node
 **************************************************************************/
-MNM_Dnode_Inout_Multiclass::MNM_Dnode_Inout_Multiclass(TInt ID, TFlt flow_scalar)
+MNM_Dnode_Inout_Multiclass::MNM_Dnode_Inout_Multiclass(TInt ID, TFlt flow_scalar, TFlt veh_convert_factor)
 	: MNM_Dnode::MNM_Dnode(ID, flow_scalar)
 {
 	m_demand = NULL;
@@ -887,6 +883,7 @@ MNM_Dnode_Inout_Multiclass::MNM_Dnode_Inout_Multiclass(TInt ID, TFlt flow_scalar
 	m_veh_flow = NULL;
 	m_veh_moved_car = NULL;
 	m_veh_moved_truck = NULL;
+	m_veh_convert_factor = veh_convert_factor;
 }
 
 MNM_Dnode_Inout_Multiclass::~MNM_Dnode_Inout_Multiclass()
@@ -920,11 +917,11 @@ int MNM_Dnode_Inout_Multiclass::prepare_supplyANDdemand()
 	size_t _offset = m_out_link_array.size();
 	TFlt _equiv_count;
 	std::deque<MNM_Veh*>::iterator _veh_it;
-	MNM_Dlink_Ctm_Multiclass *_in_link, *_out_link;
+	MNM_Dlink *_in_link, *_out_link;
 
 	/* calculate demand */
 	for (size_t i = 0; i < m_in_link_array.size(); ++i){
-		_in_link = dynamic_cast<MNM_Dlink_Ctm_Multiclass *>(m_in_link_array[i]);
+		_in_link = m_in_link_array[i];
 		for (_veh_it = _in_link -> m_finished_array.begin(); _veh_it != _in_link -> m_finished_array.end(); _veh_it++){
 			if (std::find(m_out_link_array.begin(), m_out_link_array.end(), (*_veh_it) -> get_next_link()) == m_out_link_array.end()){
 				printf("Vehicle in the wrong node, no exit!\n");
@@ -934,7 +931,7 @@ int MNM_Dnode_Inout_Multiclass::prepare_supplyANDdemand()
 			}
 		}
 		for (size_t j = 0; j < m_out_link_array.size(); ++j){
-			_out_link = dynamic_cast<MNM_Dlink_Ctm_Multiclass *>(m_out_link_array[j]);
+			_out_link = m_out_link_array[j];
 			_equiv_count = 0;
 			for (_veh_it = _in_link -> m_finished_array.begin(); _veh_it != _in_link -> m_finished_array.end(); _veh_it++){
         		MNM_Veh_Multiclass *_veh = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it);
@@ -945,7 +942,7 @@ int MNM_Dnode_Inout_Multiclass::prepare_supplyANDdemand()
         			}
         			else { 
         				// truck
-        				_equiv_count += _in_link -> m_veh_convert_factor;
+        				_equiv_count += m_veh_convert_factor;
         			}
         		}
       		}
@@ -955,9 +952,7 @@ int MNM_Dnode_Inout_Multiclass::prepare_supplyANDdemand()
 
 	/* calculated supply */
   	for (size_t j = 0; j < m_out_link_array.size(); ++j){
-    	_out_link = dynamic_cast<MNM_Dlink_Ctm_Multiclass *>(m_out_link_array[j]);
-	    m_supply[j] = _out_link -> get_link_supply();
-	    // printf(" get link s fin\n");
+	    m_supply[j] = m_out_link_array[j] -> get_link_supply();
 	    // printf("Link %d, supply is %.4f\n", _out_link -> m_link_ID, m_supply[j]);
   	}
 
@@ -984,15 +979,15 @@ int MNM_Dnode_Inout_Multiclass::prepare_supplyANDdemand()
 int MNM_Dnode_Inout_Multiclass::record_cumulative_curve(TInt timestamp)
 {
   	TInt _temp_sum_car, _temp_sum_truck;
-  	MNM_Dlink_Ctm_Multiclass *_in_link, *_out_link;
+  	MNM_Dlink_Multiclass *_in_link, *_out_link;
   	size_t _offset = m_out_link_array.size();
 
   	for (size_t j = 0; j < m_out_link_array.size(); ++j){
     	_temp_sum_car = 0;
     	_temp_sum_truck = 0;
-    	_out_link = dynamic_cast<MNM_Dlink_Ctm_Multiclass *>(m_out_link_array[j]);
+    	_out_link = dynamic_cast<MNM_Dlink_Multiclass *>(m_out_link_array[j]);
     	for (size_t i = 0; i < m_in_link_array.size(); ++i) {
-    		_in_link = dynamic_cast<MNM_Dlink_Ctm_Multiclass *>(m_in_link_array[i]);
+    		_in_link = dynamic_cast<MNM_Dlink_Multiclass *>(m_in_link_array[i]);
        		_temp_sum_car += m_veh_moved_car[i * _offset + j];
       		_temp_sum_truck += m_veh_moved_truck[i * _offset + j];
     	}
@@ -1007,9 +1002,9 @@ int MNM_Dnode_Inout_Multiclass::record_cumulative_curve(TInt timestamp)
   	for (size_t i = 0; i < m_in_link_array.size(); ++i){
     	_temp_sum_car = 0;
     	_temp_sum_truck = 0;
-    	_in_link = dynamic_cast<MNM_Dlink_Ctm_Multiclass *>(m_in_link_array[i]);
+    	_in_link = dynamic_cast<MNM_Dlink_Multiclass *>(m_in_link_array[i]);
     	for (size_t j = 0; j < m_out_link_array.size(); ++j) {
-      		_out_link = dynamic_cast<MNM_Dlink_Ctm_Multiclass *>(m_out_link_array[j]);
+      		_out_link = dynamic_cast<MNM_Dlink_Multiclass *>(m_out_link_array[j]);
       		_temp_sum_car += m_veh_moved_car[i * _offset + j];
       		_temp_sum_truck += m_veh_moved_truck[i * _offset + j];
     	}
@@ -1026,16 +1021,16 @@ int MNM_Dnode_Inout_Multiclass::record_cumulative_curve(TInt timestamp)
 
 int MNM_Dnode_Inout_Multiclass::move_vehicle()
 {
-	MNM_Dlink_Ctm_Multiclass *_in_link, *_out_link;
+	MNM_Dlink *_in_link, *_out_link;
 	size_t _offset = m_out_link_array.size();
 	TFlt _to_move;
 	TFlt _equiv_num;
 	TFlt _r;
 
 	for (size_t j = 0; j < m_out_link_array.size(); ++j){
-		_out_link = dynamic_cast<MNM_Dlink_Ctm_Multiclass *>(m_out_link_array[j]);
+		_out_link = m_out_link_array[j];
 		for (size_t i = 0; i < m_in_link_array.size(); ++i){
-			_in_link = dynamic_cast<MNM_Dlink_Ctm_Multiclass *>(m_in_link_array[i]);
+			_in_link = m_in_link_array[i];
 			_to_move = m_veh_flow[i * _offset + j] * m_flow_scalar;
 			auto _veh_it = _in_link -> m_finished_array.begin();
 			while (_veh_it != _in_link -> m_finished_array.end()){
@@ -1048,7 +1043,7 @@ int MNM_Dnode_Inout_Multiclass::move_vehicle()
 	        			}
 	        			else { 
 	        				// truck
-	        				_equiv_num = _in_link -> m_veh_convert_factor;
+	        				_equiv_num = m_veh_convert_factor;
 	        			}
 	        			if (_to_move < _equiv_num) {
 	        				// randomly decide to move or not in this case 
@@ -1125,13 +1120,14 @@ int MNM_Dnode_Inout_Multiclass::evolve(TInt timestamp)
 	move_vehicle();
 	// printf("5\n");
 	record_cumulative_curve(timestamp);
+	// printf("6\n");
 	return 0;
 }
 
 /*                          FWJ node
 **************************************************************************/
-MNM_Dnode_FWJ_Multiclass::MNM_Dnode_FWJ_Multiclass(TInt ID, TFlt flow_scalar)
-  : MNM_Dnode_Inout_Multiclass::MNM_Dnode_Inout_Multiclass(ID, flow_scalar)
+MNM_Dnode_FWJ_Multiclass::MNM_Dnode_FWJ_Multiclass(TInt ID, TFlt flow_scalar, TFlt veh_convert_factor)
+  : MNM_Dnode_Inout_Multiclass::MNM_Dnode_Inout_Multiclass(ID, flow_scalar, veh_convert_factor)
 {
 }
 
@@ -1160,8 +1156,8 @@ int MNM_Dnode_FWJ_Multiclass::compute_flow()
 
 /*               General Road Junction node
 **************************************************************************/
-MNM_Dnode_GRJ_Multiclass::MNM_Dnode_GRJ_Multiclass(TInt ID, TFlt flow_scalar)
-  : MNM_Dnode_Inout_Multiclass::MNM_Dnode_Inout_Multiclass(ID, flow_scalar)
+MNM_Dnode_GRJ_Multiclass::MNM_Dnode_GRJ_Multiclass(TInt ID, TFlt flow_scalar, TFlt veh_convert_factor)
+  : MNM_Dnode_Inout_Multiclass::MNM_Dnode_Inout_Multiclass(ID, flow_scalar, veh_convert_factor)
 {
 	m_d_a = NULL;
 	m_C_a = NULL;
@@ -1408,18 +1404,19 @@ MNM_Node_Factory_Multiclass::~MNM_Node_Factory_Multiclass()
 
 MNM_Dnode *MNM_Node_Factory_Multiclass::make_node_multiclass(TInt ID, 
 												  			DNode_type_multiclass node_type, 
-												  			TFlt flow_scalar)
+												  			TFlt flow_scalar,
+												  			TFlt veh_convert_factor)
 {
 	MNM_Dnode *_node;
 	switch (node_type){
     	case MNM_TYPE_FWJ_MULTICLASS:
-			_node = new MNM_Dnode_FWJ_Multiclass(ID, flow_scalar);
+			_node = new MNM_Dnode_FWJ_Multiclass(ID, flow_scalar, veh_convert_factor);
 			break;
     	case MNM_TYPE_ORIGIN_MULTICLASS:
-			_node = new MNM_DMOND_Multiclass(ID, flow_scalar);
+			_node = new MNM_DMOND_Multiclass(ID, flow_scalar, veh_convert_factor);
 			break;
     	case MNM_TYPE_DEST_MULTICLASS:
-			_node = new MNM_DMDND_Multiclass(ID, flow_scalar);
+			_node = new MNM_DMDND_Multiclass(ID, flow_scalar, veh_convert_factor);
 			break;
     	default:
 			printf("Wrong node type.\n");
@@ -1554,34 +1551,39 @@ int MNM_IO_Multiclass::build_node_factory_multiclass(std::string file_folder,
 	std::vector<std::string> _words;
 	TInt _node_ID;
 	std::string _type;
+	TFlt _veh_convert_factor;
 
 	MNM_Node_Factory_Multiclass* _node_factory = dynamic_cast<MNM_Node_Factory_Multiclass *>(node_factory);
 
 	if (_node_file.is_open())
 	{
 		std::getline(_node_file,_line); //skip the first line
-		for (int i=0; i < _num_of_node; ++i){
+		for (int i = 0; i < _num_of_node; ++i){
 			std::getline(_node_file,_line);
 			_words = split(_line, ' ');
-			if (_words.size() == 2) {
+			if (_words.size() == 3) {
 				_node_ID = TInt(std::stoi(_words[0]));
 				_type = trim(_words[1]);
+				_veh_convert_factor = TFlt(std::stod(_words[2]));
 				if (_type == "FWJ"){
 					_node_factory -> make_node_multiclass(_node_ID, 
 														MNM_TYPE_FWJ_MULTICLASS, 
-														_flow_scalar);
+														_flow_scalar,
+														_veh_convert_factor);
 					continue;
 				}				
 				if (_type =="DMOND"){
 					_node_factory -> make_node_multiclass(_node_ID, 
 														MNM_TYPE_ORIGIN_MULTICLASS, 
-														_flow_scalar);
+														_flow_scalar,
+														_veh_convert_factor);
 					continue;
 				}
 				if (_type =="DMDND"){
 					_node_factory -> make_node_multiclass(_node_ID, 
 														MNM_TYPE_DEST_MULTICLASS, 
-														_flow_scalar);
+														_flow_scalar,
+														_veh_convert_factor);
 					continue;
 				}
 				printf("Wrong node type, %s\n", _type.c_str());
