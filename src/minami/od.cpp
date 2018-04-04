@@ -93,6 +93,7 @@ int MNM_Destination::receive(TInt current_interval)
 
   MNM_Veh *_veh;
   size_t _num_to_receive = m_dest_node -> m_out_veh_queue.size();
+  // printf("Dest node %d out vehicle: %d\n", m_dest_node -> m_node_ID, _num_to_receive);
   for (size_t i=0; i < _num_to_receive; ++i){
     _veh = m_dest_node -> m_out_veh_queue.front();
     if (_veh -> get_destination() != this){
