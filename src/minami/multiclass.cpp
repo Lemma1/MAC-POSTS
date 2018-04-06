@@ -247,7 +247,7 @@ int MNM_Dlink_Ctm_Multiclass::update_out_veh()
 	TFlt _temp_out_flux_car, _supply_car, _demand_car;
 	TFlt _temp_out_flux_truck, _supply_truck, _demand_truck;
 
-	printf("Link %d: ", m_link_ID);
+	printf("Link %d to be moved: ", m_link_ID);
 	// no update is needed if only one cell
 	if (m_num_cells > 1){
 		for (int i = 0; i < m_num_cells - 1; ++i){
@@ -274,6 +274,27 @@ int MNM_Dlink_Ctm_Multiclass::update_out_veh()
 
 int MNM_Dlink_Ctm_Multiclass::evolve(TInt timestamp)
 {
+	printf("Link %d volume before: ", m_link_ID);
+	/* update volume */
+	if (m_num_cells > 1){
+		for (int i = 0; i < m_num_cells - 1; ++i)
+		{
+			printf("(%d, %d) ", m_cell_array[i] -> m_veh_queue_car.size(), 
+				m_cell_array[i] -> m_veh_queue_truck.size());
+		}
+	}
+	std::deque<MNM_Veh*>::iterator _veh_it;
+	TInt _count_car = 0;
+	TInt _count_truck = 0;
+	// m_class: 0 - private car, 1 - truck
+	// for (_veh_it = m_finished_array.begin(); _veh_it != m_finished_array.end(); _veh_it++){
+	// 	MNM_Veh_Multiclass *_veh = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it);
+	// 	if (_veh -> m_class == 0) _count_car += 1;
+	// 	if (_veh -> m_class == 1) _count_truck += 1;
+	// }
+	printf("(%d, %d)\n", m_cell_array[m_num_cells - 1] -> m_veh_queue_car.size() + _count_car, 
+		m_cell_array[m_num_cells - 1] -> m_veh_queue_truck.size()) + _count_truck;
+
 	update_out_veh();
 	
 	TInt _num_veh_tomove_car, _num_veh_tomove_truck;
@@ -295,7 +316,7 @@ int MNM_Dlink_Ctm_Multiclass::evolve(TInt timestamp)
 	}
 	/* last cell */
 	move_last_cell();
-	printf("Link %d: ", m_link_ID);
+	printf("Link %d volume after: ", m_link_ID);
 	/* update volume */
 	if (m_num_cells > 1){
 		for (int i = 0; i < m_num_cells - 1; ++i)
@@ -308,9 +329,8 @@ int MNM_Dlink_Ctm_Multiclass::evolve(TInt timestamp)
 		}
 	}
 
-	std::deque<MNM_Veh*>::iterator _veh_it;
-	TInt _count_car = 0;
-	TInt _count_truck = 0;
+	_count_car = 0;
+	_count_truck = 0;
 	// m_class: 0 - private car, 1 - truck
 	for (_veh_it = m_finished_array.begin(); _veh_it != m_finished_array.end(); _veh_it++){
 		MNM_Veh_Multiclass *_veh = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it);
@@ -350,6 +370,7 @@ int MNM_Dlink_Ctm_Multiclass::move_last_cell()
 					printf("Dlink_CTM_Multiclass::Some thing wrong!\n");
 					exit(-1);
 				}
+				_num_veh_tomove_car--;
 			}
 			// no car to move, move a truck
 			else {
@@ -362,6 +383,7 @@ int MNM_Dlink_Ctm_Multiclass::move_last_cell()
 					printf("Dlink_CTM_Multiclass::Some thing wrong!\n");
 					exit(-1);
 				}
+				_num_veh_tomove_truck--;
 			}
 		}
 		// probability = 1 - _pstar to move a truck
@@ -377,6 +399,7 @@ int MNM_Dlink_Ctm_Multiclass::move_last_cell()
 					printf("Dlink_CTM_Multiclass::Some thing wrong!\n");
 					exit(-1);
 				}
+				_num_veh_tomove_truck--;
 			}
 			// no truck to move, move a car
 			else {
@@ -389,6 +412,7 @@ int MNM_Dlink_Ctm_Multiclass::move_last_cell()
 					printf("Dlink_CTM_Multiclass::Some thing wrong!\n");
 					exit(-1);
 				}
+				_num_veh_tomove_car--;
 			}
 		}
 	}
@@ -413,6 +437,8 @@ int MNM_Dlink_Ctm_Multiclass::clear_incoming_array()
 		printf("Wrong incoming array size\n");
 		exit(-1);
 	}
+	
+	printf("Link incoming array size: %d\n", m_incoming_array.size());
 
 	MNM_Veh_Multiclass* _veh;
 	size_t _cur_size = m_incoming_array.size();
@@ -420,17 +446,18 @@ int MNM_Dlink_Ctm_Multiclass::clear_incoming_array()
 		_veh = dynamic_cast<MNM_Veh_Multiclass *>(m_incoming_array.front());
 		m_incoming_array.pop_front();
 		if (_veh -> m_class == TInt(0)) {
-			printf("car\n");
+			// printf("car\n");
 			m_cell_array[0] -> m_veh_queue_car.push_back(_veh);
 		}
 		else {
-			printf("truck\n");
+			// printf("truck\n");
 			m_cell_array[0] -> m_veh_queue_truck.push_back(_veh);
 		}
 	}
 	m_cell_array[0] -> m_volume_car = m_cell_array[0] -> m_veh_queue_car.size();
 	m_cell_array[0] -> m_volume_truck = m_cell_array[0] -> m_veh_queue_truck.size();
 	m_cell_array[0] -> update_perceived_density();
+	
 	return 0;
 }
 
@@ -630,6 +657,7 @@ MNM_Dlink_Pq_Multiclass::MNM_Dlink_Pq_Multiclass(TInt ID,
 	m_flow_scalar = flow_scalar;
 	m_hold_cap = m_lane_hold_cap * TFlt(number_of_lane) * m_length;
 	m_max_stamp = MNM_Ults::round(m_length/(ffs_car * unit_time));
+	printf("m_max_stamp = %d\n", m_max_stamp);
 	m_veh_pool = std::unordered_map<MNM_Veh*, TInt>();
 	m_volume_car = TInt(0);
 	m_volume_truck = TInt(0);
@@ -656,10 +684,12 @@ int MNM_Dlink_Pq_Multiclass::clear_incoming_array() {
 			m_incoming_array.pop_front();
 			m_veh_pool.insert({_veh, TInt(0)});
 			if (_veh -> m_class == 0) {
+				//printf("car\n");
 				m_volume_car += 1;
 				_to_be_moved -= 1;
 			}
 			else {
+				//printf("truck\n");
 				m_volume_truck += 1;
 				_to_be_moved -= m_veh_convert_factor;
 			}
@@ -668,6 +698,7 @@ int MNM_Dlink_Pq_Multiclass::clear_incoming_array() {
 			break;
 		}
 	}
+	// printf("car: %d, truck: %d\n", m_volume_car, m_volume_truck);
 	return 0;
 }
 
@@ -681,9 +712,18 @@ void MNM_Dlink_Pq_Multiclass::print_info()
 int MNM_Dlink_Pq_Multiclass::evolve(TInt timestamp)
 {
 	std::unordered_map<MNM_Veh*, TInt>::iterator _que_it = m_veh_pool.begin();
+	MNM_Veh_Multiclass* _veh;
+	TInt _num_car = 0, _num_truck = 0;
 	while (_que_it != m_veh_pool.end()) {
 		if (_que_it -> second >= m_max_stamp) {
 			m_finished_array.push_back(_que_it -> first);
+			_veh = dynamic_cast<MNM_Veh_Multiclass *>(m_finished_array.back());
+			if (_veh -> m_class == 0) {
+				_num_car += 1;
+			}
+			else {
+				_num_truck += 1;
+			}
 			_que_it = m_veh_pool.erase(_que_it); //c++ 11
 		}
 		else {
@@ -691,6 +731,7 @@ int MNM_Dlink_Pq_Multiclass::evolve(TInt timestamp)
 			_que_it ++;
 		}
 	}
+	// printf("car: %d, truck: %d\n", _num_car, _num_truck);
 	return 0;
 }
 
@@ -827,6 +868,7 @@ int MNM_DMOND_Multiclass::evolve(TInt timestamp)
 	    if (_next_link -> m_N_in_truck != NULL) {
 	      	_next_link -> m_N_in_truck -> add_increment(std::pair<TFlt, TFlt>(TFlt(timestamp + 1), TFlt(_moved_truck)/m_flow_scalar));
 	    }
+	    // printf("car: %d, truck: %d\n", _moved_car, _moved_truck);
   	}
   	return 0;
 }
@@ -1049,10 +1091,22 @@ int MNM_Dnode_Inout_Multiclass::move_vehicle()
 			_to_move = m_veh_flow[i * _offset + j] * m_flow_scalar;
 			printf("from %d to %d: %.4f\n", _in_link -> m_link_ID, _out_link -> m_link_ID, _to_move);
 			auto _veh_it = _in_link -> m_finished_array.begin();
+
+			// if (_to_move > 0){
+			// 	auto _veh_it2 = _in_link -> m_finished_array.begin();
+			// 	while (_veh_it2 != _in_link -> m_finished_array.end()){
+			// 		MNM_Veh_Multiclass *_veh2 = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it2);
+			// 		printf("%d ", _veh2 -> m_class);
+			// 		_veh_it2++;
+			// 	}
+			// 	printf("\n");
+			// }
+
 			while (_veh_it != _in_link -> m_finished_array.end()){
 				if (_to_move > 0){
 					MNM_Veh_Multiclass *_veh = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it);
 					if (_veh -> get_next_link() == _out_link){
+						// printf("%d ", _veh -> m_class);
 						if (_veh -> m_class == 0) {
 							// private car
 							_equiv_num = 1;
@@ -1098,8 +1152,9 @@ int MNM_Dnode_Inout_Multiclass::move_vehicle()
 					break;
 				}
 			}
-			if (_to_move > 0){
-		        printf("Something wrong during the vehicle moving, remaining to move %.4f\n", (float)_to_move);
+			// printf("\n");
+			if (_to_move > 0.001){
+		        printf("Something wrong during the vehicle moving, remaining to move %.16f\n", (float)_to_move);
 		        // printf("The finished veh queue is now size %d\n", (int)_in_link->m_finished_array.size());
 		        // printf("But it is heading to %d\n", (int)_in_link->m_finished_array.front() -> get_next_link() -> m_link_ID);
 		        exit(-1);
@@ -1283,6 +1338,7 @@ int MNM_Origin_Multiclass::release(MNM_Veh_Factory* veh_factory, TInt current_in
 	    }
 	    m_current_assign_interval++;
   	}
+  	random_shuffle(m_origin_node -> m_in_veh_queue.begin(), m_origin_node -> m_in_veh_queue.end());
   	return 0;
 }
 
@@ -1333,6 +1389,7 @@ int MNM_Origin_Multiclass::release_one_interval(TInt current_interval,
 			m_origin_node -> m_in_veh_queue.push_back(_veh);
 		}
 	}
+	random_shuffle(m_origin_node -> m_in_veh_queue.begin(), m_origin_node -> m_in_veh_queue.end());
  	return 0;
 }
 
