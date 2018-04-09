@@ -332,7 +332,7 @@ PNEGraph MNM_IO::build_graph(std::string file_folder, MNM_ConfReader *conf_reade
   std::string _line;
   std::vector<std::string> _words;
   std::getline(_graph_file,_line); // skip one line
-  for (int i=0; i<_num_of_link; ++i){
+  for (int i = 0; i < _num_of_link; ++i){
     std::getline(_graph_file,_line);
     _words = split(_line, ' ');
     if (_words.size() == 3){
@@ -340,12 +340,12 @@ PNEGraph MNM_IO::build_graph(std::string file_folder, MNM_ConfReader *conf_reade
       _link_ID = TInt(std::stoi(_words[0]));
       _from_ID = TInt(std::stoi(_words[1]));
       _to_ID = TInt(std::stoi(_words[2]));
-    if (! _graph->IsNode(_from_ID)) { _graph->AddNode(_from_ID); }
-    if (! _graph->IsNode(_to_ID)) { _graph->AddNode(_to_ID); }
-    _graph->AddEdge(_from_ID, _to_ID, _link_ID);
+      if (! _graph -> IsNode(_from_ID)) { _graph -> AddNode(_from_ID); }
+      if (! _graph -> IsNode(_to_ID)) { _graph -> AddNode(_to_ID); }
+      _graph -> AddEdge(_from_ID, _to_ID, _link_ID);
     }
   }
-  _graph->Defrag();
+  _graph -> Defrag();
   return _graph;
 }
 

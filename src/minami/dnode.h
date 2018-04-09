@@ -37,7 +37,7 @@ class MNM_DMOND : public MNM_Dnode
 {
 public:
   MNM_DMOND(TInt ID, TFlt flow_scalar);
-  ~MNM_DMOND();
+  virtual ~MNM_DMOND();
   int virtual evolve(TInt timestamp) override;
   void virtual print_info();
   int virtual add_out_link(MNM_Dlink* out_link) override;
@@ -52,7 +52,7 @@ class MNM_DMDND : public MNM_Dnode
 {
 public:
   MNM_DMDND(TInt ID, TFlt flow_scalar);
-  ~MNM_DMDND();
+  virtual ~MNM_DMDND();
   int virtual evolve(TInt timestamp) override;
   void virtual print_info() override;
   int virtual add_in_link(MNM_Dlink *link) override;

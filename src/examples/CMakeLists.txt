@@ -63,11 +63,14 @@
 #add_executable (test_due test_due.cpp)
 #target_link_libraries (test_due Snap minami adv_ds)
 
-add_executable (test_detNL test_determined_routing.cpp)
-target_link_libraries (test_detNL Snap minami adv_ds)
+add_executable (test_multiclass test_multiclass.cpp)
+target_link_libraries (test_multiclass Snap minami adv_ds)
 
-add_executable (test_dta_gradient test_dta_gradient.cpp)
-target_link_libraries (test_dta_gradient Snap minami adv_ds)
+#add_executable (test_detNL test_determined_routing.cpp)
+#target_link_libraries (test_detNL Snap minami adv_ds)
 
-add_executable (test_tree_cc test_tree_cc.cpp)
-target_link_libraries (test_tree_cc Snap minami adv_ds)
+#add_executable (test_dta_gradient test_dta_gradient.cpp)
+#target_link_libraries (test_dta_gradient Snap minami adv_ds)
+
+#add_executable (test_tree_cc test_tree_cc.cpp)
+#target_link_libraries (test_tree_cc Snap minami adv_ds)

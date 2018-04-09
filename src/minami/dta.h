@@ -19,9 +19,9 @@ class MNM_Dta
 {
 public:
   MNM_Dta(std::string file_folder);
-  ~MNM_Dta();
-  int initialize();
-  int build_from_files();
+  virtual ~MNM_Dta();
+  int virtual initialize();
+  int virtual build_from_files();
   bool is_ok();
   int hook_up_node_and_link();
   int loading(bool verbose);
