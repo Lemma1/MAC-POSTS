@@ -25,12 +25,20 @@ public:
 
 	// use this one instead of the one in Dlink class
 	int install_cumulative_curve_multiclass();
+	// use this one instead of the one in Dlink class
+	int install_cumulative_curve_tree_multiclass();
 
 	// Two seperate N-curves for private cars and trucks
 	MNM_Cumulative_Curve *m_N_in_car;
   	MNM_Cumulative_Curve *m_N_out_car;
   	MNM_Cumulative_Curve *m_N_in_truck;
   	MNM_Cumulative_Curve *m_N_out_truck;
+
+  	// Two seperate N-curve_trees for private cars and trucks
+	MNM_Tree_Cumulative_Curve *m_N_in_tree_car;
+  	MNM_Tree_Cumulative_Curve *m_N_out_tree_car;
+  	MNM_Tree_Cumulative_Curve *m_N_in_tree_truck;
+  	MNM_Tree_Cumulative_Curve *m_N_out_tree_truck;
 };
 
 
@@ -221,7 +229,7 @@ protected:
 	int prepare_supplyANDdemand();
 	int virtual compute_flow(){return 0;};
 	// int flow_to_vehicle();
-	int move_vehicle();
+	int move_vehicle(TInt timestamp);
 	int record_cumulative_curve(TInt timestamp);
 	TFlt *m_demand; //2d
 	TFlt *m_supply; //1d
@@ -418,6 +426,7 @@ public:
 	~MNM_Dta_Multiclass();
 	int virtual initialize() override;
 	int virtual build_from_files() override;
+	int virtual pre_loading() override;
 }; 
 
 

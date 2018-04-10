@@ -33,7 +33,7 @@ public:
   int set_routing();
   int build_workzone();
   int check_origin_destination_connectivity();
-  int pre_loading();
+  int virtual pre_loading();
   TInt m_start_assign_interval;
   TInt m_total_assign_inter;
   TFlt m_unit_time;

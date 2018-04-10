@@ -21,7 +21,13 @@ MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(TInt ID,
   	m_N_in_truck = NULL;
   	m_N_out_truck = NULL;
 
+  	m_N_in_tree_car = NULL;
+  	m_N_out_tree_car = NULL;
+  	m_N_in_tree_truck = NULL;
+  	m_N_out_tree_truck = NULL;
+
   	install_cumulative_curve_multiclass();
+  	install_cumulative_curve_tree_multiclass();
 }
 
 MNM_Dlink_Multiclass::~MNM_Dlink_Multiclass()
@@ -30,10 +36,18 @@ MNM_Dlink_Multiclass::~MNM_Dlink_Multiclass()
   	if (m_N_in_car != NULL) delete m_N_in_car;
   	if (m_N_out_truck != NULL) delete m_N_out_truck;
   	if (m_N_in_truck != NULL) delete m_N_in_truck;
+  	if (m_N_out_tree_car != NULL) delete m_N_out_tree_car;
+  	if (m_N_in_tree_car != NULL) delete m_N_in_tree_car;
+  	if (m_N_out_tree_truck != NULL) delete m_N_out_tree_truck;
+  	if (m_N_in_tree_truck != NULL) delete m_N_in_tree_truck;
 }
 
 int MNM_Dlink_Multiclass::install_cumulative_curve_multiclass()
 {
+	if (m_N_out_car != NULL) delete m_N_out_car;
+  	if (m_N_in_car != NULL) delete m_N_in_car;
+  	if (m_N_out_truck != NULL) delete m_N_out_truck;
+  	if (m_N_in_truck != NULL) delete m_N_in_truck;
 	m_N_in_car = new MNM_Cumulative_Curve();
   	m_N_out_car = new MNM_Cumulative_Curve();
   	m_N_in_truck = new MNM_Cumulative_Curve();
@@ -44,6 +58,20 @@ int MNM_Dlink_Multiclass::install_cumulative_curve_multiclass()
   	m_N_out_truck -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
   	return 0;
 }
+
+int MNM_Dlink_Multiclass::install_cumulative_curve_tree_multiclass()
+{
+	if (m_N_out_tree_car != NULL) delete m_N_out_tree_car;
+  	if (m_N_in_tree_car != NULL) delete m_N_in_tree_car;
+  	if (m_N_out_tree_truck != NULL) delete m_N_out_tree_truck;
+  	if (m_N_in_tree_truck != NULL) delete m_N_in_tree_truck;
+	m_N_in_tree_car = new MNM_Tree_Cumulative_Curve();
+  	m_N_out_tree_car = new MNM_Tree_Cumulative_Curve();
+  	m_N_in_tree_truck = new MNM_Tree_Cumulative_Curve();
+  	m_N_out_tree_truck = new MNM_Tree_Cumulative_Curve();
+  	return 0;
+}
+
 
 /*************************************************************************					
 						Multiclass CTM Functions
@@ -1030,22 +1058,128 @@ int MNM_Dnode_Inout_Multiclass::prepare_supplyANDdemand()
   	return 0;
 }
 
-// int MNM_Dnode_Inout_Multiclass::flow_to_vehicle()
-// {
-// 	size_t _offset = m_out_link_array.size();
-// 	MNM_Dlink *_out_link;
-//  TFlt _to_move;
-// 	size_t _rand_idx;
-// 	for (size_t j = 0; j < m_out_link_array.size(); ++j){
-// 		_to_move = 0;
-// 		_out_link = m_out_link_array[j];
-// 		for (size_t i = 0; i < m_in_link_array.size(); ++i){
-// 			m_veh_tomove[i * _offset + j] = m_veh_flow[i * _offset + j] * m_flow_scalar;
-//			_to_move += m_veh_tomove[i * _offset + j];
-// 		}
-// 	}
-// 	return 0;
-// }
+int MNM_Dnode_Inout_Multiclass::move_vehicle(TInt timestamp)
+{
+	MNM_Dlink *_in_link, *_out_link;
+	MNM_Dlink_Multiclass *_ilink, *_olink;
+	size_t _offset = m_out_link_array.size();
+	TFlt _to_move;
+	TFlt _equiv_num;
+	TFlt _r;
+
+	for (size_t j = 0; j < m_out_link_array.size(); ++j){
+		_out_link = m_out_link_array[j];
+		for (size_t i = 0; i < m_in_link_array.size(); ++i){
+			_in_link = m_in_link_array[i];
+			_to_move = m_veh_flow[i * _offset + j] * m_flow_scalar;
+			printf("from %d to %d: %.4f\n", _in_link -> m_link_ID, _out_link -> m_link_ID, _to_move);
+			auto _veh_it = _in_link -> m_finished_array.begin();
+
+			// if (_to_move > 0){
+			// 	auto _veh_it2 = _in_link -> m_finished_array.begin();
+			// 	while (_veh_it2 != _in_link -> m_finished_array.end()){
+			// 		MNM_Veh_Multiclass *_veh2 = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it2);
+			// 		printf("%d ", _veh2 -> m_class);
+			// 		_veh_it2++;
+			// 	}
+			// 	printf("\n");
+			// }
+
+			while (_veh_it != _in_link -> m_finished_array.end()){
+				if (_to_move > 0){
+					MNM_Veh_Multiclass *_veh = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it);
+					if (_veh -> get_next_link() == _out_link){
+						// printf("%d ", _veh -> m_class);
+						if (_veh -> m_class == 0) {
+							// private car
+							_equiv_num = 1;
+						}
+						else { 
+							// truck
+							_equiv_num = m_veh_convert_factor;
+						}
+						if (_to_move < _equiv_num) {
+							// randomly decide to move or not in this case 
+							// base on the probability = _to_move/_equiv_num < 1
+							_r = MNM_Ults::rand_flt();
+							// if (_r <= _to_move/_equiv_num){
+							// 	_out_link -> m_incoming_array.push_back(_veh);
+							// 	_veh -> set_current_link(_out_link);
+							// 	if (_veh -> m_class == 0){
+							// 		m_veh_moved_car[i * _offset + j] += 1;
+							// 		_olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
+							// 		_ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
+							// 		if (_out_link -> m_N_out_tree_car != NULL) {
+							// 			_out_link -> m_N_out_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+							// 		}
+							// 		if (_in_link -> m_N_in_tree_car != NULL) {
+							// 			_in_link -> m_N_in_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+							// 		}
+							// 	}
+							// 	else {
+							// 		m_veh_moved_truck[i * _offset + j] += 1;
+							// 		_olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
+							// 		_ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
+							// 		if (_out_link -> m_N_out_tree_truck != NULL) {
+							// 			_out_link -> m_N_out_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+							// 		}
+							// 		if (_in_link -> m_N_in_tree_truck != NULL) {
+							// 			_in_link -> m_N_in_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+							// 		}
+							// 	}
+							// 	_veh_it = _in_link -> m_finished_array.erase(_veh_it);
+							// }
+						}
+						else {
+							_out_link -> m_incoming_array.push_back(_veh);
+							_veh -> set_current_link(_out_link);
+							if (_veh -> m_class == 0){
+								m_veh_moved_car[i * _offset + j] += 1;
+								_olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
+								_ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
+								if (_out_link -> m_N_out_tree_car != NULL) {
+									_out_link -> m_N_out_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+								}
+								if (_in_link -> m_N_in_tree_car != NULL) {
+									_in_link -> m_N_in_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+								}
+							}
+							else {
+								m_veh_moved_truck[i * _offset + j] += 1;
+								_olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
+								_ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
+								if (_out_link -> m_N_out_tree_truck != NULL) {
+									_out_link -> m_N_out_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+								}
+								if (_in_link -> m_N_in_tree_truck != NULL) {
+									_in_link -> m_N_in_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+								}
+							}
+							_veh_it = _in_link -> m_finished_array.erase(_veh_it);
+						}
+						_to_move -= _equiv_num;
+					}
+					else {
+						_veh_it++;
+					}
+				}
+				else {
+					break;
+				}
+			}
+			// printf("\n");
+			if (_to_move > 0.001){
+				printf("Something wrong during the vehicle moving, remaining to move %.16f\n", (float)_to_move);
+				// printf("The finished veh queue is now size %d\n", (int)_in_link->m_finished_array.size());
+				// printf("But it is heading to %d\n", (int)_in_link->m_finished_array.front() -> get_next_link() -> m_link_ID);
+				exit(-1);
+			}
+		}
+		random_shuffle(_out_link -> m_incoming_array.begin(), _out_link -> m_incoming_array.end());
+	}
+
+	return 0;
+}
 
 int MNM_Dnode_Inout_Multiclass::record_cumulative_curve(TInt timestamp)
 {
@@ -1090,96 +1224,6 @@ int MNM_Dnode_Inout_Multiclass::record_cumulative_curve(TInt timestamp)
   	return 0;
 }
 
-int MNM_Dnode_Inout_Multiclass::move_vehicle()
-{
-	MNM_Dlink *_in_link, *_out_link;
-	size_t _offset = m_out_link_array.size();
-	TFlt _to_move;
-	TFlt _equiv_num;
-	TFlt _r;
-
-	for (size_t j = 0; j < m_out_link_array.size(); ++j){
-		_out_link = m_out_link_array[j];
-		for (size_t i = 0; i < m_in_link_array.size(); ++i){
-			_in_link = m_in_link_array[i];
-			_to_move = m_veh_flow[i * _offset + j] * m_flow_scalar;
-			printf("from %d to %d: %.4f\n", _in_link -> m_link_ID, _out_link -> m_link_ID, _to_move);
-			auto _veh_it = _in_link -> m_finished_array.begin();
-
-			// if (_to_move > 0){
-			// 	auto _veh_it2 = _in_link -> m_finished_array.begin();
-			// 	while (_veh_it2 != _in_link -> m_finished_array.end()){
-			// 		MNM_Veh_Multiclass *_veh2 = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it2);
-			// 		printf("%d ", _veh2 -> m_class);
-			// 		_veh_it2++;
-			// 	}
-			// 	printf("\n");
-			// }
-
-			while (_veh_it != _in_link -> m_finished_array.end()){
-				if (_to_move > 0){
-					MNM_Veh_Multiclass *_veh = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it);
-					if (_veh -> get_next_link() == _out_link){
-						// printf("%d ", _veh -> m_class);
-						if (_veh -> m_class == 0) {
-							// private car
-							_equiv_num = 1;
-						}
-						else { 
-							// truck
-							_equiv_num = m_veh_convert_factor;
-						}
-						if (_to_move < _equiv_num) {
-							// randomly decide to move or not in this case 
-							// base on the probability = _to_move/_equiv_num < 1
-							// _r = MNM_Ults::rand_flt()
-							// 				if (_r <= _to_move/_equiv_num){
-							// 	_out_link -> m_incoming_array.push_back(_veh);
-							// 	_veh -> set_current_link(_out_link);
-							// 	if (_veh -> m_class == 0){
-							// 		m_veh_moved_car[i * _offset + j] += 1;
-							// 	}
-							// 	else {
-							// 		m_veh_moved_truck[i * _offset + j] += 1;
-							// 	}
-							// 	_veh_it = _in_link -> m_finished_array.erase(_veh_it);
-							// }
-						}
-						else {
-							_out_link -> m_incoming_array.push_back(_veh);
-							_veh -> set_current_link(_out_link);
-							if (_veh -> m_class == 0){
-								m_veh_moved_car[i * _offset + j] += 1;
-							}
-							else {
-								m_veh_moved_truck[i * _offset + j] += 1;
-							}
-							_veh_it = _in_link -> m_finished_array.erase(_veh_it);
-						}
-						_to_move -= _equiv_num;
-					}
-					else {
-						_veh_it++;
-					}
-				}
-				else {
-					break;
-				}
-			}
-			// printf("\n");
-			if (_to_move > 0.001){
-		        printf("Something wrong during the vehicle moving, remaining to move %.16f\n", (float)_to_move);
-		        // printf("The finished veh queue is now size %d\n", (int)_in_link->m_finished_array.size());
-		        // printf("But it is heading to %d\n", (int)_in_link->m_finished_array.front() -> get_next_link() -> m_link_ID);
-		        exit(-1);
-		    }
-		}
-		random_shuffle(_out_link -> m_incoming_array.begin(), _out_link -> m_incoming_array.end());
-	}
-
-	return 0;
-}
-
 int MNM_Dnode_Inout_Multiclass::add_out_link(MNM_Dlink* out_link)
 {
   	m_out_link_array.push_back(out_link);
@@ -1200,12 +1244,10 @@ int MNM_Dnode_Inout_Multiclass::evolve(TInt timestamp)
 	// printf("2\n"); 
 	compute_flow();
 	// printf("3\n");
-	// flow_to_vehicle();
+	move_vehicle(timestamp);
 	// printf("4\n");
-	move_vehicle();
-	// printf("5\n");
 	record_cumulative_curve(timestamp);
-	// printf("6\n");
+	// printf("5\n");
 	return 0;
 }
 
@@ -1883,7 +1925,7 @@ int MNM_Dta_Multiclass::initialize()
 	m_flow_scalar = m_config -> get_int("flow_scalar");
 	m_assign_freq = m_config -> get_int("assign_frq");
 	m_start_assign_interval = m_config -> get_int("start_assign_interval");
-	m_total_assign_inter = m_config ->  get_int("max_interval");
+	m_total_assign_inter = m_config -> get_int("max_interval");
 
 	return 0;
 }
@@ -1895,8 +1937,22 @@ int MNM_Dta_Multiclass::build_from_files()
 	MNM_IO_Multiclass::build_od_factory_multiclass(m_file_folder, m_config, m_od_factory, m_node_factory);
 	m_graph = MNM_IO_Multiclass::build_graph(m_file_folder, m_config);
 	MNM_IO_Multiclass::build_demand_multiclass(m_file_folder, m_config, m_od_factory);
-	build_workzone();
+	// build_workzone();
 	set_statistics();
 	set_routing();
 	return 0;
+}
+
+int MNM_Dta_Multiclass::pre_loading()
+{
+  MNM_Dnode *_node;
+  printf("MNM: Prepare loading!\n");
+  m_routing -> init_routing();
+  m_statistics -> init_record();
+  for (auto _node_it = m_node_factory -> m_node_map.begin(); _node_it != m_node_factory -> m_node_map.end(); _node_it++){
+    _node = _node_it -> second;
+    _node -> prepare_loading();
+  }
+  printf("Exiting MNM: Prepare loading!\n");
+  return 0;
 }
