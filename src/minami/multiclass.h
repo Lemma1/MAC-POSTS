@@ -85,8 +85,6 @@ public:
 	int move_last_cell();
 
 	TInt m_num_cells;
-	TFlt m_ffs_car;
-	TFlt m_ffs_truck;
 	TFlt m_lane_hold_cap_car;
 	TFlt m_lane_hold_cap_truck;
 	TFlt m_lane_critical_density_car;
@@ -460,8 +458,8 @@ TFlt get_link_inflow_truck(MNM_Dlink_Multiclass* link,
 TFlt get_travel_time_car(MNM_Dlink_Multiclass* link, TFlt start_time);
 TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time);
 
-int get_dar_matrix(double **output, std::vector<MNM_Dlink*> links, 
-                   std::vector<MNM_Path*> paths, MNM_Veh_Factory *veh_factory);
+int get_dar_matrix_multiclass(double **output, std::vector<MNM_Dlink*> links, 
+                   			std::vector<MNM_Path*> paths, MNM_Veh_Factory *veh_factory);
 };
 
 

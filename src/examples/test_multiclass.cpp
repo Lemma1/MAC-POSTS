@@ -5,6 +5,9 @@
 
 int main()
 {
+	MNM_Dlink *_link;
+	MNM_Dlink_Multiclass *_link_m;
+
 	printf("BEGIN multiclass test!\n");
 
 	std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_7link_multiclass";
@@ -32,6 +35,20 @@ int main()
 		if (_current_inter % test_dta -> m_assign_freq == 0 || _current_inter == 0){
 			_assign_inter += 1;
 		}
+
+		if (_current_inter != 0){
+			for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); 
+					  _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
+				_link = _link_it -> second;
+				printf("link ID is %d: ", _link -> m_link_ID());
+				_link_m = dynamic_cast<MNM_Dlink_Multiclass*>(_link);
+				printf("car flow(%.4f), ", MNM_DTA_GRADIENT::get_link_inflow_car(_link_m, _current_inter - 1, _current_inter));
+				printf("truck flow(%.4f), ", MNM_DTA_GRADIENT::get_link_inflow_truck(_link_m, _current_inter - 1, _current_inter));
+				printf("car tt(%.4f s), ", MNM_DTA_GRADIENT::get_travel_time_car(_link_m, TFlt(_current_inter)));
+				printf("truck tt(%.4f s)\n", MNM_DTA_GRADIENT::get_travel_time_truck(_link_m, TFlt(_current_inter)));
+			}
+		}
+
 		_current_inter += 1;
 		// if (_current_inter > 22){ break; };
 	}
