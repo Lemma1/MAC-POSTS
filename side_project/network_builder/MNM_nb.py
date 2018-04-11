@@ -80,6 +80,33 @@ class MNM_demand():
     else:
       self.demand_dict[O][D] = demand
 
+  def build_from_file(self, file_name):
+    f = file(file_name)
+    log = f.readlines()[1:]
+    f.close()
+    for i in range(len(log)):
+      tmp_str = log[i].strip()
+      if tmp_str == '':
+        continue
+      words = tmp_str.split()
+      O_ID = np.int(words[0])
+      D_ID = np.int(words[1])
+      demand = np.array(words[2:]).astype(np.float)
+      self.add_demand(O_ID, D_ID, demand)
+
+  def __str__(self):
+    return "MNM_demand, number of O: {}".format(len(self.demand_dict))
+
+  def __repr__(self):
+    return self.__str__()
+
+  def generate_text(self):
+    tmp_str = '#Origin_ID Destination_ID <demand by interval>\n'
+    for O in self.demand_dict.keys():
+      for D in self.demand_dict[O].keys():
+        tmp_str += ' '.join([str(e) for e in [O, D] + self.demand_dict[O][D].tolist()]) + '\n'
+    return tmp_str
+
 
 class MNM_od():
   def __init__(self):
@@ -219,6 +246,9 @@ class MNM_path():
 
   def create_route_choice_portions(self, num_intervals):
     self.route_portions = np.zeros(num_intervals)
+
+  def attach_route_choice_portions(self, portions):
+    self.route_portions = portions
   
   def __ne__(self, other):
     return not self.__eq__(other)
@@ -231,6 +261,10 @@ class MNM_path():
 
   def generate_node_list_text(self):
     return ' '.join([str(e) for e in self.node_list])
+
+  def generate_portion_text(self):
+    assert(self.route_portions is not None)
+    return ' '.join([str(e) for e in self.route_portions])
 
 class MNM_pathset():
   def __init__(self):
@@ -246,7 +280,15 @@ class MNM_pathset():
     else:
       self.path_list.append(path)
 
-  
+  def normalize_route_portions(self):
+    for i in range(len(self.path_list) - 1):
+      assert(self.path_list[i].route_portions.shape == self.path_list[i + 1].route_portions.shape)
+    tmp_sum = np.zeros(self.path_list[0].route_portions.shape)
+    for i in range(len(self.path_list)):
+      tmp_sum += self.path_list[i].route_portions
+    for i in range(len(self.path_list)):
+      self.path_list[i].route_portions = self.path_list[i].route_portions / tmp_sum
+
   def __str__(self):
     return "MNM_pathset, O node: {}, D node: {}, number_of_paths: {}".format(self.origin_node, self.destination_node, len(self.path_list))
 
@@ -299,8 +341,13 @@ class MNM_pathtable():
     if w_ID:
       raise ("Error, pathtable load_route_choice_from_file not implemented")
     f = file(file_name)
-    log = f.readlines()
+    log = list(filter(lambda x: not x.strip() == '', f.readlines()))
     f.close()
+    assert(len(log) == len(self.ID2path))
+    for i in range(len(log)):
+      tmp_portions = np.array(log[i].strip().split()).astype(np.float)
+      self.ID2path[i].attach_route_choice_portions(tmp_portions)
+    
 
   def __str__(self):
     return "MNM_pathtable, number of paths:" + str(len(self.ID2path)) 
@@ -308,13 +355,17 @@ class MNM_pathtable():
   def __repr__(self):
     return self.__str__()
 
-  def generate_text(self):
+  def generate_tabel_text(self):
     tmp_str = ""
     for path_ID, path in self.ID2path.iteritems():
       tmp_str += path.generate_node_list_text() + '\n'
     return tmp_str
 
-
+  def generate_portion_text(self):
+    tmp_str = ""
+    for path_ID, path in self.ID2path.iteritems():
+      tmp_str += path.generate_portion_text() + '\n'
+    return tmp_str    
 
 # class MNM_routing():
 #   def __init__(self):
@@ -405,7 +456,8 @@ class MNM_network_builder():
   def load_from_folder(self, path, config_file_name = 'config.conf',
                                     link_file_name = 'MNM_input_link', node_file_name = 'MNM_input_node',
                                     graph_file_name = 'Snap_graph', od_file_name = 'MNM_input_od',
-                                    pathtable_file_name = 'path_table', path_p_file_name = 'path_table_buffer'):
+                                    pathtable_file_name = 'path_table', path_p_file_name = 'path_table_buffer',
+                                    demand_file_name = 'MNM_input_demand'):
     if os.path.isfile(os.path.join(path, config_file_name)):
       self.config.build_from_file(os.path.join(path, config_file_name))
     else:
@@ -422,10 +474,17 @@ class MNM_network_builder():
       self.graph.build_from_file(os.path.join(path, graph_file_name))
     else:
       print "No graph input"
+
     if os.path.isfile(os.path.join(path, od_file_name)):
       self.od.build_from_file(os.path.join(path, od_file_name))
     else:
       print "No OD input"
+
+    if os.path.isfile(os.path.join(path, demand_file_name)):
+      self.demand.build_from_file(os.path.join(path, demand_file_name))
+    else:
+      print "No demand input"
+
     if os.path.isfile(os.path.join(path, pathtable_file_name)):
       self.path_table.build_from_file(os.path.join(path, pathtable_file_name))
       if os.path.isfile(os.path.join(path, path_p_file_name)):
@@ -441,7 +500,8 @@ class MNM_network_builder():
   def dump_to_folder(self, path, config_file_name = 'config.conf',
                                     link_file_name = 'MNM_input_link', node_file_name = 'MNM_input_node',
                                     graph_file_name = 'Snap_graph', od_file_name = 'MNM_input_od',
-                                    pathtable_file_name = 'path_table', path_p_file_name = 'path_table_buffer'):
+                                    pathtable_file_name = 'path_table', path_p_file_name = 'path_table_buffer',
+                                    demand_file_name = 'MNM_input_demand'):
     if not os.path.isdir(path):
       os.makedirs(path)
     f = open(os.path.join(path, link_file_name), 'wb')
@@ -460,13 +520,22 @@ class MNM_network_builder():
     f.write(self.od.generate_text())
     f.close()
 
+    f = open(os.path.join(path, demand_file_name), 'wb')
+    f.write(self.demand.generate_text())
+    f.close()
+
     f = open(os.path.join(path, graph_file_name), 'wb')
     f.write(self.graph.generate_text())
     f.close()
 
     f = open(os.path.join(path, pathtable_file_name), 'wb')
-    f.write(self.path_table.generate_text())
+    f.write(self.path_table.generate_tabel_text())
     f.close()
+
+    if self.route_choice_flag:
+      f = open(os.path.join(path, path_p_file_name), 'wb')
+      f.write(self.path_table.generate_portion_text())
+      f.close()
 
   def read_link_input(self, file_name):
     link_list = list()
