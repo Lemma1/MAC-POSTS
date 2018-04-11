@@ -1,6 +1,8 @@
 #include "limits.h"
 #include "multiclass.h"
 
+#include "limits.h"
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -13,9 +15,14 @@
 
 MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(TInt ID,
 										TInt number_of_lane,
-										TFlt length)
+										TFlt length,
+										TFlt ffs_car, // Free-flow speed (m/s)
+										TFlt ffs_truck)
 	: MNM_Dlink::MNM_Dlink(ID, number_of_lane, length, 0.0) // Note: m_ffs is not used in child class, so let it be 0.0
 {
+	m_ffs_car = ffs_car;
+	m_ffs_truck = ffs_truck;
+
 	m_N_in_car = NULL;
   	m_N_out_car = NULL;
   	m_N_in_truck = NULL;
@@ -72,6 +79,16 @@ int MNM_Dlink_Multiclass::install_cumulative_curve_tree_multiclass()
   	return 0;
 }
 
+TFlt MNM_Dlink_Multiclass::get_link_freeflow_tt_car()
+{
+	return m_length/m_ffs_car;
+}
+
+TFlt MNM_Dlink_Multiclass::get_link_freeflow_tt_truck()
+{
+	return m_length/m_ffs_truck;
+}
+
 
 /*************************************************************************					
 						Multiclass CTM Functions
@@ -91,7 +108,7 @@ MNM_Dlink_Ctm_Multiclass::MNM_Dlink_Ctm_Multiclass(TInt ID,
 												   TFlt veh_convert_factor, // 1 * truck = c * private cars 
 												   							// when compute node demand
 												   TFlt flow_scalar) // flow_scalar can be 2.0, 5.0, 10.0, etc.
-	: MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(ID, number_of_lane, length)
+	: MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(ID, number_of_lane, length, ffs_car, ffs_truck)
 {
 	// Jam density for private cars and trucks cannot be negative
 	if ((lane_hold_cap_car < 0) || (lane_hold_cap_truck < 0)){
@@ -149,8 +166,6 @@ MNM_Dlink_Ctm_Multiclass::MNM_Dlink_Ctm_Multiclass(TInt ID,
 	m_lane_flow_cap_truck = lane_flow_cap_truck;	
 	m_lane_hold_cap_car = lane_hold_cap_car;
 	m_lane_hold_cap_truck = lane_hold_cap_truck;
-	m_ffs_car = ffs_car;
-	m_ffs_truck = ffs_truck;
 	m_veh_convert_factor = veh_convert_factor;
 	m_flow_scalar = flow_scalar;
 
@@ -692,14 +707,14 @@ MNM_Dlink_Pq_Multiclass::MNM_Dlink_Pq_Multiclass(TInt ID,
 												TFlt unit_time,
 												TFlt veh_convert_factor,
 												TFlt flow_scalar)
-  : MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(ID, number_of_lane, length)
+  : MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(ID, number_of_lane, length, ffs_car, ffs_truck)
 {
 	m_lane_hold_cap = lane_hold_cap_car;
 	m_lane_flow_cap = lane_flow_cap_car;
 	m_flow_scalar = flow_scalar;
 	m_hold_cap = m_lane_hold_cap * TFlt(number_of_lane) * m_length;
 	m_max_stamp = MNM_Ults::round(m_length/(ffs_car * unit_time));
-	printf("m_max_stamp = %d\n", m_max_stamp);
+	// printf("m_max_stamp = %d\n", m_max_stamp);
 	m_veh_pool = std::unordered_map<MNM_Veh*, TInt>();
 	m_volume_car = TInt(0);
 	m_volume_truck = TInt(0);
@@ -1956,3 +1971,114 @@ int MNM_Dta_Multiclass::pre_loading()
   printf("Exiting MNM: Prepare loading!\n");
   return 0;
 }
+
+
+
+
+/******************************************************************************************************************
+*******************************************************************************************************************
+										Multiclass DTA Gradient Utils
+*******************************************************************************************************************
+******************************************************************************************************************/
+namespace MNM_DTA_GRADIENT
+{
+
+TFlt get_link_inflow_car(MNM_Dlink_Multiclass* link, 
+                    	TFlt start_time, TFlt end_time)
+{
+	if (link == NULL){
+		throw std::runtime_error("Error, get_link_inflow_car link is null");
+	}
+	if (link -> m_N_in_car == NULL){
+		throw std::runtime_error("Error, get_link_inflow_car link cummulative curve is not installed");
+	}
+	return link -> m_N_in_car -> get_result(end_time) - link -> m_N_in_car -> get_result(start_time);
+}
+
+TFlt get_link_inflow_car(MNM_Dlink_Multiclass* link, 
+                    	TInt start_time, TInt end_time)
+{
+	if (link == NULL){
+		throw std::runtime_error("Error, get_link_inflow_car link is null");
+	}
+	if (link -> m_N_in_car == NULL){
+		throw std::runtime_error("Error, get_link_inflow_car link cummulative curve is not installed");
+	}
+	return link -> m_N_in_car -> get_result(TFlt(end_time)) - link -> m_N_in_car -> get_result(TFlt(start_time));
+}
+
+TFlt get_link_inflow_truck(MNM_Dlink_Multiclass* link, 
+                    	TFlt start_time, TFlt end_time)
+{
+	if (link == NULL){
+		throw std::runtime_error("Error, get_link_inflow_truck link is null");
+	}
+	if (link -> m_N_in_truck == NULL){
+		throw std::runtime_error("Error, get_link_inflow_truck link cummulative curve is not installed");
+	}
+	return link -> m_N_in_truck -> get_result(end_time) - link -> m_N_in_truck -> get_result(start_time);
+}
+
+TFlt get_link_inflow_truck(MNM_Dlink_Multiclass* link, 
+                    	TInt start_time, TInt end_time)
+{
+	if (link == NULL){
+		throw std::runtime_error("Error, get_link_inflow_truck link is null");
+	}
+	if (link -> m_N_in_truck == NULL){
+		throw std::runtime_error("Error, get_link_inflow_truck link cummulative curve is not installed");
+	}
+	return link -> m_N_in_truck -> get_result(TFlt(end_time)) - link -> m_N_in_truck -> get_result(TFlt(start_time));
+}
+
+TFlt get_travel_time_car(MNM_Dlink_Multiclass* link, TFlt start_time)
+{
+	if (link == NULL){
+		throw std::runtime_error("Error, get_travel_time_car link is null");
+	}
+	if (link -> m_N_in_car == NULL){
+		throw std::runtime_error("Error, get_travel_time_car link cummulative curve is not installed");
+	}
+	TFlt _cc_flow = link -> m_N_in_car -> get_result(start_time);
+	if (_cc_flow <= DBL_EPSILON){
+		return link -> get_link_freeflow_tt_car();
+	}
+	TFlt _end_time = link -> m_N_out_car -> get_time(_cc_flow);
+	if (_end_time() < 0 || (_end_time - start_time < 0)){
+		return link -> get_link_freeflow_tt_car();
+	}
+	else{
+		return _end_time - start_time;
+	}
+	return 0;
+}
+
+TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time)
+{
+	if (link == NULL){
+		throw std::runtime_error("Error, get_travel_time_truck link is null");
+	}
+	if (link -> m_N_in_truck == NULL){
+		throw std::runtime_error("Error, get_travel_time_truck link cummulative curve is not installed");
+	}
+	TFlt _cc_flow = link -> m_N_in_truck -> get_result(start_time);
+	if (_cc_flow <= DBL_EPSILON){
+		return link -> get_link_freeflow_tt_truck();
+	}
+	TFlt _end_time = link -> m_N_out_truck -> get_time(_cc_flow);
+	if (_end_time() < 0 || (_end_time - start_time < 0)){
+		return link -> get_link_freeflow_tt_truck();
+	}
+	else{
+		return _end_time - start_time;
+	}
+	return 0;
+}
+
+int get_dar_matrix(double **output, std::vector<MNM_Dlink*> links, 
+                    std::vector<MNM_Path*> paths, MNM_Veh_Factory *veh_factory)
+{
+  return 0;
+}
+
+}//end namespace MNM_DTA_GRADIENT

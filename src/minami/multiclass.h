@@ -5,6 +5,7 @@
 #include "dnode.h"
 #include "vehicle.h"
 #include "dta.h"
+#include "dta_gradient_utls.h"
 
 class MNM_Destination_Multiclass;
 
@@ -20,13 +21,21 @@ class MNM_Dlink_Multiclass : public MNM_Dlink
 public:
 	MNM_Dlink_Multiclass(TInt ID,
 						TInt number_of_lane,
-						TFlt length);
+						TFlt length,
+						TFlt ffs_car, 
+						TFlt ffs_truck);
 	~MNM_Dlink_Multiclass();
 
 	// use this one instead of the one in Dlink class
 	int install_cumulative_curve_multiclass();
 	// use this one instead of the one in Dlink class
 	int install_cumulative_curve_tree_multiclass();
+
+	TFlt get_link_freeflow_tt_car();
+	TFlt get_link_freeflow_tt_truck();
+
+	TFlt m_ffs_car;
+	TFlt m_ffs_truck;
 
 	// Two seperate N-curves for private cars and trucks
 	MNM_Cumulative_Curve *m_N_in_car;
@@ -428,6 +437,32 @@ public:
 	int virtual build_from_files() override;
 	int virtual pre_loading() override;
 }; 
+
+
+
+
+/******************************************************************************************************************
+*******************************************************************************************************************
+										Multiclass DTA Gradient Utils
+*******************************************************************************************************************
+******************************************************************************************************************/
+namespace MNM_DTA_GRADIENT
+{
+TFlt get_link_inflow_car(MNM_Dlink_Multiclass* link, 
+                    	TFlt start_time, TFlt end_time);
+TFlt get_link_inflow_car(MNM_Dlink_Multiclass* link, 
+                    	TInt start_time, TInt end_time);
+TFlt get_link_inflow_truck(MNM_Dlink_Multiclass* link, 
+                    	TFlt start_time, TFlt end_time);
+TFlt get_link_inflow_truck(MNM_Dlink_Multiclass* link, 
+                    	TInt start_time, TInt end_time);
+
+TFlt get_travel_time_car(MNM_Dlink_Multiclass* link, TFlt start_time);
+TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time);
+
+int get_dar_matrix(double **output, std::vector<MNM_Dlink*> links, 
+                   std::vector<MNM_Path*> paths, MNM_Veh_Factory *veh_factory);
+};
 
 
 
