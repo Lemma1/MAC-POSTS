@@ -2049,7 +2049,7 @@ TFlt get_travel_time_car(MNM_Dlink_Multiclass* link, TFlt start_time)
 		return link -> get_link_freeflow_tt_car();
 	}
 	else{
-		return _end_time - start_time;
+		return (_end_time - start_time) * 5; // each interval is 5s
 	}
 	return 0;
 }
@@ -2071,7 +2071,7 @@ TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time)
 		return link -> get_link_freeflow_tt_truck();
 	}
 	else{
-		return _end_time - start_time;
+		return (_end_time - start_time) * 5; // each interval is 5s
 	}
 	return 0;
 }
