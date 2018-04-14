@@ -36,19 +36,6 @@ int main()
 			_assign_inter += 1;
 		}
 
-		// for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); 
-		// 		  _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
-		// 	_link = _link_it -> second;
-		// 	printf("link ID is %d: ", _link -> m_link_ID());
-		// 	_link_m = dynamic_cast<MNM_Dlink_Multiclass*>(_link);
-		// 	printf("car flow(%.4f), ", MNM_DTA_GRADIENT::get_link_inflow_car(_link_m, _current_inter, _current_inter + 1));
-		// 	printf("truck flow(%.4f), ", MNM_DTA_GRADIENT::get_link_inflow_truck(_link_m, _current_inter, _current_inter + 1));
-		// 	printf("car tt(%.4f s), ", MNM_DTA_GRADIENT::get_travel_time_car(_link_m, TFlt(_current_inter + 1)));
-		// 	printf("truck tt(%.4f s), ", MNM_DTA_GRADIENT::get_travel_time_truck(_link_m, TFlt(_current_inter + 1)));
-		// 	printf("car tt(%.4f s), ", _link_m -> get_link_freeflow_tt_car());
-		// 	printf("truck tt(%.4f s)\n", _link_m -> get_link_freeflow_tt_truck());
-		// }
-
 		_current_inter += 1;
 		// if (_current_inter > 100){ break; };
 	}
@@ -73,22 +60,37 @@ int main()
 		// if (_iter > 100){ break; };
 	}
 
+	
+	// for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
+	// 		_link = _link_it -> second;
+	// 		if (_link -> m_link_ID() == 3) {
+	// 			TInt _iter = 0;
+	// 			while (_iter < _current_inter){
+	// 				_link_m = dynamic_cast<MNM_Dlink_Multiclass*>(_link);
+	// 				printf("%d,%.4f,%.4f\n", int(_iter),
+	// 					double(MNM_DTA_GRADIENT::get_travel_time_car(_link_m, TFlt(_iter + 1))), 
+	// 					double(MNM_DTA_GRADIENT::get_travel_time_truck(_link_m, TFlt(_iter + 1))));
+	// 				_iter += 1;
+	// 			}
+	// 		}
+	// }
 
-	for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); 
-				  _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
-			_link = _link_it -> second;
-		if (_link -> m_link_ID() == 2){
-			_link_m = dynamic_cast<MNM_Dlink_Multiclass*>(_link);
-			printf("m_N_in_car: \n");
-			std::cout <<_link_m -> m_N_in_car -> to_string() << std::endl;
-			printf("m_N_out_car: \n");
-			std::cout <<_link_m -> m_N_out_car -> to_string() << std::endl;
-			printf("m_N_in_truck: \n");
-			std::cout <<_link_m -> m_N_in_truck -> to_string() << std::endl;
-			printf("m_N_out_truck: \n");
-			std::cout <<_link_m -> m_N_out_truck -> to_string() << std::endl;
-		}
-	}
+
+	// for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); 
+	// 			  _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
+	// 		_link = _link_it -> second;
+	// 	if (_link -> m_link_ID() == 3){
+	// 		_link_m = dynamic_cast<MNM_Dlink_Multiclass*>(_link);
+	// 		printf("m_N_in_car: \n");
+	// 		std::cout <<_link_m -> m_N_in_car -> to_string() << std::endl;
+	// 		printf("m_N_out_car: \n");
+	// 		std::cout <<_link_m -> m_N_out_car -> to_string() << std::endl;
+	// 		printf("m_N_in_truck: \n");
+	// 		std::cout <<_link_m -> m_N_in_truck -> to_string() << std::endl;
+	// 		printf("m_N_out_truck: \n");
+	// 		std::cout <<_link_m -> m_N_out_truck -> to_string() << std::endl;
+	// 	}
+	// }
 
 	return 0;
 }
