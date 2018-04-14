@@ -4,6 +4,8 @@
 
 #include "dta_gradient_utls.h"
 
+#include <unordered_map>
+
 namespace py = pybind11;
 
 int run_dta(std::string folder) {
@@ -60,6 +62,14 @@ int Dta_Api::install_cc()
 {
   for (size_t i = 0; i<m_link_vec.size(); ++i){
     m_link_vec[i] -> install_cumulative_curve();
+  }
+  return 0;
+}
+
+int Dta_Api::install_cc_tree()
+{
+  for (size_t i = 0; i<m_link_vec.size(); ++i){
+    m_link_vec[i] -> install_cumulative_curve_tree();
   }
   return 0;
 }
@@ -175,6 +185,7 @@ py::array_t<double> Dta_Api::get_link_in_cc(int link_ID)
   return result;
 }
 
+
 py::array_t<double> Dta_Api::get_link_out_cc(int link_ID)
 {
   if (m_dta -> m_link_factory -> get_link(TInt(link_ID)) -> m_N_out == NULL){
@@ -191,6 +202,36 @@ py::array_t<double> Dta_Api::get_link_out_cc(int link_ID)
   }
   return result;
 }
+
+
+py::array_t<double> Dta_Api::get_dar_matrix(py::array_t<int>path_assign_times, 
+                                                py::array_t<int>link_start_intervals, py::array_t<int>link_end_intervals)
+{
+  auto _record = std::vector<dar_record*>();
+  auto link_start_buf = link_start_intervals.request();
+  // path_ID, assign_time, link_ID, start_int, flow
+  int new_shape [2] = { (int) _record.size(), 5}; 
+  auto result = py::array_t<double>(new_shape);
+  auto result_buf = result.request();
+  double *result_prt = (double *) result_buf.ptr;
+
+  dar_record* tmp_record;
+  for (size_t i = 0; i < _record.size(); ++i){
+    tmp_record = _record[i];
+    result_prt[i * 5 + 0] = (double) tmp_record -> path_ID();
+    result_prt[i * 5 + 1] = (double) tmp_record -> assign_int();
+    result_prt[i * 5 + 2] = (double) tmp_record -> link_ID();
+    result_prt[i * 5 + 3] = (double) tmp_record -> link_start_int();
+    result_prt[i * 5 + 4] = tmp_record -> flow();
+  }
+  for (size_t i = 0; i < _record.size(); ++i){
+    delete _record[i];
+  }
+  _record.clear();
+  return result;
+}
+
+
 
 
 PYBIND11_MODULE(MNMAPI, m) {
@@ -227,7 +268,8 @@ PYBIND11_MODULE(MNMAPI, m) {
             .def("get_link_tt", &Dta_Api::get_link_tt)
             .def("get_link_inflow", &Dta_Api::get_link_inflow)
             .def("get_link_in_cc", &Dta_Api::get_link_in_cc)
-            .def("get_link_out_cc", &Dta_Api::get_link_out_cc);
+            .def("get_link_out_cc", &Dta_Api::get_link_out_cc)
+            .def("get_dar_matrix", &Dta_Api::get_dar_matrix);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
