@@ -46,18 +46,38 @@ TFlt get_travel_time(MNM_Dlink* link, TFlt start_time)
   }
   TFlt _end_time = link -> m_N_out -> get_time(_cc_flow);
   if (_end_time() < 0 || (_end_time - start_time < 0)){
-    return _end_time - start_time;
+    return link -> get_link_tt();
   }
   else{
-    return link -> get_link_tt();
+    return _end_time - start_time;
   }
   return 0;
 }
 
 
-int get_dar_matrix(double **output, std::vector<MNM_Dlink*> links, 
-                    std::vector<MNM_Path*> paths, MNM_Veh_Factory *veh_factory)
+int add_dar_records(std::vector<dar_record*> &record, MNM_Dlink* link, 
+                    TFlt start_time, TFlt end_time)
 {
+  if (link == NULL){
+    throw std::runtime_error("Error, add_dar_records link is null");
+  }
+  if (link -> m_N_in_tree == NULL){
+    throw std::runtime_error("Error, add_dar_records link cummulative curve tree is not installed");
+  }
+  for (auto path_it : link -> m_N_in_tree -> m_record){
+    for (auto depart_it : path_it.second){
+      TFlt tmp_flow = depart_it.second -> get_result(end_time) - depart_it.second -> get_result(start_time);
+      if (tmp_flow > DBL_EPSILON){
+        auto new_record = new dar_record();
+        new_record -> path_ID = path_it.first -> m_path_ID;
+        new_record -> assign_int = depart_it.first;
+        new_record -> link_ID = link -> m_link_ID;
+        new_record -> link_start_int = start_time;
+        new_record -> flow = tmp_flow;
+        record.push_back(new_record);
+      }
+    }
+  }
   return 0;
 }
 
