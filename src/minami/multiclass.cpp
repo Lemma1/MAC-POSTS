@@ -1344,6 +1344,7 @@ int MNM_Dnode_GRJ_Multiclass::prepare_loading()
 
 int MNM_Dnode_GRJ_Multiclass::compute_flow()
 {
+	// to be implemented...
 	return 0;
 }
 
@@ -1980,16 +1981,16 @@ int MNM_Dta_Multiclass::build_from_files()
 
 int MNM_Dta_Multiclass::pre_loading()
 {
-  MNM_Dnode *_node;
-  printf("MNM: Prepare loading!\n");
-  m_routing -> init_routing();
-  m_statistics -> init_record();
-  for (auto _node_it = m_node_factory -> m_node_map.begin(); _node_it != m_node_factory -> m_node_map.end(); _node_it++){
-    _node = _node_it -> second;
-    _node -> prepare_loading();
-  }
-  printf("Exiting MNM: Prepare loading!\n");
-  return 0;
+	MNM_Dnode *_node;
+	printf("MNM: Prepare loading!\n");
+	m_routing -> init_routing();
+	m_statistics -> init_record();
+	for (auto _node_it = m_node_factory -> m_node_map.begin(); _node_it != m_node_factory -> m_node_map.end(); _node_it++){
+		_node = _node_it -> second;
+		_node -> prepare_loading();
+	}
+	printf("Exiting MNM: Prepare loading!\n");
+	return 0;
 }
 
 
@@ -2098,7 +2099,7 @@ TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time)
 int get_dar_matrix_multiclass(double **output, std::vector<MNM_Dlink*> links, 
                     		std::vector<MNM_Path*> paths, MNM_Veh_Factory *veh_factory)
 {
-  return 0;
+	return 0;
 }
 
 }//end namespace MNM_DTA_GRADIENT

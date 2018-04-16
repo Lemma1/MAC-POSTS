@@ -10,7 +10,7 @@ int main()
 
 	printf("BEGIN multiclass test!\n");
 
-	std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_7link_multiclass";
+	std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_MckeesRocks_SPC";
 	MNM_Dta_Multiclass *test_dta = new MNM_Dta_Multiclass(folder);
 	printf("================================ DTA set! =================================\n");
 	
