@@ -1,6 +1,8 @@
 #include "limits.h"
 #include "multiclass.h"
 
+#include "limits.h"
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -13,15 +15,26 @@
 
 MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(TInt ID,
 										TInt number_of_lane,
-										TFlt length)
+										TFlt length,
+										TFlt ffs_car, // Free-flow speed (m/s)
+										TFlt ffs_truck)
 	: MNM_Dlink::MNM_Dlink(ID, number_of_lane, length, 0.0) // Note: m_ffs is not used in child class, so let it be 0.0
 {
+	m_ffs_car = ffs_car;
+	m_ffs_truck = ffs_truck;
+
 	m_N_in_car = NULL;
   	m_N_out_car = NULL;
   	m_N_in_truck = NULL;
   	m_N_out_truck = NULL;
 
+  	m_N_in_tree_car = NULL;
+  	m_N_out_tree_car = NULL;
+  	m_N_in_tree_truck = NULL;
+  	m_N_out_tree_truck = NULL;
+
   	install_cumulative_curve_multiclass();
+  	install_cumulative_curve_tree_multiclass();
 }
 
 MNM_Dlink_Multiclass::~MNM_Dlink_Multiclass()
@@ -30,10 +43,18 @@ MNM_Dlink_Multiclass::~MNM_Dlink_Multiclass()
   	if (m_N_in_car != NULL) delete m_N_in_car;
   	if (m_N_out_truck != NULL) delete m_N_out_truck;
   	if (m_N_in_truck != NULL) delete m_N_in_truck;
+  	if (m_N_out_tree_car != NULL) delete m_N_out_tree_car;
+  	if (m_N_in_tree_car != NULL) delete m_N_in_tree_car;
+  	if (m_N_out_tree_truck != NULL) delete m_N_out_tree_truck;
+  	if (m_N_in_tree_truck != NULL) delete m_N_in_tree_truck;
 }
 
 int MNM_Dlink_Multiclass::install_cumulative_curve_multiclass()
 {
+	if (m_N_out_car != NULL) delete m_N_out_car;
+  	if (m_N_in_car != NULL) delete m_N_in_car;
+  	if (m_N_out_truck != NULL) delete m_N_out_truck;
+  	if (m_N_in_truck != NULL) delete m_N_in_truck;
 	m_N_in_car = new MNM_Cumulative_Curve();
   	m_N_out_car = new MNM_Cumulative_Curve();
   	m_N_in_truck = new MNM_Cumulative_Curve();
@@ -44,6 +65,30 @@ int MNM_Dlink_Multiclass::install_cumulative_curve_multiclass()
   	m_N_out_truck -> add_record(std::pair<TFlt, TFlt>(TFlt(0), TFlt(0)));
   	return 0;
 }
+
+int MNM_Dlink_Multiclass::install_cumulative_curve_tree_multiclass()
+{
+	if (m_N_out_tree_car != NULL) delete m_N_out_tree_car;
+  	if (m_N_in_tree_car != NULL) delete m_N_in_tree_car;
+  	if (m_N_out_tree_truck != NULL) delete m_N_out_tree_truck;
+  	if (m_N_in_tree_truck != NULL) delete m_N_in_tree_truck;
+	m_N_in_tree_car = new MNM_Tree_Cumulative_Curve();
+  	m_N_out_tree_car = new MNM_Tree_Cumulative_Curve();
+  	m_N_in_tree_truck = new MNM_Tree_Cumulative_Curve();
+  	m_N_out_tree_truck = new MNM_Tree_Cumulative_Curve();
+  	return 0;
+}
+
+TFlt MNM_Dlink_Multiclass::get_link_freeflow_tt_car()
+{
+	return m_length/m_ffs_car;
+}
+
+TFlt MNM_Dlink_Multiclass::get_link_freeflow_tt_truck()
+{
+	return m_length/m_ffs_truck;
+}
+
 
 /*************************************************************************					
 						Multiclass CTM Functions
@@ -63,7 +108,7 @@ MNM_Dlink_Ctm_Multiclass::MNM_Dlink_Ctm_Multiclass(TInt ID,
 												   TFlt veh_convert_factor, // 1 * truck = c * private cars 
 												   							// when compute node demand
 												   TFlt flow_scalar) // flow_scalar can be 2.0, 5.0, 10.0, etc.
-	: MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(ID, number_of_lane, length)
+	: MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(ID, number_of_lane, length, ffs_car, ffs_truck)
 {
 	// Jam density for private cars and trucks cannot be negative
 	if ((lane_hold_cap_car < 0) || (lane_hold_cap_truck < 0)){
@@ -121,8 +166,6 @@ MNM_Dlink_Ctm_Multiclass::MNM_Dlink_Ctm_Multiclass(TInt ID,
 	m_lane_flow_cap_truck = lane_flow_cap_truck;	
 	m_lane_hold_cap_car = lane_hold_cap_car;
 	m_lane_hold_cap_truck = lane_hold_cap_truck;
-	m_ffs_car = ffs_car;
-	m_ffs_truck = ffs_truck;
 	m_veh_convert_factor = veh_convert_factor;
 	m_flow_scalar = flow_scalar;
 
@@ -247,7 +290,7 @@ int MNM_Dlink_Ctm_Multiclass::update_out_veh()
 	TFlt _temp_out_flux_car, _supply_car, _demand_car;
 	TFlt _temp_out_flux_truck, _supply_truck, _demand_truck;
 
-	printf("Link %d to be moved: ", m_link_ID);
+	printf("Link %d to be moved: ", int(m_link_ID));
 	// no update is needed if only one cell
 	if (m_num_cells > 1){
 		for (int i = 0; i < m_num_cells - 1; ++i){
@@ -256,41 +299,33 @@ int MNM_Dlink_Ctm_Multiclass::update_out_veh()
 			_supply_car = m_cell_array[i + 1] -> get_perceived_supply(TInt(0));
 			_temp_out_flux_car = m_cell_array[i] -> m_space_fraction_car * MNM_Ults::min(_demand_car, _supply_car);
 			m_cell_array[i] -> m_out_veh_car = MNM_Ults::round(_temp_out_flux_car * m_flow_scalar);
-			// Edge case, when only few cars on the in this cell and there is room in the downstream cell for these cars, move them!!
-			if ((m_cell_array[i] -> m_veh_queue_car.size() != 0) && (_demand_car < _supply_car) && (m_cell_array[i] -> m_out_veh_car == 0)){
-				m_cell_array[i] -> m_out_veh_car = m_cell_array[i] -> m_veh_queue_car.size();
-			}
 
 			// truck, veh_type = TInt(1)
 			_demand_truck = m_cell_array[i] -> get_perceived_demand(TInt(1));
 			_supply_truck = m_cell_array[i + 1] -> get_perceived_supply(TInt(1));
 			_temp_out_flux_truck = m_cell_array[i] -> m_space_fraction_truck * MNM_Ults::min(_demand_truck, _supply_truck);
 			m_cell_array[i] -> m_out_veh_truck = MNM_Ults::round(_temp_out_flux_truck * m_flow_scalar);
-			// Edge case, when only few trucks on the in this cell and there is room in the downstream cell for these trucks, move them!!
-			if ((m_cell_array[i] -> m_veh_queue_truck.size() != 0) && (_demand_truck < _supply_truck) && (m_cell_array[i] -> m_out_veh_truck == 0)){
-				m_cell_array[i] -> m_out_veh_truck = m_cell_array[i] -> m_veh_queue_truck.size();
-			}
 
 			// printf("(%.2f, %.2f, %.2f, %.2f, %d; %.2f, %.2f, %.2f, %.2f, %d) ", 
 			// 						_demand_car, _supply_car, _temp_out_flux_car, m_cell_array[i] -> m_space_fraction_car, m_cell_array[i] -> m_out_veh_car,
 			// 						_demand_truck, _supply_truck, _temp_out_flux_truck, m_cell_array[i] -> m_space_fraction_truck, m_cell_array[i] -> m_out_veh_truck);
-			printf("(%d, %d) ",  m_cell_array[i] -> m_out_veh_car, m_cell_array[i] -> m_out_veh_truck);
+			printf("(%d, %d) ",  int(m_cell_array[i] -> m_out_veh_car), int(m_cell_array[i] -> m_out_veh_truck));
 		}
 	}
 	m_cell_array[m_num_cells - 1] -> m_out_veh_car = m_cell_array[m_num_cells - 1] -> m_veh_queue_car.size();
 	m_cell_array[m_num_cells - 1] -> m_out_veh_truck = m_cell_array[m_num_cells - 1] -> m_veh_queue_truck.size();
-	printf("(%d, %d)\n", m_cell_array[m_num_cells - 1] -> m_out_veh_car, m_cell_array[m_num_cells - 1] -> m_out_veh_truck);
+	printf("(%d, %d)\n", int(m_cell_array[m_num_cells - 1] -> m_out_veh_car), int(m_cell_array[m_num_cells - 1] -> m_out_veh_truck));
 	return 0;
 }
 
 int MNM_Dlink_Ctm_Multiclass::evolve(TInt timestamp)
 {
-	printf("Link %d volume before: ", m_link_ID);
+	printf("Link %d volume before: ", int(m_link_ID));
 	/* update volume */
 	if (m_num_cells > 1){
 		for (int i = 0; i < m_num_cells - 1; ++i)
 		{
-			printf("(%d, %d) ", m_cell_array[i] -> m_veh_queue_car.size(), m_cell_array[i] -> m_veh_queue_truck.size());
+			printf("(%d, %d) ", int(m_cell_array[i] -> m_veh_queue_car.size()), int(m_cell_array[i] -> m_veh_queue_truck.size()));
 		}
 	}
 	std::deque<MNM_Veh*>::iterator _veh_it;
@@ -302,8 +337,8 @@ int MNM_Dlink_Ctm_Multiclass::evolve(TInt timestamp)
 		if (_veh -> m_class == 0) _count_car += 1;
 		if (_veh -> m_class == 1) _count_truck += 1;
 	}
-	printf("(%d, %d; %d, %d)\n", m_cell_array[m_num_cells - 1] -> m_veh_queue_car.size(), 
-		m_cell_array[m_num_cells - 1] -> m_veh_queue_truck.size(), _count_car, _count_truck);
+	printf("(%d, %d; %d, %d)\n", int(m_cell_array[m_num_cells - 1] -> m_veh_queue_car.size()), 
+		int(m_cell_array[m_num_cells - 1] -> m_veh_queue_truck.size()), int(_count_car), int(_count_truck));
 
 	update_out_veh();
 	
@@ -328,7 +363,7 @@ int MNM_Dlink_Ctm_Multiclass::evolve(TInt timestamp)
 	/* last cell */
 	move_last_cell();
 
-	printf("Link %d volume after: ", m_link_ID);
+	printf("Link %d volume after: ", int(m_link_ID));
 	/* update volume */
 	if (m_num_cells > 1){
 		for (int i = 0; i < m_num_cells - 1; ++i)
@@ -337,7 +372,7 @@ int MNM_Dlink_Ctm_Multiclass::evolve(TInt timestamp)
 			m_cell_array[i] -> m_volume_truck = m_cell_array[i] -> m_veh_queue_truck.size();
 			// Update perceived density of the i-th cell
 			m_cell_array[i] -> update_perceived_density();
-			printf("(%d, %d) ", m_cell_array[i] -> m_volume_car, m_cell_array[i] -> m_volume_truck);
+			printf("(%d, %d) ", int(m_cell_array[i] -> m_volume_car), int(m_cell_array[i] -> m_volume_truck));
 		}
 	}
 
@@ -354,8 +389,9 @@ int MNM_Dlink_Ctm_Multiclass::evolve(TInt timestamp)
 	m_cell_array[m_num_cells - 1] -> m_volume_truck = 
 		m_cell_array[m_num_cells - 1] -> m_veh_queue_truck.size() + _count_truck;	
 	m_cell_array[m_num_cells - 1] -> update_perceived_density();
-	printf("(%d, %d; %d, %d)\n", m_cell_array[m_num_cells - 1] -> m_volume_car, 
-		m_cell_array[m_num_cells - 1] -> m_volume_truck, _count_car, _count_truck);
+	printf("(%d, %d; %d, %d) (%.4f, %.4f)\n", int(m_cell_array[m_num_cells - 1] -> m_volume_car), 
+		int(m_cell_array[m_num_cells - 1] -> m_volume_truck), int(_count_car), int(_count_truck),
+		double(m_cell_array[0] -> m_cell_length), double(m_cell_array[0] -> m_critical_density_car));
 	return 0;
 }
 
@@ -450,7 +486,7 @@ int MNM_Dlink_Ctm_Multiclass::clear_incoming_array()
 		exit(-1);
 	}
 	
-	printf("Link incoming array size: %d\n", m_incoming_array.size());
+	printf("Link incoming array size: %d\n", int(m_incoming_array.size()));
 
 	MNM_Veh_Multiclass* _veh;
 	size_t _cur_size = m_incoming_array.size();
@@ -585,6 +621,14 @@ int MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::update_perceived_density()
 		_space_fraction_truck = _density_truck/m_critical_density_truck;
 		m_perceived_density_car = _density_car + m_critical_density_car * _space_fraction_truck;
 		m_perceived_density_truck = _density_truck + m_critical_density_truck * _space_fraction_car;
+		if (_space_fraction_car + _space_fraction_truck == 0){
+			m_space_fraction_car = 0;
+			m_space_fraction_truck = 0;
+		}
+		else {
+			m_space_fraction_car = _space_fraction_car / (_space_fraction_car + _space_fraction_truck);
+			m_space_fraction_truck = _space_fraction_truck / (_space_fraction_car + _space_fraction_truck);
+		}
 	}
 	// Semi-congested traffic (truck free-flow but car not)
 	else if ((_density_truck / m_critical_density_truck < 1) && 
@@ -593,12 +637,14 @@ int MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::update_perceived_density()
 		_space_fraction_car = 1 - _space_fraction_truck;
 		m_perceived_density_car = _density_car / _space_fraction_car;
 		m_perceived_density_truck = m_critical_density_truck;
+		m_space_fraction_car = _space_fraction_car;
+		m_space_fraction_truck = _space_fraction_truck;
 	}
 	// Fully congested traffic (both car and truck not free-flow)
 	// this case should satisfy: 1. m_perceived_density_car > m_rho_1_N
 	// 							 2. m_perceived_density_truck > m_critical_density_truck
 	else {
-		// _density_truck (m_volume_truck) could still be 0, but _density_car can't
+		// _density_truck (m_volume_truck) could still be 0
 		if (m_volume_truck == 0) {
 			m_perceived_density_car = _density_car;
 			_space_fraction_car = 1;
@@ -606,6 +652,15 @@ int MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::update_perceived_density()
 			// this case same speed (u) for both private cars and trucks
 			TFlt _u = (m_hold_cap_car - _density_car) * m_wave_speed_car / _density_car;
 			m_perceived_density_truck = (m_hold_cap_truck * m_wave_speed_truck) / (_u + m_wave_speed_truck);
+		}
+		// _density_car (m_volume_car) could still be 0 in some extreme case
+		else if (m_volume_car == 0) {
+			m_perceived_density_truck = _density_truck;
+			_space_fraction_car = 0;
+			_space_fraction_truck = 1;
+			// this case same speed (u) for both private cars and trucks
+			TFlt _u = (m_hold_cap_truck - _density_truck) * m_wave_speed_truck / _density_truck;
+			m_perceived_density_car = (m_hold_cap_car * m_wave_speed_car) / (_u + m_wave_speed_car);
 		}
 		else {
 			TFlt _tmp_1 = m_hold_cap_car * m_wave_speed_car * _density_truck;
@@ -617,9 +672,10 @@ int MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::update_perceived_density()
 			m_perceived_density_car = _density_car / _space_fraction_car;
 			m_perceived_density_truck = _density_truck / _space_fraction_truck;
 		}
+		m_space_fraction_car = _space_fraction_car;
+		m_space_fraction_truck = _space_fraction_truck;
 	}
-	m_space_fraction_car = _space_fraction_car;
-	m_space_fraction_truck = _space_fraction_truck;
+	
 	return 0;
 }
 
@@ -664,14 +720,14 @@ MNM_Dlink_Pq_Multiclass::MNM_Dlink_Pq_Multiclass(TInt ID,
 												TFlt unit_time,
 												TFlt veh_convert_factor,
 												TFlt flow_scalar)
-  : MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(ID, number_of_lane, length)
+  : MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(ID, number_of_lane, length, ffs_car, ffs_truck)
 {
 	m_lane_hold_cap = lane_hold_cap_car;
 	m_lane_flow_cap = lane_flow_cap_car;
 	m_flow_scalar = flow_scalar;
 	m_hold_cap = m_lane_hold_cap * TFlt(number_of_lane) * m_length;
 	m_max_stamp = MNM_Ults::round(m_length/(ffs_car * unit_time));
-	printf("m_max_stamp = %d\n", m_max_stamp);
+	// printf("m_max_stamp = %d\n", m_max_stamp);
 	m_veh_pool = std::unordered_map<MNM_Veh*, TInt>();
 	m_volume_car = TInt(0);
 	m_volume_truck = TInt(0);
@@ -985,13 +1041,19 @@ int MNM_Dnode_Inout_Multiclass::prepare_loading()
 
 int MNM_Dnode_Inout_Multiclass::prepare_supplyANDdemand()
 {
+	size_t _num_in = m_in_link_array.size();
+	size_t _num_out = m_out_link_array.size();
 	size_t _offset = m_out_link_array.size();
 	TFlt _equiv_count;
 	std::deque<MNM_Veh*>::iterator _veh_it;
 	MNM_Dlink *_in_link, *_out_link;
 
+	/* zerolize num of vehicle moved */
+	memset(m_veh_moved_car, 0x0, sizeof(TFlt) * _num_in * _num_out);
+	memset(m_veh_moved_truck, 0x0, sizeof(TFlt) * _num_in * _num_out);
+
 	/* calculate demand */
-	for (size_t i = 0; i < m_in_link_array.size(); ++i){
+	for (size_t i = 0; i < _num_in; ++i){
 		_in_link = m_in_link_array[i];
 		for (_veh_it = _in_link -> m_finished_array.begin(); _veh_it != _in_link -> m_finished_array.end(); _veh_it++){
 			if (std::find(m_out_link_array.begin(), m_out_link_array.end(), (*_veh_it) -> get_next_link()) == m_out_link_array.end()){
@@ -1001,7 +1063,7 @@ int MNM_Dnode_Inout_Multiclass::prepare_supplyANDdemand()
         		exit(-1);
 			}
 		}
-		for (size_t j = 0; j < m_out_link_array.size(); ++j){
+		for (size_t j = 0; j < _num_out; ++j){
 			_out_link = m_out_link_array[j];
 			_equiv_count = 0;
 			for (_veh_it = _in_link -> m_finished_array.begin(); _veh_it != _in_link -> m_finished_array.end(); _veh_it++){
@@ -1022,7 +1084,7 @@ int MNM_Dnode_Inout_Multiclass::prepare_supplyANDdemand()
 	}
 
 	/* calculated supply */
-  	for (size_t j = 0; j < m_out_link_array.size(); ++j){
+  	for (size_t j = 0; j < _num_out; ++j){
 	    m_supply[j] = m_out_link_array[j] -> get_link_supply();
 	    // printf("Link %d, supply is %.4f\n", _out_link -> m_link_ID, m_supply[j]);
   	}
@@ -1030,22 +1092,129 @@ int MNM_Dnode_Inout_Multiclass::prepare_supplyANDdemand()
   	return 0;
 }
 
-// int MNM_Dnode_Inout_Multiclass::flow_to_vehicle()
-// {
-// 	size_t _offset = m_out_link_array.size();
-// 	MNM_Dlink *_out_link;
-//  TFlt _to_move;
-// 	size_t _rand_idx;
-// 	for (size_t j = 0; j < m_out_link_array.size(); ++j){
-// 		_to_move = 0;
-// 		_out_link = m_out_link_array[j];
-// 		for (size_t i = 0; i < m_in_link_array.size(); ++i){
-// 			m_veh_tomove[i * _offset + j] = m_veh_flow[i * _offset + j] * m_flow_scalar;
-//			_to_move += m_veh_tomove[i * _offset + j];
-// 		}
-// 	}
-// 	return 0;
-// }
+int MNM_Dnode_Inout_Multiclass::move_vehicle(TInt timestamp)
+{
+	MNM_Dlink *_in_link, *_out_link;
+	MNM_Dlink_Multiclass *_ilink, *_olink;
+	size_t _offset = m_out_link_array.size();
+	TFlt _to_move;
+	TFlt _equiv_num;
+	TFlt _r;
+
+	for (size_t j = 0; j < m_out_link_array.size(); ++j){
+		_out_link = m_out_link_array[j];
+		for (size_t i = 0; i < m_in_link_array.size(); ++i){
+			_in_link = m_in_link_array[i];
+			_to_move = m_veh_flow[i * _offset + j] * m_flow_scalar;
+			printf("from %d to %d: %.4f\n", int(_in_link -> m_link_ID), int(_out_link -> m_link_ID), double(_to_move));
+			auto _veh_it = _in_link -> m_finished_array.begin();
+
+			// if (_to_move > 0){
+			// 	auto _veh_it2 = _in_link -> m_finished_array.begin();
+			// 	while (_veh_it2 != _in_link -> m_finished_array.end()){
+			// 		MNM_Veh_Multiclass *_veh2 = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it2);
+			// 		printf("%d ", _veh2 -> m_class);
+			// 		_veh_it2++;
+			// 	}
+			// 	printf("\n");
+			// }
+
+			while (_veh_it != _in_link -> m_finished_array.end()){
+				if (_to_move > 0){
+					MNM_Veh_Multiclass *_veh = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it);
+					if (_veh -> get_next_link() == _out_link){
+						// printf("%d ", _veh -> m_class);
+						if (_veh -> m_class == 0) {
+							// private car
+							_equiv_num = 1;
+						}
+						else { 
+							// truck
+							_equiv_num = m_veh_convert_factor;
+						}
+						if (_to_move < _equiv_num) {
+							// Randomly decide to move or not in this case base on the probability = _to_move/_equiv_num < 1
+							// Will result in WRONG INCOMING ARRAY SIZE if the beginning check in fucntion
+							// MNM_Dlink_Ctm_Multiclass::clear_incoming_array() was not commented out (@_@)!
+							_r = MNM_Ults::rand_flt();
+							// if (_r <= _to_move/_equiv_num){
+							// 	_out_link -> m_incoming_array.push_back(_veh);
+							// 	_veh -> set_current_link(_out_link);
+							// 	if (_veh -> m_class == 0){
+							// 		m_veh_moved_car[i * _offset + j] += 1;
+							// 		_olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
+							// 		_ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
+							// 		if (_olink -> m_N_out_tree_car != NULL) {
+							// 			_olink -> m_N_out_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+							// 		}
+							// 		if (_ilink -> m_N_in_tree_car != NULL) {
+							// 			_ilink -> m_N_in_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+							// 		}
+							// 	}
+							// 	else {
+							// 		m_veh_moved_truck[i * _offset + j] += 1;
+							// 		_olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
+							// 		_ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
+							// 		if (_olink -> m_N_out_tree_truck != NULL) {
+							// 			_olink -> m_N_out_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+							// 		}
+							// 		if (_ilink -> m_N_in_tree_truck != NULL) {
+							// 			_ilink -> m_N_in_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+							// 		}
+							// 	}
+							// 	_veh_it = _in_link -> m_finished_array.erase(_veh_it);
+							// }
+						}
+						else {
+							_out_link -> m_incoming_array.push_back(_veh);
+							_veh -> set_current_link(_out_link);
+							if (_veh -> m_class == 0){
+								m_veh_moved_car[i * _offset + j] += 1;
+								_olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
+								_ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
+								if (_olink -> m_N_out_tree_car != NULL) {
+									_olink -> m_N_out_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+								}
+								if (_ilink -> m_N_in_tree_car != NULL) {
+									_ilink -> m_N_in_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+								}
+							}
+							else {
+								m_veh_moved_truck[i * _offset + j] += 1;
+								_olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
+								_ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
+								if (_olink -> m_N_out_tree_truck != NULL) {
+									_olink -> m_N_out_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+								}
+								if (_ilink -> m_N_in_tree_truck != NULL) {
+									_ilink -> m_N_in_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+								}
+							}
+							_veh_it = _in_link -> m_finished_array.erase(_veh_it);
+						}
+						_to_move -= _equiv_num;
+					}
+					else {
+						_veh_it++;
+					}
+				}
+				else {
+					break;
+				}
+			}
+			// printf("\n");
+			if (_to_move > 0.001){
+				printf("Something wrong during the vehicle moving, remaining to move %.16f\n", (float)_to_move);
+				// printf("The finished veh queue is now size %d\n", (int)_in_link->m_finished_array.size());
+				// printf("But it is heading to %d\n", (int)_in_link->m_finished_array.front() -> get_next_link() -> m_link_ID);
+				exit(-1);
+			}
+		}
+		random_shuffle(_out_link -> m_incoming_array.begin(), _out_link -> m_incoming_array.end());
+	}
+
+	return 0;
+}
 
 int MNM_Dnode_Inout_Multiclass::record_cumulative_curve(TInt timestamp)
 {
@@ -1090,96 +1259,6 @@ int MNM_Dnode_Inout_Multiclass::record_cumulative_curve(TInt timestamp)
   	return 0;
 }
 
-int MNM_Dnode_Inout_Multiclass::move_vehicle()
-{
-	MNM_Dlink *_in_link, *_out_link;
-	size_t _offset = m_out_link_array.size();
-	TFlt _to_move;
-	TFlt _equiv_num;
-	TFlt _r;
-
-	for (size_t j = 0; j < m_out_link_array.size(); ++j){
-		_out_link = m_out_link_array[j];
-		for (size_t i = 0; i < m_in_link_array.size(); ++i){
-			_in_link = m_in_link_array[i];
-			_to_move = m_veh_flow[i * _offset + j] * m_flow_scalar;
-			printf("from %d to %d: %.4f\n", _in_link -> m_link_ID, _out_link -> m_link_ID, _to_move);
-			auto _veh_it = _in_link -> m_finished_array.begin();
-
-			// if (_to_move > 0){
-			// 	auto _veh_it2 = _in_link -> m_finished_array.begin();
-			// 	while (_veh_it2 != _in_link -> m_finished_array.end()){
-			// 		MNM_Veh_Multiclass *_veh2 = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it2);
-			// 		printf("%d ", _veh2 -> m_class);
-			// 		_veh_it2++;
-			// 	}
-			// 	printf("\n");
-			// }
-
-			while (_veh_it != _in_link -> m_finished_array.end()){
-				if (_to_move > 0){
-					MNM_Veh_Multiclass *_veh = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it);
-					if (_veh -> get_next_link() == _out_link){
-						// printf("%d ", _veh -> m_class);
-						if (_veh -> m_class == 0) {
-							// private car
-							_equiv_num = 1;
-						}
-						else { 
-							// truck
-							_equiv_num = m_veh_convert_factor;
-						}
-						if (_to_move < _equiv_num) {
-							// randomly decide to move or not in this case 
-							// base on the probability = _to_move/_equiv_num < 1
-							// _r = MNM_Ults::rand_flt()
-							// 				if (_r <= _to_move/_equiv_num){
-							// 	_out_link -> m_incoming_array.push_back(_veh);
-							// 	_veh -> set_current_link(_out_link);
-							// 	if (_veh -> m_class == 0){
-							// 		m_veh_moved_car[i * _offset + j] += 1;
-							// 	}
-							// 	else {
-							// 		m_veh_moved_truck[i * _offset + j] += 1;
-							// 	}
-							// 	_veh_it = _in_link -> m_finished_array.erase(_veh_it);
-							// }
-						}
-						else {
-							_out_link -> m_incoming_array.push_back(_veh);
-							_veh -> set_current_link(_out_link);
-							if (_veh -> m_class == 0){
-								m_veh_moved_car[i * _offset + j] += 1;
-							}
-							else {
-								m_veh_moved_truck[i * _offset + j] += 1;
-							}
-							_veh_it = _in_link -> m_finished_array.erase(_veh_it);
-						}
-						_to_move -= _equiv_num;
-					}
-					else {
-						_veh_it++;
-					}
-				}
-				else {
-					break;
-				}
-			}
-			// printf("\n");
-			if (_to_move > 0.001){
-		        printf("Something wrong during the vehicle moving, remaining to move %.16f\n", (float)_to_move);
-		        // printf("The finished veh queue is now size %d\n", (int)_in_link->m_finished_array.size());
-		        // printf("But it is heading to %d\n", (int)_in_link->m_finished_array.front() -> get_next_link() -> m_link_ID);
-		        exit(-1);
-		    }
-		}
-		random_shuffle(_out_link -> m_incoming_array.begin(), _out_link -> m_incoming_array.end());
-	}
-
-	return 0;
-}
-
 int MNM_Dnode_Inout_Multiclass::add_out_link(MNM_Dlink* out_link)
 {
   	m_out_link_array.push_back(out_link);
@@ -1200,12 +1279,10 @@ int MNM_Dnode_Inout_Multiclass::evolve(TInt timestamp)
 	// printf("2\n"); 
 	compute_flow();
 	// printf("3\n");
-	// flow_to_vehicle();
+	move_vehicle(timestamp);
 	// printf("4\n");
-	move_vehicle();
-	// printf("5\n");
 	record_cumulative_curve(timestamp);
-	// printf("6\n");
+	// printf("5\n");
 	return 0;
 }
 
@@ -1267,6 +1344,7 @@ int MNM_Dnode_GRJ_Multiclass::prepare_loading()
 
 int MNM_Dnode_GRJ_Multiclass::compute_flow()
 {
+	// to be implemented...
 	return 0;
 }
 
@@ -1883,7 +1961,7 @@ int MNM_Dta_Multiclass::initialize()
 	m_flow_scalar = m_config -> get_int("flow_scalar");
 	m_assign_freq = m_config -> get_int("assign_frq");
 	m_start_assign_interval = m_config -> get_int("start_assign_interval");
-	m_total_assign_inter = m_config ->  get_int("max_interval");
+	m_total_assign_inter = m_config -> get_int("max_interval");
 
 	return 0;
 }
@@ -1895,8 +1973,133 @@ int MNM_Dta_Multiclass::build_from_files()
 	MNM_IO_Multiclass::build_od_factory_multiclass(m_file_folder, m_config, m_od_factory, m_node_factory);
 	m_graph = MNM_IO_Multiclass::build_graph(m_file_folder, m_config);
 	MNM_IO_Multiclass::build_demand_multiclass(m_file_folder, m_config, m_od_factory);
-	build_workzone();
+	// build_workzone();
 	set_statistics();
 	set_routing();
 	return 0;
 }
+
+int MNM_Dta_Multiclass::pre_loading()
+{
+	MNM_Dnode *_node;
+	printf("MNM: Prepare loading!\n");
+	m_routing -> init_routing();
+	m_statistics -> init_record();
+	for (auto _node_it = m_node_factory -> m_node_map.begin(); _node_it != m_node_factory -> m_node_map.end(); _node_it++){
+		_node = _node_it -> second;
+		_node -> prepare_loading();
+	}
+	printf("Exiting MNM: Prepare loading!\n");
+	return 0;
+}
+
+
+
+
+/******************************************************************************************************************
+*******************************************************************************************************************
+										Multiclass DTA Gradient Utils
+*******************************************************************************************************************
+******************************************************************************************************************/
+namespace MNM_DTA_GRADIENT
+{
+
+TFlt get_link_inflow_car(MNM_Dlink_Multiclass* link, 
+                    	TFlt start_time, TFlt end_time)
+{
+	if (link == NULL){
+		throw std::runtime_error("Error, get_link_inflow_car link is null");
+	}
+	if (link -> m_N_in_car == NULL){
+		throw std::runtime_error("Error, get_link_inflow_car link cummulative curve is not installed");
+	}
+	return link -> m_N_in_car -> get_result(end_time) - link -> m_N_in_car -> get_result(start_time);
+}
+
+TFlt get_link_inflow_car(MNM_Dlink_Multiclass* link, 
+                    	TInt start_time, TInt end_time)
+{
+	if (link == NULL){
+		throw std::runtime_error("Error, get_link_inflow_car link is null");
+	}
+	if (link -> m_N_in_car == NULL){
+		throw std::runtime_error("Error, get_link_inflow_car link cummulative curve is not installed");
+	}
+	return link -> m_N_in_car -> get_result(TFlt(end_time)) - link -> m_N_in_car -> get_result(TFlt(start_time));
+}
+
+TFlt get_link_inflow_truck(MNM_Dlink_Multiclass* link, 
+                    	TFlt start_time, TFlt end_time)
+{
+	if (link == NULL){
+		throw std::runtime_error("Error, get_link_inflow_truck link is null");
+	}
+	if (link -> m_N_in_truck == NULL){
+		throw std::runtime_error("Error, get_link_inflow_truck link cummulative curve is not installed");
+	}
+	return link -> m_N_in_truck -> get_result(end_time) - link -> m_N_in_truck -> get_result(start_time);
+}
+
+TFlt get_link_inflow_truck(MNM_Dlink_Multiclass* link, 
+                    	TInt start_time, TInt end_time)
+{
+	if (link == NULL){
+		throw std::runtime_error("Error, get_link_inflow_truck link is null");
+	}
+	if (link -> m_N_in_truck == NULL){
+		throw std::runtime_error("Error, get_link_inflow_truck link cummulative curve is not installed");
+	}
+	return link -> m_N_in_truck -> get_result(TFlt(end_time)) - link -> m_N_in_truck -> get_result(TFlt(start_time));
+}
+
+TFlt get_travel_time_car(MNM_Dlink_Multiclass* link, TFlt start_time)
+{
+	if (link == NULL){
+		throw std::runtime_error("Error, get_travel_time_car link is null");
+	}
+	if (link -> m_N_in_car == NULL){
+		throw std::runtime_error("Error, get_travel_time_car link cummulative curve is not installed");
+	}
+	TFlt _cc_flow = link -> m_N_in_car -> get_result(start_time);
+	if (_cc_flow <= DBL_EPSILON){
+		return link -> get_link_freeflow_tt_car();
+	}
+	TFlt _end_time = link -> m_N_out_car -> get_time(_cc_flow);
+	if (_end_time() < 0 || (_end_time - start_time < 0)){
+		return link -> get_link_freeflow_tt_car();
+	}
+	else{
+		return (_end_time - start_time) * 5; // each interval is 5s
+	}
+	return 0;
+}
+
+TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time)
+{
+	if (link == NULL){
+		throw std::runtime_error("Error, get_travel_time_truck link is null");
+	}
+	if (link -> m_N_in_truck == NULL){
+		throw std::runtime_error("Error, get_travel_time_truck link cummulative curve is not installed");
+	}
+	TFlt _cc_flow = link -> m_N_in_truck -> get_result(start_time);
+	if (_cc_flow <= DBL_EPSILON){
+		return link -> get_link_freeflow_tt_truck();
+	}
+	TFlt _end_time = link -> m_N_out_truck -> get_time(_cc_flow);
+	if (_end_time() < 0 || (_end_time - start_time < 0)){
+		return link -> get_link_freeflow_tt_truck();
+	}
+	else{
+		return (_end_time - start_time) * 5; // each interval is 5s
+	}
+	return 0;
+}
+
+int get_dar_matrix_multiclass(double **output, std::vector<MNM_Dlink*> links, 
+                    		std::vector<MNM_Path*> paths, MNM_Veh_Factory *veh_factory)
+{
+	return 0;
+}
+
+}//end namespace MNM_DTA_GRADIENT
