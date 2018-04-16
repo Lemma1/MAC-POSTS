@@ -552,7 +552,8 @@ TFlt MNM_Dlink_Ctm_Multiclass::get_link_tt()
 	// }
 	// return _cost;
 
-	return 0;
+	// FOR DEBUG ONLY RETURN FREE-FLOW TT
+	return m_length/m_ffs_car;
 }
 
 /*							Multiclass CTM Cells
@@ -840,7 +841,8 @@ TFlt MNM_Dlink_Pq_Multiclass::get_link_tt()
 	// }
 	// return _cost;
   	
-  	return 0;
+  	// FOR DEBUG ONLY RETURN FREE-FLOW TT
+	return m_length/m_ffs_car;
 }
 
 
