@@ -290,7 +290,7 @@ int MNM_Dlink_Ctm_Multiclass::update_out_veh()
 	TFlt _temp_out_flux_car, _supply_car, _demand_car;
 	TFlt _temp_out_flux_truck, _supply_truck, _demand_truck;
 
-	printf("Link %d to be moved: ", int(m_link_ID));
+	// printf("Link %d to be moved: ", int(m_link_ID));
 	// no update is needed if only one cell
 	if (m_num_cells > 1){
 		for (int i = 0; i < m_num_cells - 1; ++i){
@@ -309,37 +309,38 @@ int MNM_Dlink_Ctm_Multiclass::update_out_veh()
 			// printf("(%.2f, %.2f, %.2f, %.2f, %d; %.2f, %.2f, %.2f, %.2f, %d) ", 
 			// 						_demand_car, _supply_car, _temp_out_flux_car, m_cell_array[i] -> m_space_fraction_car, m_cell_array[i] -> m_out_veh_car,
 			// 						_demand_truck, _supply_truck, _temp_out_flux_truck, m_cell_array[i] -> m_space_fraction_truck, m_cell_array[i] -> m_out_veh_truck);
-			printf("(%d, %d) ",  int(m_cell_array[i] -> m_out_veh_car), int(m_cell_array[i] -> m_out_veh_truck));
+			// printf("(%d, %d) ",  int(m_cell_array[i] -> m_out_veh_car), int(m_cell_array[i] -> m_out_veh_truck));
 		}
 	}
 	m_cell_array[m_num_cells - 1] -> m_out_veh_car = m_cell_array[m_num_cells - 1] -> m_veh_queue_car.size();
 	m_cell_array[m_num_cells - 1] -> m_out_veh_truck = m_cell_array[m_num_cells - 1] -> m_veh_queue_truck.size();
-	printf("(%d, %d)\n", int(m_cell_array[m_num_cells - 1] -> m_out_veh_car), int(m_cell_array[m_num_cells - 1] -> m_out_veh_truck));
+	// printf("(%d, %d)\n", int(m_cell_array[m_num_cells - 1] -> m_out_veh_car), int(m_cell_array[m_num_cells - 1] -> m_out_veh_truck));
 	return 0;
 }
 
 int MNM_Dlink_Ctm_Multiclass::evolve(TInt timestamp)
 {
-	printf("Link %d volume before: ", int(m_link_ID));
-	/* update volume */
-	if (m_num_cells > 1){
-		for (int i = 0; i < m_num_cells - 1; ++i)
-		{
-			printf("(%d, %d) ", int(m_cell_array[i] -> m_veh_queue_car.size()), int(m_cell_array[i] -> m_veh_queue_truck.size()));
-		}
-	}
 	std::deque<MNM_Veh*>::iterator _veh_it;
 	TInt _count_car = 0;
 	TInt _count_truck = 0;
-	// m_class: 0 - private car, 1 - truck
-	for (_veh_it = m_finished_array.begin(); _veh_it != m_finished_array.end(); _veh_it++){
-		MNM_Veh_Multiclass *_veh = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it);
-		if (_veh -> m_class == 0) _count_car += 1;
-		if (_veh -> m_class == 1) _count_truck += 1;
-	}
-	printf("(%d, %d; %d, %d)\n", int(m_cell_array[m_num_cells - 1] -> m_veh_queue_car.size()), 
-		int(m_cell_array[m_num_cells - 1] -> m_veh_queue_truck.size()), int(_count_car), int(_count_truck));
 
+	// printf("Link %d volume before: ", int(m_link_ID));
+	// if (m_num_cells > 1){
+	// 	for (int i = 0; i < m_num_cells - 1; ++i)
+	// 	{
+	// 		printf("(%d, %d) ", int(m_cell_array[i] -> m_veh_queue_car.size()), int(m_cell_array[i] -> m_veh_queue_truck.size()));
+	// 	}
+	// }
+	// // m_class: 0 - private car, 1 - truck
+	// for (_veh_it = m_finished_array.begin(); _veh_it != m_finished_array.end(); _veh_it++){
+	// 	MNM_Veh_Multiclass *_veh = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it);
+	// 	if (_veh -> m_class == 0) _count_car += 1;
+	// 	if (_veh -> m_class == 1) _count_truck += 1;
+	// }
+	// printf("(%d, %d; %d, %d)\n", int(m_cell_array[m_num_cells - 1] -> m_veh_queue_car.size()), 
+	// 	int(m_cell_array[m_num_cells - 1] -> m_veh_queue_truck.size()), int(_count_car), int(_count_truck));
+	
+	/* update volume */
 	update_out_veh();
 	
 	TInt _num_veh_tomove_car, _num_veh_tomove_truck;
@@ -363,7 +364,7 @@ int MNM_Dlink_Ctm_Multiclass::evolve(TInt timestamp)
 	/* last cell */
 	move_last_cell();
 
-	printf("Link %d volume after: ", int(m_link_ID));
+	// printf("Link %d volume after: ", int(m_link_ID));
 	/* update volume */
 	if (m_num_cells > 1){
 		for (int i = 0; i < m_num_cells - 1; ++i)
@@ -372,7 +373,7 @@ int MNM_Dlink_Ctm_Multiclass::evolve(TInt timestamp)
 			m_cell_array[i] -> m_volume_truck = m_cell_array[i] -> m_veh_queue_truck.size();
 			// Update perceived density of the i-th cell
 			m_cell_array[i] -> update_perceived_density();
-			printf("(%d, %d) ", int(m_cell_array[i] -> m_volume_car), int(m_cell_array[i] -> m_volume_truck));
+			// printf("(%d, %d) ", int(m_cell_array[i] -> m_volume_car), int(m_cell_array[i] -> m_volume_truck));
 		}
 	}
 
@@ -389,9 +390,9 @@ int MNM_Dlink_Ctm_Multiclass::evolve(TInt timestamp)
 	m_cell_array[m_num_cells - 1] -> m_volume_truck = 
 		m_cell_array[m_num_cells - 1] -> m_veh_queue_truck.size() + _count_truck;	
 	m_cell_array[m_num_cells - 1] -> update_perceived_density();
-	printf("(%d, %d; %d, %d) (%.4f, %.4f)\n", int(m_cell_array[m_num_cells - 1] -> m_volume_car), 
-		int(m_cell_array[m_num_cells - 1] -> m_volume_truck), int(_count_car), int(_count_truck),
-		double(m_cell_array[0] -> m_cell_length), double(m_cell_array[0] -> m_critical_density_car));
+	// printf("(%d, %d; %d, %d) (%.4f, %.4f)\n", int(m_cell_array[m_num_cells - 1] -> m_volume_car), 
+	// 	int(m_cell_array[m_num_cells - 1] -> m_volume_truck), int(_count_car), int(_count_truck),
+	// 	double(m_cell_array[0] -> m_cell_length), double(m_cell_array[0] -> m_critical_density_car));
 	return 0;
 }
 
@@ -486,7 +487,7 @@ int MNM_Dlink_Ctm_Multiclass::clear_incoming_array()
 		exit(-1);
 	}
 	
-	printf("Link incoming array size: %d\n", int(m_incoming_array.size()));
+	// printf("Link incoming array size: %d\n", int(m_incoming_array.size()));
 
 	MNM_Veh_Multiclass* _veh;
 	size_t _cur_size = m_incoming_array.size();
@@ -1087,8 +1088,8 @@ int MNM_Dnode_Inout_Multiclass::prepare_supplyANDdemand()
 
 	/* calculated supply */
   	for (size_t j = 0; j < _num_out; ++j){
+  		// printf("%d, %d\n", j, m_out_link_array[j] -> m_link_ID);
 	    m_supply[j] = m_out_link_array[j] -> get_link_supply();
-	    // printf("Link %d, supply is %.4f\n", _out_link -> m_link_ID, m_supply[j]);
   	}
 
   	return 0;
@@ -1108,7 +1109,7 @@ int MNM_Dnode_Inout_Multiclass::move_vehicle(TInt timestamp)
 		for (size_t i = 0; i < m_in_link_array.size(); ++i){
 			_in_link = m_in_link_array[i];
 			_to_move = m_veh_flow[i * _offset + j] * m_flow_scalar;
-			printf("from %d to %d: %.4f\n", int(_in_link -> m_link_ID), int(_out_link -> m_link_ID), double(_to_move));
+			// printf("from %d to %d: %.4f\n", int(_in_link -> m_link_ID), int(_out_link -> m_link_ID), double(_to_move));
 			auto _veh_it = _in_link -> m_finished_array.begin();
 
 			// if (_to_move > 0){
