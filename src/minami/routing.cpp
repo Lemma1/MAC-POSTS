@@ -138,6 +138,11 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
         _shortest_path_tree = m_table -> find(_dest) -> second;
         // MNM_Shortest_Path::all_to_one_FIFO(_dest_node_ID, m_graph, m_statistics -> m_record_interval_tt, *_shortest_path_tree);
         MNM_Shortest_Path::all_to_one_Dijkstra(_dest_node_ID, m_graph, m_statistics -> m_record_interval_tt, *_shortest_path_tree);
+        if (_dest -> m_Dest_ID !=  250241){
+          printf("%d\n", _dest_node_ID);
+          for (auto it : (*_shortest_path_tree)) printf("%d, %d\n", it.first, it.second);
+          break;
+        }
       // } 
     }
   }
@@ -159,6 +164,10 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
       _next_link_ID = m_table -> find(_veh -> get_destination()) -> second -> find(_node_ID) -> second;
       if (_next_link_ID < 0){
         printf("Something wrong in routing, wrong next link 1\n");
+        printf("%d\n", _veh -> get_destination() -> m_Dest_ID);
+        _shortest_path_tree = m_table -> find(_veh -> get_destination()) -> second;
+        // printf("%d\n", _shortest_path_tree -> size());
+        // for (auto it : (*_shortest_path_tree)) printf("%d, %d\n", it.first, it.second);
         exit(-1);
       }
       // printf("From origin, The next link ID will be %d\n", _next_link_ID());

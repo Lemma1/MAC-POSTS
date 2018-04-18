@@ -47,12 +47,14 @@ int MNM_Shortest_Path::all_to_one_Dijkstra(TInt destination_ID,
     MNM_Cost *_min_cost = m_Q.top();
     m_Q.pop();
     TInt _node_id = _min_cost->m_ID;
+    if (destination_ID == 150241) printf("%d\n", _node_id);
     auto _node_it = graph->GetNI(_node_id);
     TFlt _tmp_dist = dist_to_dest[_node_id]; 
       for (int e = 0; e < _node_it.GetInDeg(); e++){
         TInt _in_node_id = _node_it.GetInNId(e);
         TInt _in_link_id = graph->GetEI(_in_node_id, _node_id).GetId();
         TFlt _alt = _tmp_dist + cost_map[_in_link_id];
+        if (destination_ID == 150241) printf("%d, %d, %.4f\n", _in_node_id, _in_link_id, _alt);
         if (_alt < dist_to_dest[_in_node_id]){
           dist_to_dest[_in_node_id] = _alt;
           m_Q.push(new MNM_Cost(_in_node_id, _alt));
