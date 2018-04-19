@@ -1907,6 +1907,8 @@ int MNM_IO_Multiclass::build_demand_multiclass(std::string file_folder,
 	_demand_file.open(_demand_file_name, std::ios::in);
 
 	/* read config */
+	TInt _unit_time = conf_reader -> get_int("unit_time");
+	TInt _num_of_minute =  int(conf_reader -> get_int("assign_frq")) / (60 / _unit_time);
 	TInt _max_interval = conf_reader -> get_int("max_interval"); 
 	TInt _num_OD = conf_reader -> get_int("OD_pair");
 
@@ -1919,21 +1921,27 @@ int MNM_IO_Multiclass::build_demand_multiclass(std::string file_folder,
 	if (_demand_file.is_open())
 	{
 		// printf("Start build demand profile.\n");
-		TFlt *_demand_vector_car = (TFlt*) malloc(sizeof(TFlt) * _max_interval);
-		TFlt *_demand_vector_truck = (TFlt*) malloc(sizeof(TFlt) * _max_interval);
-		memset(_demand_vector_car, 0x0, sizeof(TFlt) * _max_interval);
-		memset(_demand_vector_truck, 0x0, sizeof(TFlt) * _max_interval);
+		TFlt *_demand_vector_car = (TFlt*) malloc(sizeof(TFlt) * _max_interval * _num_of_minute);
+		TFlt *_demand_vector_truck = (TFlt*) malloc(sizeof(TFlt) * _max_interval * _num_of_minute);
+		memset(_demand_vector_car, 0x0, sizeof(TFlt) * _max_interval * _num_of_minute);
+		memset(_demand_vector_truck, 0x0, sizeof(TFlt) * _max_interval * _num_of_minute);
+		TFlt _demand_car;
+		TFlt _demand_truck;
+
 		std::getline(_demand_file,_line); //skip the first line
 		for (int i = 0; i < _num_OD; ++i){
 			std::getline(_demand_file,_line);
-			// std::cout << "Processing: " << _line << "\n";
 			_words = split(_line, ' ');
 			if (TInt(_words.size()) == (_max_interval * 2 + 2)) {
 				_O_ID = TInt(std::stoi(_words[0]));
 				_D_ID = TInt(std::stoi(_words[1]));
 				for (int j = 0; j < _max_interval; ++j) {
-					_demand_vector_car[j] = TFlt(std::stod(_words[j + 2]));
-					_demand_vector_truck[j] = TFlt(std::stod(_words[j + _max_interval + 2]));
+					_demand_car = TFlt(std::stod(_words[j + 2])) / TFlt(_num_of_minute);
+					_demand_truck = TFlt(std::stod(_words[j + _max_interval + 2])) / TFlt(_num_of_minute);
+					for (int k = 0; k < _num_of_minute; ++k){
+						_demand_vector_car[j * _num_of_minute + k] = _demand_car;
+						_demand_vector_truck[j * _num_of_minute + k] = _demand_truck;
+					}
 				}
 				_origin = dynamic_cast<MNM_Origin_Multiclass *>(od_factory -> get_origin(_O_ID));
 				_dest = dynamic_cast<MNM_Destination_Multiclass *>(od_factory -> get_destination(_D_ID));
@@ -1982,9 +1990,13 @@ int MNM_Dta_Multiclass::initialize()
 	m_config = new MNM_ConfReader(m_file_folder + "/config.conf", "DTA");
 	m_unit_time = m_config -> get_int("unit_time");
 	m_flow_scalar = m_config -> get_int("flow_scalar");
-	m_assign_freq = m_config -> get_int("assign_frq");
+
+	// change assign_freq to 12 (1 minute) and total_assign_interval to max_interval*_num_of_minute
+	m_assign_freq = 60 / int(m_unit_time);
+	TInt _num_of_minute =  int(m_config -> get_int("assign_frq")) / m_assign_freq;
+	m_total_assign_inter = m_config ->  get_int("max_interval") * _num_of_minute;
+
 	m_start_assign_interval = m_config -> get_int("start_assign_interval");
-	m_total_assign_inter = m_config -> get_int("max_interval");
 
 	return 0;
 }
