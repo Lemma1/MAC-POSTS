@@ -209,6 +209,24 @@ MNM_Dlink_Ctm_Multiclass::~MNM_Dlink_Ctm_Multiclass()
 	m_cell_array.clear();
 }
 
+int MNM_Dlink_Ctm_Multiclass::move_veh_queue(std::deque<MNM_Veh*> *from_queue,
+                                		std::deque<MNM_Veh*> *to_queue, 
+                                		TInt number_tomove)
+{
+	MNM_Veh* _veh;
+	MNM_Veh_Multiclass* _veh_multiclass;
+	for (int i = 0; i < number_tomove; ++i) {
+		_veh = from_queue -> front();
+		from_queue -> pop_front();
+		_veh_multiclass = dynamic_cast<MNM_Veh_Multiclass *>(_veh);
+		_veh_multiclass -> m_visual_position_on_link += float(1)/float(m_num_cells);
+		if (_veh_multiclass -> m_visual_position_on_link > 0.99) 
+			_veh_multiclass -> m_visual_position_on_link = 0.99;
+		to_queue -> push_back(_veh);
+	}
+	return 0;
+}
+
 int MNM_Dlink_Ctm_Multiclass::init_cell_array(TFlt unit_time, 
 											  TFlt std_cell_length, 
 											  TFlt last_cell_length)
@@ -502,6 +520,7 @@ int MNM_Dlink_Ctm_Multiclass::clear_incoming_array()
 			// printf("truck\n");
 			m_cell_array[0] -> m_veh_queue_truck.push_back(_veh);
 		}
+		_veh -> m_visual_position_on_link = float(1)/float(m_num_cells)/float(2);
 	}
 	m_cell_array[0] -> m_volume_car = m_cell_array[0] -> m_veh_queue_car.size();
 	m_cell_array[0] -> m_volume_truck = m_cell_array[0] -> m_veh_queue_truck.size();
@@ -1515,6 +1534,7 @@ MNM_Veh_Multiclass::MNM_Veh_Multiclass(TInt ID, TInt vehicle_class, TInt start_t
 	: MNM_Veh::MNM_Veh(ID, start_time)
 {
 	m_class = vehicle_class;
+	m_visual_position_on_link = 0.5; // default: visualize veh as at the middle point of link
 }
 
 MNM_Veh_Multiclass::~MNM_Veh_Multiclass()

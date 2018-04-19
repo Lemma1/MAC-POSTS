@@ -30,15 +30,48 @@ int main()
 
 	printf("\n\n\n====================================== Start loading! =======================================\n");
 	bool _verbose = false;
+	bool output_vis = true; // if true output veh location every vis_frequency
+	TInt vis_frequency = 12; // 1 minute
+	MNM_Veh_Multiclass* _veh;
+	std::ofstream _vis_file;
+	std::string _str;
+	if (output_vis){
+		_vis_file.open(folder + "/veh_loc/veh_loc_raw.txt", std::ofstream::out); 
+		if (! _vis_file.is_open()){
+        	printf("Error happens when open _vis_file\n");
+        	exit(-1);
+        }
+	}
+
 	while (!test_dta -> finished_loading(_current_inter)){
 		printf("Current interval: %d\n", _current_inter());
 		test_dta -> load_once(_verbose, _current_inter, _assign_inter);
 		if (_current_inter % test_dta -> m_assign_freq == 0 || _current_inter == 0){
 			_assign_inter += 1;
 		}
-
+		if (output_vis && (_current_inter % vis_frequency == 0)){
+			for (auto _map_it : test_dta -> m_veh_factory -> m_veh_map){
+				if (_map_it.second -> m_finish_time < 0) {
+					_veh = dynamic_cast<MNM_Veh_Multiclass *>(_map_it.second);
+					if (_veh -> m_class == 0){
+						_str = "Car ";
+					}
+					else {
+						_str = "Truck ";
+					}
+					_str += std::to_string(_current_inter) + " ";
+					_str += std::to_string(_veh -> get_current_link() -> m_link_ID) + " ";
+					_str += std::to_string(_veh -> m_visual_position_on_link);
+					_str += "\n";
+					_vis_file << _str;
+				}
+			}
+		}
 		_current_inter += 1;
-		// if (_current_inter > 100){ break; };
+	}
+
+	if (output_vis){
+		if (_vis_file.is_open()) _vis_file.close();
 	}
 
 
