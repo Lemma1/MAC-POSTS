@@ -118,7 +118,8 @@
 
     
 <!-- Import GeoJson data. -->   
-<script src="link_cong.geojson"></script>
+<script src="link_cong_car.geojson"></script>
+<!-- <script src="link_cong_truck.geojson"></script> -->
 <!-- Import GeoJson data. --> 
         
 <script>
@@ -172,7 +173,7 @@
 
         var filters = ['==', 'time_point', time_point];
         map.setFilter('Car', filters);
-        map.setFilter('Truck', filters);
+        //map.setFilter('Truck', filters);
 
         // Set the label to the month
         document.getElementById('time_point').textContent = time_points[time_point];
@@ -185,15 +186,15 @@ map.on('load', function () {
          unit: 'imperial'
     }));
         
-    map.addSource("cong", {
+    map.addSource("cong_car", {
         type: "geojson",
-        data: data_cong
+        data: data_cong_car
     });
 
     map.addLayer({
         'id': 'Car',
         'type': 'line',
-        'source': 'cong',
+        'source': 'cong_car',
         'layout': {
             'line-cap': 'round',
             'line-join': 'round',
@@ -202,43 +203,41 @@ map.on('load', function () {
         'paint': {
             'line-width': 3.5,
             'line-color': {
-                property: 'cong_level',
-                stops: [
-                    [10, '#FC0202'],
-                    [8, '#FC4A02'],
-                    [7, '#FC7702'],
-                    [6, '#FCB402'],
-                    [5, '#FCE102'],
-                    [4, '#EDFC02'],
-                    [3, '#CBFC02'],
+                property: 'car_cong',
+                stops: [ 
+                    [1, '#46FC02'],
                     [2, '#96FC02'],
-                    [1, '#46FC02']
+                    [3, '#CBFC02'],
+                    [4, '#EDFC02'],
+                    [5, '#FCE102'],
+                    [6, '#FCB402'],
+                    [7, '#FC7702'],
+                    [8, '#FC4A02'],
+                    [10, '#FC0202'],
                 ]
             },
             'line-opacity': 0.55
         }
     });
-    
+/*    
     // Set filter to first time point
     filterBy(0);
 
     document.getElementById('slider').addEventListener('input', function(e) {
         var time_point = parseInt(e.target.value, 10);
         filterBy(time_point);
-    });
+    }); */
     
     map.on('click', 'Car', function(e) {      
         new mapboxgl.Popup()
             .setLngLat(e.lngLat)
             .setHTML("<Strong>Link ID:</Strong> " + e.features[0].properties.ID + 
-                     "<br>" + "<Strong>ROAD NUMBER:</Strong> " +e.features[0].properties.ROAD_NUMBER + 
-                     "<br>" + "<Strong>ROAD NAME:</Strong> " +e.features[0].properties.ROAD_NAME + 
-                     "<br>" + "<Strong>DISTANCE:</Strong> " + e.features[0].properties.DISTANCE + " miles" +
-                     "<br>" + "<Strong>ROAD DIRECTION:</Strong> " + e.features[0].properties.ROAD_DIRECTION + 
-                     "<br>" + "<Strong>AM PEAK TRAVELTIME (all, car, truck):</Strong> " + e.features[0].properties.AM_PEAK_TT + "seconds" +
-                     "<br>" + "<Strong>AM PEAK SPEED (all, car, truck):</Strong> " + e.features[0].properties.AM_PEAK_SPEED + "mph" +
-                     "<br>" + "<Strong>PM PEAK TRAVELTIME (all, car, truck):</Strong> " + e.features[0].properties.PM_PEAK_TT + "seconds" +
-                     "<br>" + "<Strong>PM PEAK SPEED (all, car, truck):</Strong> " + e.features[0].properties.PM_PEAK_SPEED + "mph")
+                     "<br>" + "<Strong>Length:</Strong> " +e.features[0].properties.length +"miles"+ 
+                     "<br>" + "<Strong>Lanes:</Strong> " +e.features[0].properties.lanes + 
+                     "<br>" + "<Strong>ffs_car:</Strong> " + e.features[0].properties.ffs_car + " mph" +
+                     "<br>" + "<Strong>Car volume:</Strong> " + e.features[0].properties.car_flow + 
+                     "<br>" + "<Strong>Car fft:</Strong> " + e.features[0].properties.car_fft + "seconds" +
+                     "<br>" + "<Strong>Car Congestion Level:</Strong> " + e.features[0].properties.car_cong)
             .addTo(map);
     });
     
