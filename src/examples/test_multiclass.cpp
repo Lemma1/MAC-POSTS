@@ -30,12 +30,14 @@ int main()
 
 	printf("\n\n\n====================================== Start loading! =======================================\n");
 	bool _verbose = false;
-	bool output_vis = true; // if true output veh location every vis_frequency
-	TInt vis_frequency = 12; // 1 minute
+	bool output_link_cong = false; // if true output link congestion level every cong_frequency
+	TInt cong_frequency = 180; // 15 minutes
+	bool output_veh_locs = true; // if true output veh location every vis_frequency
+	TInt vis_frequency = 60; // 5 minutes
 	MNM_Veh_Multiclass* _veh;
 	std::ofstream _vis_file;
 	std::string _str;
-	if (output_vis){
+	if (output_veh_locs){
 		_vis_file.open(folder + "/veh_loc/veh_loc_raw.txt", std::ofstream::out); 
 		if (! _vis_file.is_open()){
         	printf("Error happens when open _vis_file\n");
@@ -49,7 +51,7 @@ int main()
 		if (_current_inter % test_dta -> m_assign_freq == 0 || _current_inter == 0){
 			_assign_inter += 1;
 		}
-		if (output_vis && (_current_inter % vis_frequency == 0)){
+		if (output_veh_locs && (_current_inter % vis_frequency == 0)){
 			for (auto _map_it : test_dta -> m_veh_factory -> m_veh_map){
 				if (_map_it.second -> m_finish_time < 0) {
 					_veh = dynamic_cast<MNM_Veh_Multiclass *>(_map_it.second);
@@ -70,29 +72,41 @@ int main()
 		_current_inter += 1;
 	}
 
-	if (output_vis){
+	if (output_veh_locs){
 		if (_vis_file.is_open()) _vis_file.close();
 	}
 
 
-	// TInt _iter = 0;
-	// while (_iter < _current_inter){
-	// 	printf("---------------------------------- Current interval: %d ----------------------------------\n", int(_iter));
-	// 	for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); 
-	// 			  _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
-	// 		_link = _link_it -> second;
-	// 		printf("link ID is %d: ", _link -> m_link_ID());
-	// 		_link_m = dynamic_cast<MNM_Dlink_Multiclass*>(_link);
-	// 		printf("car flow(%.4f), ", double(MNM_DTA_GRADIENT::get_link_inflow_car(_link_m, _iter, _iter + 1)));
-	// 		printf("truck flow(%.4f), ", double(MNM_DTA_GRADIENT::get_link_inflow_truck(_link_m, _iter, _iter + 1)));
-	// 		printf("car tt(%.4f s), ", double(MNM_DTA_GRADIENT::get_travel_time_car(_link_m, TFlt(_iter + 1))));
-	// 		printf("truck tt(%.4f s), ", double(MNM_DTA_GRADIENT::get_travel_time_truck(_link_m, TFlt(_iter + 1))));
-	// 		printf("car tt(%.4f s), ", double(_link_m -> get_link_freeflow_tt_car()));
-	// 		printf("truck tt(%.4f s)\n", double(_link_m -> get_link_freeflow_tt_truck()));
-	// 	}
-	// 	_iter += 1;
-	// 	// if (_iter > 100){ break; };
-	// }
+	std::ofstream _vis_file2;
+	if (output_link_cong){
+		_vis_file2.open(folder + "/link_cong/link_cong_raw.txt", std::ofstream::out); 
+		if (! _vis_file2.is_open()){
+        	printf("Error happens when open _vis_file2\n");
+        	exit(-1);
+        }
+		TInt _iter = 0;
+		while (_iter < _current_inter){
+			if (_iter % cong_frequency == 0){
+				printf("Current iteration: %d\n", _iter);
+				for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); 
+						  _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
+					_link = _link_it -> second;
+					_link_m = dynamic_cast<MNM_Dlink_Multiclass*>(_link);
+					_str = std::to_string(_link -> m_link_ID()) + " ";
+					_str += std::to_string(_iter) + " ";
+					_str += std::to_string(MNM_DTA_GRADIENT::get_link_inflow_car(_link_m, _iter, _iter + 1)) + " ";
+					_str += std::to_string(MNM_DTA_GRADIENT::get_link_inflow_truck(_link_m, _iter, _iter + 1)) + " ";
+					_str += std::to_string(MNM_DTA_GRADIENT::get_travel_time_car(_link_m, TFlt(_iter + 1))) + " ";
+					_str += std::to_string(MNM_DTA_GRADIENT::get_travel_time_truck(_link_m, TFlt(_iter + 1))) + " ";
+					_str += std::to_string(_link_m -> get_link_freeflow_tt_car()) + " ";
+					_str += std::to_string(_link_m -> get_link_freeflow_tt_truck()) + "\n";
+					_vis_file2 << _str;
+				}
+			}
+			_iter += 1;
+		}
+		if (_vis_file2.is_open()) _vis_file2.close();
+	}
 
 	
 	// for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
