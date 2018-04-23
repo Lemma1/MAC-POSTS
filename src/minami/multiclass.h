@@ -78,6 +78,9 @@ public:
 	void virtual print_info() override;
 	TFlt virtual get_link_flow() override;
 	TFlt virtual get_link_tt() override;
+	int virtual move_veh_queue(std::deque<MNM_Veh*> *from_queue, 
+						std::deque<MNM_Veh*> *to_queue, 
+						TInt number_tomove) override;
 
 	class Ctm_Cell_Multiclass;
 	int init_cell_array(TFlt unit_time, TFlt std_cell_length, TFlt last_cell_length);
@@ -325,6 +328,7 @@ public:
 	~MNM_Veh_Multiclass();
 
 	TInt m_class;
+	TFlt m_visual_position_on_link; //[0(start), 1(end)], for vehicle-based visualization
 };
 
 

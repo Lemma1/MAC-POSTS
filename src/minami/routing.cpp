@@ -159,6 +159,10 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
       _next_link_ID = m_table -> find(_veh -> get_destination()) -> second -> find(_node_ID) -> second;
       if (_next_link_ID < 0){
         printf("Something wrong in routing, wrong next link 1\n");
+        // printf("%d\n", _veh -> get_destination() -> m_Dest_ID);
+        // _shortest_path_tree = m_table -> find(_veh -> get_destination()) -> second;
+        // printf("%d\n", _shortest_path_tree -> size());
+        // for (auto it : (*_shortest_path_tree)) printf("%d, %d\n", it.first, it.second);
         exit(-1);
       }
       // printf("From origin, The next link ID will be %d\n", _next_link_ID());
