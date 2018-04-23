@@ -118,8 +118,8 @@
 
     
 <!-- Import GeoJson data. -->   
-<script src="link_cong_car.js"></script>
-<script src="link_cong_truck.js"></script>
+<script src="link_cong_car.geojson"></script>
+<script src="link_cong_truck.geojson"></script>
 <!-- Import GeoJson data. --> 
 
 <script>
@@ -233,7 +233,7 @@ map.on('load', function () {
         'layout': {
             'line-cap': 'round',
             'line-join': 'round',
-            'visibility': 'visible'
+            'visibility': 'none'
         },
         'paint': {
             'line-width': 3.5,
@@ -259,12 +259,12 @@ map.on('load', function () {
         new mapboxgl.Popup()
             .setLngLat(e.lngLat)
             .setHTML("<Strong>Link ID:</Strong> " + e.features[0].properties.ID + 
-                     "<br>" + "<Strong>Length:</Strong> " +e.features[0].properties.length +"miles"+ 
+                     "<br>" + "<Strong>Length:</Strong> " +e.features[0].properties.length +" miles"+ 
                      "<br>" + "<Strong>Lanes:</Strong> " +e.features[0].properties.lanes + 
-                     "<br>" + "<Strong>ffs_car:</Strong> " + e.features[0].properties.ffs_car + " mph" +
-                     "<br>" + "<Strong>Car volume:</Strong> " + e.features[0].properties.car_flow + 
-                     "<br>" + "<Strong>Car fft:</Strong> " + e.features[0].properties.car_fft + "seconds" +
-                     "<br>" + "<Strong>Car Congestion Level:</Strong> " + e.features[0].properties.car_cong)
+                     "<br>" + "<Strong>ffs_car:</Strong> " + parseFloat(e.features[0].properties.ffs_car).toFixed(0) + " mph" +
+                     "<br>" + "<Strong>Car volume:</Strong> " + e.features[0].properties.car_flow.toFixed(2) + 
+                     "<br>" + "<Strong>Car fft:</Strong> " + e.features[0].properties.car_fft.toFixed(2) + " seconds" +
+                     "<br>" + "<Strong>Car Congestion Level:</Strong> " + e.features[0].properties.car_cong.toFixed(2))
             .addTo(map);
     });
     
@@ -281,12 +281,12 @@ map.on('load', function () {
         new mapboxgl.Popup()
             .setLngLat(e.lngLat)
             .setHTML("<Strong>Link ID:</Strong> " + e.features[0].properties.ID + 
-                     "<br>" + "<Strong>Length:</Strong> " +e.features[0].properties.length +"miles"+ 
-                     "<br>" + "<Strong>Lanes:</Strong> " +e.features[0].properties.lanes + 
-                     "<br>" + "<Strong>ffs_car:</Strong> " + e.features[0].properties.ffs_car + " mph" +
-                     "<br>" + "<Strong>Truck volume:</Strong> " + e.features[0].properties.truck_flow + 
-                     "<br>" + "<Strong>Truck fft:</Strong> " + e.features[0].properties.truck_fft + "seconds" +
-                     "<br>" + "<Strong>Truck Congestion Level:</Strong> " + e.features[0].properties.truck_cong)
+                     "<br>" + "<Strong>Length:</Strong> " + e.features[0].properties.length +" miles"+ 
+                     "<br>" + "<Strong>Lanes:</Strong> " + e.features[0].properties.lanes + 
+                     "<br>" + "<Strong>ffs_car:</Strong> " + parseFloat(e.features[0].properties.ffs_car).toFixed(0) + " mph" +
+                     "<br>" + "<Strong>Truck volume:</Strong> " + e.features[0].properties.truck_flow.toFixed(2) + 
+                     "<br>" + "<Strong>Truck fft:</Strong> " + e.features[0].properties.truck_fft.toFixed(2) + " seconds" +
+                     "<br>" + "<Strong>Truck Congestion Level:</Strong> " + e.features[0].properties.truck_cong.toFixed(2))
             .addTo(map);
     });
     
