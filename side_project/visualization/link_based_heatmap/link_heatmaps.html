@@ -106,7 +106,7 @@
     <div class='map-overlay-inner'>
         <h2>Congestion Level (morning peak hours)</h2>
         <label id='time_point'></label>
-        <input id='slider' type='range' min='0' max='19' step='1' value='0' />
+        <input id='slider' type='range' min='0' max='9' step='1' value='0' />
     </div>
     <div class='map-overlay-inner'>
         <div id='legend' class='legend'>
@@ -118,10 +118,10 @@
 
     
 <!-- Import GeoJson data. -->   
-<script src="link_cong_car.geojson"></script>
-<!-- <script src="link_cong_truck.geojson"></script> -->
+<script src="link_cong_car.js"></script>
+<script src="link_cong_truck.js"></script>
 <!-- Import GeoJson data. --> 
-        
+
 <script>
     mapboxgl.accessToken = 'pk.eyJ1IjoieHBpIiwiYSI6ImNqMXA0MXFpZDAwNDEycW1qa29oMTl3dWcifQ.J2lp7DtGJWGT690etQoZVg';
     var map = new mapboxgl.Map({
@@ -165,15 +165,16 @@
         layers.appendChild(link);
     }
     
-    var time_points = ['5:00 AM', '5:15 AM', '5:30 AM', '5:45 AM', '6:00 AM', '6:15 AM', '6:30 AM', '6:45 AM', 
-                       '7:00 AM', '7:15 AM', '7:30 AM', '7:45 AM', '8:00 AM', '8:15 AM', '8:30 AM', '8:45 AM', 
-                       '9:00 AM', '9:15 AM', '9:30 AM', '9:45 AM'];
-   
+   // var time_points = ['5:00 AM', '5:15 AM', '5:30 AM', '5:45 AM', '6:00 AM', '6:15 AM', '6:30 AM', '6:45 AM', 
+   //                    '7:00 AM', '7:15 AM', '7:30 AM', '7:45 AM', '8:00 AM', '8:15 AM', '8:30 AM', '8:45 AM', 
+   //                    '9:00 AM', '9:15 AM', '9:30 AM', '9:45 AM'];
+    var time_points = ['5:00 AM', '5:30 AM', '6:00 AM', '6:30 AM', '7:00 AM', '7:30 AM', '8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM'];
+    
     function filterBy(time_point) {
 
         var filters = ['==', 'time_point', time_point];
         map.setFilter('Car', filters);
-        //map.setFilter('Truck', filters);
+        map.setFilter('Truck', filters);
 
         // Set the label to the month
         document.getElementById('time_point').textContent = time_points[time_point];
@@ -189,6 +190,11 @@ map.on('load', function () {
     map.addSource("cong_car", {
         type: "geojson",
         data: data_cong_car
+    });
+    
+    map.addSource("cong_truck", {
+        type: "geojson",
+        data: data_cong_truck
     });
 
     map.addLayer({
@@ -219,14 +225,35 @@ map.on('load', function () {
             'line-opacity': 0.55
         }
     });
-/*    
-    // Set filter to first time point
-    filterBy(0);
-
-    document.getElementById('slider').addEventListener('input', function(e) {
-        var time_point = parseInt(e.target.value, 10);
-        filterBy(time_point);
-    }); */
+    
+     map.addLayer({
+        'id': 'Truck',
+        'type': 'line',
+        'source': 'cong_truck',
+        'layout': {
+            'line-cap': 'round',
+            'line-join': 'round',
+            'visibility': 'visible'
+        },
+        'paint': {
+            'line-width': 3.5,
+            'line-color': {
+                property: 'truck_cong',
+                stops: [ 
+                    [1, '#46FC02'],
+                    [2, '#96FC02'],
+                    [3, '#CBFC02'],
+                    [4, '#EDFC02'],
+                    [5, '#FCE102'],
+                    [6, '#FCB402'],
+                    [7, '#FC7702'],
+                    [8, '#FC4A02'],
+                    [10, '#FC0202'],
+                ]
+            },
+            'line-opacity': 0.55
+        }
+    });
     
     map.on('click', 'Car', function(e) {      
         new mapboxgl.Popup()
@@ -249,7 +276,38 @@ map.on('load', function () {
     map.on('mouseleave', 'Car', function() {
         map.getCanvas().style.cursor = '';
     });
-        
+    
+    map.on('click', 'Truck', function(e) {      
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("<Strong>Link ID:</Strong> " + e.features[0].properties.ID + 
+                     "<br>" + "<Strong>Length:</Strong> " +e.features[0].properties.length +"miles"+ 
+                     "<br>" + "<Strong>Lanes:</Strong> " +e.features[0].properties.lanes + 
+                     "<br>" + "<Strong>ffs_car:</Strong> " + e.features[0].properties.ffs_car + " mph" +
+                     "<br>" + "<Strong>Truck volume:</Strong> " + e.features[0].properties.truck_flow + 
+                     "<br>" + "<Strong>Truck fft:</Strong> " + e.features[0].properties.truck_fft + "seconds" +
+                     "<br>" + "<Strong>Truck Congestion Level:</Strong> " + e.features[0].properties.truck_cong)
+            .addTo(map);
+    });
+    
+    map.on('mouseenter', 'Truck', function(e) {
+        // Change the cursor style as a UI indicator.
+        map.getCanvas().style.cursor = 'pointer';
+    });
+
+    map.on('mouseleave', 'Truck', function() {
+        map.getCanvas().style.cursor = '';
+    });    
+    
+    
+    
+    // Set filter to first time point
+    filterBy(0);
+
+    document.getElementById('slider').addEventListener('input', function(e) {
+        var time_point = parseInt(e.target.value, 10);
+        filterBy(time_point);
+    });
 });
 </script>
 
