@@ -87,7 +87,7 @@ int main()
 		TInt _iter = 0;
 		while (_iter < _current_inter){
 			if (_iter % cong_frequency == 0){
-				printf("Current iteration: %d\n", _iter);
+				printf("Current iteration: %d\n", int(_iter));
 				for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); 
 						  _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
 					_link = _link_it -> second;
