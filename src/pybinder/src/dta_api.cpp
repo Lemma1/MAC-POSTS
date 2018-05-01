@@ -32,6 +32,8 @@ Dta_Api::Dta_Api()
   m_dta = NULL;
   m_link_vec = std::vector<MNM_Dlink*>();
   m_path_vec = std::vector<MNM_Path*>();
+  m_path_set = std::set<MNM_Path*>(); 
+  m_ID_path_mapping = std::unordered_map<TInt, MNM_Path*>();
 }
 
 Dta_Api::~Dta_Api()
@@ -50,6 +52,9 @@ int Dta_Api::initialize(std::string folder)
   m_dta -> build_from_files();
   m_dta -> hook_up_node_and_link();
   m_dta -> is_ok();
+  if (MNM_Routing_Fixed *_routing = dynamic_cast<MNM_Routing_Fixed *>(m_dta -> m_routing)){
+    MNM::get_ID_path_mapping(m_ID_path_mapping, _routing -> m_path_table);
+  }
   return 0;
 }
 
@@ -88,6 +93,10 @@ int Dta_Api::get_cur_loading_interval()
 
 int Dta_Api::register_links(py::array_t<int> links)
 {
+  if (m_link_vec.size() > 0){
+    printf("Warning, Dta_Api::register_links, link exists\n");
+    m_link_vec.clear();
+  }
   auto links_buf = links.request();
   if (links_buf.ndim != 1){
     throw std::runtime_error("Number of dimensions must be one");
@@ -108,6 +117,28 @@ int Dta_Api::register_links(py::array_t<int> links)
 
 int Dta_Api::register_paths(py::array_t<int> paths)
 {
+  if (m_link_vec.size() > 0){
+    printf("Warning, Dta_Api::register_paths, path exists\n");
+    m_path_vec.clear();
+    m_path_set.clear();
+  }
+  auto paths_buf = paths.request();
+  if (paths_buf.ndim != 1){
+    throw std::runtime_error("register_paths: Number of dimensions must be one");
+  }
+  int *paths_ptr = (int *) paths_buf.ptr; 
+  TInt _path_ID;
+  for (int i = 0; i < paths_buf.shape[0]; i++){
+    _path_ID = TInt(paths_ptr[i]);
+    printf("registering path %d, %d\n", _path_ID(), (int)m_ID_path_mapping.size());
+    if (m_ID_path_mapping.find(_path_ID) == m_ID_path_mapping.end()){
+      throw std::runtime_error("register_paths: No such path");
+    }
+    else {
+      m_path_vec.push_back(m_ID_path_mapping[_path_ID]);
+    }
+  }
+  m_path_set = std::set<MNM_Path*> (m_path_vec.begin(), m_path_vec.end());
   return 0;
 }
 
@@ -204,17 +235,40 @@ py::array_t<double> Dta_Api::get_link_out_cc(int link_ID)
 }
 
 
-py::array_t<double> Dta_Api::get_dar_matrix(py::array_t<int>path_assign_times, 
-                                                py::array_t<int>link_start_intervals, py::array_t<int>link_end_intervals)
+py::array_t<double> Dta_Api::get_dar_matrix(py::array_t<int>start_intervals, py::array_t<int>end_intervals)
 {
-  auto _record = std::vector<dar_record*>();
-  auto link_start_buf = link_start_intervals.request();
+  auto start_buf = start_intervals.request();
+  auto end_buf = end_intervals.request();
+  if (start_buf.ndim != 1 || end_buf.ndim != 1){
+    throw std::runtime_error("Error, Dta_Api::get_link_inflow, input dismension mismatch");
+  }
+  if (start_buf.shape[0] != end_buf.shape[0]){
+    throw std::runtime_error("Error, Dta_Api::get_link_inflow, input length mismatch");
+  }
+  int l = start_buf.shape[0];
+  int *start_prt = (int *) start_buf.ptr;
+  int *end_prt = (int *) end_buf.ptr;
+  std::vector<dar_record*> _record = std::vector<dar_record*>();
+  // for (size_t i = 0; i<m_link_vec.size(); ++i){
+  //   m_link_vec[i] -> m_N_in_tree -> print_out();
+  // }
+  for (int t = 0; t < l; ++t){
+    for (size_t i = 0; i<m_link_vec.size(); ++i){
+      if (end_prt[t] < start_prt[t]){
+        throw std::runtime_error("Error, Dta_Api::get_dar_matrix, end time smaller than start time");
+      }
+      if (end_prt[t] > get_cur_loading_interval()){
+        throw std::runtime_error("Error, Dta_Api::get_dar_matrix, loaded data not enough");
+      }
+        MNM_DTA_GRADIENT::add_dar_records(
+                      _record, m_link_vec[i], m_path_set, TFlt(start_prt[t]), TFlt(end_prt[t]));
+    }
+  }
   // path_ID, assign_time, link_ID, start_int, flow
   int new_shape [2] = { (int) _record.size(), 5}; 
   auto result = py::array_t<double>(new_shape);
   auto result_buf = result.request();
   double *result_prt = (double *) result_buf.ptr;
-
   dar_record* tmp_record;
   for (size_t i = 0; i < _record.size(); ++i){
     tmp_record = _record[i];
@@ -263,8 +317,10 @@ PYBIND11_MODULE(MNMAPI, m) {
             .def("initialize", &Dta_Api::initialize)
             .def("run_whole", &Dta_Api::run_whole)
             .def("install_cc", &Dta_Api::install_cc)
+            .def("install_cc_tree", &Dta_Api::install_cc_tree)
             .def("get_cur_loading_interval", &Dta_Api::get_cur_loading_interval)
             .def("register_links", &Dta_Api::register_links)
+            .def("register_paths", &Dta_Api::register_paths)
             .def("get_link_tt", &Dta_Api::get_link_tt)
             .def("get_link_inflow", &Dta_Api::get_link_inflow)
             .def("get_link_in_cc", &Dta_Api::get_link_in_cc)

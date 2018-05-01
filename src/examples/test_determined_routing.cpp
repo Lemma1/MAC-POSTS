@@ -7,7 +7,8 @@
 int main(){
 
   // std::string folder = "../../data/input_files_PGH_emission";
-  std::string folder = "../../data/input_files_7link_fix";
+  // std::string folder = "../../data/input_files_7link_fix";
+  std::string folder = "../../data/input_files_SR41_fix";
   MNM_Dta *test_dta = new MNM_Dta(folder);
   // MNM_Dta *test_dta = new MNM_Dta("../../data/input_files_2link_fix");
   // MNM_Dta *test_dta = new MNM_Dta("../../data/input_files_PGH");

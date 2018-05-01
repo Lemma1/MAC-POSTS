@@ -4,6 +4,7 @@
 #include "Snap.h"
 #include "factory.h"
 #include "shortest_path.h"
+#include "path.h"
 
 #include <vector>
 #include <deque>
@@ -59,6 +60,7 @@ namespace MNM {
   int normalize_path_table_p(Path_Table *path_table);
   int copy_p_to_buffer(Path_Table *path_table, TInt col);
   int copy_buffer_to_p(Path_Table *path_table, TInt col);
+  int get_ID_path_mapping(std::unordered_map<TInt, MNM_Path*>& map, Path_Table *path_table);
 }
 
 
