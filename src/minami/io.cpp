@@ -29,7 +29,8 @@ int MNM_IO::build_node_factory(std::string file_folder, MNM_ConfReader *conf_rea
     for (int i=0; i < _num_of_node; ++i){
       std::getline(_node_file,_line);
       _words = split(_line, ' ');
-      if (_words.size() == 2) {
+      // if (_words.size() == 2) {
+      if (_words.size() >= 2) {
         // std::cout << "Processing: " << _line << "\n";
         _node_ID = TInt(std::stoi(_words[0]));
         _type = trim(_words[1]);
@@ -92,7 +93,8 @@ int MNM_IO::build_link_factory(std::string file_folder, MNM_ConfReader *conf_rea
     for (int i=0; i < _num_of_link; ++i){
       std::getline(_link_file,_line);
       _words = split(_line, ' ');
-      if (_words.size() == 7) {
+      // if (_words.size() == 7) {
+      if (_words.size() >= 7) {
         // std::cout << "Processing: " << _line << "\n";
         _link_ID = TInt(std::stoi(_words[0]));
         _type = trim(_words[1]);
@@ -378,7 +380,8 @@ int MNM_IO::build_demand(std::string file_folder, MNM_ConfReader *conf_reader, M
       std::getline(_demand_file,_line);
       // std::cout << "Processing: " << _line << "\n";
       _words = split(_line, ' ');
-      if (TInt(_words.size()) == (_max_interval + 2)) {
+      //if (TInt(_words.size()) == (_max_interval + 2)) {
+      if (TInt(_words.size()) >= (_max_interval + 2)) {
         _O_ID = TInt(std::stoi(_words[0]));
         _D_ID = TInt(std::stoi(_words[1]));
         for(int j=0; j<_max_interval; ++j){
