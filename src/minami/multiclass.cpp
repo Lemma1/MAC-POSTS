@@ -2164,3 +2164,120 @@ int get_dar_matrix_multiclass(double **output, std::vector<MNM_Dlink*> links,
 }
 
 }//end namespace MNM_DTA_GRADIENT
+
+
+
+
+/******************************************************************************************************************
+*******************************************************************************************************************
+											Multiclass Emissions
+*******************************************************************************************************************
+******************************************************************************************************************/
+MNM_Cumulative_Emission_Multiclass::MNM_Cumulative_Emission_Multiclass(TFlt unit_time, TInt freq)
+	: MNM_Cumulative_Emission::MNM_Cumulative_Emission(TFlt unit_time, TInt freq)
+{
+	m_fuel_truck = TFlt(0);
+	m_CO2_truck = TFlt(0);
+	m_HC_truck = TFlt(0);
+	m_CO_truck = TFlt(0);
+	m_NOX_truck = TFlt(0);
+	m_VMT_truck = TFlt(0);
+}
+
+MNM_Cumulative_Emission_Multiclass::~MNM_Cumulative_Emission_Multiclass()
+{
+	;
+}
+
+// All convert_factors from MOVES
+// Reference: 
+TFlt MNM_Cumulative_Emission_Multiclass::calculate_fuel_rate_truck(TFlt v)
+{
+	TFlt _convert_factor = 1.0;
+	TFlt _fuel_rate_car = calculate_fuel_rate(TFlt v);
+	TFlt _fuel_rate_truck = _fuel_rate_car * _convert_factor;
+	return _fuel_rate_truck;
+}
+
+TFlt MNM_Cumulative_Emission_Multiclass::calculate_CO2_rate_truck(TFlt v)
+{
+	TFlt _convert_factor = 1.0;
+	TFlt _CO2_rate_car = calculate_CO2_rate(TFlt v);
+	TFlt _CO2_rate_truck = _CO2_rate_car * _convert_factor;
+	return _CO2_rate_truck;
+}
+
+TFlt MNM_Cumulative_Emission_Multiclass::calculate_HC_rate_truck(TFlt v)
+{
+	TFlt _convert_factor = 1.0;
+	TFlt _HC_rate_car = calculate_HC_rate(TFlt v);
+	TFlt _HC_rate_truck = _HC_rate_car * _convert_factor;
+	return _HC_rate_truck;
+}
+
+TFlt MNM_Cumulative_Emission_Multiclass::calculate_CO_rate_truck(TFlt v)
+{
+	TFlt _convert_factor = 1.0;
+	TFlt _CO_rate_car = calculate_CO2_rate(TFlt v);
+	TFlt _CO_rate_truck = _CO_rate_car * _convert_factor;
+	return _CO_rate_truck;
+}
+
+TFlt MNM_Cumulative_Emission_Multiclass::calculate_NOX_rate_truck(TFlt v)
+{
+	TFlt _convert_factor = 1.0;
+	TFlt _NOX_rate_car = calculate_CO2_rate(TFlt v);
+	TFlt _NOX_rate_truck = _NOX_rate_car * _convert_factor;
+	return _NOX_rate_truck;
+}
+
+int MNM_Cumulative_Emission_Multiclass::update()
+{
+  m_counter += 1;
+  // printf("ce counter is now %d\n", m_counter());
+  TFlt _v;
+  TFlt _v_converted;
+  for (MNM_Dlink *link : m_link_vector){
+    _v = link -> m_length / link -> get_link_tt(); // m/s
+    _v_converted = _v * TFlt(3600) / TFlt(1600); // mile / hour
+    _v_converted = MNM_Ults::max(_v_converted, TFlt(5));
+    _v_converted = MNM_Ults::min(_v_converted, TFlt(65));
+    m_fuel += calculate_fuel_rate(_v_converted) 
+              * (_v * m_unit_time / TFlt(1600))  
+              * link -> get_link_flow();
+    m_CO2 += calculate_CO2_rate(_v_converted) 
+              * (_v * m_unit_time / TFlt(1600))  
+              * link -> get_link_flow();
+    m_HC += calculate_HC_rate(_v_converted) 
+              * (_v * m_unit_time / TFlt(1600))  
+              * link -> get_link_flow();
+    m_CO += calculate_CO_rate(_v_converted) 
+              * (_v * m_unit_time / TFlt(1600))  
+              * link -> get_link_flow();
+    m_NOX += calculate_NOX_rate(_v_converted) 
+              * (_v * m_unit_time / TFlt(1600))  
+              * link -> get_link_flow();
+    m_VMT += (_v * m_unit_time / TFlt(1600))  
+              * link -> get_link_flow();
+    // printf("link ID is %d, flow is :%lf, _v is %lf, CO2 is %lf, HC is %lf\n",
+    //       (link -> m_link_ID)(), link -> get_link_flow()(), _v(), m_CO2(), m_HC());              
+  }
+  if (m_counter == m_freq){
+    output();
+    m_fuel = TFlt(0);
+    m_CO2 = TFlt(0);
+    m_HC = TFlt(0);
+    m_CO = TFlt(0);
+    m_NOX = TFlt(0);
+    m_VMT = TFlt(0);
+    m_counter = 0;
+  }
+  return 0;
+}
+
+int MNM_Cumulative_Emission_Multiclass::output()
+{
+  printf("The emission stats are: ");
+  printf("%d, %lf, %lf, %lf, %lf, %lf, %lf\n", m_link_vector[0] -> m_link_ID(), m_fuel(), m_CO2(), m_HC(), m_CO(), m_NOX(), m_VMT());
+  return 0;
+}
