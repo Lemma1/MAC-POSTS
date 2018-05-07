@@ -86,8 +86,8 @@ public:
   MNM_Tree_Cumulative_Curve *m_N_in_tree;
   MNM_Tree_Cumulative_Curve *m_N_out_tree;
 
-protected:
-  int move_veh_queue(std::deque<MNM_Veh*> *from_queue, std::deque<MNM_Veh*> *to_queue, TInt number_tomove);
+//protected:
+  int virtual move_veh_queue(std::deque<MNM_Veh*> *from_queue, std::deque<MNM_Veh*> *to_queue, TInt number_tomove);
 };
 
 
