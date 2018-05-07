@@ -265,7 +265,7 @@ int MNM_Dta::load_once(bool verbose, TInt load_int, TInt assign_int)
   // step 3: move vehicles through node
   for (auto _node_it = m_node_factory -> m_node_map.begin(); _node_it != m_node_factory -> m_node_map.end(); _node_it++){
     _node = _node_it -> second;
-    printf("node ID is %d\n", _node -> m_node_ID());
+    // printf("node ID is %d\n", _node -> m_node_ID());
     _node -> evolve(load_int);
   }
 
@@ -278,7 +278,7 @@ int MNM_Dta::load_once(bool verbose, TInt load_int, TInt assign_int)
     //       _link -> m_link_ID(), _link -> get_link_flow()(), (int)_link -> m_incoming_array.size(),  (int)_link -> m_finished_array.size());
     //   _link -> print_info();
     // }
-    printf("link ID is %d\n", _link-> m_link_ID());
+    // printf("link ID is %d\n", _link-> m_link_ID());
     // _link -> print_info();
     _link -> clear_incoming_array();
     _link -> evolve(load_int);
@@ -291,11 +291,11 @@ int MNM_Dta::load_once(bool verbose, TInt load_int, TInt assign_int)
     _dest -> receive(load_int);
   }
 
-  printf("Update record!\n");
+  if (verbose) printf("Update record!\n");
   // step 5: update record
   m_statistics -> update_record(load_int);
 
-  if (verbose) MNM::print_vehicle_statistics(m_veh_factory);
+  MNM::print_vehicle_statistics(m_veh_factory);
   // test();  
   return 0;
 }

@@ -5,6 +5,7 @@
 #include "dnode.h"
 #include "vehicle.h"
 #include "dta.h"
+#include "dta_gradient_utls.h"
 
 class MNM_Destination_Multiclass;
 
@@ -20,17 +21,33 @@ class MNM_Dlink_Multiclass : public MNM_Dlink
 public:
 	MNM_Dlink_Multiclass(TInt ID,
 						TInt number_of_lane,
-						TFlt length);
+						TFlt length,
+						TFlt ffs_car, 
+						TFlt ffs_truck);
 	~MNM_Dlink_Multiclass();
 
 	// use this one instead of the one in Dlink class
 	int install_cumulative_curve_multiclass();
+	// use this one instead of the one in Dlink class
+	int install_cumulative_curve_tree_multiclass();
+
+	TFlt get_link_freeflow_tt_car();
+	TFlt get_link_freeflow_tt_truck();
+
+	TFlt m_ffs_car;
+	TFlt m_ffs_truck;
 
 	// Two seperate N-curves for private cars and trucks
 	MNM_Cumulative_Curve *m_N_in_car;
   	MNM_Cumulative_Curve *m_N_out_car;
   	MNM_Cumulative_Curve *m_N_in_truck;
   	MNM_Cumulative_Curve *m_N_out_truck;
+
+  	// Two seperate N-curve_trees for private cars and trucks
+	MNM_Tree_Cumulative_Curve *m_N_in_tree_car;
+  	MNM_Tree_Cumulative_Curve *m_N_out_tree_car;
+  	MNM_Tree_Cumulative_Curve *m_N_in_tree_truck;
+  	MNM_Tree_Cumulative_Curve *m_N_out_tree_truck;
 };
 
 
@@ -61,6 +78,9 @@ public:
 	void virtual print_info() override;
 	TFlt virtual get_link_flow() override;
 	TFlt virtual get_link_tt() override;
+	int virtual move_veh_queue(std::deque<MNM_Veh*> *from_queue, 
+						std::deque<MNM_Veh*> *to_queue, 
+						TInt number_tomove) override;
 
 	class Ctm_Cell_Multiclass;
 	int init_cell_array(TFlt unit_time, TFlt std_cell_length, TFlt last_cell_length);
@@ -68,8 +88,6 @@ public:
 	int move_last_cell();
 
 	TInt m_num_cells;
-	TFlt m_ffs_car;
-	TFlt m_ffs_truck;
 	TFlt m_lane_hold_cap_car;
 	TFlt m_lane_hold_cap_truck;
 	TFlt m_lane_critical_density_car;
@@ -221,7 +239,7 @@ protected:
 	int prepare_supplyANDdemand();
 	int virtual compute_flow(){return 0;};
 	// int flow_to_vehicle();
-	int move_vehicle();
+	int move_vehicle(TInt timestamp);
 	int record_cumulative_curve(TInt timestamp);
 	TFlt *m_demand; //2d
 	TFlt *m_supply; //1d
@@ -310,6 +328,7 @@ public:
 	~MNM_Veh_Multiclass();
 
 	TInt m_class;
+	TFlt m_visual_position_on_link; //[0(start), 1(end)], for vehicle-based visualization
 };
 
 
@@ -418,7 +437,34 @@ public:
 	~MNM_Dta_Multiclass();
 	int virtual initialize() override;
 	int virtual build_from_files() override;
+	int virtual pre_loading() override;
 }; 
+
+
+
+
+/******************************************************************************************************************
+*******************************************************************************************************************
+										Multiclass DTA Gradient Utils
+*******************************************************************************************************************
+******************************************************************************************************************/
+namespace MNM_DTA_GRADIENT
+{
+TFlt get_link_inflow_car(MNM_Dlink_Multiclass* link, 
+                    	TFlt start_time, TFlt end_time);
+TFlt get_link_inflow_car(MNM_Dlink_Multiclass* link, 
+                    	TInt start_time, TInt end_time);
+TFlt get_link_inflow_truck(MNM_Dlink_Multiclass* link, 
+                    	TFlt start_time, TFlt end_time);
+TFlt get_link_inflow_truck(MNM_Dlink_Multiclass* link, 
+                    	TInt start_time, TInt end_time);
+
+TFlt get_travel_time_car(MNM_Dlink_Multiclass* link, TFlt start_time);
+TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time);
+
+int get_dar_matrix_multiclass(double **output, std::vector<MNM_Dlink*> links, 
+                   			std::vector<MNM_Path*> paths, MNM_Veh_Factory *veh_factory);
+};
 
 
 
