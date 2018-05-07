@@ -28,6 +28,7 @@ public:
   int add_record(std::pair<TFlt, TFlt> r);
   int add_increment(std::pair<TFlt, TFlt> r);
   TFlt get_result(TFlt time);
+  TFlt get_approximated_result(TFlt time);
   TFlt get_time(TFlt result);
   std::string to_string();
   int shrink(TInt number);
@@ -44,6 +45,7 @@ public:
   ~MNM_Tree_Cumulative_Curve();
   std::unordered_map<MNM_Path*, std::unordered_map<TInt, MNM_Cumulative_Curve*>> m_record;
   int add_flow(TFlt timestamp, TFlt flow, MNM_Path* path, TInt departing_int);
+  int print_out();
 };
 
 

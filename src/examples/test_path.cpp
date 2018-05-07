@@ -7,14 +7,15 @@
 
 int main()
 {
-  std::string m_file_folder = "../../data/input_files_7link_fix";
+  // std::string m_file_folder = "../../data/input_files_7link_fix";
   // std::string m_file_folder = "../../data/input_files_philly";
+  std::string m_file_folder = "../../data/input_files_SR41_fix";
   MNM_ConfReader *m_config;
   MNM_Node_Factory *m_node_factory;
   MNM_Link_Factory *m_link_factory;
   MNM_OD_Factory *m_od_factory;
   PNEGraph m_graph;
-
+  printf("1\n");
   m_node_factory = new MNM_Node_Factory();
   m_link_factory = new MNM_Link_Factory();
   m_od_factory = new MNM_OD_Factory();
@@ -23,8 +24,9 @@ int main()
   MNM_IO::build_node_factory(m_file_folder, m_config, m_node_factory);
   MNM_IO::build_link_factory(m_file_folder, m_config, m_link_factory);
   MNM_IO::build_od_factory(m_file_folder, m_config, m_od_factory, m_node_factory);
+  printf("2\n");
   m_graph = MNM_IO::build_graph(m_file_folder, m_config);
-
+  printf("3\n");
   // std::map<TInt, TFlt> cost_map = std::map<TInt, TFlt>();
   // for (auto _it = m_link_factory -> m_link_map.begin(); _it != m_link_factory -> m_link_map.end(); ++_it){
   //   cost_map.insert(std::pair<TInt, TFlt>(_it -> first, TFlt(1)));

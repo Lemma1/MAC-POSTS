@@ -56,7 +56,7 @@ TFlt get_travel_time(MNM_Dlink* link, TFlt start_time)
 
 
 int add_dar_records(std::vector<dar_record*> &record, MNM_Dlink* link, 
-                    TFlt start_time, TFlt end_time)
+                    std::set<MNM_Path*> pathset, TFlt start_time, TFlt end_time)
 {
   if (link == NULL){
     throw std::runtime_error("Error, add_dar_records link is null");
@@ -64,17 +64,23 @@ int add_dar_records(std::vector<dar_record*> &record, MNM_Dlink* link,
   if (link -> m_N_in_tree == NULL){
     throw std::runtime_error("Error, add_dar_records link cummulative curve tree is not installed");
   }
+  MNM_Path* _path;
   for (auto path_it : link -> m_N_in_tree -> m_record){
-    for (auto depart_it : path_it.second){
-      TFlt tmp_flow = depart_it.second -> get_result(end_time) - depart_it.second -> get_result(start_time);
-      if (tmp_flow > DBL_EPSILON){
-        auto new_record = new dar_record();
-        new_record -> path_ID = path_it.first -> m_path_ID;
-        new_record -> assign_int = depart_it.first;
-        new_record -> link_ID = link -> m_link_ID;
-        new_record -> link_start_int = start_time;
-        new_record -> flow = tmp_flow;
-        record.push_back(new_record);
+    _path = path_it.first;
+    if (std::find(pathset.begin(), pathset.end(), _path) != pathset.end()) {
+      for (auto depart_it : path_it.second){
+        TFlt tmp_flow = depart_it.second -> get_result(end_time) - depart_it.second -> get_result(start_time);
+        if (tmp_flow > DBL_EPSILON){
+          auto new_record = new dar_record();
+          new_record -> path_ID = path_it.first -> m_path_ID;
+          new_record -> assign_int = depart_it.first;
+          new_record -> link_ID = link -> m_link_ID;
+          new_record -> link_start_int = start_time;
+          new_record -> flow = tmp_flow;
+          // printf("Adding record, %d, %d, %d, %f, %f\n", new_record -> path_ID(), new_record -> assign_int(), 
+          //     new_record -> link_ID(), (float)new_record -> link_start_int(), (float) new_record -> flow());
+          record.push_back(new_record);
+        }
       }
     }
   }
