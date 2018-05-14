@@ -32,7 +32,7 @@ int main()
 	bool _verbose = false;
 	bool output_link_cong = false; // if true output link congestion level every cong_frequency
 	TInt cong_frequency = 180; // 15 minutes
-	bool output_veh_locs = true; // if true output veh location every vis_frequency
+	bool output_veh_locs = false; // if true output veh location every vis_frequency
 	TInt vis_frequency = 60; // 5 minutes
 	MNM_Veh_Multiclass* _veh;
 	std::ofstream _vis_file;
@@ -70,6 +70,7 @@ int main()
 			}
 		}
 		_current_inter += 1;
+		// if (_current_inter > 2000) break;
 	}
 
 	if (output_veh_locs){
