@@ -53,6 +53,7 @@ int MNM_Dta::set_routing()
   if (m_config -> get_string("routing_type") == "Hybrid"){
     m_routing = new MNM_Routing_Hybrid(m_file_folder, m_graph, m_statistics,
                                    m_od_factory, m_node_factory, m_link_factory);
+    m_routing -> init_routing();
   }else if(m_config ->get_string("routing_type")=="Predetermined"){
     
     Path_Table *_path_table = MNM::build_pathset(m_graph, m_od_factory, m_link_factory);
@@ -203,8 +204,8 @@ bool MNM_Dta::is_ok()
 int MNM_Dta::pre_loading()
 {
   MNM_Dnode *_node;
-  printf("MNM: Prepare loading!\n");
-  m_routing -> init_routing();
+  // printf("MNM: Prepare loading!\n");
+  // m_routing -> init_routing();
   // printf("Finish prepare routing\n");
   m_statistics -> init_record();
   for (auto _node_it = m_node_factory -> m_node_map.begin(); _node_it != m_node_factory -> m_node_map.end(); _node_it++){
@@ -244,7 +245,7 @@ int MNM_Dta::load_once(bool verbose, TInt load_int, TInt assign_int)
       }
       else{
         if (m_config -> get_string("routing_type") == "Fixed"){
-          printf("Fixed Realsing.\n");
+          //printf("Fixed Realsing.\n");
           _origin -> release_one_interval(load_int, m_veh_factory, assign_int, TFlt(0));
         }
         else if((m_config -> get_string("routing_type") == "Hybrid")){

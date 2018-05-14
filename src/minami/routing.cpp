@@ -282,6 +282,7 @@ int MNM_Routing_Fixed::init_routing(Path_Table *path_table)
   }
   if (path_table != NULL){
     set_path_table(path_table);
+    printf("path_table set!!!\n");
   }
   
   return 0;
@@ -290,19 +291,19 @@ int MNM_Routing_Fixed::init_routing(Path_Table *path_table)
 
 int MNM_Routing_Fixed::change_choice_portion(TInt routing_interval)
 {
-  printf("Entering MNM_Routing_Fixed::change_choice_portion\n");
-  printf("Current routing interval %d\n", routing_interval);
+  // printf("Entering MNM_Routing_Fixed::change_choice_portion\n");
+  // printf("Current routing interval %d\n", routing_interval);
   MNM::copy_buffer_to_p(m_path_table, routing_interval);
-  printf("Finish copying\n");
+  // printf("Finish copying\n");
   MNM::normalize_path_table_p(m_path_table);
-  printf("Exiting MNM_Routing_Fixed::change_choice_portion\n");
+  // printf("Exiting MNM_Routing_Fixed::change_choice_portion\n");
   return 0;
 }
 
 
 int MNM_Routing_Fixed::update_routing(TInt timestamp)
 {
-  printf("MNM_Routing_Fixed::update_routing\n");
+  // printf("MNM_Routing_Fixed::update_routing\n");
   MNM_Origin *_origin;
   MNM_DMOND *_origin_node;
   TInt _node_ID, _next_link_ID;
@@ -314,8 +315,6 @@ int MNM_Routing_Fixed::update_routing(TInt timestamp)
       change_choice_portion(TInt(timestamp / m_routing_freq));
     }
   }
-
-
 
   for (auto _origin_it = m_od_factory->m_origin_map.begin(); _origin_it != m_od_factory->m_origin_map.end(); _origin_it++){
     // printf("1.1\n");
@@ -332,6 +331,7 @@ int MNM_Routing_Fixed::update_routing(TInt timestamp)
       if (m_tracker.find(_veh) == m_tracker.end()){
         // printf("Registering!\n");
         register_veh(_veh);
+        // printf("1.3\n");
         _next_link_ID = m_tracker.find(_veh) -> second -> front();
         _next_link = m_link_factory -> get_link(_next_link_ID);
         _veh -> set_next_link(_next_link);
@@ -340,7 +340,7 @@ int MNM_Routing_Fixed::update_routing(TInt timestamp)
     }
   }
 
-  printf("Finished route OD veh\n");
+  // printf("Finished route OD veh\n");
   MNM_Destination *_veh_dest;
   MNM_Dlink *_link;
   for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it ++){
@@ -389,6 +389,8 @@ int MNM_Routing_Fixed::update_routing(TInt timestamp)
 int MNM_Routing_Fixed::register_veh(MNM_Veh* veh)
 {
   TFlt _r = MNM_Ults::rand_flt();
+  // printf("%d\n", veh -> get_origin() -> m_origin_node  -> m_node_ID);
+  // printf("%d\n", veh -> get_destination() -> m_dest_node  -> m_node_ID);
   MNM_Pathset *_pathset = m_path_table -> find(veh -> get_origin() -> m_origin_node  -> m_node_ID) -> second
                         -> find(veh -> get_destination() -> m_dest_node  -> m_node_ID) -> second;
   MNM_Path *_route_path = NULL;
