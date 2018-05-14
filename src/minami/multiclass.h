@@ -478,8 +478,8 @@ int get_dar_matrix_multiclass(double **output, std::vector<MNM_Dlink*> links,
 class MNM_Cumulative_Emission_Multiclass : public MNM_Cumulative_Emission
 {
 public:
-  MNM_Cumulative_Emission(TFlt unit_time, TInt freq);
-  ~MNM_Cumulative_Emission();
+  MNM_Cumulative_Emission_Multiclass(TFlt unit_time, TInt freq);
+  ~MNM_Cumulative_Emission_Multiclass();
 
   // new functions for trucks
   TFlt calculate_fuel_rate_truck(TFlt v);
@@ -493,7 +493,7 @@ public:
 
   TFlt m_fuel_truck;
   TFlt m_CO2_truck;
-  TFlt m_HC_truck
+  TFlt m_HC_truck;
   TFlt m_CO_truck;
   TFlt m_NOX_truck;
   TFlt m_VMT_truck;
