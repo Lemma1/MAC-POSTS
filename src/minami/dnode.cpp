@@ -1,5 +1,7 @@
 #include "dnode.h"
 
+#include "path.h"
+
 #include <algorithm>
 
 MNM_Dnode::MNM_Dnode(TInt ID, TFlt flow_scalar)
@@ -309,6 +311,7 @@ int MNM_Dnode_Inout::record_cumulative_curve(TInt timestamp)
       _temp_sum += _num_to_move;
     }
     if (_out_link -> m_N_out != NULL) {
+      // printf("record out link cc: link ID %d, time %d, value %f\n", _out_link -> m_link_ID(), timestamp()+1, (float) TFlt(_temp_sum)/m_flow_scalar);
       _out_link -> m_N_in -> add_increment(std::pair<TFlt, TFlt>(TFlt(timestamp+1), TFlt(_temp_sum)/m_flow_scalar));
     }
   }
@@ -322,6 +325,7 @@ int MNM_Dnode_Inout::record_cumulative_curve(TInt timestamp)
       _temp_sum += _num_to_move;
     }
     if (_in_link -> m_N_in != NULL) {
+      // printf("record in link cc: link ID %d, time %d, value %f\n", _in_link -> m_link_ID(), timestamp()+1, (float) TFlt(_temp_sum)/m_flow_scalar);
       _in_link -> m_N_out -> add_increment(std::pair<TFlt, TFlt>(TFlt(timestamp+1), TFlt(_temp_sum)/m_flow_scalar));
     }
   }
@@ -367,11 +371,13 @@ int MNM_Dnode_Inout::move_vehicle(TInt timestamp)
             _veh -> set_current_link(_out_link);
             _veh_it = _in_link->m_finished_array.erase(_veh_it); //c++ 11
             _num_to_move -= 1;
-            if (_out_link -> m_N_out_tree != NULL) {
-              _out_link -> m_N_out_tree -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+            if (_out_link -> m_N_in_tree != NULL) {
+              // printf("record out link cc tree: link ID %d, time %d, path id %d, assign interval %d\n", _out_link -> m_link_ID(), timestamp()+1, _veh -> m_path -> m_path_ID(), _veh -> m_assign_interval());
+              _out_link -> m_N_in_tree -> add_flow(TFlt(timestamp + 1), TFlt(1)/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
             }
-            if (_in_link -> m_N_in_tree != NULL) {
-              _in_link -> m_N_in_tree -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+            if (_in_link -> m_N_out_tree != NULL) {
+              // printf("record in link cc tree: link ID %d, time %d, path id %d, assign interval %d\n", _in_link -> m_link_ID(), timestamp()+1, _veh -> m_path -> m_path_ID(), _veh -> m_assign_interval());
+              _in_link -> m_N_out_tree -> add_flow(TFlt(timestamp + 1), TFlt(1)/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
             }
           }
           else {

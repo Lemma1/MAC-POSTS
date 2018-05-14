@@ -663,6 +663,7 @@ int MNM_Cumulative_Curve::shrink(TInt number)
 
 int MNM_Cumulative_Curve::add_increment(std::pair<TFlt, TFlt> r)
 {
+  // printf("Add increment time %f with flow %f\n", r.first, r.second);
   if (m_recorder.size() == 0){
     add_record(r);
     return 0;
@@ -673,9 +674,11 @@ int MNM_Cumulative_Curve::add_increment(std::pair<TFlt, TFlt> r)
     throw std::runtime_error("Error, MNM_Cumulative_Curve::add_increment, early time index");
   }
   if (r.first == _best.first){
+    // printf("Incrementing\n");
     m_recorder[m_recorder.size() - 1].second += r.second;
   }
   else{
+    // printf("Pushing\n");
     r.second += _best.second;
     // printf("New r is <%lf, %lf>\n", r.first(), r.second());
     m_recorder.push_back(r); 
@@ -685,7 +688,7 @@ int MNM_Cumulative_Curve::add_increment(std::pair<TFlt, TFlt> r)
 }
 
 
-TFlt MNM_Cumulative_Curve::get_result(TFlt time)
+TFlt MNM_Cumulative_Curve::get_approximated_result(TFlt time)
 {
   // arrange();
   if (m_recorder.size() == 0){
@@ -702,6 +705,30 @@ TFlt MNM_Cumulative_Curve::get_result(TFlt time)
       return m_recorder[i-1].second 
           + (m_recorder[i].second - m_recorder[i-1].second)/(m_recorder[i].first - m_recorder[i-1].first)
             * (time - m_recorder[i-1].first);
+    }
+  }
+  return m_recorder.back().second;
+}
+
+
+TFlt MNM_Cumulative_Curve::get_result(TFlt time)
+{
+  // arrange();
+  if (m_recorder.size() == 0){
+    return TFlt(0);
+  }
+  if (m_recorder.size() == 1){
+    return m_recorder[0].second;
+  }
+  if (m_recorder[0].first >= time){
+    return m_recorder[0].second;
+  }
+  for (size_t i=1; i<m_recorder.size(); ++i){
+    if (m_recorder[i].first > time){
+      return m_recorder[i - 1].second;
+    }
+    else if (m_recorder[i].first == time) {
+      return m_recorder[i].second;
     }
   }
   return m_recorder.back().second;
