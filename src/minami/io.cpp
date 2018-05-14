@@ -435,7 +435,7 @@ Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph,
   TInt _from_ID, _to_ID, _link_ID;
   TInt _path_ID_counter = 0;
   if (_path_table_file.is_open()){
-    for (int i=0; i<Num_Path; ++i){
+    for (int i = 0; i < Num_Path; ++i){
       std::getline(_path_table_file,_line);
       if (w_buffer){
         std::getline(_buffer_file,_buffer_line);
@@ -491,6 +491,8 @@ Path_Table *MNM_IO::load_path_table(std::string file_name, PNEGraph graph,
   }
   printf("Finish Loading Path Table!\n");
   // printf("path table %p\n", _path_table);
+  // printf("path table %s\n", _path_table -> find(100283) -> second -> find(150153) -> second 
+  //                           -> m_path_vec.front() -> node_vec_to_string());
   return _path_table;
 }
 

@@ -1435,14 +1435,15 @@ int MNM_Origin_Multiclass::add_dest_demand_multiclass(MNM_Destination_Multiclass
 													TFlt* demand_car, 
 													TFlt* demand_truck)
 {
-  	TFlt* _demand_car = (TFlt*) malloc(sizeof(TFlt) * m_max_assign_interval);
-  	for (int i = 0; i < m_max_assign_interval; ++i) {
+	// split (15-mins demand) to (15 * 1-minute demand)
+  	TFlt* _demand_car = (TFlt*) malloc(sizeof(TFlt) * m_max_assign_interval * 15);
+  	for (int i = 0; i < m_max_assign_interval * 15; ++i) {
   		_demand_car[i] =  TFlt(demand_car[i]);
   	}
   	m_demand_car.insert({dest, _demand_car});
 
-  	TFlt* _demand_truck = (TFlt*) malloc(sizeof(TFlt) * m_max_assign_interval);
-  	for (int i = 0; i < m_max_assign_interval; ++i) {
+  	TFlt* _demand_truck = (TFlt*) malloc(sizeof(TFlt) * m_max_assign_interval * 15);
+  	for (int i = 0; i < m_max_assign_interval * 15; ++i) {
   		_demand_truck[i] =  TFlt(demand_truck[i]);
   	}
   	m_demand_truck.insert({dest, _demand_truck});
@@ -1452,33 +1453,33 @@ int MNM_Origin_Multiclass::add_dest_demand_multiclass(MNM_Destination_Multiclass
 
 int MNM_Origin_Multiclass::release(MNM_Veh_Factory* veh_factory, TInt current_interval)
 {
-  	if ((m_current_assign_interval < m_max_assign_interval) && (current_interval % m_frequency == 0)){
-    	TInt _veh_to_release;
-    	MNM_Veh_Multiclass *_veh;
-    	MNM_Veh_Factory_Multiclass *_vfactory = dynamic_cast<MNM_Veh_Factory_Multiclass *>(veh_factory);
-    	// release all car
-	    for (auto _demand_it = m_demand_car.begin(); _demand_it != m_demand_car.end(); _demand_it++) {
-	    	_veh_to_release = TInt(MNM_Ults::round((_demand_it -> second)[m_current_assign_interval] * m_flow_scalar));
-	      	for (int i = 0; i < _veh_to_release; ++i) {
-		        _veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(0));
-		        _veh -> set_destination(_demand_it -> first);
-		        _veh -> set_origin(this);
-		        m_origin_node -> m_in_veh_queue.push_back(_veh);
-	      	}
-	    }
-	    // release all truck
-	    for (auto _demand_it = m_demand_truck.begin(); _demand_it != m_demand_truck.end(); _demand_it++) {
-	    	_veh_to_release = TInt(MNM_Ults::round((_demand_it -> second)[m_current_assign_interval] * m_flow_scalar));
-	      	for (int i = 0; i < _veh_to_release; ++i) {
-		        _veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(1));
-		        _veh -> set_destination(_demand_it -> first);
-		        _veh -> set_origin(this);
-		        m_origin_node -> m_in_veh_queue.push_back(_veh);
-	      	}
-	    }
-	    m_current_assign_interval++;
-  	}
-  	random_shuffle(m_origin_node -> m_in_veh_queue.begin(), m_origin_node -> m_in_veh_queue.end());
+  	// if ((m_current_assign_interval < m_max_assign_interval) && (current_interval % m_frequency == 0)){
+   //  	TInt _veh_to_release;
+   //  	MNM_Veh_Multiclass *_veh;
+   //  	MNM_Veh_Factory_Multiclass *_vfactory = dynamic_cast<MNM_Veh_Factory_Multiclass *>(veh_factory);
+   //  	// release all car
+	  //   for (auto _demand_it = m_demand_car.begin(); _demand_it != m_demand_car.end(); _demand_it++) {
+	  //   	_veh_to_release = TInt(MNM_Ults::round((_demand_it -> second)[m_current_assign_interval] * m_flow_scalar));
+	  //     	for (int i = 0; i < _veh_to_release; ++i) {
+		 //        _veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(0));
+		 //        _veh -> set_destination(_demand_it -> first);
+		 //        _veh -> set_origin(this);
+		 //        m_origin_node -> m_in_veh_queue.push_back(_veh);
+	  //     	}
+	  //   }
+	  //   // release all truck
+	  //   for (auto _demand_it = m_demand_truck.begin(); _demand_it != m_demand_truck.end(); _demand_it++) {
+	  //   	_veh_to_release = TInt(MNM_Ults::round((_demand_it -> second)[m_current_assign_interval] * m_flow_scalar));
+	  //     	for (int i = 0; i < _veh_to_release; ++i) {
+		 //        _veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(1));
+		 //        _veh -> set_destination(_demand_it -> first);
+		 //        _veh -> set_origin(this);
+		 //        m_origin_node -> m_in_veh_queue.push_back(_veh);
+	  //     	}
+	  //   }
+	  //   m_current_assign_interval++;
+  	// }
+  	// random_shuffle(m_origin_node -> m_in_veh_queue.begin(), m_origin_node -> m_in_veh_queue.end());
   	return 0;
 }
 
@@ -2043,8 +2044,7 @@ int MNM_Dta_Multiclass::build_from_files()
 int MNM_Dta_Multiclass::pre_loading()
 {
 	MNM_Dnode *_node;
-	printf("MNM: Prepare loading!\n");
-	m_routing -> init_routing();
+	// printf("MNM: Prepare loading!\n");
 	m_statistics -> init_record();
 	for (auto _node_it = m_node_factory -> m_node_map.begin(); _node_it != m_node_factory -> m_node_map.end(); _node_it++){
 		_node = _node_it -> second;
@@ -2174,7 +2174,7 @@ int get_dar_matrix_multiclass(double **output, std::vector<MNM_Dlink*> links,
 *******************************************************************************************************************
 ******************************************************************************************************************/
 MNM_Cumulative_Emission_Multiclass::MNM_Cumulative_Emission_Multiclass(TFlt unit_time, TInt freq)
-	: MNM_Cumulative_Emission::MNM_Cumulative_Emission(TFlt unit_time, TInt freq)
+	: MNM_Cumulative_Emission::MNM_Cumulative_Emission(unit_time, freq)
 {
 	m_fuel_truck = TFlt(0);
 	m_CO2_truck = TFlt(0);
@@ -2194,7 +2194,7 @@ MNM_Cumulative_Emission_Multiclass::~MNM_Cumulative_Emission_Multiclass()
 TFlt MNM_Cumulative_Emission_Multiclass::calculate_fuel_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;
-	TFlt _fuel_rate_car = calculate_fuel_rate(TFlt v);
+	TFlt _fuel_rate_car = calculate_fuel_rate(v);
 	TFlt _fuel_rate_truck = _fuel_rate_car * _convert_factor;
 	return _fuel_rate_truck;
 }
@@ -2202,7 +2202,7 @@ TFlt MNM_Cumulative_Emission_Multiclass::calculate_fuel_rate_truck(TFlt v)
 TFlt MNM_Cumulative_Emission_Multiclass::calculate_CO2_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;
-	TFlt _CO2_rate_car = calculate_CO2_rate(TFlt v);
+	TFlt _CO2_rate_car = calculate_CO2_rate(v);
 	TFlt _CO2_rate_truck = _CO2_rate_car * _convert_factor;
 	return _CO2_rate_truck;
 }
@@ -2210,7 +2210,7 @@ TFlt MNM_Cumulative_Emission_Multiclass::calculate_CO2_rate_truck(TFlt v)
 TFlt MNM_Cumulative_Emission_Multiclass::calculate_HC_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;
-	TFlt _HC_rate_car = calculate_HC_rate(TFlt v);
+	TFlt _HC_rate_car = calculate_HC_rate(v);
 	TFlt _HC_rate_truck = _HC_rate_car * _convert_factor;
 	return _HC_rate_truck;
 }
@@ -2218,7 +2218,7 @@ TFlt MNM_Cumulative_Emission_Multiclass::calculate_HC_rate_truck(TFlt v)
 TFlt MNM_Cumulative_Emission_Multiclass::calculate_CO_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;
-	TFlt _CO_rate_car = calculate_CO2_rate(TFlt v);
+	TFlt _CO_rate_car = calculate_CO2_rate(v);
 	TFlt _CO_rate_truck = _CO_rate_car * _convert_factor;
 	return _CO_rate_truck;
 }
@@ -2226,7 +2226,7 @@ TFlt MNM_Cumulative_Emission_Multiclass::calculate_CO_rate_truck(TFlt v)
 TFlt MNM_Cumulative_Emission_Multiclass::calculate_NOX_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;
-	TFlt _NOX_rate_car = calculate_CO2_rate(TFlt v);
+	TFlt _NOX_rate_car = calculate_CO2_rate(v);
 	TFlt _NOX_rate_truck = _NOX_rate_car * _convert_factor;
 	return _NOX_rate_truck;
 }
