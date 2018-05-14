@@ -102,7 +102,7 @@ int MNM_Dta::build_from_files()
   // std::cout << test_dta -> m_od_factory -> m_destination_map.size() << "\n";
   m_graph = MNM_IO::build_graph(m_file_folder, m_config);
   MNM_IO::build_demand(m_file_folder, m_config, m_od_factory);
-  build_workzone();
+  //build_workzone();
   set_statistics();
   set_routing();
   return 0;  
@@ -212,7 +212,7 @@ int MNM_Dta::pre_loading()
     // printf("Node ID: %d\n", _node -> m_node_ID);
     _node -> prepare_loading();
   }
-  m_workzone -> init_workzone();
+  //m_workzone -> init_workzone();
 
   // MNM_Dlink *_link;
   // for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){

@@ -9,7 +9,7 @@ class MNM_Cumulative_Emission
 {
 public:
   MNM_Cumulative_Emission(TFlt unit_time, TInt freq);
-  ~MNM_Cumulative_Emission();
+  virtual ~MNM_Cumulative_Emission();
   std::vector<MNM_Dlink*> m_link_vector;
   int register_link(MNM_Dlink *link);
   // v should be in mile/hour
@@ -21,8 +21,8 @@ public:
   TFlt calculate_CO_rate(TFlt v);
   TFlt calculate_NOX_rate(TFlt v);
 
-  int update();
-  int output();
+  int virtual update();
+  int virtual output();
 
   TFlt m_fuel;
   TFlt m_CO2;

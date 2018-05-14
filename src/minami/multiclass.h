@@ -6,6 +6,7 @@
 #include "vehicle.h"
 #include "dta.h"
 #include "dta_gradient_utls.h"
+#include "emission.h"
 
 class MNM_Destination_Multiclass;
 
@@ -467,6 +468,36 @@ int get_dar_matrix_multiclass(double **output, std::vector<MNM_Dlink*> links,
 };
 
 
+
+
+/******************************************************************************************************************
+*******************************************************************************************************************
+											Multiclass Emissions
+*******************************************************************************************************************
+******************************************************************************************************************/
+class MNM_Cumulative_Emission_Multiclass : public MNM_Cumulative_Emission
+{
+public:
+  MNM_Cumulative_Emission(TFlt unit_time, TInt freq);
+  ~MNM_Cumulative_Emission();
+
+  // new functions for trucks
+  TFlt calculate_fuel_rate_truck(TFlt v);
+  TFlt calculate_CO2_rate_truck(TFlt v);
+  TFlt calculate_HC_rate_truck(TFlt v);
+  TFlt calculate_CO_rate_truck(TFlt v);
+  TFlt calculate_NOX_rate_truck(TFlt v);
+
+  int virtual update() override;
+  int virtual output() override;
+
+  TFlt m_fuel_truck;
+  TFlt m_CO2_truck;
+  TFlt m_HC_truck
+  TFlt m_CO_truck;
+  TFlt m_NOX_truck;
+  TFlt m_VMT_truck;
+};
 
 
 #endif              
