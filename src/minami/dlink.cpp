@@ -734,6 +734,28 @@ TFlt MNM_Cumulative_Curve::get_result(TFlt time)
   return m_recorder.back().second;
 }
 
+// TFlt MNM_Cumulative_Curve::get_time(TFlt result)
+// {
+//   // arrange2();
+//   if (m_recorder.size() == 0){
+//     return TFlt(-1);
+//   }
+//   if (m_recorder[0].second >= result){
+//     return TFlt(-1);
+//   }
+//   if (m_recorder.size() == 1){
+//     return TFlt(-1);
+//   }
+//   for (size_t i= m_recorder.size() - 1; i >= 0; --i){
+//     if (m_recorder[i].second <= result){
+//       return m_recorder[i].first 
+//           + (m_recorder[i+1].first - m_recorder[i].first)/(m_recorder[i+1].second - m_recorder[i].second)
+//             * (result - m_recorder[i].second);
+//     }
+//   }
+//   return TFlt(-1);
+// }
+
 TFlt MNM_Cumulative_Curve::get_time(TFlt result)
 {
   // arrange2();
@@ -746,11 +768,11 @@ TFlt MNM_Cumulative_Curve::get_time(TFlt result)
   if (m_recorder.size() == 1){
     return TFlt(-1);
   }
-  for (size_t i= m_recorder.size() - 1; i >= 0; --i){
-    if (m_recorder[i].second <= result){
+  for (size_t i = 1; i < m_recorder.size(); ++i){
+    if (m_recorder[i].second >= result){
       return m_recorder[i].first 
-          + (m_recorder[i+1].first - m_recorder[i].first)/(m_recorder[i+1].second - m_recorder[i].second)
-            * (result - m_recorder[i].second);
+            - (m_recorder[i].first - m_recorder[i-1].first)
+            * (m_recorder[i].second - result) / (m_recorder[i].second - m_recorder[i - 1].second);
     }
   }
   return TFlt(-1);

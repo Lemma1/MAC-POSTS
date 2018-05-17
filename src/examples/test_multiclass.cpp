@@ -30,9 +30,9 @@ int main()
 
 	printf("\n\n\n====================================== Start loading! =======================================\n");
 	bool _verbose = false;
-	bool output_link_cong = false; // if true output link congestion level every cong_frequency
+	bool output_link_cong = true; // if true output link congestion level every cong_frequency
 	TInt cong_frequency = 180; // 15 minutes
-	bool output_veh_locs = false; // if true output veh location every vis_frequency
+	bool output_veh_locs = true; // if true output veh location every vis_frequency
 	TInt vis_frequency = 60; // 5 minutes
 	MNM_Veh_Multiclass* _veh;
 	std::ofstream _vis_file;
@@ -100,7 +100,9 @@ int main()
 					_str += std::to_string(MNM_DTA_GRADIENT::get_travel_time_car(_link_m, TFlt(_iter + 1))) + " ";
 					_str += std::to_string(MNM_DTA_GRADIENT::get_travel_time_truck(_link_m, TFlt(_iter + 1))) + " ";
 					_str += std::to_string(_link_m -> get_link_freeflow_tt_car()) + " ";
-					_str += std::to_string(_link_m -> get_link_freeflow_tt_truck()) + "\n";
+					_str += std::to_string(_link_m -> get_link_freeflow_tt_truck()) + " ";
+					_str += std::to_string(_link_m -> m_length/MNM_DTA_GRADIENT::get_travel_time_car(_link_m, TFlt(_iter + 1))*3600/1600) + " ";
+					_str += std::to_string(_link_m -> m_length/MNM_DTA_GRADIENT::get_travel_time_truck(_link_m, TFlt(_iter + 1))*3600/1600) + "\n";
 					_vis_file2 << _str;
 				}
 			}

@@ -116,14 +116,14 @@ MNM_Dlink_Ctm_Multiclass::MNM_Dlink_Ctm_Multiclass(TInt ID,
 		exit(-1);
 	}
 	// Jam density for private cars cannot be too large
-	if (lane_hold_cap_car > TFlt(300) / TFlt(1600)){
+	if (lane_hold_cap_car > TFlt(400) / TFlt(1600)){
 		// "lane_hold_cap is too large, set to 300 veh/mile
-		lane_hold_cap_car = TFlt(300) / TFlt(1600);
+		lane_hold_cap_car = TFlt(400) / TFlt(1600);
 	}
 	// Jam density for trucks cannot be too large !!!NEED CHECK FOR THRESHOLD!!!
-	if (lane_hold_cap_truck > TFlt(300) / TFlt(1600)){
+	if (lane_hold_cap_truck > TFlt(400) / TFlt(1600)){
 		// "lane_hold_cap is too large, set to 300 veh/mile
-		lane_hold_cap_truck = TFlt(300) / TFlt(1600);
+		lane_hold_cap_truck = TFlt(400) / TFlt(1600);
 	}
 
 	// Maximum flux for private cars and trucks cannot be negative
@@ -656,7 +656,7 @@ int MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::update_perceived_density()
 	TFlt _density_truck = _real_volume_truck / m_cell_length;
 
 	TFlt _space_fraction_car, _space_fraction_truck;
-	
+	// printf("0");
 	// Free-flow traffic (free-flow for both car and truck classes)
 	if (_density_car/m_critical_density_car + _density_truck/m_critical_density_truck <= 1) {
 		_space_fraction_car = _density_car/m_critical_density_car;
@@ -671,6 +671,7 @@ int MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::update_perceived_density()
 			m_space_fraction_car = _space_fraction_car / (_space_fraction_car + _space_fraction_truck);
 			m_space_fraction_truck = _space_fraction_truck / (_space_fraction_car + _space_fraction_truck);
 		}
+		// printf("-1, %.4f, %.4f", m_space_fraction_car, m_space_fraction_truck);
 	}
 	// Semi-congested traffic (truck free-flow but car not)
 	else if ((_density_truck / m_critical_density_truck < 1) && 
@@ -681,6 +682,7 @@ int MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::update_perceived_density()
 		m_perceived_density_truck = m_critical_density_truck;
 		m_space_fraction_car = _space_fraction_car;
 		m_space_fraction_truck = _space_fraction_truck;
+		// printf("-2, %.4f, %.4f", m_space_fraction_car, m_space_fraction_truck);
 	}
 	// Fully congested traffic (both car and truck not free-flow)
 	// this case should satisfy: 1. m_perceived_density_car > m_rho_1_N
@@ -716,8 +718,9 @@ int MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::update_perceived_density()
 		}
 		m_space_fraction_car = _space_fraction_car;
 		m_space_fraction_truck = _space_fraction_truck;
+		// printf("-3, %.4f, %.4f", m_space_fraction_car, m_space_fraction_truck);
 	}
-	
+	// printf("\n");
 	return 0;
 }
 
@@ -785,6 +788,7 @@ MNM_Dlink_Pq_Multiclass::~MNM_Dlink_Pq_Multiclass()
 TFlt MNM_Dlink_Pq_Multiclass::get_link_supply()
 {
 	return m_lane_flow_cap * TFlt(m_number_of_lane) * m_unit_time;
+	// return 9999999;
 }
 
 int MNM_Dlink_Pq_Multiclass::clear_incoming_array() {
@@ -1190,25 +1194,25 @@ int MNM_Dnode_Inout_Multiclass::move_vehicle(TInt timestamp)
 								_veh -> set_current_link(_out_link);
 								if (_veh -> m_class == 0){
 									m_veh_moved_car[i * _offset + j] += 1;
-									_olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
-									_ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
-									if (_olink -> m_N_out_tree_car != NULL) {
-										_olink -> m_N_out_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
-									}
-									if (_ilink -> m_N_in_tree_car != NULL) {
-										_ilink -> m_N_in_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
-									}
+									// _olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
+									// _ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
+									// if (_olink -> m_N_out_tree_car != NULL) {
+									// 	_olink -> m_N_out_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+									// }
+									// if (_ilink -> m_N_in_tree_car != NULL) {
+									// 	_ilink -> m_N_in_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+									// }
 								}
 								else {
 									m_veh_moved_truck[i * _offset + j] += 1;
-									_olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
-									_ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
-									if (_olink -> m_N_out_tree_truck != NULL) {
-										_olink -> m_N_out_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
-									}
-									if (_ilink -> m_N_in_tree_truck != NULL) {
-										_ilink -> m_N_in_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
-									}
+									// _olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
+									// _ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
+									// if (_olink -> m_N_out_tree_truck != NULL) {
+									// 	_olink -> m_N_out_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+									// }
+									// if (_ilink -> m_N_in_tree_truck != NULL) {
+									// 	_ilink -> m_N_in_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+									// }
 								}
 								_veh_it = _in_link -> m_finished_array.erase(_veh_it);
 							}
@@ -1218,25 +1222,25 @@ int MNM_Dnode_Inout_Multiclass::move_vehicle(TInt timestamp)
 							_veh -> set_current_link(_out_link);
 							if (_veh -> m_class == 0){
 								m_veh_moved_car[i * _offset + j] += 1;
-								_olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
-								_ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
-								if (_olink -> m_N_out_tree_car != NULL) {
-									_olink -> m_N_out_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
-								}
-								if (_ilink -> m_N_in_tree_car != NULL) {
-									_ilink -> m_N_in_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
-								}
+								// _olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
+								// _ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
+								// if (_olink -> m_N_out_tree_car != NULL) {
+								// 	_olink -> m_N_out_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+								// }
+								// if (_ilink -> m_N_in_tree_car != NULL) {
+								// 	_ilink -> m_N_in_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+								// }
 							}
 							else {
 								m_veh_moved_truck[i * _offset + j] += 1;
-								_olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
-								_ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
-								if (_olink -> m_N_out_tree_truck != NULL) {
-									_olink -> m_N_out_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
-								}
-								if (_ilink -> m_N_in_tree_truck != NULL) {
-									_ilink -> m_N_in_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
-								}
+								// _olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
+								// _ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
+								// if (_olink -> m_N_out_tree_truck != NULL) {
+								// 	_olink -> m_N_out_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+								// }
+								// if (_ilink -> m_N_in_tree_truck != NULL) {
+								// 	_ilink -> m_N_in_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+								// }
 							}
 							_veh_it = _in_link -> m_finished_array.erase(_veh_it);
 						}
