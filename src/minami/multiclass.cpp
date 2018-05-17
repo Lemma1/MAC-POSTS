@@ -2193,8 +2193,8 @@ MNM_Cumulative_Emission_Multiclass::~MNM_Cumulative_Emission_Multiclass()
 	;
 }
 
-// All convert_factors from MOVES
-// Reference: 
+// All convert_factors from MOVES, to be done...
+// Reference: MOVES default database
 TFlt MNM_Cumulative_Emission_Multiclass::calculate_fuel_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;

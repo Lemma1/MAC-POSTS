@@ -30,7 +30,7 @@ int main()
 
 	printf("\n\n\n====================================== Start loading! =======================================\n");
 	bool _verbose = false;
-	bool output_link_cong = true; // if true output link congestion level every cong_frequency
+	bool output_link_cong = false; // if true output link congestion level every cong_frequency
 	TInt cong_frequency = 180; // 15 minutes
 	bool output_veh_locs = true; // if true output veh location every vis_frequency
 	TInt vis_frequency = 60; // 5 minutes
@@ -72,6 +72,25 @@ int main()
 		_current_inter += 1;
 		// if (_current_inter > 2000) break;
 	}
+
+	// Output total travels and travel time, before divided by flow_scalar
+	TInt _count_car = 0, _count_truck = 0;
+	TFlt _tot_tt = 0.0;
+	for (auto _map_it : test_dta -> m_veh_factory -> m_veh_map){
+		if (_map_it.second -> m_finish_time > 0) {
+			_veh = dynamic_cast<MNM_Veh_Multiclass *>(_map_it.second);
+			if (_veh -> m_class == 0){
+				_count_car += 1;
+			}
+			else {
+				_count_truck += 1;
+			}
+			_tot_tt += (_veh -> m_finish_time - _veh -> m_start_time) * 5.0 / 3600.0;
+		}
+	}
+	printf("\n\n\nTotal car: %d, Total truck: %d, Total tt: %.2f hours\n\n\n\n", int(_count_car), int(_count_truck), float(_tot_tt));
+
+
 
 	if (output_veh_locs){
 		if (_vis_file.is_open()) _vis_file.close();
@@ -126,22 +145,22 @@ int main()
 	// 		}
 	// }
 
-
-	// for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); 
-	// 			  _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
-	// 		_link = _link_it -> second;
-	// 	if (_link -> m_link_ID() == 3){
-	// 		_link_m = dynamic_cast<MNM_Dlink_Multiclass*>(_link);
-	// 		printf("m_N_in_car: \n");
-	// 		std::cout <<_link_m -> m_N_in_car -> to_string() << std::endl;
-	// 		printf("m_N_out_car: \n");
-	// 		std::cout <<_link_m -> m_N_out_car -> to_string() << std::endl;
-	// 		printf("m_N_in_truck: \n");
-	// 		std::cout <<_link_m -> m_N_in_truck -> to_string() << std::endl;
-	// 		printf("m_N_out_truck: \n");
-	// 		std::cout <<_link_m -> m_N_out_truck -> to_string() << std::endl;
-	// 	}
-	// }
+	// output CC of some special links
+	for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); 
+				  _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
+			_link = _link_it -> second;
+		if (_link -> m_link_ID() == 4901){
+			_link_m = dynamic_cast<MNM_Dlink_Multiclass*>(_link);
+			printf("\n\nm_N_in_car: \n");
+			std::cout <<_link_m -> m_N_in_car -> to_string() << std::endl;
+			printf("\n\nm_N_out_car: \n");
+			std::cout <<_link_m -> m_N_out_car -> to_string() << std::endl;
+			printf("\n\nm_N_in_truck: \n");
+			std::cout <<_link_m -> m_N_in_truck -> to_string() << std::endl;
+			printf("\n\nm_N_out_truck: \n");
+			std::cout <<_link_m -> m_N_out_truck -> to_string() << std::endl;
+		}
+	}
 
 	return 0;
 }
