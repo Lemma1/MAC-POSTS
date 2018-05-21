@@ -750,6 +750,38 @@ TFlt MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::get_perceived_supply(TInt ve
 	return std::max(TFlt(0.0), _tmp) * m_unit_time;
 }
 
+
+/**************************************************************************
+							Multiclass Link-Queue Model
+**************************************************************************/
+MNM_Dlink_Lq_Multiclass::MNM_Dlink_Lq_Multiclass(TInt ID,
+												TInt number_of_lane,
+												TFlt length,
+												TFlt lane_hold_cap_car,
+												TFlt lane_hold_cap_truck,
+												TFlt lane_flow_cap_car,
+												TFlt lane_flow_cap_truck,
+												TFlt ffs_car,
+												TFlt ffs_truck,
+												TFlt unit_time,
+												TFlt veh_convert_factor,
+												TFlt flow_scalar)
+  : MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(ID, number_of_lane, length, ffs_car, ffs_truck)
+{
+	m_lane_hold_cap = lane_hold_cap_car;
+	m_lane_flow_cap = lane_flow_cap_car;
+	m_flow_scalar = flow_scalar;
+	m_hold_cap = m_lane_hold_cap * TFlt(number_of_lane) * m_length;
+	m_max_stamp = MNM_Ults::round(m_length/(ffs_car * unit_time));
+	// printf("m_max_stamp = %d\n", m_max_stamp);
+	m_veh_pool = std::unordered_map<MNM_Veh*, TInt>();
+	m_volume_car = TInt(0);
+	m_volume_truck = TInt(0);
+	m_unit_time = unit_time;
+	m_veh_convert_factor = veh_convert_factor;
+}
+
+
 /**************************************************************************
 							Multiclass Point-Queue Model
 **************************************************************************/
