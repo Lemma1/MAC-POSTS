@@ -772,14 +772,21 @@ MNM_Dlink_Lq_Multiclass::MNM_Dlink_Lq_Multiclass(TInt ID,
 	m_lane_flow_cap = lane_flow_cap_car;
 	m_flow_scalar = flow_scalar;
 	m_hold_cap = m_lane_hold_cap * TFlt(number_of_lane) * m_length;
-	m_max_stamp = MNM_Ults::round(m_length/(ffs_car * unit_time));
-	// printf("m_max_stamp = %d\n", m_max_stamp);
-	m_veh_pool = std::unordered_map<MNM_Veh*, TInt>();
+	m_C = lane_flow_cap_car * TFlt(m_number_of_lane);
+ 	m_k_c = m_lane_flow_cap / m_ffs * TFlt(m_number_of_lane);
+
+	m_veh_queue_car = std::deque<MNM_Veh*>();
+	m_veh_queue_truck = std::deque<MNM_Veh*>();
+	m_veh_out_buffer_car = std::deque<MNM_Veh*>();
+	m_veh_out_buffer_truck = std::deque<MNM_Veh*>();
 	m_volume_car = TInt(0);
 	m_volume_truck = TInt(0);
 	m_unit_time = unit_time;
 	m_veh_convert_factor = veh_convert_factor;
 }
+
+
+
 
 
 /**************************************************************************
@@ -799,6 +806,8 @@ MNM_Dlink_Pq_Multiclass::MNM_Dlink_Pq_Multiclass(TInt ID,
 												TFlt flow_scalar)
   : MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(ID, number_of_lane, length, ffs_car, ffs_truck)
 {
+	// PQ only used for OD connectors, cap/rhoj are all 99999 
+	// so no need to use truck parameters
 	m_lane_hold_cap = lane_hold_cap_car;
 	m_lane_flow_cap = lane_flow_cap_car;
 	m_flow_scalar = flow_scalar;
