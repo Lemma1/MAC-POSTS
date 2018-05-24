@@ -585,7 +585,7 @@ TFlt MNM_Dlink_Lq::get_flow_from_density(TFlt density)
   }
   else {
     TFlt _w = m_lane_flow_cap / (m_lane_hold_cap - m_lane_flow_cap / m_ffs);
-    _flow = _w * density;
+    _flow = _w * density; // ????
   }
   return _flow; 
 }

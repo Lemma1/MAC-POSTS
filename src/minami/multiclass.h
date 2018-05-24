@@ -179,6 +179,7 @@ public:
 	void virtual print_info() override;
 	TFlt virtual get_link_flow() override;
 	TFlt virtual get_link_tt() override;
+	int update_perceived_density();
 
 	std::deque<MNM_Veh*> m_veh_queue_car;
 	std::deque<MNM_Veh*> m_veh_queue_truck;
@@ -187,12 +188,21 @@ public:
 
 	TInt m_volume_car; //vehicle number, without the flow scalar
 	TInt m_volume_truck; //vehicle number, without the flow scalar
-	TFlt m_lane_hold_cap;
-	TFlt m_lane_flow_cap;
 	TFlt m_flow_scalar;
-	TFlt m_hold_cap;
-	TFlt m_C;
-	TFlt m_k_C;
+	TFlt m_k_j_car; //jam density
+	TFlt m_k_j_truck; //jam density
+	TFlt m_C_car; //maximum free flow capacity
+	TFlt m_C_truck; //maximum free flow capacity
+	TFlt m_k_C_car; //maximum free flow density
+	TFlt m_k_C_truck; //maximum free flow density
+	TFlt m_w_car; //backward wave speed
+	TFlt m_w_truck; //backward wave speed
+	TFlt m_rho_1_N;
+
+	TFlt m_space_fraction_car;
+	TFlt m_space_fraction_truck;
+	TFlt m_perceived_density_car;
+	TFlt m_perceived_density_truck;
 
 	TFlt m_unit_time;
 	TFlt m_veh_convert_factor;
