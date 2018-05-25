@@ -406,7 +406,7 @@ int MNM_Dlink_Pq::clear_incoming_array() {
 
 void MNM_Dlink_Pq::print_info()
 {
-  printf("Link Dynamic model: Poing Queue\n");
+  printf("Link Dynamic model: Point Queue\n");
   printf("Real volume in the link: %.4f\n", (float)(m_volume/m_flow_scalar));
   printf("Finished real volume in the link: %.2f\n", (float)(TFlt(m_finished_array.size())/m_flow_scalar));
 }

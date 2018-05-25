@@ -726,7 +726,7 @@ TFlt MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::get_perceived_demand(TInt ve
 {	
 	// car
 	if (veh_type == TInt(0)) {
-		return 
+		return std::min(m_flow_cap_car, TFlt(m_ffs_car * m_perceived_density_car)) * m_unit_time;
 	}
 	// truck
 	else {
@@ -892,7 +892,7 @@ int MNM_Dlink_Lq_Multiclass::evolve(TInt timestamp)
 
 	TFlt _demand_car = m_space_fraction_car * std::min(m_C_car, TFlt(m_ffs_car * m_perceived_density_car)) * m_unit_time;
 	TFlt _demand_truck = m_space_fraction_truck * std::min(m_C_truck, TFlt(m_ffs_truck * m_perceived_density_truck)) * m_unit_time;
-	TFlt _demand = _demand_car + m_veh_convert_factor * _demand_truck;
+	// TFlt _demand = _demand_car + m_veh_convert_factor * _demand_truck;
 
 	// Move vehicle from queue to buffer
 	MNM_Veh *_v;
@@ -1018,12 +1018,19 @@ int MNM_Dlink_Lq_Multiclass::clear_incoming_array() {
 	return 0;
 }
 
-TFlt MNM_Dlink_Lq::get_link_flow()
+void MNM_Dlink_Lq_Multiclass::print_info()
+{
+	printf("Link Dynamic model: Multiclass Link Queue\n");
+	printf("Total car volume in the link: %.4f\n", (float)(m_volume_car/m_flow_scalar));
+	printf("Total truck volume in the link: %.4f\n", (float)(m_volume_truck/m_flow_scalar));
+}
+
+TFlt MNM_Dlink_Lq_Multiclass::get_link_flow()
 {
 	return TFlt(m_volume_car + m_volume_truck) / m_flow_scalar;
 }
 
-TFlt MNM_Dlink_Lq::get_link_tt()
+TFlt MNM_Dlink_Lq_Multiclass::get_link_tt()
 {
 	TFlt _cost, _spd;
 	TFlt _rho  = get_link_flow() / m_number_of_lane / m_length;// get the density in veh/mile
@@ -1120,7 +1127,7 @@ int MNM_Dlink_Pq_Multiclass::clear_incoming_array() {
 
 void MNM_Dlink_Pq_Multiclass::print_info()
 {
-	printf("Link Dynamic model: Poing Queue\n");
+	printf("Link Dynamic model: Multiclass Point Queue\n");
 	printf("Total car volume in the link: %.4f\n", (float)(m_volume_car/m_flow_scalar));
 	printf("Total truck volume in the link: %.4f\n", (float)(m_volume_truck/m_flow_scalar));
 }
@@ -1988,6 +1995,20 @@ MNM_Dlink *MNM_Link_Factory_Multiclass::make_link_multiclass(TInt ID,
 												veh_convert_factor,
 												flow_scalar);
 			break;
+		case MNM_TYPE_LQ_MULTICLASS:
+			_link = new MNM_Dlink_Lq_Multiclass(ID,
+												number_of_lane,
+												length,
+												lane_hold_cap_car,
+												lane_hold_cap_truck,
+												lane_flow_cap_car,
+												lane_flow_cap_truck,
+												ffs_car,
+												ffs_truck,
+												unit_time,
+												veh_convert_factor,
+												flow_scalar);
+			break;
     	case MNM_TYPE_PQ_MULTICLASS:
 			_link = new MNM_Dlink_Pq_Multiclass(ID,
 												number_of_lane,
@@ -2194,7 +2215,23 @@ int MNM_IO_Multiclass::build_link_factory_multiclass(std::string file_folder,
 														_ffs_truck,
 														_unit_time,
 														_veh_convert_factor,
-														_flow_scalar);					
+														_flow_scalar);
+					continue;
+				}
+				if (_type == "LQ"){
+					_link_factory -> make_link_multiclass(_link_ID,
+														MNM_TYPE_LQ_MULTICLASS,
+														_number_of_lane,
+														_length,
+														_lane_hold_cap_car,
+														_lane_hold_cap_truck,
+														_lane_flow_cap_car,
+														_lane_flow_cap_truck,
+														_ffs_car,
+														_ffs_truck,
+														_unit_time,
+														_veh_convert_factor,
+														_flow_scalar);
 					continue;
 				}
 				if (_type =="CTM"){
