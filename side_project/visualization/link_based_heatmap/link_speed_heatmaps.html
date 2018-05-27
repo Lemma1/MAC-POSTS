@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Link heatmaps</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
+
+<style>
+    #menu {
+        background: #fff;
+        position: absolute;
+        z-index: 1;
+        top: 10px;
+        right: 10px;
+        border-radius: 3px;
+        width: 120px;
+        border: 1px solid rgba(0,0,0,0.4);
+        font-family: 'Open Sans', sans-serif;
+    }
+
+    #menu a {
+        font-size: 13px;
+        color: #404040;
+        display: block;
+        margin: 0;
+        padding: 0;
+        padding: 10px;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(0,0,0,0.25);
+        text-align: center;
+    }
+
+    #menu a:last-child {
+        border: none;
+    }
+
+    #menu a:hover {
+        background-color: #f8f8f8;
+        color: #404040;
+    }
+
+    #menu a.active {
+        background-color: #3887be;
+        color: #ffffff;
+    }
+
+    #menu a.active:hover {
+        background: #3074a4;
+    }
+</style>    
+
+<style>
+.map-overlay {
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    position: absolute;
+    width: 15%;
+    top: 50px;
+    left: 0;
+    padding: 10px;
+}
+
+.map-overlay .map-overlay-inner {
+    background-color: #fff;
+    box-shadow:0 1px 2px rgba(0, 0, 0, 0.20);
+    border-radius: 3px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.map-overlay h2 {
+    line-height: 24px;
+    display: block;
+    margin: 0 0 10px;
+}
+
+.map-overlay .legend .bar {
+    height: 10px;
+    width: 100%;
+    background: linear-gradient(to right, #46FC02, #FC0202);
+}
+
+.map-overlay input {
+    background-color: transparent;
+    display: inline-block;
+    width: 100%;
+    position: relative;
+    margin: 0;
+    cursor: ew-resize;
+}
+</style>
+    
+    
+<nav id="menu"></nav>
+    
+<div id='map'></div>
+
+<div class='map-overlay top'>
+    <div class='map-overlay-inner'>
+        <h2>Speed/mph (morning peak hours)</h2>
+        <label id='time_point'></label>
+        <input id='slider' type='range' min='0' max='8' step='1' value='0' />
+    </div>
+    <div class='map-overlay-inner'>
+        <div id='legend' class='legend'>
+            <div class='bar'></div>
+            <div>From &ge;50 mph to &le;10 mph</div>
+        </div>
+    </div>
+</div>  
+
+    
+<!-- Import GeoJson data. -->   
+<script src="link_cong_car.geojson"></script>
+<script src="link_cong_truck.geojson"></script>
+<!-- Import GeoJson data. --> 
+
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoieHBpIiwiYSI6ImNqMXA0MXFpZDAwNDEycW1qa29oMTl3dWcifQ.J2lp7DtGJWGT690etQoZVg';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v9',
+        zoom: 10.5,
+        center: [-80.003694, 40.440881],
+        attributionControl: false,
+    });
+    
+    var toggleableLayerIds = ['Car', 'Truck'];
+    for (var i = 0; i < toggleableLayerIds.length; i++) {
+        var id = toggleableLayerIds[i];
+
+        var link = document.createElement('a');
+        link.href = '#';
+        if (id == 'Car'){
+            link.className = 'active';
+        } else {
+            link.className = 'inactive';
+        }
+        link.textContent = id;
+
+        link.onclick = function (e) {
+            var clickedLayer = this.textContent;
+            e.preventDefault();
+            e.stopPropagation();
+
+            var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+
+            if (visibility === 'visible') {
+                map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                this.className = '';
+            } else {
+                this.className = 'active';
+                map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+            }
+        };
+
+        var layers = document.getElementById('menu');
+        layers.appendChild(link);
+    }
+    
+   // var time_points = ['5:00 AM', '5:15 AM', '5:30 AM', '5:45 AM', '6:00 AM', '6:15 AM', '6:30 AM', '6:45 AM', 
+   //                    '7:00 AM', '7:15 AM', '7:30 AM', '7:45 AM', '8:00 AM', '8:15 AM', '8:30 AM', '8:45 AM', 
+   //                    '9:00 AM', '9:15 AM', '9:30 AM', '9:45 AM'];
+    var time_points = ['6:00 AM', '6:30 AM', '7:00 AM', '7:30 AM', '8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM', '10:00 AM'];
+    
+    function filterBy(time_point) {
+
+        var filters = ['==', 'time_point', time_point];
+        map.setFilter('Car', filters);
+        map.setFilter('Truck', filters);
+
+        // Set the label to the month
+        document.getElementById('time_point').textContent = time_points[time_point];
+    }
+ 
+    
+map.on('load', function () {   
+    map.addControl(new mapboxgl.ScaleControl({
+         maxWidth: 80,
+         unit: 'imperial'
+    }));
+        
+    map.addSource("cong_car", {
+        type: "geojson",
+        data: data_cong_car
+    });
+    
+    map.addSource("cong_truck", {
+        type: "geojson",
+        data: data_cong_truck
+    });
+
+    map.addLayer({
+        'id': 'Car',
+        'type': 'line',
+        'source': 'cong_car',
+        'layout': {
+            'line-cap': 'round',
+            'line-join': 'round',
+            'visibility': 'visible'
+        },
+        'paint': {
+            'line-width': 3.5,
+            'line-color': {
+                property: 'car_speed',
+                stops: [
+                    [10, '#FC0202'], 
+                    [15, '#FC4A02'],
+                    [20, '#FC7702'],
+                    [25, '#FCB402'],
+                    [30, '#FCE102'],
+                    [35, '#EDFC02'],
+                    [40, '#CBFC02'],
+                    [45, '#96FC02'],
+                    [50, '#46FC02'],
+                ]
+            },
+            'line-opacity': 0.55
+        }
+    });
+    
+     map.addLayer({
+        'id': 'Truck',
+        'type': 'line',
+        'source': 'cong_truck',
+        'layout': {
+            'line-cap': 'round',
+            'line-join': 'round',
+            'visibility': 'none'
+        },
+        'paint': {
+            'line-width': 3.5,
+            'line-color': {
+                property: 'truck_speed',
+                stops: [
+                    [10, '#FC0202'],
+                    [13, '#FC4A02'],
+                    [16, '#FC7702'],
+                    [20, '#FCB402'],
+                    [25, '#FCE102'],
+                    [31, '#EDFC02'],
+                    [37, '#CBFC02'],
+                    [44, '#96FC02'], 
+                    [50, '#46FC02'],
+                ]
+            },
+            'line-opacity': 0.55
+        }
+    });
+    
+    map.on('click', 'Car', function(e) {      
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("<Strong>Link ID:</Strong> " + e.features[0].properties.ID + 
+                     "<br>" + "<Strong>Length:</Strong> " +e.features[0].properties.length +" miles"+ 
+                     "<br>" + "<Strong>Lanes:</Strong> " +e.features[0].properties.lanes + 
+                     "<br>" + "<Strong>ffs_car:</Strong> " + parseFloat(e.features[0].properties.ffs_car).toFixed(0) + " mph" +
+                     "<br>" + "<Strong>Car fft:</Strong> " + e.features[0].properties.car_fft.toFixed(2) + " seconds" +
+                     "<br>" + "<Strong>Car speed:</Strong> " + e.features[0].properties.car_speed.toFixed(2))
+            .addTo(map);
+    });
+    
+    map.on('mouseenter', 'Car', function(e) {
+        // Change the cursor style as a UI indicator.
+        map.getCanvas().style.cursor = 'pointer';
+    });
+
+    map.on('mouseleave', 'Car', function() {
+        map.getCanvas().style.cursor = '';
+    });
+    
+    map.on('click', 'Truck', function(e) {      
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML("<Strong>Link ID:</Strong> " + e.features[0].properties.ID + 
+                     "<br>" + "<Strong>Length:</Strong> " + e.features[0].properties.length +" miles"+ 
+                     "<br>" + "<Strong>Lanes:</Strong> " + e.features[0].properties.lanes + 
+                     "<br>" + "<Strong>ffs_car:</Strong> " + parseFloat(e.features[0].properties.ffs_car).toFixed(0) + " mph" +
+                     "<br>" + "<Strong>Truck fft:</Strong> " + e.features[0].properties.truck_fft.toFixed(2) + " seconds" +
+                     "<br>" + "<Strong>Truck speed:</Strong> " + e.features[0].properties.truck_speed.toFixed(2))
+            .addTo(map);
+    });
+    
+    map.on('mouseenter', 'Truck', function(e) {
+        // Change the cursor style as a UI indicator.
+        map.getCanvas().style.cursor = 'pointer';
+    });
+
+    map.on('mouseleave', 'Truck', function() {
+        map.getCanvas().style.cursor = '';
+    });    
+    
+    
+    
+    // Set filter to first time point
+    filterBy(0);
+
+    document.getElementById('slider').addEventListener('input', function(e) {
+        var time_point = parseInt(e.target.value, 10);
+        filterBy(time_point);
+    });
+});
+</script>
+
+</body>
+</html>
