@@ -153,6 +153,62 @@ public:
 	std::deque<MNM_Veh*> m_veh_queue_truck;
 };
 
+
+/**************************************************************************
+							Multiclass Link-Queue Model
+**************************************************************************/
+class MNM_Dlink_Lq_Multiclass : public MNM_Dlink_Multiclass
+{
+public:
+	MNM_Dlink_Lq_Multiclass(TInt ID,
+							TInt number_of_lane,
+							TFlt length,
+							TFlt lane_hold_cap_car,
+							TFlt lane_hold_cap_truck,
+							TFlt lane_flow_cap_car,
+							TFlt lane_flow_cap_truck,
+							TFlt ffs_car,
+							TFlt ffs_truck,
+							TFlt unit_time,
+							TFlt veh_convert_factor,
+							TFlt flow_scalar);
+	~MNM_Dlink_Lq_Multiclass();
+	int virtual evolve(TInt timestamp) override;
+	TFlt virtual get_link_supply() override;
+	int virtual clear_incoming_array() override;
+	void virtual print_info() override;
+	TFlt virtual get_link_flow() override;
+	TFlt virtual get_link_tt() override;
+	int update_perceived_density();
+
+	std::deque<MNM_Veh*> m_veh_queue_car;
+	std::deque<MNM_Veh*> m_veh_queue_truck;
+	std::deque<MNM_Veh*> m_veh_out_buffer_car;
+	std::deque<MNM_Veh*> m_veh_out_buffer_truck;
+
+	TInt m_volume_car; //vehicle number, without the flow scalar
+	TInt m_volume_truck; //vehicle number, without the flow scalar
+	TFlt m_flow_scalar;
+	TFlt m_k_j_car; //jam density
+	TFlt m_k_j_truck; //jam density
+	TFlt m_C_car; //maximum free flow capacity
+	TFlt m_C_truck; //maximum free flow capacity
+	TFlt m_k_C_car; //maximum free flow density
+	TFlt m_k_C_truck; //maximum free flow density
+	TFlt m_w_car; //backward wave speed
+	TFlt m_w_truck; //backward wave speed
+	TFlt m_rho_1_N;
+
+	TFlt m_space_fraction_car;
+	TFlt m_space_fraction_truck;
+	TFlt m_perceived_density_car;
+	TFlt m_perceived_density_truck;
+
+	TFlt m_unit_time;
+	TFlt m_veh_convert_factor;
+};
+
+
 /**************************************************************************
 							Multiclass Point-Queue Model
 **************************************************************************/

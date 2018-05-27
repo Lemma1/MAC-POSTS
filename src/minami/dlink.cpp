@@ -406,7 +406,7 @@ int MNM_Dlink_Pq::clear_incoming_array() {
 
 void MNM_Dlink_Pq::print_info()
 {
-  printf("Link Dynamic model: Poing Queue\n");
+  printf("Link Dynamic model: Point Queue\n");
   printf("Real volume in the link: %.4f\n", (float)(m_volume/m_flow_scalar));
   printf("Finished real volume in the link: %.2f\n", (float)(TFlt(m_finished_array.size())/m_flow_scalar));
 }
@@ -585,9 +585,11 @@ TFlt MNM_Dlink_Lq::get_flow_from_density(TFlt density)
   }
   else {
     TFlt _w = m_lane_flow_cap / (m_lane_hold_cap - m_lane_flow_cap / m_ffs);
-    _flow = _w * density;
+    _flow = (m_lane_hold_cap * TFlt(m_number_of_lane) - density) * _w;
+    // Only for short links, change the FD shape around rhoj:
+    // _flow = MNM_Ults::max(_flow, 0.25*(m_lane_hold_cap*TFlt(m_number_of_lane)-m_k_c) * _w);
   }
-  return _flow; 
+  return _flow;
 }
 
 
@@ -734,6 +736,28 @@ TFlt MNM_Cumulative_Curve::get_result(TFlt time)
   return m_recorder.back().second;
 }
 
+// TFlt MNM_Cumulative_Curve::get_time(TFlt result)
+// {
+//   // arrange2();
+//   if (m_recorder.size() == 0){
+//     return TFlt(-1);
+//   }
+//   if (m_recorder[0].second >= result){
+//     return TFlt(-1);
+//   }
+//   if (m_recorder.size() == 1){
+//     return TFlt(-1);
+//   }
+//   for (size_t i= m_recorder.size() - 1; i >= 0; --i){
+//     if (m_recorder[i].second <= result){
+//       return m_recorder[i].first 
+//           + (m_recorder[i+1].first - m_recorder[i].first)/(m_recorder[i+1].second - m_recorder[i].second)
+//             * (result - m_recorder[i].second);
+//     }
+//   }
+//   return TFlt(-1);
+// }
+
 TFlt MNM_Cumulative_Curve::get_time(TFlt result)
 {
   // arrange2();
@@ -746,11 +770,11 @@ TFlt MNM_Cumulative_Curve::get_time(TFlt result)
   if (m_recorder.size() == 1){
     return TFlt(-1);
   }
-  for (size_t i= m_recorder.size() - 1; i >= 0; --i){
-    if (m_recorder[i].second <= result){
+  for (size_t i = 1; i < m_recorder.size(); ++i){
+    if (m_recorder[i].second >= result){
       return m_recorder[i].first 
-          + (m_recorder[i+1].first - m_recorder[i].first)/(m_recorder[i+1].second - m_recorder[i].second)
-            * (result - m_recorder[i].second);
+            - (m_recorder[i].first - m_recorder[i-1].first)
+            * (m_recorder[i].second - result) / (m_recorder[i].second - m_recorder[i - 1].second);
     }
   }
   return TFlt(-1);
@@ -762,9 +786,9 @@ std::string MNM_Cumulative_Curve::to_string()
   std::string _output = "";
   arrange();
   for (size_t i=0; i<m_recorder.size() - 1; ++i){
-    _output += std::to_string(m_recorder[i].first) + ":" + std::to_string(m_recorder[i].second) + ",";
+    _output += std::to_string(int(m_recorder[i].first)) + ":" + std::to_string(int(m_recorder[i].second)) + ",";
   }
-  _output += std::to_string(m_recorder[m_recorder.size() - 1].first) + ":" + std::to_string(m_recorder[m_recorder.size() - 1].second);
+  _output += std::to_string(int(m_recorder[m_recorder.size() - 1].first)) + ":" + std::to_string(int(m_recorder[m_recorder.size() - 1].second));
   return _output;
 }
 
