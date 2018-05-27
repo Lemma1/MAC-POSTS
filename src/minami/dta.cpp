@@ -32,7 +32,7 @@ int MNM_Dta::initialize()
   m_flow_scalar = m_config -> get_int("flow_scalar");
   m_assign_freq = m_config -> get_int("assign_frq");
   m_start_assign_interval = m_config -> get_int("start_assign_interval");
-  m_total_assign_inter = m_config ->  get_int("max_interval");
+  m_total_assign_inter = m_config -> get_int("max_interval");
 
   return 0;
 }
@@ -50,39 +50,50 @@ int MNM_Dta::set_statistics()
 
 int MNM_Dta::set_routing()
 {
-  if (m_config -> get_string("routing_type") == "Hybrid"){
-    m_routing = new MNM_Routing_Hybrid(m_file_folder, m_graph, m_statistics,
-                                   m_od_factory, m_node_factory, m_link_factory);
+  if (m_config -> get_string("routing_type") == "Adaptive"){
+    m_routing = new MNM_Routing_Adaptive(m_file_folder, m_graph, m_statistics, m_od_factory, m_node_factory, m_link_factory);
     m_routing -> init_routing();
-  }else if(m_config ->get_string("routing_type")=="Predetermined"){
-    
-    Path_Table *_path_table = MNM::build_pathset(m_graph, m_od_factory, m_link_factory);
-    MNM_Pre_Routing *_pre_routing = new MNM_Pre_Routing(_path_table,m_od_factory);
-    m_routing = new MNM_Routing_Predetermined(m_graph,m_od_factory,m_node_factory,
-                    m_link_factory, _path_table,_pre_routing, 
-                    m_total_assign_inter);
   }
-  else if (m_config ->get_string("routing_type") == "Fixed"){
+  else if (m_config -> get_string("routing_type") == "Predetermined"){
+    Path_Table *_path_table = MNM::build_pathset(m_graph, m_od_factory, m_link_factory);
+    MNM_Pre_Routing *_pre_routing = new MNM_Pre_Routing(_path_table, m_od_factory);
+    m_routing = new MNM_Routing_Predetermined(m_graph, m_od_factory, m_node_factory,
+                    m_link_factory, _path_table, _pre_routing, m_total_assign_inter);
+  }
+  else if (m_config -> get_string("routing_type") == "Fixed"){
     MNM_ConfReader* _tmp_conf = new MNM_ConfReader(m_file_folder + "/config.conf", "FIXED");
     Path_Table *_path_table;
-    if (_tmp_conf ->get_string("choice_portion") == "Buffer"){
-      _path_table = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf ->get_string("path_file_name"), 
+    if (_tmp_conf -> get_string("choice_portion") == "Buffer"){
+      _path_table = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf -> get_string("path_file_name"), 
                       m_graph, _tmp_conf -> get_int("num_path"), true);
     }
     else{
-      _path_table = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf ->get_string("path_file_name"), 
+      _path_table = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf -> get_string("path_file_name"), 
                       m_graph, _tmp_conf -> get_int("num_path"), false);
     }
-    // printf("path table dta %p\n", _path_table);
     m_routing = new MNM_Routing_Fixed(m_graph, m_od_factory, m_node_factory, m_link_factory, _tmp_conf -> get_int("route_frq"));
     m_routing -> init_routing(_path_table);
-    // printf("Finishend set routing\n");
   }
-
-
-  // m_routing = new MNM_Routing_Random(m_graph, m_statistics, m_od_factory, m_node_factory, m_link_factory);
-
-  return 0;  
+  else if (m_config ->get_string("routing_type") == "Hybrid"){
+    MNM_ConfReader* _tmp_conf = new MNM_ConfReader(m_file_folder + "/config.conf", "FIXED");
+    Path_Table *_path_table;
+    if (_tmp_conf -> get_string("choice_portion") == "Buffer"){
+      _path_table = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf -> get_string("path_file_name"), 
+                      m_graph, _tmp_conf -> get_int("num_path"), true);
+    }
+    else{
+      _path_table = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf -> get_string("path_file_name"), 
+                      m_graph, _tmp_conf -> get_int("num_path"), false);
+    }
+    TInt _route_freq_fixed = _tmp_conf -> get_int("route_frq");
+    m_routing = new MNM_Routing_Hybrid(m_file_folder, m_graph, m_statistics, m_od_factory, m_node_factory, m_link_factory, _route_freq_fixed);
+    m_routing -> init_routing(_path_table);
+  }
+  else {
+    m_routing = new MNM_Routing_Random(m_graph, m_od_factory, m_node_factory, m_link_factory);
+    m_routing -> init_routing();
+  }
+  return 0;
 }
 
 int MNM_Dta::build_workzone()
@@ -205,8 +216,6 @@ int MNM_Dta::pre_loading()
 {
   MNM_Dnode *_node;
   // printf("MNM: Prepare loading!\n");
-  // m_routing -> init_routing();
-  // printf("Finish prepare routing\n");
   m_statistics -> init_record();
   for (auto _node_it = m_node_factory -> m_node_map.begin(); _node_it != m_node_factory -> m_node_map.end(); _node_it++){
     _node = _node_it -> second;
@@ -241,15 +250,21 @@ int MNM_Dta::load_once(bool verbose, TInt load_int, TInt assign_int)
     for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){
       _origin = _origin_it -> second;
       if (assign_int >= m_total_assign_inter) {
-        _origin -> release_one_interval(load_int, m_veh_factory, -1, TFlt(0));
+        _origin -> release_one_interval(load_int, m_veh_factory, -1, TFlt(-1));
       }
       else{
         if (m_config -> get_string("routing_type") == "Fixed"){
           //printf("Fixed Realsing.\n");
           _origin -> release_one_interval(load_int, m_veh_factory, assign_int, TFlt(0));
         }
-        else if((m_config -> get_string("routing_type") == "Hybrid")){
+        else if((m_config -> get_string("routing_type") == "Adaptive")){
           _origin -> release_one_interval(load_int, m_veh_factory, assign_int, TFlt(1));
+        }
+        else if((m_config -> get_string("routing_type") == "Hybrid")){
+          TFlt _ad_ratio = m_config -> get_float("adaptive_ratio");
+          if (_ad_ratio > 1) _ad_ratio = 1;
+          if (_ad_ratio < 0) _ad_ratio = 0;
+          _origin -> release_one_interval(load_int, m_veh_factory, assign_int, _ad_ratio);
         }
         else{
           printf("WARNING:No assignemnt!\n");

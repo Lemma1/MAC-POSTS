@@ -1,6 +1,8 @@
 #include "routing.h"
 #include <omp.h>
 
+
+
 MNM_Routing::MNM_Routing(PNEGraph &graph,
                           MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory)
 {
@@ -16,11 +18,13 @@ MNM_Routing::~MNM_Routing()
 
 }
 
+
+
+
 /**************************************************************************
                           Random routing
 **************************************************************************/
 /* assign each vehicle a random link ahead of it, only used for testing */
-
 MNM_Routing_Random::MNM_Routing_Random(PNEGraph &graph, MNM_OD_Factory *od_factory, 
                                           MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory)
   : MNM_Routing::MNM_Routing(graph, od_factory, node_factory, link_factory)
@@ -84,10 +88,12 @@ int MNM_Routing_Random::update_routing(TInt timestamp)
   return 0;
 }
 
+
+
+
 /**************************************************************************
                           Adaptive routing
 **************************************************************************/
-
 MNM_Routing_Adaptive::MNM_Routing_Adaptive(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, 
                   MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory)
   : MNM_Routing::MNM_Routing(graph, od_factory, node_factory, link_factory)
@@ -156,19 +162,21 @@ int MNM_Routing_Adaptive::update_routing(TInt timestamp)
     _node_ID = _origin_node -> m_node_ID;
     for (auto _veh_it = _origin_node -> m_in_veh_queue.begin(); _veh_it!=_origin_node -> m_in_veh_queue.end(); _veh_it++){
       _veh = *_veh_it;
-      _next_link_ID = m_table -> find(_veh -> get_destination()) -> second -> find(_node_ID) -> second;
-      if (_next_link_ID < 0){
-        printf("Something wrong in routing, wrong next link 1\n");
-        // printf("%d\n", _veh -> get_destination() -> m_Dest_ID);
-        // _shortest_path_tree = m_table -> find(_veh -> get_destination()) -> second;
-        // printf("%d\n", _shortest_path_tree -> size());
-        // for (auto it : (*_shortest_path_tree)) printf("%d, %d\n", it.first, it.second);
-        exit(-1);
+      if (_veh -> m_type == MNM_TYPE_ADAPTIVE){
+        _next_link_ID = m_table -> find(_veh -> get_destination()) -> second -> find(_node_ID) -> second;
+        if (_next_link_ID < 0){
+          printf("Something wrong in routing, wrong next link 1\n");
+          // printf("%d\n", _veh -> get_destination() -> m_Dest_ID);
+          // _shortest_path_tree = m_table -> find(_veh -> get_destination()) -> second;
+          // printf("%d\n", _shortest_path_tree -> size());
+          // for (auto it : (*_shortest_path_tree)) printf("%d, %d\n", it.first, it.second);
+          exit(-1);
+        }
+        // printf("From origin, The next link ID will be %d\n", _next_link_ID());
+        _next_link = m_link_factory -> get_link(_next_link_ID);
+        _veh -> set_next_link(_next_link);
+        // printf("The next link now it's %d\n", _veh -> get_next_link() -> m_link_ID());
       }
-      // printf("From origin, The next link ID will be %d\n", _next_link_ID());
-      _next_link = m_link_factory -> get_link(_next_link_ID);
-      _veh -> set_next_link(_next_link);
-      // printf("The next link now it's %d\n", _veh -> get_next_link() -> m_link_ID());
     }
   }  
 
@@ -179,72 +187,76 @@ int MNM_Routing_Adaptive::update_routing(TInt timestamp)
     _node_ID = _link -> m_to_node -> m_node_ID;
     for (auto _veh_it = _link -> m_finished_array.begin(); _veh_it!=_link -> m_finished_array.end(); _veh_it++){
       _veh = *_veh_it;
-      if (_link != _veh -> get_current_link()){
-        printf("Wrong current link!\n");
-        exit(-1);
-      }
-      // if (_link != _veh -> get_next_link()){
-      //   printf("Wrong node allocation!\n");
-      //   printf("The next link should be %d, but now it's %d, current link is %d\n",_link -> m_link_ID(), 
-      //                 _veh -> get_next_link() -> m_link_ID(), _veh -> get_current_link() -> m_link_ID());
-      //   _next_link_ID = m_table -> find(_veh -> get_destination()) -> second -> find(_node_ID) -> second;
-      //   _node_ID = m_table -> find(_veh -> get_destination()) -> second -> find(1) -> second;
-      //   printf("The next link ID will be %d\n", _next_link_ID());
-      //   printf("From origin, The next link ID will be %d\n", _node_ID());
-      //   exit(-1);
-      // }
-      _veh_dest = _veh -> get_destination();
-      if (_veh_dest -> m_dest_node -> m_node_ID == _node_ID){
-        _veh -> set_next_link(NULL);
-      }
-      else{
-        _next_link_ID = m_table -> find(_veh -> get_destination()) -> second -> find(_node_ID) -> second;
-        if (_next_link_ID == -1){
-          printf("Something wrong in routing, wrong next link 2\n");
-          printf("The node is %d, the vehicle should head to %d\n", (int)_node_ID, (int)_veh_dest -> m_dest_node -> m_node_ID);
-          // exit(-1);
-          auto _node_I = m_graph -> GetNI(_node_ID);
-          if (_node_I.GetOutDeg() > 0){
-            printf("Assign randomly!\n");
-            _next_link_ID = _node_I.GetOutEId(MNM_Ults::mod(rand(), _node_I.GetOutDeg()));
-          }
-          else
-          {
-            printf("Can't do anything!\n");
-          }
+      if (_veh -> m_type == MNM_TYPE_ADAPTIVE){
+        if (_link != _veh -> get_current_link()){
+          printf("Wrong current link!\n");
+          exit(-1);
         }
-        _next_link = m_link_factory -> get_link(_next_link_ID);
-        if (_next_link != NULL) {
-          // printf("Checking future\n");
-          TInt _next_node_ID = _next_link -> m_to_node -> m_node_ID;
-          if (_next_node_ID != _veh -> get_destination() -> m_dest_node -> m_node_ID){
-            // printf("Destination node is %d\n", _veh -> get_destination() -> m_dest_node -> m_node_ID());
-            if (m_table -> find(_veh -> get_destination()) == m_table -> end()){
-              printf("Cant'f find Destination\n");
-            }
-            if (m_table -> find(_veh -> get_destination()) -> second -> find(_next_node_ID) == m_table -> find(_veh -> get_destination()) -> second -> end()){
-              printf("can't find _next_node_ID\n");
-            }
-            if (m_table -> find(_veh -> get_destination()) -> second -> find(_next_node_ID) -> second == -1){
-              printf("Something wrong for the future node!\n");
-              exit(-1);
-            }
-            // printf("Pass checking\n");
-          }
+        // if (_link != _veh -> get_next_link()){
+        //   printf("Wrong node allocation!\n");
+        //   printf("The next link should be %d, but now it's %d, current link is %d\n",_link -> m_link_ID(), 
+        //                 _veh -> get_next_link() -> m_link_ID(), _veh -> get_current_link() -> m_link_ID());
+        //   _next_link_ID = m_table -> find(_veh -> get_destination()) -> second -> find(_node_ID) -> second;
+        //   _node_ID = m_table -> find(_veh -> get_destination()) -> second -> find(1) -> second;
+        //   printf("The next link ID will be %d\n", _next_link_ID());
+        //   printf("From origin, The next link ID will be %d\n", _node_ID());
+        //   exit(-1);
+        // }
+        _veh_dest = _veh -> get_destination();
+        if (_veh_dest -> m_dest_node -> m_node_ID == _node_ID){
+          _veh -> set_next_link(NULL);
         }
-        _veh -> set_next_link(_next_link);
-      }
-    }
-  }
+        else{
+          _next_link_ID = m_table -> find(_veh -> get_destination()) -> second -> find(_node_ID) -> second;
+          if (_next_link_ID == -1){
+            printf("Something wrong in routing, wrong next link 2\n");
+            printf("The node is %d, the vehicle should head to %d\n", (int)_node_ID, (int)_veh_dest -> m_dest_node -> m_node_ID);
+            // exit(-1);
+            auto _node_I = m_graph -> GetNI(_node_ID);
+            if (_node_I.GetOutDeg() > 0){
+              printf("Assign randomly!\n");
+              _next_link_ID = _node_I.GetOutEId(MNM_Ults::mod(rand(), _node_I.GetOutDeg()));
+            }
+            else
+            {
+              printf("Can't do anything!\n");
+            }
+          }
+          _next_link = m_link_factory -> get_link(_next_link_ID);
+          if (_next_link != NULL) {
+            // printf("Checking future\n");
+            TInt _next_node_ID = _next_link -> m_to_node -> m_node_ID;
+            if (_next_node_ID != _veh -> get_destination() -> m_dest_node -> m_node_ID){
+              // printf("Destination node is %d\n", _veh -> get_destination() -> m_dest_node -> m_node_ID());
+              if (m_table -> find(_veh -> get_destination()) == m_table -> end()){
+                printf("Cant'f find Destination\n");
+              }
+              if (m_table -> find(_veh -> get_destination()) -> second -> find(_next_node_ID) == m_table -> find(_veh -> get_destination()) -> second -> end()){
+                printf("can't find _next_node_ID\n");
+              }
+              if (m_table -> find(_veh -> get_destination()) -> second -> find(_next_node_ID) -> second == -1){
+                printf("Something wrong for the future node!\n");
+                exit(-1);
+              }
+              // printf("Pass checking\n");
+            }
+          }
+          _veh -> set_next_link(_next_link);
+        } //end if else
+      } //end if veh->m_type
+    } //end for veh_it
+  } //end for link_it
+
   // printf("Finished Routing\n");
   return 0;
 }
 
 
+
+
 /**************************************************************************
                           fixed routing
 **************************************************************************/
-
 MNM_Routing_Fixed::MNM_Routing_Fixed(PNEGraph &graph,
               MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, 
               MNM_Link_Factory *link_factory, TInt routing_frq)
@@ -256,13 +268,11 @@ MNM_Routing_Fixed::MNM_Routing_Fixed(PNEGraph &graph,
     m_routing_freq = -1;
     // m_cur_routing_interval = -1;
   }
-  else{
-
+  else {
     m_routing_freq = routing_frq;
     m_buffer_as_p = true;
     // m_cur_routing_interval = 0;
   }
-  
 }
 
 MNM_Routing_Fixed::~MNM_Routing_Fixed()
@@ -316,26 +326,24 @@ int MNM_Routing_Fixed::update_routing(TInt timestamp)
     }
   }
 
-  for (auto _origin_it = m_od_factory->m_origin_map.begin(); _origin_it != m_od_factory->m_origin_map.end(); _origin_it++){
+  for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){
     // printf("1.1\n");
     _origin = _origin_it -> second;
     _origin_node = _origin -> m_origin_node;
     _node_ID = _origin_node -> m_node_ID;
-    for (auto _veh_it = _origin_node -> m_in_veh_queue.begin(); _veh_it!=_origin_node -> m_in_veh_queue.end(); _veh_it++){
+    for (auto _veh_it = _origin_node -> m_in_veh_queue.begin(); _veh_it != _origin_node -> m_in_veh_queue.end(); _veh_it++){
       _veh = *_veh_it;
       // printf("1.2\n");
-      if (_veh -> m_type != MNM_TYPE_STATIC){
-        printf("Wrong vehicle type in routing!\n");
-        exit(-1);
-      }
-      if (m_tracker.find(_veh) == m_tracker.end()){
-        // printf("Registering!\n");
-        register_veh(_veh);
-        // printf("1.3\n");
-        _next_link_ID = m_tracker.find(_veh) -> second -> front();
-        _next_link = m_link_factory -> get_link(_next_link_ID);
-        _veh -> set_next_link(_next_link);
-        m_tracker.find(_veh) -> second -> pop_front();
+      if (_veh -> m_type == MNM_TYPE_STATIC){
+        if (m_tracker.find(_veh) == m_tracker.end()){
+          // printf("Registering!\n");
+          register_veh(_veh);
+          // printf("1.3\n");
+          _next_link_ID = m_tracker.find(_veh) -> second -> front();
+          _next_link = m_link_factory -> get_link(_next_link_ID);
+          _veh -> set_next_link(_next_link);
+          m_tracker.find(_veh) -> second -> pop_front();
+        }
       }
     }
   }
@@ -349,38 +357,40 @@ int MNM_Routing_Fixed::update_routing(TInt timestamp)
     // printf("2.02\n");
     _node_ID = _link -> m_to_node -> m_node_ID;
     // printf("2.1\n");
-    for (auto _veh_it = _link -> m_finished_array.begin(); _veh_it!=_link -> m_finished_array.end(); _veh_it++){
+    for (auto _veh_it = _link -> m_finished_array.begin(); _veh_it != _link -> m_finished_array.end(); _veh_it++){
       _veh = *_veh_it;
-      _veh_dest = _veh -> get_destination();
-      // printf("2.2\n");
-      if (_veh_dest -> m_dest_node -> m_node_ID == _node_ID){
-        if (m_tracker.find(_veh) -> second -> size() != 0){
-          printf("Something wrong in fixed routing!\n");
-          exit(-1);
-        }
-        _veh -> set_next_link(NULL);
-        // m_tracker.erase(m_tracker.find(_veh));
-      }
-      else{
-        // printf("2.3\n");
-        if (m_tracker.find(_veh) == m_tracker.end()){
-          printf("Vehicle not registered in link, impossible!\n");
-          exit(-1);
-        }
-        if(_veh -> get_current_link() == _veh -> get_next_link()){
-          _next_link_ID = m_tracker.find(_veh) -> second -> front();
-          if (_next_link_ID == -1){
-            printf("Something wrong in routing, wrong next link 2\n");
-            printf("The node is %d, the vehicle should head to %d\n", (int)_node_ID, (int)_veh_dest -> m_dest_node -> m_node_ID);
+      if (_veh -> m_type == MNM_TYPE_STATIC){
+        _veh_dest = _veh -> get_destination();
+        // printf("2.2\n");
+        if (_veh_dest -> m_dest_node -> m_node_ID == _node_ID){
+          if (m_tracker.find(_veh) -> second -> size() != 0){
+            printf("Something wrong in fixed routing!\n");
             exit(-1);
           }
-          _next_link = m_link_factory -> get_link(_next_link_ID);
-          _veh -> set_next_link(_next_link);
-          m_tracker.find(_veh) -> second -> pop_front();
+          _veh -> set_next_link(NULL);
+          // m_tracker.erase(m_tracker.find(_veh));
         }
-      }
-    }
-  }
+        else{
+          // printf("2.3\n");
+          if (m_tracker.find(_veh) == m_tracker.end()){
+            printf("Vehicle not registered in link, impossible!\n");
+            exit(-1);
+          }
+          if (_veh -> get_current_link() == _veh -> get_next_link()){
+            _next_link_ID = m_tracker.find(_veh) -> second -> front();
+            if (_next_link_ID == -1){
+              printf("Something wrong in routing, wrong next link 2\n");
+              printf("The node is %d, the vehicle should head to %d\n", (int)_node_ID, (int)_veh_dest -> m_dest_node -> m_node_ID);
+              exit(-1);
+            }
+            _next_link = m_link_factory -> get_link(_next_link_ID);
+            _veh -> set_next_link(_next_link);
+            m_tracker.find(_veh) -> second -> pop_front();
+          }
+        } //end if-else
+      } //end if veh->m_type
+    } //end for veh_it
+  } //end for link_it
 
   return 0;
 }
@@ -429,5 +439,39 @@ int MNM_Routing_Fixed::add_veh_path(MNM_Veh* veh, std::deque<TInt> *link_que)
   std::deque<TInt> *_new_link_que = new std::deque<TInt>();
   std::copy(link_que->begin(), link_que->end(), std::back_inserter(*_new_link_que));
   m_tracker.insert(std::pair<MNM_Veh*, std::deque<TInt>*>(veh, _new_link_que));
+  return 0;
+}
+
+
+
+
+/**************************************************************************
+                          Hybrid (Adaptive+Fixed) routing
+**************************************************************************/
+MNM_Routing_Hybrid::MNM_Routing_Hybrid(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, 
+  MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory, TInt route_frq_fixed)
+  : MNM_Routing::MNM_Routing(graph, od_factory, node_factory, link_factory)
+{
+  m_routing_adaptive = new MNM_Routing_Adaptive(file_folder, graph, statistics, od_factory, node_factory, link_factory);
+  m_routing_fixed = new MNM_Routing_Fixed(graph, od_factory, node_factory, link_factory, route_frq_fixed);
+}
+
+MNM_Routing_Hybrid::~MNM_Routing_Hybrid()
+{
+  delete m_routing_adaptive;
+  delete m_routing_fixed;
+}
+
+int MNM_Routing_Hybrid::init_routing(Path_Table *path_table)
+{
+  m_routing_adaptive -> init_routing();
+  m_routing_fixed -> init_routing(path_table);
+  return 0;
+}
+
+int MNM_Routing_Hybrid::update_routing(TInt timestamp)
+{
+  m_routing_adaptive -> update_routing(timestamp);
+  m_routing_fixed -> update_routing(timestamp);
   return 0;
 }

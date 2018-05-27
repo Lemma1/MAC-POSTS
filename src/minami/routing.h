@@ -35,8 +35,8 @@ public:
   MNM_Routing_Random(PNEGraph &graph,
                       MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
   ~MNM_Routing_Random();
-  int virtual init_routing(Path_Table *path_table=NULL);
-  int virtual update_routing(TInt timestamp);
+  int virtual init_routing(Path_Table *path_table=NULL) override;
+  int virtual update_routing(TInt timestamp) override;
 };
 
 
@@ -47,14 +47,15 @@ public:
   MNM_Routing_Adaptive(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, 
                       MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
   ~MNM_Routing_Adaptive();
-  int virtual init_routing(Path_Table *path_table=NULL);
-  int virtual update_routing(TInt timestamp);  
+  int virtual init_routing(Path_Table *path_table=NULL) override;
+  int virtual update_routing(TInt timestamp) override;  
 // private:
   MNM_Statistics* m_statistics;
   Routing_Table *m_table;
   TInt m_routing_freq;
   MNM_ConfReader *m_self_config;
 };
+
 
 
 class MNM_Routing_Fixed : public MNM_Routing
@@ -64,8 +65,8 @@ public:
               MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, 
               MNM_Link_Factory *link_factory, TInt route_frq = TInt(-1));
   ~MNM_Routing_Fixed();
-  int virtual init_routing(Path_Table *path_table=NULL);
-  int virtual update_routing(TInt timestamp);
+  int virtual init_routing(Path_Table *path_table=NULL) override;
+  int virtual update_routing(TInt timestamp) override;
 // private:
   int set_path_table(Path_Table *path_table);
   int register_veh(MNM_Veh* veh);
@@ -79,14 +80,18 @@ public:
 };
 
 
-class MNM_Routing_Hybrid
+// just a wrapper of Adaptive and Fixed routing
+class MNM_Routing_Hybrid : public MNM_Routing
 {
 public:
-  MNM_Routing_Hybrid(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, 
-                      MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
+  MNM_Routing_Hybrid(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, MNM_OD_Factory *od_factory, 
+                    MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory, TInt route_frq_fixed = TInt(-1));
   ~MNM_Routing_Hybrid();
-  int init_routing(Path_Table *path_table=NULL);
-  int update_routing(TInt timestamp);
+  int virtual init_routing(Path_Table *path_table=NULL) override;
+  int virtual update_routing(TInt timestamp) override;
+
+  MNM_Routing_Adaptive* m_routing_adaptive;
+  MNM_Routing_Fixed* m_routing_fixed;
 };
 
 

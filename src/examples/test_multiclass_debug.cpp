@@ -5,7 +5,7 @@
 
 int main()
 {
-	MNM_Dlink *_link;
+	// MNM_Dlink *_link;
 
 	printf("BEGIN sigle class DTA test!\n");
 

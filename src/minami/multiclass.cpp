@@ -1848,8 +1848,13 @@ int MNM_Origin_Multiclass::release_one_interval(TInt current_interval,
 				_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(0));
 			}
 			else{
-				printf("HyBrid assign, not implemented!\n");
-				exit(-1);
+				TFlt _r = MNM_Ults::rand_flt();
+				if (_r <= adaptive_ratio){
+					_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(0));
+				}
+				else{
+					_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_STATIC, TInt(0));
+				}
 			}
 			_veh -> set_destination(_demand_it -> first);
 			_veh -> set_origin(this);
@@ -1867,8 +1872,13 @@ int MNM_Origin_Multiclass::release_one_interval(TInt current_interval,
 				_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(1));
 			}
 			else{
-				printf("HyBrid assign, not implemented!\n");
-				exit(-1);
+				TFlt _r = MNM_Ults::rand_flt();
+				if (_r <= adaptive_ratio){
+					_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(1));
+				}
+				else{
+					_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_STATIC, TInt(1));
+				}
 			}
 			_veh -> set_destination(_demand_it -> first);
 			_veh -> set_origin(this);
