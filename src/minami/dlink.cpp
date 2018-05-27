@@ -585,9 +585,11 @@ TFlt MNM_Dlink_Lq::get_flow_from_density(TFlt density)
   }
   else {
     TFlt _w = m_lane_flow_cap / (m_lane_hold_cap - m_lane_flow_cap / m_ffs);
-    _flow = _w * density; // ????
+    _flow = (m_lane_hold_cap * TFlt(m_number_of_lane) - density) * _w;
+    // Only for short links, change the FD shape around rhoj:
+    // _flow = MNM_Ults::max(_flow, 0.25*(m_lane_hold_cap*TFlt(m_number_of_lane)-m_k_c) * _w);
   }
-  return _flow; 
+  return _flow;
 }
 
 

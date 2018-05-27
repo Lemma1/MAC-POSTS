@@ -11,6 +11,7 @@ int main()
 	printf("BEGIN multiclass test!\n");
 
 	std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_MckeesRocks_SPC";
+	// std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_7link_multiclass";
 	MNM_Dta_Multiclass *test_dta = new MNM_Dta_Multiclass(folder);
 	printf("================================ DTA set! =================================\n");
 	
@@ -32,7 +33,7 @@ int main()
 	bool _verbose = false;
 	bool output_link_cong = false; // if true output link congestion level every cong_frequency
 	TInt cong_frequency = 180; // 15 minutes
-	bool output_veh_locs = true; // if true output veh location every vis_frequency
+	bool output_veh_locs = false; // if true output veh location every vis_frequency
 	TInt vis_frequency = 60; // 5 minutes
 	MNM_Veh_Multiclass* _veh;
 	std::ofstream _vis_file;
@@ -131,19 +132,19 @@ int main()
 	}
 
 	// output tt of some special links
-	for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
-			_link = _link_it -> second;
-			if (_link -> m_link_ID() == 4901) {
-				TInt _iter = 0;
-				while (_iter < _current_inter){
-					_link_m = dynamic_cast<MNM_Dlink_Multiclass*>(_link);
-					printf("%d,%.2f,%.2f\n", int(_iter),
-						double(MNM_DTA_GRADIENT::get_travel_time_car(_link_m, TFlt(_iter + 1))), 
-						double(MNM_DTA_GRADIENT::get_travel_time_truck(_link_m, TFlt(_iter + 1))));
-					_iter += 1;
-				}
-			}
-	}
+	// for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
+	// 		_link = _link_it -> second;
+	// 		if (_link -> m_link_ID() == 4901) {
+	// 			TInt _iter = 0;
+	// 			while (_iter < _current_inter){
+	// 				_link_m = dynamic_cast<MNM_Dlink_Multiclass*>(_link);
+	// 				printf("%d,%.2f,%.2f\n", int(_iter),
+	// 					double(MNM_DTA_GRADIENT::get_travel_time_car(_link_m, TFlt(_iter + 1))), 
+	// 					double(MNM_DTA_GRADIENT::get_travel_time_truck(_link_m, TFlt(_iter + 1))));
+	// 				_iter += 1;
+	// 			}
+	// 		}
+	// }
 
 	// output CC of some special links
 	// for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); 

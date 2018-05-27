@@ -17,7 +17,7 @@ MNM_Routing::~MNM_Routing()
 }
 
 /**************************************************************************
-                          Random rouing
+                          Random routing
 **************************************************************************/
 /* assign each vehicle a random link ahead of it, only used for testing */
 
@@ -85,20 +85,20 @@ int MNM_Routing_Random::update_routing(TInt timestamp)
 }
 
 /**************************************************************************
-                          Hybrid rouing
+                          Adaptive routing
 **************************************************************************/
 
-MNM_Routing_Hybrid::MNM_Routing_Hybrid(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, 
+MNM_Routing_Adaptive::MNM_Routing_Adaptive(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, 
                   MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory)
   : MNM_Routing::MNM_Routing(graph, od_factory, node_factory, link_factory)
 {
   m_statistics = statistics;
-  m_self_config = new MNM_ConfReader(file_folder + "/config.conf", "HYBRID");
+  m_self_config = new MNM_ConfReader(file_folder + "/config.conf", "ADAPTIVE");
   m_routing_freq = m_self_config -> get_int("route_frq");
   m_table = new Routing_Table();
 }
 
-MNM_Routing_Hybrid::~MNM_Routing_Hybrid()
+MNM_Routing_Adaptive::~MNM_Routing_Adaptive()
 {
   for (auto _it = m_od_factory -> m_destination_map.begin(); _it != m_od_factory -> m_destination_map.end(); _it++){
     m_table -> find(_it -> second) -> second -> clear();
@@ -108,7 +108,7 @@ MNM_Routing_Hybrid::~MNM_Routing_Hybrid()
   delete m_table;
 }
 
-int MNM_Routing_Hybrid::init_routing(Path_Table *path_table)
+int MNM_Routing_Adaptive::init_routing(Path_Table *path_table)
 {
   std::unordered_map<TInt, TInt> *_shortest_path_tree;
   for (auto _it = m_od_factory -> m_destination_map.begin(); _it != m_od_factory -> m_destination_map.end(); _it++){
@@ -122,7 +122,7 @@ int MNM_Routing_Hybrid::init_routing(Path_Table *path_table)
 }
 
 
-int MNM_Routing_Hybrid::update_routing(TInt timestamp)
+int MNM_Routing_Adaptive::update_routing(TInt timestamp)
 {
   MNM_Destination *_dest;
   TInt _dest_node_ID;
@@ -242,7 +242,7 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
 
 
 /**************************************************************************
-                          fixed rouing
+                          fixed routing
 **************************************************************************/
 
 MNM_Routing_Fixed::MNM_Routing_Fixed(PNEGraph &graph,

@@ -504,18 +504,32 @@ int MNM_Dlink_Ctm_Multiclass::move_last_cell()
 	return 0;
 }
 
+// TFlt MNM_Dlink_Ctm_Multiclass::get_link_supply()
+// {
+// 	m_cell_array[0] -> update_perceived_density();
+// 	TFlt _supply_car = m_cell_array[0] -> m_space_fraction_car * std::min(m_cell_array[0] -> m_flow_cap_car, 
+// 					TFlt(m_wave_speed_car * (m_cell_array[0] -> m_hold_cap_car - m_cell_array[0] -> m_perceived_density_car)));
+// 	TFlt _supply_truck = m_cell_array[0] -> m_space_fraction_truck * std::min(m_cell_array[0] -> m_flow_cap_truck, 
+// 					TFlt(m_wave_speed_truck * (m_cell_array[0] -> m_hold_cap_truck - m_cell_array[0] -> m_perceived_density_truck)));
+// 	TFlt _supply = std::max(TFlt(0.0), _supply_car) + m_veh_convert_factor * std::max(TFlt(0.0), _supply_truck);
+
+// 	return _supply * (m_cell_array[0] -> m_unit_time);
+// }
+
 TFlt MNM_Dlink_Ctm_Multiclass::get_link_supply()
 {
-	m_cell_array[0] -> update_perceived_density();
-	TFlt _supply_car = m_cell_array[0] -> m_space_fraction_car * std::min(m_cell_array[0] -> m_flow_cap_car, 
-					TFlt(m_wave_speed_car * (m_cell_array[0] -> m_hold_cap_car - m_cell_array[0] -> m_perceived_density_car)));
-	TFlt _supply_truck = m_cell_array[0] -> m_space_fraction_truck * std::min(m_cell_array[0] -> m_flow_cap_truck, 
-					TFlt(m_wave_speed_truck * (m_cell_array[0] -> m_hold_cap_truck - m_cell_array[0] -> m_perceived_density_truck)));
-	TFlt _supply = std::max(TFlt(0.0), _supply_car) + m_veh_convert_factor * std::max(TFlt(0.0), _supply_truck);
+	//TFlt _real_volume_both = ( TFlt(m_cell_array[0] -> m_volume_truck) * m_veh_convert_factor + 
+	//						   TFlt(m_cell_array[0] -> m_volume_car) ) / m_flow_scalar;
+	TFlt _real_volume_both = ( TFlt(m_cell_array[0] -> m_volume_truck) * 1 + 
+							   TFlt(m_cell_array[0] -> m_volume_car) ) / m_flow_scalar;
 
-	return _supply * (m_cell_array[0] -> m_unit_time);
+	// m_cell_length can't be 0 according to implementation above
+	TFlt _density = _real_volume_both / (m_cell_array[0] -> m_cell_length);
+	double _tmp = std::min(double(m_cell_array[0] -> m_flow_cap_car), m_wave_speed_car * (m_cell_array[0] -> m_hold_cap_car - _density));
+
+	return std::max(0.0, _tmp) * (m_cell_array[0] -> m_unit_time);
 }
-
+	
 int MNM_Dlink_Ctm_Multiclass::clear_incoming_array()
 {
 	// if (get_link_supply() * m_flow_scalar < m_incoming_array.size()){
@@ -628,7 +642,8 @@ MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::Ctm_Cell_Multiclass(TFlt cell_len
 	m_wave_speed_car = wave_speed_car;
 	m_wave_speed_truck = wave_speed_truck;
 
-	m_space_fraction_car = TFlt(0);
+	// initialized as car=1, truck=0
+	m_space_fraction_car = TFlt(1);
 	m_space_fraction_truck = TFlt(0);
 
 	m_volume_car = TInt(0);
@@ -662,7 +677,8 @@ int MNM_Dlink_Ctm_Multiclass::Ctm_Cell_Multiclass::update_perceived_density()
 		m_perceived_density_car = _density_car + m_critical_density_car * _space_fraction_truck;
 		m_perceived_density_truck = _density_truck + m_critical_density_truck * _space_fraction_car;
 		if (_space_fraction_car + _space_fraction_truck == 0){
-			m_space_fraction_car = 0;
+			// same to initial values car=1, truck=0
+			m_space_fraction_car = 1;
 			m_space_fraction_truck = 0;
 		}
 		else {
@@ -783,7 +799,8 @@ MNM_Dlink_Lq_Multiclass::MNM_Dlink_Lq_Multiclass(TInt ID,
 	m_volume_car = TInt(0);
 	m_volume_truck = TInt(0);
 
-	m_space_fraction_car = TFlt(0);
+	// initialized as car=1, truck=0
+	m_space_fraction_car = TFlt(1);
 	m_space_fraction_truck = TFlt(0);
 
 	m_flow_scalar = flow_scalar;
@@ -816,7 +833,8 @@ int MNM_Dlink_Lq_Multiclass::update_perceived_density()
 		m_perceived_density_car = _density_car + m_k_C_car * _space_fraction_truck;
 		m_perceived_density_truck = _density_truck + m_k_C_truck * _space_fraction_car;
 		if (_space_fraction_car + _space_fraction_truck == 0){
-			m_space_fraction_car = 0;
+			// same to initial values: car=1, truck=0
+			m_space_fraction_car = 1;
 			m_space_fraction_truck = 0;
 		}
 		else {
@@ -892,13 +910,14 @@ int MNM_Dlink_Lq_Multiclass::evolve(TInt timestamp)
 
 	TFlt _demand_car = m_space_fraction_car * std::min(m_C_car, TFlt(m_ffs_car * m_perceived_density_car)) * m_unit_time;
 	TFlt _demand_truck = m_space_fraction_truck * std::min(m_C_truck, TFlt(m_ffs_truck * m_perceived_density_truck)) * m_unit_time;
-	// TFlt _demand = _demand_car + m_veh_convert_factor * _demand_truck;
+	TFlt _demand = _demand_car + m_veh_convert_factor * _demand_truck;
+	TFlt _veh_to_move = _demand * m_flow_scalar - TInt(m_finished_array.size());
 
 	// Move vehicle from queue to buffer
 	MNM_Veh *_v;
-	TInt _veh_to_move_car = MNM_Ults::round(_demand_car * m_flow_scalar) - TInt(_count_car);
+	TInt _veh_to_move_car = MNM_Ults::round(_veh_to_move * (_demand_car / _demand));
 	_veh_to_move_car = std::min(_veh_to_move_car, TInt(m_veh_queue_car.size()));
-	TInt _veh_to_move_truck = MNM_Ults::round(_demand_truck * m_flow_scalar) - TInt(_count_truck);
+	TInt _veh_to_move_truck = MNM_Ults::round(_veh_to_move * (m_veh_convert_factor * _demand_truck / _demand) / m_veh_convert_factor);
 	_veh_to_move_truck = std::min(_veh_to_move_truck, TInt(m_veh_queue_truck.size()));
 	// printf("demand %f, Veh queue size %d, finished size %d, to move %d \n", (float) _demand(), (int) m_veh_queue.size(), (int)m_finished_array.size(), _veh_to_move());
 	for (int i = 0; i < _veh_to_move_car; ++i){
@@ -994,9 +1013,25 @@ int MNM_Dlink_Lq_Multiclass::evolve(TInt timestamp)
 
 TFlt MNM_Dlink_Lq_Multiclass::get_link_supply()
 {
+	// std::deque<MNM_Veh*>::iterator _veh_it;
+	// TInt _count_car = 0;
+	// TInt _count_truck = 0;
+	// for (_veh_it = m_finished_array.begin(); _veh_it != m_finished_array.end(); _veh_it++){
+	// 	MNM_Veh_Multiclass *_veh = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it);
+	// 	if (_veh -> m_class == 0) _count_car += 1;
+	// 	if (_veh -> m_class == 1) _count_truck += 1;
+	// }
+	// m_volume_car = m_veh_queue_car.size() + _count_car;
+	// m_volume_truck = m_veh_queue_truck.size() + _count_truck;
 	// update_perceived_density();
+
 	TFlt _supply_car = m_space_fraction_car * std::min(m_C_car, TFlt(m_w_car * (m_k_j_car - m_perceived_density_car))) * m_unit_time;
 	TFlt _supply_truck = m_space_fraction_truck * std::min(m_C_truck, TFlt(m_w_truck * (m_k_j_truck - m_perceived_density_truck))) * m_unit_time;
+
+	// Only for short links, change the FD shape around rhoj:
+    // _supply_car = std::max(_supply_car, TFlt(m_space_fraction_car * m_w_car * 0.25 * (m_k_j_car - m_k_C_car) * m_unit_time));
+    // _supply_truck = std::max(_supply_truck, TFlt(m_space_fraction_truck * m_w_truck * 0.25 * (m_k_j_truck - m_k_C_truck) * m_unit_time));
+
 	TFlt _supply = std::max(TFlt(0.0), _supply_car) + m_veh_convert_factor * std::max(TFlt(0.0), _supply_truck);
 	return _supply;
 }
