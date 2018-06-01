@@ -35,21 +35,21 @@ public:
   MNM_Routing_Random(PNEGraph &graph,
                       MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
   ~MNM_Routing_Random();
-  int virtual init_routing(Path_Table *path_table=NULL);
-  int virtual update_routing(TInt timestamp);
+  int virtual init_routing(Path_Table *path_table=NULL) override;
+  int virtual update_routing(TInt timestamp) override;
 };
 
 
 
-class MNM_Routing_Hybrid : public MNM_Routing
+class MNM_Routing_Adaptive : public MNM_Routing
 {
 public:
-  MNM_Routing_Hybrid(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, 
+  MNM_Routing_Adaptive(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, 
                       MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory);
-  ~MNM_Routing_Hybrid();
-  int virtual init_routing(Path_Table *path_table=NULL);
-  int virtual update_routing(TInt timestamp);  
-private:
+  ~MNM_Routing_Adaptive();
+  int virtual init_routing(Path_Table *path_table=NULL) override;
+  int virtual update_routing(TInt timestamp) override;  
+// private:
   MNM_Statistics* m_statistics;
   Routing_Table *m_table;
   TInt m_routing_freq;
@@ -65,8 +65,8 @@ public:
               MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, 
               MNM_Link_Factory *link_factory, TInt route_frq = TInt(-1));
   ~MNM_Routing_Fixed();
-  int virtual init_routing(Path_Table *path_table=NULL);
-  int virtual update_routing(TInt timestamp);
+  int virtual init_routing(Path_Table *path_table=NULL) override;
+  int virtual update_routing(TInt timestamp) override;
 // private:
   int set_path_table(Path_Table *path_table);
   int register_veh(MNM_Veh* veh);
@@ -79,9 +79,24 @@ public:
   // TInt m_cur_routing_interval;
 };
 
+
+// just a wrapper of Adaptive and Fixed routing
+class MNM_Routing_Hybrid : public MNM_Routing
+{
+public:
+  MNM_Routing_Hybrid(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, MNM_OD_Factory *od_factory, 
+                    MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory, TInt route_frq_fixed = TInt(-1));
+  ~MNM_Routing_Hybrid();
+  int virtual init_routing(Path_Table *path_table=NULL) override;
+  int virtual update_routing(TInt timestamp) override;
+
+  MNM_Routing_Adaptive* m_routing_adaptive;
+  MNM_Routing_Fixed* m_routing_fixed;
+};
+
+
+
 // ==================== For SO-DTA, by pinchao =========================//
-
-
 class MNM_Routing_Predetermined : public MNM_Routing
 {
 public:
@@ -102,4 +117,5 @@ public:
   std::unordered_map<MNM_Veh*, std::deque<TInt>*> m_tracker;
 
 };
+
 #endif

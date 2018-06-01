@@ -58,7 +58,7 @@ int MNM_Origin::release_one_interval(TInt current_interval, MNM_Veh_Factory* veh
   MNM_Veh *_veh;
   for (auto _demand_it = m_demand.begin(); _demand_it != m_demand.end(); _demand_it++) {
     _veh_to_release = TInt(MNM_Ults::round((_demand_it -> second)[assign_interval] * m_flow_scalar)) ;
-    for (int i=0; i<_veh_to_release; ++i) {
+    for (int i = 0; i < _veh_to_release; ++i) {
       if (adaptive_ratio == TFlt(0)){
         _veh = veh_factory -> make_veh(current_interval, MNM_TYPE_STATIC);
       }
@@ -66,13 +66,18 @@ int MNM_Origin::release_one_interval(TInt current_interval, MNM_Veh_Factory* veh
         _veh = veh_factory -> make_veh(current_interval, MNM_TYPE_ADAPTIVE);
       }
       else{
-        printf("HyBrid assign, not implemented!\n");
-        exit(-1);
+        TFlt _r = MNM_Ults::rand_flt();
+        if (_r <= adaptive_ratio){
+          _veh = veh_factory -> make_veh(current_interval, MNM_TYPE_ADAPTIVE);
+        }
+        else{
+          _veh = veh_factory -> make_veh(current_interval, MNM_TYPE_STATIC);
+        }
       }
       _veh -> set_destination(_demand_it -> first);
       _veh -> set_origin(this);
       _veh -> m_assign_interval = assign_interval;
-      m_origin_node -> m_in_veh_queue.push_back(_veh); 
+      m_origin_node -> m_in_veh_queue.push_back(_veh);
     }
   }
   return 0;

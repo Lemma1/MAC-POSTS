@@ -5,7 +5,7 @@
 
 int main()
 {
-	MNM_Dlink *_link;
+	// MNM_Dlink *_link;
 
 	printf("BEGIN sigle class DTA test!\n");
 
@@ -29,7 +29,7 @@ int main()
 	printf("========================== Finished pre_loading! ==========================\n");
 
 	printf("\n\n\n====================================== Start loading! =======================================\n");
-	bool _verbose = true;
+	bool _verbose = false;
 	bool output_veh_locs = false; // if true output veh location every vis_frequency
 	TInt vis_frequency = 60; // 5 minutes
 	std::ofstream _vis_file;
