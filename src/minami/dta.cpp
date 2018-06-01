@@ -78,7 +78,11 @@ int MNM_Dta::set_routing()
     m_routing -> init_routing(_path_table);
     // printf("Finishend set routing\n");
   }
-
+  else if (m_config ->get_string("routing_type") == "Due"){
+    // Path_Table *_path_table = MNM::build_pathset(m_graph, m_od_factory, m_link_factory);
+    m_routing = new MNM_Routing_Fixed(m_graph, m_od_factory, m_node_factory, m_link_factory, m_config -> get_int("assign_frq"));
+    // m_routing -> init_routing(_path_table);
+  }
 
   // m_routing = new MNM_Routing_Random(m_graph, m_statistics, m_od_factory, m_node_factory, m_link_factory);
 
