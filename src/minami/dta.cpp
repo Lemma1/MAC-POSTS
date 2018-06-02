@@ -74,6 +74,15 @@ int MNM_Dta::set_routing()
     m_routing = new MNM_Routing_Fixed(m_graph, m_od_factory, m_node_factory, m_link_factory, _tmp_conf -> get_int("route_frq"));
     m_routing -> init_routing(_path_table);
   }
+  
+  else if (m_config ->get_string("routing_type") == "Due"){
+    // Path_Table *_path_table = MNM::build_pathset(m_graph, m_od_factory, m_link_factory);
+    m_routing = new MNM_Routing_Fixed(m_graph, m_od_factory, m_node_factory, m_link_factory, m_config -> get_int("assign_frq"));
+    // m_routing -> init_routing(_path_table);
+  }
+
+  // m_routing = new MNM_Routing_Random(m_graph, m_statistics, m_od_factory, m_node_factory, m_link_factory);
+
   else if (m_config ->get_string("routing_type") == "Hybrid"){
     MNM_ConfReader* _tmp_conf = new MNM_ConfReader(m_file_folder + "/config.conf", "FIXED");
     Path_Table *_path_table;
@@ -94,6 +103,7 @@ int MNM_Dta::set_routing()
     m_routing -> init_routing();
   }
   return 0;
+
 }
 
 int MNM_Dta::build_workzone()
