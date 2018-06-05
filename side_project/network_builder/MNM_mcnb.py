@@ -4,8 +4,8 @@ import networkx as nx
 from bidict import bidict
 from collections import OrderedDict
 
-DLINK_ENUM = ['CTM', 'LQ', 'LTM', 'PQ']
-DNODE_ENUM = ['FWJ', 'GRJ', 'DMOND', 'DMDND']
+DLINK_ENUM = ['CTM', 'LQ', 'PQ']
+DNODE_ENUM = ['FWJ', 'DMOND', 'DMDND']
 
 
 class MNM_dlink():
@@ -13,75 +13,97 @@ class MNM_dlink():
     self.ID = None
     self.length = None
     self.typ = None
-    self.ffs = None
-    self.cap = None
-    self.rhoj = None
+    self.ffs_car = None
+    self.cap_car = None
+    self.rhoj_car = None
     self.lanes = None
+    self.ffs_truck = None
+    self.cap_truck = None
+    self.convert_factor = None
 
-  def __init__(self, ID, length, typ, ffs, cap, rhoj, lanes):
+  def __init__(self, ID, length, typ, ffs_car, cap_car, rhoj_car, lanes, 
+                  ffs_truck, cap_truck, rhoj_truck, convert_factor):
     self.ID = ID
     self.length = length  #mile
     self.typ = typ        #type
-    self.ffs = ffs        #mile/h
-    self.cap = cap        #v/hour
-    self.rhoj = rhoj      #v/miles
+    self.ffs_car = ffs_car        #mile/h
+    self.cap_car = cap_car        #v/hour
+    self.rhoj_car = rhoj_car      #v/miles
     self.lanes = lanes    #num of lanes
+    self.ffs_truck = ffs_truck        #mile/h
+    self.cap_truck = cap_truck        #v/hour
+    self.rhoj_truck = rhoj_truck      #v/miles
+    self.convert_factor = convert_factor
+
 
   def get_fft(self):
     return self.length / self.ffs * 3600
 
   def is_ok(self, unit_time = 5):
     assert(self.length > 0.0)
-    assert(self.ffs > 0.0)
-    assert(self.cap > 0.0)
-    assert(self.rhoj > 0.0)
+    assert(self.ffs_car > 0.0)
+    assert(self.cap_car > 0.0)
+    assert(self.rhoj_car > 0.0)
+    assert(self.ffs_truck > 0.0)
+    assert(self.cap_truck > 0.0)
+    assert(self.rhoj_truck > 0.0)
     assert(self.lanes > 0)
+    assert(self.convert_factor >= 1)
     assert(self.typ in DLINK_ENUM)
-    assert(self.cap / self.ffs < self.rhoj)
+    assert(self.cap_car / self.ffs_car < self.rhoj_car)
+    assert(self.cap_truck / self.ffs_truck < self.rhoj_truck)
     # if self.ffs < 9999:
     #   assert(unit_time * self.ffs / 3600 <= self.length)
 
   def __str__(self):
-    return "MNM_dlink, ID: {}, type: {}, length: {} miles, ffs: {} mi/h".format(self.ID, self.typ, self.length, self.ffs)
+    return ("MNM_dlink, ID: {}, type: {}, length: {} miles, ffs_car: {} mi/h, ffs_truck: {}".format(self.ID, 
+                self.typ, self.length, self.ffs_car, self.ffs_truck))
 
   def __repr__(self):
     return self.__str__()
 
   def generate_text(self):
-    return ' '.join([str(e) for e in [self.ID, self.typ, self.length, self.ffs, self.cap, self.rhoj, self.lanes]])
+    return ' '.join([str(e) for e in [self.ID, self.typ, 
+            self.length, self.ffs_car, self.cap_car, self.rhoj_car, self.lanes,
+            self.ffs_truck, self.cap_truck, self.rhoj_truck, self.convert_factor]])
 
 class MNM_dnode():
   def __init__(self):
     self.ID = None
     self.typ = None
-  def __init__(self, ID, typ):
+    self.convert_factor = None
+  def __init__(self, ID, typ, convert_factor):
     self.ID = ID
     self.typ = typ
+    self.convert_factor = convert_factor
+
   def is_ok(self):
     assert(self.typ in DNODE_ENUM)
 
   def __str__(self):
-    return "MNM_dnode, ID: {}, type: {}".format(self.ID, self.typ)
+    return "MNM_dnode, ID: {}, type: {}, convert_factor: {}".format(self.ID, self.typ, self.convert_factor)
 
   def __repr__(self):
     return self.__str__()
 
   def generate_text(self):
-    return ' '.join([str(e) for e in [self.ID, self.typ]])
+    return ' '.join([str(e) for e in [self.ID, self.typ, self.convert_factor]])
 
 class MNM_demand():
   def __init__(self):
     self.demand_dict = dict()
 
-  def add_demand(self, O, D, demand, overwriting = False):
-    assert(type(demand) is np.ndarray)
-    assert(len(demand.shape) == 1)
+  def add_demand(self, O, D, car_demand, truck_demand, overwriting = False):
+    assert(type(car_demand) is np.ndarray)
+    assert(len(car_demand.shape) == 1)
+    assert(type(truck_demand) is np.ndarray)
+    assert(len(truck_demand.shape) == 1)
     if O not in self.demand_dict.keys():
       self.demand_dict[O] = dict()
     if (not overwriting) and (D in self.demand_dict[O].keys()):
       raise("Error, exists OD demand already") 
     else:
-      self.demand_dict[O][D] = demand
+      self.demand_dict[O][D] = [car_demand, truck_demand]
 
   def build_from_file(self, file_name):
     f = file(file_name)
@@ -95,7 +117,9 @@ class MNM_demand():
       O_ID = np.int(words[0])
       D_ID = np.int(words[1])
       demand = np.array(words[2:]).astype(np.float)
-      self.add_demand(O_ID, D_ID, demand)
+      total_l = len(demand)
+      assert (total_l % 2 == 0)
+      self.add_demand(O_ID, D_ID, demand[0: total_l /2], demand[- total_l /2:])
 
   def __str__(self):
     return "MNM_demand, number of O: {}".format(len(self.demand_dict))
@@ -104,10 +128,11 @@ class MNM_demand():
     return self.__str__()
 
   def generate_text(self):
-    tmp_str = '#Origin_ID Destination_ID <demand by interval>\n'
+    tmp_str = '#Origin_ID Destination_ID <car demand by interval> <truck demand by interval>\n'
     for O in self.demand_dict.keys():
       for D in self.demand_dict[O].keys():
-        tmp_str += ' '.join([str(e) for e in [O, D] + self.demand_dict[O][D].tolist()]) + '\n'
+        tmp_str += ' '.join([str(e) for e in [O, D] + 
+                  self.demand_dict[O][D][0].tolist() + self.demand_dict[O][D][1].tolist()] ) + '\n'
     return tmp_str
 
 
@@ -562,11 +587,15 @@ class MNM_network_builder():
       ID = np.int(words[0])
       typ = words[1]
       length = np.float(words[2])
-      ffs = np.float(words[3])
-      cap = np.float(words[4])
-      rhoj = np.float(words[5])
+      ffs_car = np.float(words[3])
+      cap_car = np.float(words[4])
+      rhoj_car = np.float(words[5])
       lanes = np.int(words[6])
-      l = MNM_dlink(ID, length, typ, ffs, cap, rhoj, lanes)
+      ffs_truck = np.float(words[7])
+      cap_truck = np.float(words[8])
+      rhoj_truck = np.float(words[9])
+      convert_factor = np.float(words[10])
+      l = MNM_dlink(ID, length, typ, ffs_car, cap_car, rhoj_car, lanes, ffs_truck, cap_truck, rhoj_truck, convert_factor)
       l.is_ok()
       link_list.append(l)
     return link_list
@@ -583,19 +612,22 @@ class MNM_network_builder():
       words = tmp_str.split()
       ID = np.int(words[0])
       typ = words[1]
-      n = MNM_dnode(ID, typ)
+      convert_factor = np.float(words[2])
+      n = MNM_dnode(ID, typ, convert_factor)
       n.is_ok()
       node_list.append(n)
     return node_list
 
   def generate_link_text(self):
-    tmp_str = '#ID Type LEN(mile) FFS(mile/h) Cap(v/hour) RHOJ(v/miles) Lane\n'
+    tmp_str = '''#ID Type LEN(mile) FFS_car(mile/h) Cap_car(v/hour) RHOJ_car(v/miles) 
+                  Lane FFS_truck(mile/h) Cap_truck(v/hour) 
+                  RHOJ_truck(v/miles) Convert_factor(1)\n'''
     for link in self.link_list:
       tmp_str += link.generate_text() + '\n'
     return tmp_str
 
   def generate_node_text(self):
-    tmp_str = '#ID Type\n'
+    tmp_str = '#ID Type Convert_factor(only for Inout node)\n'
     for node in self.node_list:
       tmp_str += node.generate_text() + '\n'
     return tmp_str
@@ -603,23 +635,23 @@ class MNM_network_builder():
   def set_network_nake(self, name):
     self.network_name = name
 
-  def update_demand_path(self, f):
-    assert (len(f) == len(self.path_table.ID2path) * self.config.config_dict['DTA']['max_interval'])
-    f = f.reshape(self.config.config_dict['DTA']['max_interval'], len(self.path_table.ID2path))
-    for i, path_ID in enumerate(self.path_table.ID2path.keys()):
-      path = self.path_table.ID2path[path_ID]
-      path.attach_route_choice_portions(f[:, i])
-    self.demand.demand_dict = dict()
-    for O_node in self.path_table.path_dict.keys():
-      for D_node in self.path_table.path_dict[O_node].keys():
-        demand = self.path_table.path_dict[O_node][D_node].normalize_route_portions(sum_to_OD = True)
-        self.demand.add_demand(self.od.O_dict.inv[O_node], self.od.D_dict.inv[D_node], demand, overwriting = True)
-    self.route_choice_flag = True
+  # def update_demand_path(self, f):
+  #   assert (len(f) == len(self.path_table.ID2path) * self.config.config_dict['DTA']['max_interval'])
+  #   f = f.reshape(self.config.config_dict['DTA']['max_interval'], len(self.path_table.ID2path))
+  #   for i, path_ID in enumerate(self.path_table.ID2path.keys()):
+  #     path = self.path_table.ID2path[path_ID]
+  #     path.attach_route_choice_portions(f[:, i])
+  #   self.demand.demand_dict = dict()
+  #   for O_node in self.path_table.path_dict.keys():
+  #     for D_node in self.path_table.path_dict[O_node].keys():
+  #       demand = self.path_table.path_dict[O_node][D_node].normalize_route_portions(sum_to_OD = True)
+  #       self.demand.add_demand(self.od.O_dict.inv[O_node], self.od.D_dict.inv[D_node], demand, overwriting = True)
+  #   self.route_choice_flag = True
 
-  def get_path_flow(self):
-    f = np.zeros((self.config.config_dict['DTA']['max_interval'], len(self.path_table.ID2path)))
-    for i, ID in enumerate(self.path_table.ID2path.keys()):
-      path = self.path_table.ID2path[ID]
-      # print path.route_portions
-      f[:, i] = path.route_portions * self.demand.demand_dict[self.od.O_dict.inv[path.origin_node]][self.od.D_dict.inv[path.destination_node]]
-    return f.flatten()
+  # def get_path_flow(self):
+  #   f = np.zeros((self.config.config_dict['DTA']['max_interval'], len(self.path_table.ID2path)))
+  #   for i, ID in enumerate(self.path_table.ID2path.keys()):
+  #     path = self.path_table.ID2path[ID]
+  #     # print path.route_portions
+  #     f[:, i] = path.route_portions * self.demand.demand_dict[self.od.O_dict.inv[path.origin_node]][self.od.D_dict.inv[path.destination_node]]
+  #   return f.flatten()
