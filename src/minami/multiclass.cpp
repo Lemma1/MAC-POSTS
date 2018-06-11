@@ -2398,6 +2398,11 @@ MNM_Dta_Multiclass::~MNM_Dta_Multiclass()
 
 int MNM_Dta_Multiclass::initialize()
 {
+	if (m_veh_factory != NULL) delete m_veh_factory;
+  	if (m_node_factory != NULL) delete m_node_factory;
+  	if (m_link_factory != NULL) delete m_link_factory;
+  	if (m_od_factory != NULL) delete m_od_factory;
+  	if (m_config != NULL) delete m_config;
 	m_veh_factory = new MNM_Veh_Factory_Multiclass();
 	m_node_factory = new MNM_Node_Factory_Multiclass();
 	m_link_factory = new MNM_Link_Factory_Multiclass();
