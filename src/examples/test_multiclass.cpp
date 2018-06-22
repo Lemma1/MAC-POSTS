@@ -11,11 +11,11 @@ int main()
 	printf("BEGIN multiclass test!\n");
 
 	// On ubuntu (PC)
-	// std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_MckeesRocks_SPC";
+	std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_MckeesRocks_SPC";
 	// std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_7link_multiclass";
 
 	// on macOS (Mac air)
-	std::string folder = "/Users/alan-air/Dropbox/MAC-POSTS/data/input_files_MckeesRocks_SPC";
+	// std::string folder = "/Users/alan-air/Dropbox/MAC-POSTS/data/input_files_MckeesRocks_SPC";
 	// std::string folder = "/Users/alan-air/Dropbox/MAC-POSTS/data/input_files_7link_multiclass";
 
 

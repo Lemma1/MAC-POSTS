@@ -528,7 +528,7 @@ TFlt MNM_Dlink_Ctm_Multiclass::get_link_supply()
 	double _tmp = std::min(double(m_cell_array[0] -> m_flow_cap_car), m_wave_speed_car * (m_cell_array[0] -> m_hold_cap_car - _density));
 
 	// only use when network is too large and complex and no other ways solving gridlock.
-	_tmp = std::max(_tmp, m_wave_speed_car * 0.25 * (m_cell_array[0] -> m_hold_cap_car - _density));
+	_tmp = std::max(_tmp, m_wave_speed_car * 0.30 * (m_cell_array[0] -> m_hold_cap_car - _density));
 
 	return std::max(0.0, _tmp) * (m_cell_array[0] -> m_unit_time);
 }
@@ -1032,8 +1032,8 @@ TFlt MNM_Dlink_Lq_Multiclass::get_link_supply()
 	TFlt _supply_truck = m_space_fraction_truck * std::min(m_C_truck, TFlt(m_w_truck * (m_k_j_truck - m_perceived_density_truck))) * m_unit_time;
 
 	// Only for short links, change the FD shape around rhoj:
-    _supply_car = std::max(_supply_car, TFlt(m_space_fraction_car * m_w_car * 0.50 * (m_k_j_car - m_k_C_car) * m_unit_time));
-    _supply_truck = std::max(_supply_truck, TFlt(m_space_fraction_truck * m_w_truck * 0.50 * (m_k_j_truck - m_k_C_truck) * m_unit_time));
+    _supply_car = std::max(_supply_car, TFlt(m_space_fraction_car * m_w_car * 0.25 * (m_k_j_car - m_k_C_car) * m_unit_time));
+    _supply_truck = std::max(_supply_truck, TFlt(m_space_fraction_truck * m_w_truck * 0.25 * (m_k_j_truck - m_k_C_truck) * m_unit_time));
 
 	TFlt _supply = std::max(TFlt(0.0), _supply_car) + m_veh_convert_factor * std::max(TFlt(0.0), _supply_truck);
 	return _supply;
