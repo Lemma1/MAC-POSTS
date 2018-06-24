@@ -8,7 +8,7 @@ import numpy as np
 import copy
 
 
-networkName = 'Philly'
+networkName = 'SR41'
 numOfInterval = 20
 curInt = 1
 
