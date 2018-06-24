@@ -1032,8 +1032,8 @@ TFlt MNM_Dlink_Lq_Multiclass::get_link_supply()
 	TFlt _supply_truck = m_space_fraction_truck * std::min(m_C_truck, TFlt(m_w_truck * (m_k_j_truck - m_perceived_density_truck))) * m_unit_time;
 
 	// Only for short links, change the FD shape around rhoj:
-    _supply_car = std::max(_supply_car, TFlt(m_space_fraction_car * m_w_car * 0.50 * (m_k_j_car - m_k_C_car) * m_unit_time));
-    _supply_truck = std::max(_supply_truck, TFlt(m_space_fraction_truck * m_w_truck * 0.50 * (m_k_j_truck - m_k_C_truck) * m_unit_time));
+    _supply_car = std::max(_supply_car, TFlt(m_space_fraction_car * m_w_car * 0.30 * (m_k_j_car - m_k_C_car) * m_unit_time));
+    _supply_truck = std::max(_supply_truck, TFlt(m_space_fraction_truck * m_w_truck * 0.30 * (m_k_j_truck - m_k_C_truck) * m_unit_time));
 
 	TFlt _supply = std::max(TFlt(0.0), _supply_car) + m_veh_convert_factor * std::max(TFlt(0.0), _supply_truck);
 	return _supply;
@@ -2398,11 +2398,12 @@ MNM_Dta_Multiclass::~MNM_Dta_Multiclass()
 
 int MNM_Dta_Multiclass::initialize()
 {
-  if(m_veh_factory != NULL) delete m_veh_factory;
-  if(m_node_factory != NULL) delete m_node_factory;
-  if(m_link_factory != NULL) delete m_link_factory;
-  if(m_od_factory != NULL) delete m_od_factory;
-  if(m_config != NULL) delete m_config;
+	  if (m_veh_factory != NULL) delete m_veh_factory;
+  	if (m_node_factory != NULL) delete m_node_factory;
+  	if (m_link_factory != NULL) delete m_link_factory;
+  	if (m_od_factory != NULL) delete m_od_factory;
+  	if (m_config != NULL) delete m_config;
+
 	m_veh_factory = new MNM_Veh_Factory_Multiclass();
 	m_node_factory = new MNM_Node_Factory_Multiclass();
 	m_link_factory = new MNM_Link_Factory_Multiclass();

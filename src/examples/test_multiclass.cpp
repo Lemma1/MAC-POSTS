@@ -11,10 +11,23 @@ int main()
 
 	printf("BEGIN multiclass test!\n");
 
+
 	// std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_MckeesRocks_SPC";
 	// std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_7link_multiclass";
-	std::string folder = "/home/lemma/Documents/modes/src/test";
+	// std::string folder = "/home/lemma/Documents/modes/src/test";
 	// MNM_Dta_Multiclass *test_dta = new MNM_Dta_Multiclass(folder);
+
+	// On ubuntu (PC)
+	std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_MckeesRocks_SPC";
+	// std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_7link_multiclass";
+
+	// on macOS (Mac air)
+	// std::string folder = "/Users/alan-air/Dropbox/MAC-POSTS/data/input_files_MckeesRocks_SPC";
+	// std::string folder = "/Users/alan-air/Dropbox/MAC-POSTS/data/input_files_7link_multiclass";
+
+
+	MNM_Dta_Multiclass *test_dta = new MNM_Dta_Multiclass(folder);
+
 	printf("================================ DTA set! =================================\n");
 	
 	// test_dta -> build_from_files();
