@@ -3,6 +3,7 @@
 
 
 #include "dta_gradient_utls.h"
+#include "multiclass.h"
 
 #include <unordered_map>
 
@@ -190,7 +191,7 @@ py::array_t<double> Dta_Api::get_link_tt(py::array_t<int>start_intervals)
   int *start_prt = (int *) start_buf.ptr;
   for (int t = 0; t < l; ++t){
     for (size_t i = 0; i<m_link_vec.size(); ++i){
-      if (start_prt[i] > get_cur_loading_interval()){
+      if (start_prt[t] > get_cur_loading_interval()){
         throw std::runtime_error("Error, Dta_Api::get_link_tt, loaded data not enough");
       }
       result_prt[i * l + t] = MNM_DTA_GRADIENT::get_travel_time(m_link_vec[i], TFlt(start_prt[t]))();
@@ -286,6 +287,182 @@ py::array_t<double> Dta_Api::get_dar_matrix(py::array_t<int>start_intervals, py:
 }
 
 
+/***************************************************************
+***************************************************************
+                        Multiclass
+***************************************************************
+***************************************************************/
+
+Mcdta_Api::Mcdta_Api()
+{
+  m_mcdta = NULL;
+  m_link_vec = std::vector<MNM_Dlink_Multiclass*>();
+  m_path_vec = std::vector<MNM_Path*>();
+  m_path_set = std::set<MNM_Path*>(); 
+  m_ID_path_mapping = std::unordered_map<TInt, MNM_Path*>();
+}
+
+Mcdta_Api::~Mcdta_Api()
+{
+  if (m_mcdta != NULL){
+    delete m_mcdta;
+  }
+  m_link_vec.clear();
+  m_path_vec.clear();
+  
+}
+
+
+int Mcdta_Api::initialize(std::string folder)
+{
+  m_mcdta = new MNM_Dta_Multiclass(folder);
+  m_mcdta -> build_from_files();
+  m_mcdta -> hook_up_node_and_link();
+  m_mcdta -> is_ok();
+  if (MNM_Routing_Fixed *_routing = dynamic_cast<MNM_Routing_Fixed *>(m_mcdta -> m_routing)){
+    MNM::get_ID_path_mapping(m_ID_path_mapping, _routing -> m_path_table);
+  }
+  return 0;
+}
+
+int Mcdta_Api::install_cc()
+{
+  for (size_t i = 0; i<m_link_vec.size(); ++i){
+    m_link_vec[i] -> install_cumulative_curve_multiclass();
+  }
+  return 0;
+}
+
+
+int Mcdta_Api::run_whole()
+{
+  m_mcdta -> pre_loading();
+  m_mcdta -> loading(false);
+  return 0;
+}
+
+
+int Mcdta_Api::register_links(py::array_t<int> links)
+{
+  if (m_link_vec.size() > 0){
+    printf("Warning, Dta_Api::register_links, link exists\n");
+    m_link_vec.clear();
+  }
+  auto links_buf = links.request();
+  if (links_buf.ndim != 1){
+    throw std::runtime_error("Number of dimensions must be one");
+  }
+  int *links_ptr = (int *) links_buf.ptr;
+  MNM_Dlink *_link;
+  for (int i = 0; i < links_buf.shape[0]; i++){
+    _link = m_mcdta -> m_link_factory -> get_link(TInt(links_ptr[i]));
+    if (MNM_Dlink_Multiclass * _mclink = dynamic_cast<MNM_Dlink_Multiclass *>(_link)){
+      if(std::find(m_link_vec.begin(), m_link_vec.end(), _link) != m_link_vec.end()) {
+        throw std::runtime_error("Error, Dta_Api::register_links, link exists");
+      } 
+      else {
+        m_link_vec.push_back(_mclink);
+      }
+    }
+    else{
+      throw std::runtime_error("Mcdta_Api::register_links: link type is not multiclass");
+    }
+  }
+  return 0;
+}
+
+int Mcdta_Api::get_cur_loading_interval()
+{
+  return m_mcdta -> m_current_loading_interval();
+}
+
+
+py::array_t<double> Mcdta_Api::get_car_link_tt(py::array_t<double>start_intervals)
+{
+  auto start_buf = start_intervals.request();
+  if (start_buf.ndim != 1){
+    throw std::runtime_error("Error, Mcdta_Api::get_link_tt, input dismension mismatch");
+  }
+  int l = start_buf.shape[0];
+  int new_shape [2] = { (int) m_link_vec.size(), l}; 
+
+  auto result = py::array_t<double>(new_shape);
+  auto result_buf = result.request();
+  double *result_prt = (double *) result_buf.ptr;
+  double *start_prt = (double *) start_buf.ptr;
+  for (int t = 0; t < l; ++t){
+    // printf("%lf\n", start_prt[t]);
+    for (size_t i = 0; i<m_link_vec.size(); ++i){
+      if (start_prt[t] > get_cur_loading_interval()){
+        throw std::runtime_error("Error, Mcdta_Api::get_link_tt, loaded data not enough");
+      }
+      result_prt[i * l + t] = MNM_DTA_GRADIENT::get_travel_time_car(m_link_vec[i], TFlt(start_prt[t]))();
+    }
+  }
+  return result;
+}
+
+
+py::array_t<double> Mcdta_Api::get_truck_link_tt(py::array_t<double>start_intervals)
+{
+  auto start_buf = start_intervals.request();
+  if (start_buf.ndim != 1){
+    throw std::runtime_error("Error, Mcdta_Api::get_link_tt, input dismension mismatch");
+  }
+  int l = start_buf.shape[0];
+  int new_shape [2] = { (int) m_link_vec.size(), l}; 
+
+  auto result = py::array_t<double>(new_shape);
+  auto result_buf = result.request();
+  double *result_prt = (double *) result_buf.ptr;
+  double *start_prt = (double *) start_buf.ptr;
+  for (int t = 0; t < l; ++t){
+    for (size_t i = 0; i<m_link_vec.size(); ++i){
+      if (start_prt[t] > get_cur_loading_interval()){
+        throw std::runtime_error("Error, Mcdta_Api::get_link_tt, loaded data not enough");
+      }
+      result_prt[i * l + t] = MNM_DTA_GRADIENT::get_travel_time_truck(m_link_vec[i], TFlt(start_prt[t]))();
+    }
+  }
+  return result;
+}
+
+// py::array_t<double> Mcdta_Api::get_car_link_out_cc(int link_ID)
+// {
+//   MNM_Dlink_Multiclass *_link = (MNM_Dlink_Multiclass *) m_mcdta -> m_link_factory -> get_link(TInt(link_ID));
+//   printf("%d\n", _link -> m_link_ID());
+//   if (_link -> m_N_out_car == NULL){
+//     throw std::runtime_error("Error, Mcdta_Api::get_car_link_out_cc, cc not installed");
+//   }
+//   printf("1\n");
+//   std::deque<std::pair<TFlt, TFlt>> _record = _link -> m_N_out_car -> m_recorder;
+//   int new_shape [2] = { (int) _record.size(), 2}; 
+//   auto result = py::array_t<double>(new_shape);
+//   printf("2\n");
+//   auto result_buf = result.request();
+//   double *result_prt = (double *) result_buf.ptr;
+//   printf("3\n");
+//   for (size_t i=0; i< _record.size(); ++i){
+//     result_prt[i * 2 ] = _record[i].first();
+//     result_prt[i * 2 + 1 ] =  _record[i].second();
+//   }
+//   printf("5\n");
+//   return result;
+// }
+
+double Mcdta_Api::get_car_link_out_num(int link_ID, double time)
+{
+  MNM_Dlink_Multiclass *_link = (MNM_Dlink_Multiclass *) m_mcdta -> m_link_factory -> get_link(TInt(link_ID));
+  // printf("%d\n", _link -> m_link_ID());
+  if (_link -> m_N_out_car == NULL){
+    throw std::runtime_error("Error, Mcdta_Api::get_car_link_out_cc, cc not installed");
+  }
+  // printf("1\n");
+  TFlt result = _link -> m_N_out_car -> get_result(TFlt(time));
+  // printf("%lf\n", result());
+  return result(); 
+}
+
 
 
 PYBIND11_MODULE(MNMAPI, m) {
@@ -327,6 +504,23 @@ PYBIND11_MODULE(MNMAPI, m) {
             .def("get_link_out_cc", &Dta_Api::get_link_out_cc)
             .def("get_dar_matrix", &Dta_Api::get_dar_matrix);
 
+    py::class_<Mcdta_Api> (m, "mcdta_api")
+            .def(py::init<>())
+            .def("initialize", &Mcdta_Api::initialize)
+            .def("run_whole", &Mcdta_Api::run_whole)
+            .def("install_cc", &Mcdta_Api::install_cc)
+            // .def("install_cc_tree", &Mcdta_Api::install_cc_tree)
+            .def("get_cur_loading_interval", &Mcdta_Api::get_cur_loading_interval)
+            .def("register_links", &Mcdta_Api::register_links)
+            // .def("register_paths", &Mcdta_Api::register_paths)
+            .def("get_car_link_tt", &Mcdta_Api::get_car_link_tt)
+            .def("get_truck_link_tt", &Mcdta_Api::get_truck_link_tt)
+            .def("get_car_link_out_num", &Mcdta_Api::get_car_link_out_num);
+            // .def("get_car_link_out_cc", &Mcdta_Api::get_car_link_out_cc);
+            // .def("get_link_inflow", &Mcdta_Api::get_link_inflow)
+            // .def("get_link_in_cc", &Mcdta_Api::get_link_in_cc)
+            // .def("get_link_out_cc", &Mcdta_Api::get_link_out_cc)
+            // .def("get_dar_matrix", &Mcdta_Api::get_dar_matrix)
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
 #else

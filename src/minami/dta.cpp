@@ -10,14 +10,14 @@ MNM_Dta::MNM_Dta(std::string file_folder)
 
 MNM_Dta::~MNM_Dta()
 {
-  delete m_veh_factory;
-  delete m_node_factory;
-  delete m_link_factory;
-  delete m_od_factory;
-  delete m_config;
-  delete m_routing;
-  delete m_statistics;
-  delete m_workzone;
+  if(m_veh_factory != NULL) delete m_veh_factory;
+  if(m_node_factory != NULL) delete m_node_factory;
+  if(m_link_factory != NULL) delete m_link_factory;
+  if(m_od_factory != NULL) delete m_od_factory;
+  if(m_config != NULL) delete m_config;
+  if(m_routing != NULL) delete m_routing;
+  if(m_statistics != NULL) delete m_statistics;
+  if(m_workzone != NULL) delete m_workzone;
   m_graph -> Clr();  
 }
 

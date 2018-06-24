@@ -1,11 +1,10 @@
-MESSAGE( STATUS "HELLP")
 cmake_minimum_required (VERSION 2.8)
 project (MINAMI C CXX)
 
 find_package(Threads)
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_COMPILER g++)
-set (CMAKE_CXX_FLAGS "-g -std=c++11 -m64 -Wall -O2 -pthread")
+set (CMAKE_CXX_FLAGS "-std=c++11 -m64 -Wall -O2")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
@@ -21,6 +20,6 @@ add_subdirectory (snap-core)
 add_subdirectory (3rdparty)
 add_subdirectory (minami)
 add_subdirectory (examples)
-add_subdirectory (pybinder)
+#add_subdirectory (pybinder)
 
 

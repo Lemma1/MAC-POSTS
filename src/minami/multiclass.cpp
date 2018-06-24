@@ -1409,9 +1409,9 @@ MNM_Dnode_Inout_Multiclass::MNM_Dnode_Inout_Multiclass(TInt ID, TFlt flow_scalar
 
 MNM_Dnode_Inout_Multiclass::~MNM_Dnode_Inout_Multiclass()
 {
-  	if (m_demand != NULL) free(m_demand);
-  	if (m_supply != NULL) free(m_supply);
-  	if (m_veh_flow != NULL) free(m_veh_flow);
+  	// if (m_demand != NULL) free(m_demand);
+  	// if (m_supply != NULL) free(m_supply);
+  	// if (m_veh_flow != NULL) free(m_veh_flow);
   	if (m_veh_moved_car != NULL) free(m_veh_moved_car);
   	if (m_veh_moved_truck != NULL) free(m_veh_moved_truck);
 }
@@ -2398,6 +2398,11 @@ MNM_Dta_Multiclass::~MNM_Dta_Multiclass()
 
 int MNM_Dta_Multiclass::initialize()
 {
+  if(m_veh_factory != NULL) delete m_veh_factory;
+  if(m_node_factory != NULL) delete m_node_factory;
+  if(m_link_factory != NULL) delete m_link_factory;
+  if(m_od_factory != NULL) delete m_od_factory;
+  if(m_config != NULL) delete m_config;
 	m_veh_factory = new MNM_Veh_Factory_Multiclass();
 	m_node_factory = new MNM_Node_Factory_Multiclass();
 	m_link_factory = new MNM_Link_Factory_Multiclass();
@@ -2511,14 +2516,14 @@ TFlt get_travel_time_car(MNM_Dlink_Multiclass* link, TFlt start_time)
 	}
 	TFlt _cc_flow = link -> m_N_in_car -> get_result(start_time);
 	if (_cc_flow <= DBL_EPSILON){
-		return link -> get_link_freeflow_tt_car();
+		return link -> get_link_freeflow_tt_car()/5.0;
 	}
 	TFlt _end_time = link -> m_N_out_car -> get_time(_cc_flow);
 	if (_end_time() < 0 || (_end_time - start_time < 0)){
-		return link -> get_link_freeflow_tt_car();
+		return link -> get_link_freeflow_tt_car()/5.0;
 	}
 	else{
-		return (_end_time - start_time) * 5; // each interval is 5s
+		return (_end_time - start_time); // each interval is 5s
 	}
 	return 0;
 }
@@ -2533,14 +2538,14 @@ TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time)
 	}
 	TFlt _cc_flow = link -> m_N_in_truck -> get_result(start_time);
 	if (_cc_flow <= DBL_EPSILON){
-		return link -> get_link_freeflow_tt_truck();
+		return link -> get_link_freeflow_tt_truck() /5.0;
 	}
 	TFlt _end_time = link -> m_N_out_truck -> get_time(_cc_flow);
 	if (_end_time() < 0 || (_end_time - start_time < 0)){
-		return link -> get_link_freeflow_tt_truck();
+		return link -> get_link_freeflow_tt_truck() /5.0;
 	}
 	else{
-		return (_end_time - start_time) * 5; // each interval is 5s
+		return (_end_time - start_time); // each interval is 5s
 	}
 	return 0;
 }
