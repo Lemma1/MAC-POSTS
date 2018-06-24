@@ -30,9 +30,9 @@ int main(int argc, char *argv[])
   test_dta -> hook_up_node_and_link();
   // printf("Checking......\n");
   // test_dta -> is_ok();
-  test_dta -> loading(false);
+  test_dta -> loading(true);
 
-
+  printf("Finished Loading!\n");
   delete test_dta;
 
   return 0;

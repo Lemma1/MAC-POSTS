@@ -7,9 +7,13 @@
 
 int main()
 {
-  // std::string m_file_folder = "../../data/input_files_7link_fix";
+  std::string m_file_folder = "../../data/input_files_7link_fix";
   // std::string m_file_folder = "../../data/input_files_philly";
-  std::string m_file_folder = "../../data/input_files_SR41_fix";
+  // std::string m_file_folder = "../../data/input_files_SR41_fix";
+  // std::string m_file_folder = "../../data/input_files_MckeesRocks_SPC";
+  // std::string m_file_folder = "/home/lemma/Documents/truck/Final data for DPFE/tmp_truck";
+
+
   MNM_ConfReader *m_config;
   MNM_Node_Factory *m_node_factory;
   MNM_Link_Factory *m_link_factory;
@@ -39,7 +43,7 @@ int main()
   // printf("node:%d, link:%d\n", p -> m_node_vec.size(),p -> m_link_vec.size());
 
   Path_Table *path_table = MNM::build_pathset(m_graph, m_od_factory, m_link_factory);
-
+  printf("Finish running\n");
   // MNM_Path *p;
   // for (size_t i = 0; i< path_table -> find(1) -> second -> find(5) -> second -> m_path_vec.size(); ++i){
   //   p = path_table -> find(1) -> second -> find(5) -> second -> m_path_vec[i];
@@ -48,7 +52,7 @@ int main()
 
   MNM::save_path_table(path_table, m_od_factory);
 
-
+  printf("Finish saving\n");
   // Path_Table *path_table;
   // path_table = MNM_IO::load_path_table("path_table", m_graph, 189065);
 
