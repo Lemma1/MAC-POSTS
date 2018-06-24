@@ -128,6 +128,38 @@ MNM_Path *extract_path(TInt origin_ID, TInt dest_ID, std::unordered_map<TInt, TI
 }
 
 
+Path_Table *build_shoartest_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_Factory *link_factory){
+  Path_Table *_path_table = new Path_Table();
+  for (auto _o_it = od_factory -> m_origin_map.begin(); _o_it != od_factory -> m_origin_map.end(); _o_it++){
+    std::unordered_map<TInt, MNM_Pathset*> *_new_map = new std::unordered_map<TInt, MNM_Pathset*>();
+    _path_table -> insert(std::pair<TInt, std::unordered_map<TInt, MNM_Pathset*>*>(_o_it -> second -> m_origin_node -> m_node_ID, _new_map));
+    for (auto _d_it = od_factory -> m_destination_map.begin(); _d_it != od_factory -> m_destination_map.end(); _d_it++){
+      MNM_Pathset *_pathset = new MNM_Pathset();
+      _new_map -> insert(std::pair<TInt, MNM_Pathset*>(_d_it -> second -> m_dest_node -> m_node_ID, _pathset));
+    }
+  }
+  TInt _dest_node_ID, _origin_node_ID;
+  std::unordered_map<TInt, TFlt> _free_cost_map =  std::unordered_map<TInt, TFlt>();
+  std::unordered_map<TInt, TInt> _free_shortest_path_tree;
+  MNM_Path *_path;
+  for (auto _link_it = link_factory -> m_link_map.begin(); _link_it!= link_factory -> m_link_map.end(); _link_it++){
+    _free_cost_map.insert(std::pair<TInt, TFlt>(_link_it -> first, _link_it -> second -> get_link_tt()));
+  }
+  for (auto _d_it = od_factory -> m_destination_map.begin(); _d_it != od_factory -> m_destination_map.end(); _d_it++){
+    _dest_node_ID = _d_it -> second -> m_dest_node -> m_node_ID;
+    MNM_Shortest_Path::all_to_one_FIFO(_dest_node_ID, graph, _free_cost_map, _free_shortest_path_tree);
+    for (auto _o_it = od_factory -> m_origin_map.begin(); _o_it != od_factory -> m_origin_map.end(); _o_it++){
+      _origin_node_ID = _o_it -> second -> m_origin_node -> m_node_ID;
+      _path = MNM::extract_path(_origin_node_ID, _dest_node_ID, _free_shortest_path_tree, graph);
+      if (_path != NULL){
+        _path_table -> find(_origin_node_ID) -> second -> find(_dest_node_ID) -> second -> m_path_vec.push_back(_path);
+      }
+    }
+  }
+  return _path_table;
+}
+
+
 Path_Table *build_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_Factory *link_factory)
 {
   /* setting */
