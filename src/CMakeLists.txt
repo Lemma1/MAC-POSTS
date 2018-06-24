@@ -20,6 +20,6 @@ add_subdirectory (snap-core)
 add_subdirectory (3rdparty)
 add_subdirectory (minami)
 add_subdirectory (examples)
-#add_subdirectory (pybinder)
+add_subdirectory (pybinder)
 
 
