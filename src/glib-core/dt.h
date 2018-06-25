@@ -364,7 +364,7 @@ public:
     Refs=0; Bf=new char[2+1]; Bf[0]=Ch1; Bf[1]=Ch2; Bf[2]=0;}
   ~TRStr(){
     // Comment this line if use shared library to prevent memory error
-    // Assert(((this!=GetNullRStr())&&(Refs==0))||((this==GetNullRStr())&&(Refs==1)));
+    Assert(((this!=GetNullRStr())&&(Refs==0))||((this==GetNullRStr())&&(Refs==1)));
     delete[] Bf;}
   explicit TRStr(TSIn& SIn, const bool& IsSmall){
     if (IsSmall){Refs=0; SIn.Load(Bf);}

@@ -1409,9 +1409,9 @@ MNM_Dnode_Inout_Multiclass::MNM_Dnode_Inout_Multiclass(TInt ID, TFlt flow_scalar
 
 MNM_Dnode_Inout_Multiclass::~MNM_Dnode_Inout_Multiclass()
 {
-  	// if (m_demand != NULL) free(m_demand);
-  	// if (m_supply != NULL) free(m_supply);
-  	// if (m_veh_flow != NULL) free(m_veh_flow);
+  	if (m_demand != NULL) free(m_demand);
+  	if (m_supply != NULL) free(m_supply);
+  	if (m_veh_flow != NULL) free(m_veh_flow);
   	if (m_veh_moved_car != NULL) free(m_veh_moved_car);
   	if (m_veh_moved_truck != NULL) free(m_veh_moved_truck);
 }
@@ -2398,7 +2398,7 @@ MNM_Dta_Multiclass::~MNM_Dta_Multiclass()
 
 int MNM_Dta_Multiclass::initialize()
 {
-	  if (m_veh_factory != NULL) delete m_veh_factory;
+	if (m_veh_factory != NULL) delete m_veh_factory;
   	if (m_node_factory != NULL) delete m_node_factory;
   	if (m_link_factory != NULL) delete m_link_factory;
   	if (m_od_factory != NULL) delete m_od_factory;
@@ -2426,10 +2426,12 @@ int MNM_Dta_Multiclass::build_from_files()
 {
 	MNM_IO_Multiclass::build_node_factory_multiclass(m_file_folder, m_config, m_node_factory);
 	MNM_IO_Multiclass::build_link_factory_multiclass(m_file_folder, m_config, m_link_factory);
-	MNM_IO_Multiclass::build_od_factory_multiclass(m_file_folder, m_config, m_od_factory, m_node_factory);
+	// MNM_IO_Multiclass::build_od_factory_multiclass(m_file_folder, m_config, m_od_factory, m_node_factory);
+	MNM_IO_Multiclass::build_od_factory(m_file_folder, m_config, m_od_factory, m_node_factory);
 	m_graph = MNM_IO_Multiclass::build_graph(m_file_folder, m_config);
 	MNM_IO_Multiclass::build_demand_multiclass(m_file_folder, m_config, m_od_factory);
 	// build_workzone();
+	m_workzone = NULL;
 	set_statistics();
 	set_routing();
 	return 0;

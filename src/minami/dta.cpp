@@ -10,12 +10,14 @@ MNM_Dta::MNM_Dta(std::string file_folder)
 
 MNM_Dta::~MNM_Dta()
 {
+  if(m_routing != NULL) delete m_routing;
+  
   if(m_veh_factory != NULL) delete m_veh_factory;
   if(m_node_factory != NULL) delete m_node_factory;
   if(m_link_factory != NULL) delete m_link_factory;
   if(m_od_factory != NULL) delete m_od_factory;
   if(m_config != NULL) delete m_config;
-  if(m_routing != NULL) delete m_routing;
+  
   if(m_statistics != NULL) delete m_statistics;
   if(m_workzone != NULL) delete m_workzone;
   m_graph -> Clr();  
@@ -73,6 +75,7 @@ int MNM_Dta::set_routing()
     }
     m_routing = new MNM_Routing_Fixed(m_graph, m_od_factory, m_node_factory, m_link_factory, _tmp_conf -> get_int("route_frq"));
     m_routing -> init_routing(_path_table);
+    delete _tmp_conf;
   }
   
   else if (m_config ->get_string("routing_type") == "Due"){
@@ -97,6 +100,7 @@ int MNM_Dta::set_routing()
     TInt _route_freq_fixed = _tmp_conf -> get_int("route_frq");
     m_routing = new MNM_Routing_Hybrid(m_file_folder, m_graph, m_statistics, m_od_factory, m_node_factory, m_link_factory, _route_freq_fixed);
     m_routing -> init_routing(_path_table);
+    delete _tmp_conf;
   }
   else {
     m_routing = new MNM_Routing_Random(m_graph, m_od_factory, m_node_factory, m_link_factory);
@@ -124,7 +128,7 @@ int MNM_Dta::build_from_files()
   // std::cout << test_dta -> m_od_factory -> m_destination_map.size() << "\n";
   m_graph = MNM_IO::build_graph(m_file_folder, m_config);
   MNM_IO::build_demand(m_file_folder, m_config, m_od_factory);
-  //build_workzone();
+  build_workzone();
   set_statistics();
   set_routing();
   return 0;  

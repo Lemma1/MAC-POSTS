@@ -112,6 +112,7 @@ MNM_Routing_Adaptive::~MNM_Routing_Adaptive()
   }
   m_table -> clear();
   delete m_table;
+  delete m_self_config;
 }
 
 int MNM_Routing_Adaptive::init_routing(Path_Table *path_table)
@@ -282,6 +283,8 @@ MNM_Routing_Fixed::~MNM_Routing_Fixed()
     delete _map_it.second;
   }
   m_tracker.clear();
+  
+  if (m_path_table != NULL) delete m_path_table;
 }
 
 int MNM_Routing_Fixed::init_routing(Path_Table *path_table)
