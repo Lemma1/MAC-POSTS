@@ -336,7 +336,7 @@ int MNM_Dta::loading(bool verbose)
   MNM_Destination *_dest;
   TInt _assign_inter = m_start_assign_interval;
 
-  pre_loading();
+  // pre_loading();
   while (!finished_loading(_cur_int)){
     printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_cur_int);
     // step 1: Origin release vehicle
@@ -353,11 +353,17 @@ int MNM_Dta::loading(bool verbose)
         }
         else{
           if (m_config -> get_string("routing_type") == "Fixed"){
-            printf("Fixed Realsing.\n");
+            //printf("Fixed Realsing.\n");
             _origin -> release_one_interval(_cur_int, m_veh_factory, _assign_inter, TFlt(0));
           }
-          else if((m_config -> get_string("routing_type") == "Hybrid")){
+          else if((m_config -> get_string("routing_type") == "Adaptive")){
             _origin -> release_one_interval(_cur_int, m_veh_factory, _assign_inter, TFlt(1));
+          }
+          else if((m_config -> get_string("routing_type") == "Hybrid")){
+            TFlt _ad_ratio = m_config -> get_float("adaptive_ratio");
+            if (_ad_ratio > 1) _ad_ratio = 1;
+            if (_ad_ratio < 0) _ad_ratio = 0;
+            _origin -> release_one_interval(_cur_int, m_veh_factory, _assign_inter, _ad_ratio);
           }
           else{
             printf("WARNING:No assignemnt!\n");
@@ -406,7 +412,7 @@ int MNM_Dta::loading(bool verbose)
     // step 5: update record
     m_statistics -> update_record(_cur_int);
 
-    if(verbose) MNM::print_vehicle_statistics(m_veh_factory);
+    MNM::print_vehicle_statistics(m_veh_factory);
     // test();
     _cur_int ++;
   }
