@@ -284,7 +284,17 @@ MNM_Routing_Fixed::~MNM_Routing_Fixed()
   }
   m_tracker.clear();
   
-  if (m_path_table != NULL) delete m_path_table;
+  if (m_path_table != NULL){
+    for (auto _it : *m_path_table){
+      for (auto _it_it : *(_it.second)){
+        delete _it_it.second;
+      }
+      _it.second -> clear();
+      delete _it.second;
+    }
+    m_path_table -> clear();
+    delete m_path_table;
+  }
 }
 
 int MNM_Routing_Fixed::init_routing(Path_Table *path_table)

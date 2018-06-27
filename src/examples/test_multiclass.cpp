@@ -141,7 +141,7 @@ int main()
 	}
 
 	delete test_dta;
-	printf("Finishe delete\n");
+	printf("Finished delete test_dta!\n\n\n");
 	
 	// output tt of some special links
 	// for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){

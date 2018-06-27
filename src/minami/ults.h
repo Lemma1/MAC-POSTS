@@ -48,10 +48,12 @@ public:
 
 class Chameleon {
     public:
-      Chameleon() {};
+      Chameleon(){};
       explicit Chameleon(const std::string&);
       explicit Chameleon(double);
       explicit Chameleon(const char*);
+
+      ~Chameleon(){};
 
       Chameleon(const Chameleon&);
       Chameleon& operator=(Chameleon const&);
@@ -71,6 +73,7 @@ class ConfigFile {
 
 public:
   ConfigFile(std::string const& configFile);
+  ~ConfigFile(){};
 
   Chameleon const& Value(std::string const& section, std::string const& entry) const;
 
