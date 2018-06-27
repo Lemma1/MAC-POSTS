@@ -32,6 +32,19 @@ MNM_Routing_Predetermined::~MNM_Routing_Predetermined()
     delete _map_it.second;
   }
   m_tracker.clear();
+
+  // add by Xidong, for clearing the memory of path table
+  if (m_path_table != NULL){
+    for (auto _it : *m_path_table){
+      for (auto _it_it : *(_it.second)){
+        delete _it_it.second;
+      }
+      _it.second -> clear();
+      delete _it.second;
+    }
+    m_path_table -> clear();
+    delete m_path_table;
+  }
 }
 
 int MNM_Routing_Predetermined::update_routing(TInt timestamp){

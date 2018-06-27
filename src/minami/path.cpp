@@ -61,6 +61,14 @@ MNM_Pathset::MNM_Pathset()
   m_path_vec = std::vector<MNM_Path*>();
 }
 
+MNM_Pathset::~MNM_Pathset()
+{
+  for (MNM_Path* _path : m_path_vec){
+    delete _path;
+  } 
+  m_path_vec.clear();
+}
+
 bool MNM_Pathset::is_in(MNM_Path* path)
 {
   for (MNM_Path *tmp_path : m_path_vec){

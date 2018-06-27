@@ -165,7 +165,7 @@ MNM_OD_Factory::~MNM_OD_Factory()
     delete _map_it -> second;
   }  
   m_origin_map.clear();
-    for (auto _map_it = m_destination_map.begin(); _map_it!= m_destination_map.end(); _map_it++){
+  for (auto _map_it = m_destination_map.begin(); _map_it!= m_destination_map.end(); _map_it++){
     delete _map_it -> second;
   }  
   m_destination_map.clear();
