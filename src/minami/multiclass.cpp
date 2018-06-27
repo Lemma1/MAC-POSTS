@@ -72,10 +72,10 @@ int MNM_Dlink_Multiclass::install_cumulative_curve_tree_multiclass()
   	if (m_N_in_tree_car != NULL) delete m_N_in_tree_car;
   	if (m_N_out_tree_truck != NULL) delete m_N_out_tree_truck;
   	if (m_N_in_tree_truck != NULL) delete m_N_in_tree_truck;
-	m_N_in_tree_car = new MNM_Tree_Cumulative_Curve();
-  	m_N_out_tree_car = new MNM_Tree_Cumulative_Curve();
+		m_N_in_tree_car = new MNM_Tree_Cumulative_Curve();
+  	// m_N_out_tree_car = new MNM_Tree_Cumulative_Curve();
   	m_N_in_tree_truck = new MNM_Tree_Cumulative_Curve();
-  	m_N_out_tree_truck = new MNM_Tree_Cumulative_Curve();
+  	// m_N_out_tree_truck = new MNM_Tree_Cumulative_Curve();
   	return 0;
 }
 
@@ -2553,10 +2553,68 @@ TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time)
 	return 0;
 }
 
-int get_dar_matrix_multiclass(double **output, std::vector<MNM_Dlink*> links, 
-                    		std::vector<MNM_Path*> paths, MNM_Veh_Factory *veh_factory)
+int add_dar_records_car(std::vector<dar_record*> &record, MNM_Dlink_Multiclass* link, 
+                    std::set<MNM_Path*> pathset, TFlt start_time, TFlt end_time)
 {
-	return 0;
+  if (link == NULL){
+    throw std::runtime_error("Error, add_dar_records_car link is null");
+  }
+  if (link -> m_N_in_tree_car == NULL){
+    throw std::runtime_error("Error, add_dar_records_car link cummulative curve tree is not installed");
+  }
+  MNM_Path* _path;
+  for (auto path_it : link -> m_N_in_tree_car -> m_record){
+    _path = path_it.first;
+    if (std::find(pathset.begin(), pathset.end(), _path) != pathset.end()) {
+      for (auto depart_it : path_it.second){
+        TFlt tmp_flow = depart_it.second -> get_result(end_time) - depart_it.second -> get_result(start_time);
+        if (tmp_flow > DBL_EPSILON){
+          auto new_record = new dar_record();
+          new_record -> path_ID = path_it.first -> m_path_ID;
+          new_record -> assign_int = depart_it.first;
+          new_record -> link_ID = link -> m_link_ID;
+          new_record -> link_start_int = start_time;
+          new_record -> flow = tmp_flow;
+          // printf("Adding record, %d, %d, %d, %f, %f\n", new_record -> path_ID(), new_record -> assign_int(), 
+          //     new_record -> link_ID(), (float)new_record -> link_start_int(), (float) new_record -> flow());
+          record.push_back(new_record);
+        }
+      }
+    }
+  }
+  return 0;
+}
+
+int add_dar_records_truck(std::vector<dar_record*> &record, MNM_Dlink_Multiclass* link, 
+                    std::set<MNM_Path*> pathset, TFlt start_time, TFlt end_time)
+{
+  if (link == NULL){
+    throw std::runtime_error("Error, add_dar_records_truck link is null");
+  }
+  if (link -> m_N_in_tree_car == NULL){
+    throw std::runtime_error("Error, add_dar_records_truck link cummulative curve tree is not installed");
+  }
+  MNM_Path* _path;
+  for (auto path_it : link -> m_N_in_tree_truck -> m_record){
+    _path = path_it.first;
+    if (std::find(pathset.begin(), pathset.end(), _path) != pathset.end()) {
+      for (auto depart_it : path_it.second){
+        TFlt tmp_flow = depart_it.second -> get_result(end_time) - depart_it.second -> get_result(start_time);
+        if (tmp_flow > DBL_EPSILON){
+          auto new_record = new dar_record();
+          new_record -> path_ID = path_it.first -> m_path_ID;
+          new_record -> assign_int = depart_it.first;
+          new_record -> link_ID = link -> m_link_ID;
+          new_record -> link_start_int = start_time;
+          new_record -> flow = tmp_flow;
+          // printf("Adding record, %d, %d, %d, %f, %f\n", new_record -> path_ID(), new_record -> assign_int(), 
+          //     new_record -> link_ID(), (float)new_record -> link_start_int(), (float) new_record -> flow());
+          record.push_back(new_record);
+        }
+      }
+    }
+  }
+  return 0;
 }
 
 }//end namespace MNM_DTA_GRADIENT
