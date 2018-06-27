@@ -427,6 +427,72 @@ py::array_t<double> Mcdta_Api::get_truck_link_tt(py::array_t<double>start_interv
   return result;
 }
 
+py::array_t<double> Mcdta_Api::get_link_car_inflow(py::array_t<int>start_intervals, py::array_t<int>end_intervals)
+{
+  auto start_buf = start_intervals.request();
+  auto end_buf = end_intervals.request();
+  if (start_buf.ndim != 1 || end_buf.ndim != 1){
+    throw std::runtime_error("Error, Mcdta_Api::get_link_car_inflow, input dismension mismatch");
+  }
+  if (start_buf.shape[0] != end_buf.shape[0]){
+    throw std::runtime_error("Error, Mcdta_Api::get_link_car_inflow, input length mismatch");
+  }
+  int l = start_buf.shape[0];
+  int new_shape [2] = { (int) m_link_vec.size(), l};
+  auto result = py::array_t<double>(new_shape);
+  auto result_buf = result.request();
+  double *result_prt = (double *) result_buf.ptr;
+  int *start_prt = (int *) start_buf.ptr;
+  int *end_prt = (int *) end_buf.ptr;
+  for (int t = 0; t < l; ++t){
+    for (size_t i = 0; i<m_link_vec.size(); ++i){
+      if (end_prt[t] < start_prt[t]){
+        throw std::runtime_error("Error, Mcdta_Api::get_link_car_inflow, end time smaller than start time");
+      }
+      if (end_prt[t] > get_cur_loading_interval()){
+        throw std::runtime_error("Error, Mcdta_Api::get_link_car_inflow, loaded data not enough");
+      }
+
+      result_prt[i * l + t] = MNM_DTA_GRADIENT::get_link_inflow_car(m_link_vec[i], TFlt(start_prt[t]), TFlt(end_prt[t]))();
+      // printf("i %d, t %d, %f\n", i, t, result_prt[i * l + t]);
+    }
+  }
+  return result;
+}
+
+
+py::array_t<double> Mcdta_Api::get_link_truck_inflow(py::array_t<int>start_intervals, py::array_t<int>end_intervals)
+{
+  auto start_buf = start_intervals.request();
+  auto end_buf = end_intervals.request();
+  if (start_buf.ndim != 1 || end_buf.ndim != 1){
+    throw std::runtime_error("Error, Mcdta_Api::get_link_truck_inflow, input dismension mismatch");
+  }
+  if (start_buf.shape[0] != end_buf.shape[0]){
+    throw std::runtime_error("Error, Mcdta_Api::get_link_truck_inflow, input length mismatch");
+  }
+  int l = start_buf.shape[0];
+  int new_shape [2] = { (int) m_link_vec.size(), l};
+  auto result = py::array_t<double>(new_shape);
+  auto result_buf = result.request();
+  double *result_prt = (double *) result_buf.ptr;
+  int *start_prt = (int *) start_buf.ptr;
+  int *end_prt = (int *) end_buf.ptr;
+  for (int t = 0; t < l; ++t){
+    for (size_t i = 0; i<m_link_vec.size(); ++i){
+      if (end_prt[t] < start_prt[t]){
+        throw std::runtime_error("Error, Mcdta_Api::get_link_truck_inflow, end time smaller than start time");
+      }
+      if (end_prt[t] > get_cur_loading_interval()){
+        throw std::runtime_error("Error, Mcdta_Api::get_link_truck_inflow, loaded data not enough");
+      }
+
+      result_prt[i * l + t] = MNM_DTA_GRADIENT::get_link_inflow_truck(m_link_vec[i], TFlt(start_prt[t]), TFlt(end_prt[t]))();
+      // printf("i %d, t %d, %f\n", i, t, result_prt[i * l + t]);
+    }
+  }
+  return result;
+}
 // py::array_t<double> Mcdta_Api::get_car_link_out_cc(int link_ID)
 // {
 //   MNM_Dlink_Multiclass *_link = (MNM_Dlink_Multiclass *) m_mcdta -> m_link_factory -> get_link(TInt(link_ID));
@@ -463,6 +529,105 @@ double Mcdta_Api::get_car_link_out_num(int link_ID, double time)
   return result(); 
 }
 
+py::array_t<double> Mcdta_Api::get_car_dar_matrix(py::array_t<int>start_intervals, py::array_t<int>end_intervals)
+{
+  auto start_buf = start_intervals.request();
+  auto end_buf = end_intervals.request();
+  if (start_buf.ndim != 1 || end_buf.ndim != 1){
+    throw std::runtime_error("Error, Mcdta_Api::get_car_dar_matrix, input dismension mismatch");
+  }
+  if (start_buf.shape[0] != end_buf.shape[0]){
+    throw std::runtime_error("Error, Mcdta_Api::get_car_dar_matrix, input length mismatch");
+  }
+  int l = start_buf.shape[0];
+  int *start_prt = (int *) start_buf.ptr;
+  int *end_prt = (int *) end_buf.ptr;
+  std::vector<dar_record*> _record = std::vector<dar_record*>();
+  // for (size_t i = 0; i<m_link_vec.size(); ++i){
+  //   m_link_vec[i] -> m_N_in_tree -> print_out();
+  // }
+  for (int t = 0; t < l; ++t){
+    for (size_t i = 0; i<m_link_vec.size(); ++i){
+      if (end_prt[t] < start_prt[t]){
+        throw std::runtime_error("Error, Mcdta_Api::get_car_dar_matrix, end time smaller than start time");
+      }
+      if (end_prt[t] > get_cur_loading_interval()){
+        throw std::runtime_error("Error, Mcdta_Api::get_car_dar_matrix, loaded data not enough");
+      }
+        MNM_DTA_GRADIENT::add_dar_records_car(
+                      _record, m_link_vec[i], m_path_set, TFlt(start_prt[t]), TFlt(end_prt[t]));
+    }
+  }
+  // path_ID, assign_time, link_ID, start_int, flow
+  int new_shape [2] = { (int) _record.size(), 5}; 
+  auto result = py::array_t<double>(new_shape);
+  auto result_buf = result.request();
+  double *result_prt = (double *) result_buf.ptr;
+  dar_record* tmp_record;
+  for (size_t i = 0; i < _record.size(); ++i){
+    tmp_record = _record[i];
+    result_prt[i * 5 + 0] = (double) tmp_record -> path_ID();
+    result_prt[i * 5 + 1] = (double) tmp_record -> assign_int();
+    result_prt[i * 5 + 2] = (double) tmp_record -> link_ID();
+    result_prt[i * 5 + 3] = (double) tmp_record -> link_start_int();
+    result_prt[i * 5 + 4] = tmp_record -> flow();
+  }
+  for (size_t i = 0; i < _record.size(); ++i){
+    delete _record[i];
+  }
+  _record.clear();
+  return result;
+}
+
+py::array_t<double> Mcdta_Api::get_truck_dar_matrix(py::array_t<int>start_intervals, py::array_t<int>end_intervals)
+{
+  auto start_buf = start_intervals.request();
+  auto end_buf = end_intervals.request();
+  if (start_buf.ndim != 1 || end_buf.ndim != 1){
+    throw std::runtime_error("Error, Mcdta_Api::get_truck_dar_matrix, input dismension mismatch");
+  }
+  if (start_buf.shape[0] != end_buf.shape[0]){
+    throw std::runtime_error("Error, Mcdta_Api::get_truck_dar_matrix, input length mismatch");
+  }
+  int l = start_buf.shape[0];
+  int *start_prt = (int *) start_buf.ptr;
+  int *end_prt = (int *) end_buf.ptr;
+  std::vector<dar_record*> _record = std::vector<dar_record*>();
+  // for (size_t i = 0; i<m_link_vec.size(); ++i){
+  //   m_link_vec[i] -> m_N_in_tree -> print_out();
+  // }
+  for (int t = 0; t < l; ++t){
+    for (size_t i = 0; i<m_link_vec.size(); ++i){
+      if (end_prt[t] < start_prt[t]){
+        throw std::runtime_error("Error, Mcdta_Api::get_truck_dar_matrix, end time smaller than start time");
+      }
+      if (end_prt[t] > get_cur_loading_interval()){
+        throw std::runtime_error("Error, Mcdta_Api::get_truck_dar_matrix, loaded data not enough");
+      }
+        MNM_DTA_GRADIENT::add_dar_records_truck(
+                      _record, m_link_vec[i], m_path_set, TFlt(start_prt[t]), TFlt(end_prt[t]));
+    }
+  }
+  // path_ID, assign_time, link_ID, start_int, flow
+  int new_shape [2] = { (int) _record.size(), 5}; 
+  auto result = py::array_t<double>(new_shape);
+  auto result_buf = result.request();
+  double *result_prt = (double *) result_buf.ptr;
+  dar_record* tmp_record;
+  for (size_t i = 0; i < _record.size(); ++i){
+    tmp_record = _record[i];
+    result_prt[i * 5 + 0] = (double) tmp_record -> path_ID();
+    result_prt[i * 5 + 1] = (double) tmp_record -> assign_int();
+    result_prt[i * 5 + 2] = (double) tmp_record -> link_ID();
+    result_prt[i * 5 + 3] = (double) tmp_record -> link_start_int();
+    result_prt[i * 5 + 4] = tmp_record -> flow();
+  }
+  for (size_t i = 0; i < _record.size(); ++i){
+    delete _record[i];
+  }
+  _record.clear();
+  return result;
+}
 
 
 PYBIND11_MODULE(MNMAPI, m) {
