@@ -432,7 +432,7 @@ class MNM_config():
                       'rec_volume': np.int, 'volume_load_automatic_rec': np.int, 'volume_record_automatic_rec': np.int,
                       'rec_tt': np.int, 'tt_load_automatic_rec':np.int, 'tt_record_automatic_rec':np.int,
                       'route_frq': np.int, 'path_file_name': str, 'num_path': np.int,
-                      'choice_portion': str, 'route_frq': np.int}
+                      'choice_portion': str, 'route_frq': np.int, 'adaptive_ratio':np.float}
 
   def build_from_file(self, file_name):
     self.config_dict = OrderedDict()
