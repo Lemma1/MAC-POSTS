@@ -336,7 +336,7 @@ int Mcdta_Api::install_cc()
 int Mcdta_Api::install_cc_tree()
 {
   for (size_t i = 0; i<m_link_vec.size(); ++i){
-    m_link_vec[i] -> install_cumulative_curve_tree();
+    m_link_vec[i] -> install_cumulative_curve_tree_multiclass();
   }
   return 0;
 }
@@ -517,7 +517,7 @@ int Mcdta_Api::register_paths(py::array_t<int> paths)
   TInt _path_ID;
   for (int i = 0; i < paths_buf.shape[0]; i++){
     _path_ID = TInt(paths_ptr[i]);
-    printf("registering path %d, %d\n", _path_ID(), (int)m_ID_path_mapping.size());
+    // printf("registering path %d, %d\n", _path_ID(), (int)m_ID_path_mapping.size());
     if (m_ID_path_mapping.find(_path_ID) == m_ID_path_mapping.end()){
       throw std::runtime_error("Mcdta_Api::register_paths: No such path");
     }
@@ -582,6 +582,7 @@ py::array_t<double> Mcdta_Api::get_car_dar_matrix(py::array_t<int>start_interval
   //   m_link_vec[i] -> m_N_in_tree -> print_out();
   // }
   for (int t = 0; t < l; ++t){
+    printf("Current processing time: %d\n", t);
     for (size_t i = 0; i<m_link_vec.size(); ++i){
       if (end_prt[t] < start_prt[t]){
         throw std::runtime_error("Error, Mcdta_Api::get_car_dar_matrix, end time smaller than start time");
