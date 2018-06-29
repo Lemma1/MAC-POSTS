@@ -342,7 +342,7 @@ int MNM_Dta::loading(bool verbose)
 
   // pre_loading();
   while (!finished_loading(_cur_int)){
-    printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_cur_int);
+    if(verbose) printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_cur_int);
     // step 1: Origin release vehicle
     if(verbose) printf("Realsing!\n");
     // for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){
@@ -416,11 +416,11 @@ int MNM_Dta::loading(bool verbose)
     // step 5: update record
     m_statistics -> update_record(_cur_int);
 
-    MNM::print_vehicle_statistics(m_veh_factory);
+    if(verbose) MNM::print_vehicle_statistics(m_veh_factory);
     // test();
     _cur_int ++;
   }
-
+  MNM::print_vehicle_statistics(m_veh_factory);
   // MNM_IO::dump_cumulative_curve(m_file_folder, m_link_factory);
   m_statistics -> post_record();
   m_current_loading_interval = _cur_int;

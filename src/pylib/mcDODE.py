@@ -225,7 +225,7 @@ class MCDODE():
       # print f_car, f_truck
       # break
       if store_folder is not None:
-        pickle.dump((f_car, f_truck), open(os.path.join(store_folder, str(i) + 'iteration.pickle'), 'wb'))
+        pickle.dump((f_car, f_truck, loss), open(os.path.join(store_folder, str(i) + 'iteration.pickle'), 'wb'))
     return (f_car, f_truck)
 
 
