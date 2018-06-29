@@ -2,6 +2,17 @@
 build/
 doc_builder/build/
 
+
+
+#MINAMI related
+MNM_input_*
+path_table_*
+path_table
+*.conf
+MNM_output_*
+input_files*
+Snap_graph
+
 # Prerequisites
 *.d
 
@@ -150,7 +161,9 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-
+#pickle
+*.pickle
+*.pkl
 
 
 
