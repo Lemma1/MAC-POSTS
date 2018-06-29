@@ -2704,25 +2704,14 @@ int MNM_Cumulative_Emission_Multiclass::update()
     _v_converted = _v * TFlt(3600) / TFlt(1600); // mile / hour
     _v_converted = MNM_Ults::max(_v_converted, TFlt(5));
     _v_converted = MNM_Ults::min(_v_converted, TFlt(65));
-    m_fuel += calculate_fuel_rate(_v_converted) 
-              * (_v * m_unit_time / TFlt(1600))  
-              * link -> get_link_flow();
-    m_CO2 += calculate_CO2_rate(_v_converted) 
-              * (_v * m_unit_time / TFlt(1600))  
-              * link -> get_link_flow();
-    m_HC += calculate_HC_rate(_v_converted) 
-              * (_v * m_unit_time / TFlt(1600))  
-              * link -> get_link_flow();
-    m_CO += calculate_CO_rate(_v_converted) 
-              * (_v * m_unit_time / TFlt(1600))  
-              * link -> get_link_flow();
-    m_NOX += calculate_NOX_rate(_v_converted) 
-              * (_v * m_unit_time / TFlt(1600))  
-              * link -> get_link_flow();
-    m_VMT += (_v * m_unit_time / TFlt(1600))  
-              * link -> get_link_flow();
+    m_fuel += calculate_fuel_rate(_v_converted) * (_v * m_unit_time / TFlt(1600)) * link -> get_link_flow();
+    m_CO2 += calculate_CO2_rate(_v_converted) * (_v * m_unit_time / TFlt(1600)) * link -> get_link_flow();
+    m_HC += calculate_HC_rate(_v_converted) * (_v * m_unit_time / TFlt(1600)) * link -> get_link_flow();
+    m_CO += calculate_CO_rate(_v_converted) * (_v * m_unit_time / TFlt(1600)) * link -> get_link_flow();
+    m_NOX += calculate_NOX_rate(_v_converted) * (_v * m_unit_time / TFlt(1600)) * link -> get_link_flow();
+    m_VMT += (_v * m_unit_time / TFlt(1600)) * link -> get_link_flow();
     // printf("link ID is %d, flow is :%lf, _v is %lf, CO2 is %lf, HC is %lf\n",
-    //       (link -> m_link_ID)(), link -> get_link_flow()(), _v(), m_CO2(), m_HC());              
+    //       (link -> m_link_ID)(), link -> get_link_flow()(), _v(), m_CO2(), m_HC());
   }
   if (m_counter == m_freq){
     output();

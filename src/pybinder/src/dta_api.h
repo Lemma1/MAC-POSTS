@@ -62,7 +62,8 @@ public:
   py::array_t<double> get_car_link_tt(py::array_t<double>start_intervals);
   py::array_t<double> get_truck_link_tt(py::array_t<double>start_intervals);
   
-  py::array_t<double> get_enroute_queue_veh_stats(py::array_t<double>start_intervals);
+  py::array_t<double> get_enroute_and_queue_veh_stats_agg();
+  py::array_t<double> get_queue_veh_each_link(py::array_t<int>useful_links, py::array_t<int>intervals);
   
   double get_car_link_out_num(int link_ID, double time);
   double get_truck_link_out_num(int link_ID, double time);

@@ -346,7 +346,7 @@ int MNM_Dta::load_once(bool verbose, TInt load_int, TInt assign_int)
     _node -> evolve(load_int);
   }
 
-  // record queued vehicles after node evolve, which is num of vehicles in finished array
+  // record queuing vehicles after node evolve, which is num of vehicles in finished array
   record_queue_vehicles();
 
   if (verbose) printf("Moving through link\n");
@@ -441,7 +441,7 @@ int MNM_Dta::loading(bool verbose)
       _node -> evolve(_cur_int);
     }
 
-    // record queued vehicles after node evolve, which is num of vehicles in finished array
+    // record queuing vehicles after node evolve, which is num of vehicles in finished array
     record_queue_vehicles();
 
     if(verbose) printf("Moving through link\n");

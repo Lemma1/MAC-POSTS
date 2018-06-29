@@ -55,8 +55,8 @@ public:
   MNM_Workzone *m_workzone;
   TInt m_current_loading_interval;
 
-  std::unordered_map<TInt, std::deque<TInt>*> m_queue_veh_map; //queued vehicle number for each link
-  std::deque<TInt> m_queue_veh_num; //total queued vehicle number
+  std::unordered_map<TInt, std::deque<TInt>*> m_queue_veh_map; //queuing vehicle number for each link
+  std::deque<TInt> m_queue_veh_num; //total queuing vehicle number
   std::deque<TInt> m_enroute_veh_num; //total enroute vehicle number
 };               
 
