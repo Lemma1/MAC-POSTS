@@ -34,6 +34,10 @@ public:
   int build_workzone();
   int check_origin_destination_connectivity();
   int virtual pre_loading();
+  
+  int record_queue_vehicles();
+  int record_enroute_vehicles();
+
   TInt m_start_assign_interval;
   TInt m_total_assign_inter;
   TFlt m_unit_time;
@@ -50,6 +54,10 @@ public:
   MNM_Routing *m_routing;
   MNM_Workzone *m_workzone;
   TInt m_current_loading_interval;
+
+  std::unordered_map<TInt, std::deque<TInt>*> m_queue_veh_map; //queued vehicle number for each link
+  std::deque<TInt> m_queue_veh_num; //total queued vehicle number
+  std::deque<TInt> m_enroute_veh_num; //total enroute vehicle number
 };               
 
 
