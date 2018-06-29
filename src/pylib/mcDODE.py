@@ -203,8 +203,11 @@ class MCDODE():
 
 
 
-  def estimate_path_flow(self, step_size = 0.1, max_epoch = 10, car_init_scale = 10, truck_init_scale = 1, store_folder = None):
-    (f_car, f_truck) = self.init_path_flow(car_scale = car_init_scale, truck_scale = truck_init_scale)
+  def estimate_path_flow(self, step_size = 0.1, max_epoch = 10, car_init_scale = 10, truck_init_scale = 1, store_folder = None, use_file_as_init = None):
+    if use_file_as_init is None:
+      (f_car, f_truck) = self.init_path_flow(car_scale = car_init_scale, truck_scale = truck_init_scale)
+    else:
+      (f_car, f_truck) = pickle.load(open(use_file_as_init, 'rb'))
     for i in range(max_epoch):
       seq = np.random.permutation(self.num_data)
       loss = np.float(0)
