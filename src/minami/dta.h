@@ -12,6 +12,7 @@
 #include "routing.h"
 #include "shortest_path.h"
 #include "pre_routing.h"
+#include "emission.h"
 
 #include <string>
 
@@ -54,6 +55,7 @@ public:
   MNM_Routing *m_routing;
   MNM_Workzone *m_workzone;
   TInt m_current_loading_interval;
+  MNM_Cumulative_Emission *m_emission;
 
   std::unordered_map<TInt, std::deque<TInt>*> m_queue_veh_map; //queuing vehicle number for each link
   std::deque<TInt> m_queue_veh_num; //total queuing vehicle number

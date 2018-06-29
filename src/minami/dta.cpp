@@ -15,16 +15,18 @@ MNM_Dta::MNM_Dta(std::string file_folder)
 
 MNM_Dta::~MNM_Dta()
 {
-  if(m_routing != NULL) delete m_routing;
+  if (m_emission != NULL) delete m_emission;
+
+  if (m_routing != NULL) delete m_routing;
   
-  if(m_veh_factory != NULL) delete m_veh_factory;
-  if(m_node_factory != NULL) delete m_node_factory;
-  if(m_link_factory != NULL) delete m_link_factory;
-  if(m_od_factory != NULL) delete m_od_factory;
-  if(m_config != NULL) delete m_config;
+  if (m_veh_factory != NULL) delete m_veh_factory;
+  if (m_node_factory != NULL) delete m_node_factory;
+  if (m_link_factory != NULL) delete m_link_factory;
+  if (m_od_factory != NULL) delete m_od_factory;
+  if (m_config != NULL) delete m_config;
   
-  if(m_statistics != NULL) delete m_statistics;
-  if(m_workzone != NULL) delete m_workzone;
+  if (m_statistics != NULL) delete m_statistics;
+  if (m_workzone != NULL) delete m_workzone;
   m_graph -> Clr();
 
   m_queue_veh_num.clear();
@@ -458,6 +460,9 @@ int MNM_Dta::loading(bool verbose)
       _link -> evolve(_cur_int);
       // _link -> print_info();
     }
+
+    // only use in multiclass vehicle cases
+    if (m_emission != NULL) m_emission -> update();
 
     if(verbose) printf("Receiving!\n");
     // step 5: Destination receive vehicle  

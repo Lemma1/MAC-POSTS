@@ -565,11 +565,41 @@ int MNM_Dlink_Ctm_Multiclass::clear_incoming_array()
 	return 0;
 }
 
+TFlt MNM_Dlink_Ctm_Multiclass::get_link_flow_car()
+{
+	TInt _total_volume_car = 0;
+	for (int i = 0; i < m_num_cells; ++i){
+		_total_volume_car += m_cell_array[i] -> m_volume_car;
+	}
+	std::deque<MNM_Veh*>::iterator _veh_it;
+	for (_veh_it = m_finished_array.begin(); _veh_it != m_finished_array.end(); _veh_it++){
+		MNM_Veh_Multiclass *_veh = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it);
+		if (_veh -> m_class == 0) _total_volume_car += 1;
+	}
+	return TFlt(_total_volume_car) / m_flow_scalar;
+
+	return 0;
+}
+
+TFlt MNM_Dlink_Ctm_Multiclass::get_link_flow_truck()
+{
+	TInt _total_volume_truck = 0;
+	for (int i = 0; i < m_num_cells; ++i){
+		_total_volume_truck += m_cell_array[i] -> m_volume_truck;
+	}
+	std::deque<MNM_Veh*>::iterator _veh_it;
+	for (_veh_it = m_finished_array.begin(); _veh_it != m_finished_array.end(); _veh_it++){
+		MNM_Veh_Multiclass *_veh = dynamic_cast<MNM_Veh_Multiclass *>(*_veh_it);
+		if (_veh -> m_class == 1) _total_volume_truck += 1;
+	}
+	return TFlt(_total_volume_truck) / m_flow_scalar;
+
+	return 0;
+}
 
 TFlt MNM_Dlink_Ctm_Multiclass::get_link_flow()
 {
-	// For adaptive routing, need modidication for multiclass case
-
+	// For get_link_tt in adaptive routing
 	TInt _total_volume_car = 0;
 	TInt _total_volume_truck = 0;
 	for (int i = 0; i < m_num_cells; ++i){
@@ -583,8 +613,7 @@ TFlt MNM_Dlink_Ctm_Multiclass::get_link_flow()
 
 TFlt MNM_Dlink_Ctm_Multiclass::get_link_tt()
 {
-	// For adaptive routing, need modidication for multiclass case
-
+	// For adaptive routing and emissions, need modidication for multiclass cases
 	TFlt _cost, _spd;
 	// get the density in veh/mile
 	TFlt _rho = get_link_flow()/m_number_of_lane/m_length;
@@ -607,9 +636,6 @@ TFlt MNM_Dlink_Ctm_Multiclass::get_link_tt()
 		_cost = m_length / _spd;
 	}
 	return _cost;
-
-	// FOR DEBUG ONLY RETURN FREE-FLOW TT
-	// return m_length/m_ffs_car;
 }
 
 /*							Multiclass CTM Cells
@@ -1063,13 +1089,26 @@ void MNM_Dlink_Lq_Multiclass::print_info()
 	printf("Total truck volume in the link: %.4f\n", (float)(m_volume_truck/m_flow_scalar));
 }
 
+TFlt MNM_Dlink_Lq_Multiclass::get_link_flow_car()
+{
+	
+	return TFlt(m_volume_car) / m_flow_scalar;
+}
+
+TFlt MNM_Dlink_Lq_Multiclass::get_link_flow_truck()
+{
+	return TFlt(m_volume_truck) / m_flow_scalar;
+}
+
 TFlt MNM_Dlink_Lq_Multiclass::get_link_flow()
 {
+	// For get_link_tt in adaptive routing
 	return TFlt(m_volume_car + m_volume_truck) / m_flow_scalar;
 }
 
 TFlt MNM_Dlink_Lq_Multiclass::get_link_tt()
 {
+	// For adaptive routing and emissions, need modidication for multiclass cases
 	TFlt _cost, _spd;
 	TFlt _rho  = get_link_flow() / m_number_of_lane / m_length;// get the density in veh/mile
 	TFlt _rhoj = m_k_j_car; //get the jam density
@@ -2412,11 +2451,12 @@ int MNM_Dta_Multiclass::initialize()
 	m_unit_time = m_config -> get_int("unit_time");
 	m_flow_scalar = m_config -> get_int("flow_scalar");
 
+	m_emission = new MNM_Cumulative_Emission_Multiclass(TFlt(m_unit_time), 0);
+
 	// change assign_freq to 12 (1 minute) and total_assign_interval to max_interval*_num_of_minute
 	m_assign_freq = 60 / int(m_unit_time);
 	TInt _num_of_minute =  int(m_config -> get_int("assign_frq")) / m_assign_freq;
 	m_total_assign_inter = m_config ->  get_int("max_interval") * _num_of_minute;
-
 	m_start_assign_interval = m_config -> get_int("start_assign_interval");
 
 	return 0;
@@ -2452,6 +2492,7 @@ int MNM_Dta_Multiclass::pre_loading()
   	{
     	_rec = new std::deque<TInt>();
     	m_queue_veh_map.insert({_map_it.second -> m_link_ID, _rec});
+    	m_emission -> register_link(_map_it.second);
   	}
   	
 	printf("Exiting MNM: Prepare loading!\n");
@@ -2651,11 +2692,20 @@ MNM_Cumulative_Emission_Multiclass::~MNM_Cumulative_Emission_Multiclass()
 	;
 }
 
-// All convert_factors from MOVES, to be done...
+// All convert_factors from MOVES
 // Reference: MOVES default database
 TFlt MNM_Cumulative_Emission_Multiclass::calculate_fuel_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;
+	if (v < 25){
+		_convert_factor = 7.74;
+	}
+	else if (v < 55){
+		_convert_factor = 6.76;
+	}
+	else {
+		_convert_factor = 7.04;
+	}
 	TFlt _fuel_rate_car = calculate_fuel_rate(v);
 	TFlt _fuel_rate_truck = _fuel_rate_car * _convert_factor;
 	return _fuel_rate_truck;
@@ -2664,6 +2714,15 @@ TFlt MNM_Cumulative_Emission_Multiclass::calculate_fuel_rate_truck(TFlt v)
 TFlt MNM_Cumulative_Emission_Multiclass::calculate_CO2_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;
+	if (v < 25){
+		_convert_factor = 7.74;
+	}
+	else if (v < 55){
+		_convert_factor = 6.76;
+	}
+	else {
+		_convert_factor = 7.04;
+	}
 	TFlt _CO2_rate_car = calculate_CO2_rate(v);
 	TFlt _CO2_rate_truck = _CO2_rate_car * _convert_factor;
 	return _CO2_rate_truck;
@@ -2672,6 +2731,15 @@ TFlt MNM_Cumulative_Emission_Multiclass::calculate_CO2_rate_truck(TFlt v)
 TFlt MNM_Cumulative_Emission_Multiclass::calculate_HC_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;
+	if (v < 25){
+		_convert_factor = 62.8;
+	}
+	else if (v < 55){
+		_convert_factor = 22.0;
+	}
+	else {
+		_convert_factor = 8.90;
+	}
 	TFlt _HC_rate_car = calculate_HC_rate(v);
 	TFlt _HC_rate_truck = _HC_rate_car * _convert_factor;
 	return _HC_rate_truck;
@@ -2680,6 +2748,15 @@ TFlt MNM_Cumulative_Emission_Multiclass::calculate_HC_rate_truck(TFlt v)
 TFlt MNM_Cumulative_Emission_Multiclass::calculate_CO_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;
+	if (v < 25){
+		_convert_factor = 3.58;
+	}
+	else if (v < 55){
+		_convert_factor = 5.20;
+	}
+	else {
+		_convert_factor = 3.88;
+	}
 	TFlt _CO_rate_car = calculate_CO2_rate(v);
 	TFlt _CO_rate_truck = _CO_rate_car * _convert_factor;
 	return _CO_rate_truck;
@@ -2688,6 +2765,15 @@ TFlt MNM_Cumulative_Emission_Multiclass::calculate_CO_rate_truck(TFlt v)
 TFlt MNM_Cumulative_Emission_Multiclass::calculate_NOX_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;
+	if (v < 25){
+		_convert_factor = 51.2;
+	}
+	else if (v < 55){
+		_convert_factor = 31.6;
+	}
+	else {
+		_convert_factor = 27.4;
+	}
 	TFlt _NOX_rate_car = calculate_CO2_rate(v);
 	TFlt _NOX_rate_truck = _NOX_rate_car * _convert_factor;
 	return _NOX_rate_truck;
@@ -2695,40 +2781,43 @@ TFlt MNM_Cumulative_Emission_Multiclass::calculate_NOX_rate_truck(TFlt v)
 
 int MNM_Cumulative_Emission_Multiclass::update()
 {
-  m_counter += 1;
-  // printf("ce counter is now %d\n", m_counter());
-  TFlt _v;
-  TFlt _v_converted;
-  for (MNM_Dlink *link : m_link_vector){
-    _v = link -> m_length / link -> get_link_tt(); // m/s
-    _v_converted = _v * TFlt(3600) / TFlt(1600); // mile / hour
-    _v_converted = MNM_Ults::max(_v_converted, TFlt(5));
-    _v_converted = MNM_Ults::min(_v_converted, TFlt(65));
-    m_fuel += calculate_fuel_rate(_v_converted) * (_v * m_unit_time / TFlt(1600)) * link -> get_link_flow();
-    m_CO2 += calculate_CO2_rate(_v_converted) * (_v * m_unit_time / TFlt(1600)) * link -> get_link_flow();
-    m_HC += calculate_HC_rate(_v_converted) * (_v * m_unit_time / TFlt(1600)) * link -> get_link_flow();
-    m_CO += calculate_CO_rate(_v_converted) * (_v * m_unit_time / TFlt(1600)) * link -> get_link_flow();
-    m_NOX += calculate_NOX_rate(_v_converted) * (_v * m_unit_time / TFlt(1600)) * link -> get_link_flow();
-    m_VMT += (_v * m_unit_time / TFlt(1600)) * link -> get_link_flow();
-    // printf("link ID is %d, flow is :%lf, _v is %lf, CO2 is %lf, HC is %lf\n",
-    //       (link -> m_link_ID)(), link -> get_link_flow()(), _v(), m_CO2(), m_HC());
-  }
-  if (m_counter == m_freq){
-    output();
-    m_fuel = TFlt(0);
-    m_CO2 = TFlt(0);
-    m_HC = TFlt(0);
-    m_CO = TFlt(0);
-    m_NOX = TFlt(0);
-    m_VMT = TFlt(0);
-    m_counter = 0;
-  }
-  return 0;
+	// assume car truck the same speed on the same link when computing the emissions
+	// possible to change to more accurate speeds for cars and trucks
+	TFlt _v;
+	TFlt _v_converted;
+	for (MNM_Dlink *link : m_link_vector){
+		MNM_Dlink_Multiclass *_mlink = dynamic_cast<MNM_Dlink_Multiclass *>(link);
+		_v = _mlink -> m_length / _mlink -> get_link_tt(); // m/s
+		_v_converted = _v * TFlt(3600) / TFlt(1600); // mile / hour
+		_v_converted = MNM_Ults::max(_v_converted, TFlt(5));
+		_v_converted = MNM_Ults::min(_v_converted, TFlt(65));
+
+		// cars
+		m_fuel += calculate_fuel_rate(_v_converted) * (_v * m_unit_time / TFlt(1600)) * _mlink -> get_link_flow_car();
+		m_CO2 += calculate_CO2_rate(_v_converted) * (_v * m_unit_time / TFlt(1600)) * _mlink -> get_link_flow_car();
+		m_HC += calculate_HC_rate(_v_converted) * (_v * m_unit_time / TFlt(1600)) * _mlink -> get_link_flow_car();
+		m_CO += calculate_CO_rate(_v_converted) * (_v * m_unit_time / TFlt(1600)) * _mlink -> get_link_flow_car();
+		m_NOX += calculate_NOX_rate(_v_converted) * (_v * m_unit_time / TFlt(1600)) * _mlink -> get_link_flow_car();
+		m_VMT += (_v * m_unit_time / TFlt(1600)) * _mlink -> get_link_flow_car();
+
+		// trucks
+		m_fuel_truck += calculate_fuel_rate_truck(_v_converted) * (_v * m_unit_time / TFlt(1600)) * _mlink -> get_link_flow_truck();
+		m_CO2_truck += calculate_CO2_rate_truck(_v_converted) * (_v * m_unit_time / TFlt(1600)) * _mlink -> get_link_flow_truck();
+		m_HC_truck += calculate_HC_rate_truck(_v_converted) * (_v * m_unit_time / TFlt(1600)) * _mlink -> get_link_flow_truck();
+		m_CO_truck += calculate_CO_rate_truck(_v_converted) * (_v * m_unit_time / TFlt(1600)) * _mlink -> get_link_flow_truck();
+		m_NOX_truck += calculate_NOX_rate_truck(_v_converted) * (_v * m_unit_time / TFlt(1600)) * _mlink -> get_link_flow_truck();
+		m_VMT_truck += (_v * m_unit_time / TFlt(1600)) * _mlink -> get_link_flow_truck();
+	}
+	return 0;
 }
 
 int MNM_Cumulative_Emission_Multiclass::output()
 {
-  printf("The emission stats are: ");
-  printf("%d, %lf, %lf, %lf, %lf, %lf, %lf\n", m_link_vector[0] -> m_link_ID(), m_fuel(), m_CO2(), m_HC(), m_CO(), m_NOX(), m_VMT());
-  return 0;
+	printf("The emission stats for cars are: ");
+	printf("fuel: %lf, CO2: %lf, HC: %lf, CO: %lf, NOX: %lf, VMT: %lf\n", m_fuel(), m_CO2(), m_HC(), m_CO(), m_NOX(), m_VMT());
+
+	printf("The emission stats for trucks are: ");
+	printf("fuel: %lf, CO2: %lf, HC: %lf, CO: %lf, NOX: %lf, VMT: %lf\n", 
+		   m_fuel_truck(), m_CO2_truck(), m_HC_truck(), m_CO_truck(), m_NOX_truck(), m_VMT_truck());
+	return 0;
 }

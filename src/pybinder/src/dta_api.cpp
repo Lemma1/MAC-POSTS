@@ -287,6 +287,7 @@ py::array_t<double> Dta_Api::get_dar_matrix(py::array_t<int>start_intervals, py:
 }
 
 
+
 /***************************************************************
 ***************************************************************
                         Multiclass
@@ -311,7 +312,6 @@ Mcdta_Api::~Mcdta_Api()
   m_path_vec.clear();
   
 }
-
 
 int Mcdta_Api::initialize(std::string folder)
 {
@@ -348,7 +348,6 @@ int Mcdta_Api::run_whole()
   return 0;
 }
 
-
 int Mcdta_Api::register_links(py::array_t<int> links)
 {
   if (m_link_vec.size() > 0){
@@ -383,6 +382,26 @@ int Mcdta_Api::get_cur_loading_interval()
   return m_mcdta -> m_current_loading_interval();
 }
 
+int Mcdta_Api::print_emission_stats()
+{
+    TInt _count_car = 0, _count_truck = 0;
+    TFlt _tot_tt = 0.0;
+    MNM_Veh_Multiclass* _veh;
+    for (auto _map_it : m_mcdta -> m_veh_factory -> m_veh_map){
+        if (_map_it.second -> m_finish_time > 0) {
+            _veh = dynamic_cast<MNM_Veh_Multiclass *>(_map_it.second);
+            if (_veh -> m_class == 0){
+                _count_car += 1;
+            }
+            else {
+                _count_truck += 1;
+            }
+            _tot_tt += (_veh -> m_finish_time - _veh -> m_start_time) * 5.0 / 3600.0;
+        }
+    }
+    printf("\n\nTotal car: %d, Total truck: %d, Total tt: %.2f hours\n\n", int(_count_car), int(_count_truck), float(_tot_tt));
+    m_mcdta -> m_emission -> output();
+}
 
 py::array_t<double> Mcdta_Api::get_car_link_tt(py::array_t<double>start_intervals)
 {
@@ -407,7 +426,6 @@ py::array_t<double> Mcdta_Api::get_car_link_tt(py::array_t<double>start_interval
   }
   return result;
 }
-
 
 py::array_t<double> Mcdta_Api::get_truck_link_tt(py::array_t<double>start_intervals)
 {
@@ -465,7 +483,6 @@ py::array_t<double> Mcdta_Api::get_link_car_inflow(py::array_t<int>start_interva
   return result;
 }
 
-
 py::array_t<double> Mcdta_Api::get_link_truck_inflow(py::array_t<int>start_intervals, py::array_t<int>end_intervals)
 {
   auto start_buf = start_intervals.request();
@@ -498,7 +515,6 @@ py::array_t<double> Mcdta_Api::get_link_truck_inflow(py::array_t<int>start_inter
   return result;
 }
 
-
 int Mcdta_Api::register_paths(py::array_t<int> paths)
 {
   if (m_link_vec.size() > 0){
@@ -525,6 +541,7 @@ int Mcdta_Api::register_paths(py::array_t<int> paths)
   m_path_set = std::set<MNM_Path*> (m_path_vec.begin(), m_path_vec.end());
   return 0;
 }
+
 // py::array_t<double> Mcdta_Api::get_car_link_out_cc(int link_ID)
 // {
 //   MNM_Dlink_Multiclass *_link = (MNM_Dlink_Multiclass *) m_mcdta -> m_link_factory -> get_link(TInt(link_ID));
@@ -603,9 +620,7 @@ py::array_t<double> Mcdta_Api::get_queue_veh_each_link(py::array_t<int>useful_li
     }
   }
   return result;
-  
 }
-
 
 double Mcdta_Api::get_car_link_out_num(int link_ID, double time)
 {
@@ -778,18 +793,19 @@ PYBIND11_MODULE(MNMAPI, m) {
             .def("run_whole", &Mcdta_Api::run_whole)
             .def("install_cc", &Mcdta_Api::install_cc)
             .def("install_cc_tree", &Mcdta_Api::install_cc_tree)
+            .def("print_emission_stats", &Mcdta_Api::print_emission_stats)
             .def("get_cur_loading_interval", &Mcdta_Api::get_cur_loading_interval)
             .def("register_links", &Mcdta_Api::register_links)
             .def("register_paths", &Mcdta_Api::register_paths)
             .def("get_car_link_tt", &Mcdta_Api::get_car_link_tt)
             .def("get_truck_link_tt", &Mcdta_Api::get_truck_link_tt)
-            .def("get_car_link_out_num", &Mcdta_Api::get_car_link_out_num)
-            .def("get_truck_link_out_num", &Mcdta_Api::get_truck_link_out_num)
-            // .def("get_car_link_out_cc", &Mcdta_Api::get_car_link_out_cc);
             .def("get_link_car_inflow", &Mcdta_Api::get_link_car_inflow)
             .def("get_link_truck_inflow", &Mcdta_Api::get_link_truck_inflow)
-            // .def("get_link_in_cc", &Mcdta_Api::get_link_in_cc)
-            // .def("get_link_out_cc", &Mcdta_Api::get_link_out_cc)
+            .def("get_enroute_and_queue_veh_stats_agg", &Mcdta_Api::get_enroute_and_queue_veh_stats_agg)
+            .def("get_queue_veh_each_link", &Mcdta_Api::get_queue_veh_each_link)
+            .def("get_car_link_out_num", &Mcdta_Api::get_car_link_out_num)
+            .def("get_truck_link_out_num", &Mcdta_Api::get_truck_link_out_num)
+            //.def("get_car_link_out_cc", &Mcdta_Api::get_car_link_out_cc)
             .def("get_car_dar_matrix", &Mcdta_Api::get_car_dar_matrix)
             .def("get_truck_dar_matrix", &Mcdta_Api::get_truck_dar_matrix);
 #ifdef VERSION_INFO
