@@ -460,9 +460,18 @@ double Mcdta_Api::get_car_link_out_num(int link_ID, double time)
   // printf("1\n");
   TFlt result = _link -> m_N_out_car -> get_result(TFlt(time));
   // printf("%lf\n", result());
-  return result(); 
+  return result();
 }
 
+double Mcdta_Api::get_truck_link_out_num(int link_ID, double time)
+{
+  MNM_Dlink_Multiclass *_link = (MNM_Dlink_Multiclass *) m_mcdta -> m_link_factory -> get_link(TInt(link_ID));
+  if (_link -> m_N_out_truck == NULL){
+    throw std::runtime_error("Error, Mcdta_Api::get_truck_link_out_cc, cc not installed");
+  }
+  TFlt result = _link -> m_N_out_truck -> get_result(TFlt(time));
+  return result();
+}
 
 
 PYBIND11_MODULE(MNMAPI, m) {
@@ -515,7 +524,8 @@ PYBIND11_MODULE(MNMAPI, m) {
             // .def("register_paths", &Mcdta_Api::register_paths)
             .def("get_car_link_tt", &Mcdta_Api::get_car_link_tt)
             .def("get_truck_link_tt", &Mcdta_Api::get_truck_link_tt)
-            .def("get_car_link_out_num", &Mcdta_Api::get_car_link_out_num);
+            .def("get_car_link_out_num", &Mcdta_Api::get_car_link_out_num)
+            .def("get_truck_link_out_num", &Mcdta_Api::get_truck_link_out_num);
             // .def("get_car_link_out_cc", &Mcdta_Api::get_car_link_out_cc);
             // .def("get_link_inflow", &Mcdta_Api::get_link_inflow)
             // .def("get_link_in_cc", &Mcdta_Api::get_link_in_cc)

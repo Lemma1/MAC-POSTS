@@ -55,12 +55,16 @@ public:
   //                                       py::array_t<int>end_intervals);
   // py::array_t<double> get_truck_link_inflow(py::array_t<int>start_intervals, 
   //                                       py::array_t<int>end_intervals);
+  // py::array_t<double> get_car_link_out_cc(int link_ID);
+  
   py::array_t<double> get_car_link_tt(py::array_t<double>start_intervals);
   py::array_t<double> get_truck_link_tt(py::array_t<double>start_intervals);
-  // py::array_t<double> get_car_link_out_cc(int link_ID);
+  
+  py::array_t<double> get_enroute_queue_veh_stats(py::array_t<double>start_intervals);
+  
   double get_car_link_out_num(int link_ID, double time);
-  // py::array_t<double> get_link_in_cc(int link_ID);
-  // py::array_t<double> get_link_out_cc(int link_ID);
+  double get_truck_link_out_num(int link_ID, double time);
+  
   MNM_Dta_Multiclass *m_mcdta;
   std::vector<MNM_Dlink_Multiclass*> m_link_vec;
   std::vector<MNM_Path*> m_path_vec;

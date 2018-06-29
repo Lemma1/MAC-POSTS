@@ -2446,6 +2446,14 @@ int MNM_Dta_Multiclass::pre_loading()
 		_node = _node_it -> second;
 		_node -> prepare_loading();
 	}
+
+	std::deque<TInt> *_rec;
+  	for (auto _map_it : m_link_factory -> m_link_map)
+  	{
+    	_rec = new std::deque<TInt>();
+    	m_queue_veh_map.insert({_map_it.second -> m_link_ID, _rec});
+  	}
+  	
 	printf("Exiting MNM: Prepare loading!\n");
 	return 0;
 }
