@@ -5,6 +5,7 @@ import hashlib
 import time
 import shutil
 from scipy.sparse import coo_matrix
+import pickle
 
 import MNMAPI
 
@@ -193,7 +194,7 @@ class MCDODE():
 
 
 
-  def estimate_path_flow(self, step_size = 0.1, max_epoch = 10, car_init_scale = 10, truck_init_scale = 1):
+  def estimate_path_flow(self, step_size = 0.1, max_epoch = 10, car_init_scale = 10, truck_init_scale = 1, store_folder = None):
     (f_car, f_truck) = self.init_path_flow(car_scale = car_init_scale, truck_scale = truck_init_scale)
     for i in range(max_epoch):
       seq = np.random.permutation(self.num_data)
@@ -204,10 +205,14 @@ class MCDODE():
         # print "gradient", car_grad, truck_grad
         f_car -= car_grad * step_size / np.sqrt(i+1)
         f_truck -= truck_grad * step_size / np.sqrt(i+1)
+        f_car = np.maximum(f_car, 0)
+        f_truck = np.maximum(f_truck, 0)
         loss += tmp_loss
       print "Epoch:", i, "Loss:", loss / np.float(self.num_data)
       # print f_car, f_truck
       # break
+      if store_folder is not None:
+        pickle.dump((f_car, f_truck), open(os.path.join(store_folder, str(i) + 'iteration.pickle'), 'wb'))
     return (f_car, f_truck)
 
 
