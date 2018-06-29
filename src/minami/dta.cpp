@@ -357,7 +357,7 @@ int MNM_Dta::loading(bool verbose)
         }
         else{
           if (m_config -> get_string("routing_type") == "Fixed"){
-            //printf("Fixed Realsing.\n");
+            // printf("Fixed Realsing.\n");
             _origin -> release_one_interval(_cur_int, m_veh_factory, _assign_inter, TFlt(0));
           }
           else if((m_config -> get_string("routing_type") == "Adaptive")){
