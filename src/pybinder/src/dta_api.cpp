@@ -333,6 +333,13 @@ int Mcdta_Api::install_cc()
   return 0;
 }
 
+int Mcdta_Api::install_cc_tree()
+{
+  for (size_t i = 0; i<m_link_vec.size(); ++i){
+    m_link_vec[i] -> install_cumulative_curve_tree_multiclass();
+  }
+  return 0;
+}
 
 int Mcdta_Api::run_whole()
 {
@@ -493,6 +500,34 @@ py::array_t<double> Mcdta_Api::get_link_truck_inflow(py::array_t<int>start_inter
   }
   return result;
 }
+
+
+int Mcdta_Api::register_paths(py::array_t<int> paths)
+{
+  if (m_link_vec.size() > 0){
+    printf("Warning, Mcdta_Api::register_paths, path exists\n");
+    m_path_vec.clear();
+    m_path_set.clear();
+  }
+  auto paths_buf = paths.request();
+  if (paths_buf.ndim != 1){
+    throw std::runtime_error("Mcdta_Api::register_paths: Number of dimensions must be one");
+  }
+  int *paths_ptr = (int *) paths_buf.ptr; 
+  TInt _path_ID;
+  for (int i = 0; i < paths_buf.shape[0]; i++){
+    _path_ID = TInt(paths_ptr[i]);
+    // printf("registering path %d, %d\n", _path_ID(), (int)m_ID_path_mapping.size());
+    if (m_ID_path_mapping.find(_path_ID) == m_ID_path_mapping.end()){
+      throw std::runtime_error("Mcdta_Api::register_paths: No such path");
+    }
+    else {
+      m_path_vec.push_back(m_ID_path_mapping[_path_ID]);
+    }
+  }
+  m_path_set = std::set<MNM_Path*> (m_path_vec.begin(), m_path_vec.end());
+  return 0;
+}
 // py::array_t<double> Mcdta_Api::get_car_link_out_cc(int link_ID)
 // {
 //   MNM_Dlink_Multiclass *_link = (MNM_Dlink_Multiclass *) m_mcdta -> m_link_factory -> get_link(TInt(link_ID));
@@ -547,6 +582,7 @@ py::array_t<double> Mcdta_Api::get_car_dar_matrix(py::array_t<int>start_interval
   //   m_link_vec[i] -> m_N_in_tree -> print_out();
   // }
   for (int t = 0; t < l; ++t){
+    printf("Current processing time: %d\n", t);
     for (size_t i = 0; i<m_link_vec.size(); ++i){
       if (end_prt[t] < start_prt[t]){
         throw std::runtime_error("Error, Mcdta_Api::get_car_dar_matrix, end time smaller than start time");
@@ -674,18 +710,20 @@ PYBIND11_MODULE(MNMAPI, m) {
             .def("initialize", &Mcdta_Api::initialize)
             .def("run_whole", &Mcdta_Api::run_whole)
             .def("install_cc", &Mcdta_Api::install_cc)
-            // .def("install_cc_tree", &Mcdta_Api::install_cc_tree)
+            .def("install_cc_tree", &Mcdta_Api::install_cc_tree)
             .def("get_cur_loading_interval", &Mcdta_Api::get_cur_loading_interval)
             .def("register_links", &Mcdta_Api::register_links)
-            // .def("register_paths", &Mcdta_Api::register_paths)
+            .def("register_paths", &Mcdta_Api::register_paths)
             .def("get_car_link_tt", &Mcdta_Api::get_car_link_tt)
             .def("get_truck_link_tt", &Mcdta_Api::get_truck_link_tt)
-            .def("get_car_link_out_num", &Mcdta_Api::get_car_link_out_num);
+            .def("get_car_link_out_num", &Mcdta_Api::get_car_link_out_num)
             // .def("get_car_link_out_cc", &Mcdta_Api::get_car_link_out_cc);
-            // .def("get_link_inflow", &Mcdta_Api::get_link_inflow)
+            .def("get_link_car_inflow", &Mcdta_Api::get_link_car_inflow)
+            .def("get_link_truck_inflow", &Mcdta_Api::get_link_truck_inflow)
             // .def("get_link_in_cc", &Mcdta_Api::get_link_in_cc)
             // .def("get_link_out_cc", &Mcdta_Api::get_link_out_cc)
-            // .def("get_dar_matrix", &Mcdta_Api::get_dar_matrix)
+            .def("get_car_dar_matrix", &Mcdta_Api::get_car_dar_matrix)
+            .def("get_truck_dar_matrix", &Mcdta_Api::get_truck_dar_matrix);
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
 #else

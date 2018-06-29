@@ -48,8 +48,10 @@ public:
   ~Mcdta_Api();
   int initialize(std::string folder);
   int install_cc();
+  int install_cc_tree();
   int run_whole();
   int register_links(py::array_t<int> links);
+  int register_paths(py::array_t<int> paths);
   int get_cur_loading_interval();
   // py::array_t<double> get_car_link_inflow(py::array_t<int>start_intervals, 
   //                                       py::array_t<int>end_intervals);

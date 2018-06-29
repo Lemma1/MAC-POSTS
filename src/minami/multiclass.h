@@ -519,9 +519,9 @@ TFlt get_link_inflow_truck(MNM_Dlink_Multiclass* link,
 TFlt get_travel_time_car(MNM_Dlink_Multiclass* link, TFlt start_time);
 TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time);
 
-int add_dar_records_car(std::vector<dar_record*> &record, MNM_Dlink* link, 
+int add_dar_records_car(std::vector<dar_record*> &record, MNM_Dlink_Multiclass* link, 
                     std::set<MNM_Path*> pathset, TFlt start_time, TFlt end_time);
-int add_dar_records_truck(std::vector<dar_record*> &record, MNM_Dlink* link, 
+int add_dar_records_truck(std::vector<dar_record*> &record, MNM_Dlink_Multiclass* link, 
                     std::set<MNM_Path*> pathset, TFlt start_time, TFlt end_time);
 };
 

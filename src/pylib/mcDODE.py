@@ -9,7 +9,7 @@ from scipy.sparse import coo_matrix
 import MNMAPI
 
 
-class DODE():
+class MCDODE():
   def __init__(self, nb, config):
     self.config = config
     self.nb = nb
@@ -22,41 +22,52 @@ class DODE():
     self.num_data = self.config['num_data']
     self.observed_links = self.config['observed_links']
     self.paths_list = self.config['paths_list']
+    self.car_count_agg_L_list = None
+    self.truck_count_agg_L_list = None
     assert (len(self.paths_list) == self.num_path)
 
-  def _add_link_flow_data(self, link_flow_df_list):
-    assert (self.config['use_link_flow'])
+  def _add_car_link_flow_data(self, link_flow_df_list):
+    assert (self.config['use_car_link_flow'])
     assert (self.num_data == len(link_flow_df_list))
-    assert (len(self.observed_links) == len(link_flow_df_list[0].columns))
-    for i in range(self.num_data):
-      assert (len(self.observed_links) == len(link_flow_df_list[i].columns))
-      for j in range(len(self.observed_links)):
-        assert (self.observed_links[j] == link_flow_df_list[i].columns[j])
-    self.data_dict['link_flow'] = link_flow_df_list
+    self.data_dict['car_link_flow'] = link_flow_df_list
 
-  def _add_link_tt_data(self, link_spd_df_list):
-    assert (self.config['use_link_tt'])
+  def _add_truck_link_flow_data(self, link_flow_df_list):
+    assert (self.config['use_truck_link_flow'])
+    assert (self.num_data == len(link_flow_df_list))
+    self.data_dict['truck_link_flow'] = link_flow_df_list
+
+  def _add_car_link_tt_data(self, link_spd_df_list):
+    assert (self.config['use_car_link_tt'])
     assert (self.num_data == len(link_spd_df_list))
-    for i in range(self.num_data):
-      assert (len(self.observed_links) == len(link_spd_df_list[i].columns))
-      for j in range(len(self.observed_links)):
-        assert (self.observed_links[j] == link_spd_df_list[i].columns[j])
-    self.data_dict['link_tt'] = link_spd_df_list
+    self.data_dict['car_link_tt'] = link_spd_df_list
+
+  def _add_truck_link_tt_data(self, link_spd_df_list):
+    assert (self.config['use_truck_link_tt'])
+    assert (self.num_data == len(link_spd_df_list))
+    self.data_dict['truck_link_tt'] = link_spd_df_list
 
   def add_data(self, data_dict):
-    if self.config['use_link_flow']:
-      self._add_link_flow_data(data_dict['link_flow'])
-    if self.config['use_link_tt']:
-      self._add_link_tt_data(data_dict['link_tt'])
+    if self.config['car_count_agg']:
+      self.car_count_agg_L_list = data_dict['car_count_agg_L_list']
+    if self.config['truck_count_agg']:
+      self.truck_count_agg_L_list = data_dict['truck_count_agg_L_list']
+    if self.config['use_car_link_flow']:
+      self._add_car_link_flow_data(data_dict['car_link_flow'])
+    if self.config['use_truck_link_flow']:
+      self._add_truck_link_flow_data(data_dict['truck_link_flow'])
+    if self.config['use_car_link_tt']:
+      self._add_car_link_tt_data(data_dict['car_link_tt'])
+    if self.config['use_car_link_tt']:
+      self._add_truck_link_tt_data(data_dict['truck_link_tt'])
 
-  def _run_simulation(self, f):
+  def _run_simulation(self, f_car, f_truck):
     hash1 = hashlib.sha1()
     hash1.update(str(time.time()))
     new_folder = str(hash1.hexdigest())
-    self.nb.update_demand_path(f)
+    self.nb.update_demand_path2(f_car, f_truck)
     self.nb.config.config_dict['DTA']['total_interval'] = self.num_loading_interval
     self.nb.dump_to_folder(new_folder)
-    a = MNMAPI.dta_api()
+    a = MNMAPI.mcdta_api()
     a.initialize(new_folder)
     shutil.rmtree(new_folder)
     a.register_links(self.observed_links)
@@ -84,8 +95,10 @@ class DODE():
                    shape=(num_assign_interval * num_e_link, num_assign_interval * num_e_path))
     return mat    
 
-  def init_path_flow(self):
-    return np.random.rand(self.num_assign_interval * self.num_path)
+  def init_path_flow(self, car_scale = 1, truck_scale = 0.1):
+    f_car =  np.random.rand(self.num_assign_interval * self.num_path) * car_scale
+    f_truck =  np.random.rand(self.num_assign_interval * self.num_path) * truck_scale
+    return (f_car, f_truck)
 
   def compute_path_flow_grad_and_loss(self, one_data_dict, f):
     print "Running simulation"
@@ -119,9 +132,9 @@ class DODE():
     assert (self.num_data > j)
     one_data_dict = dict()
     if self.config['use_link_flow']:
-      one_data_dict['link_flow'] = self.data_dict['link_flow'][j].values.flatten()
+      one_data_dict['link_flow'] = self.data_dict['link_flow'][j]
     if self.config['use_link_tt']:
-      one_data_dict['link_tt'] = self.data_dict['link_tt'][j].values.flatten()
+      one_data_dict['link_tt'] = self.data_dict['link_tt'][j]
     return one_data_dict
 
 
