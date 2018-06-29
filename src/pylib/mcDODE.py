@@ -4,7 +4,7 @@ import pandas as pd
 import hashlib
 import time
 import shutil
-from scipy.sparse import coo_matrix
+from scipy.sparse import coo_matrix, csr_matrix
 import pickle
 
 import MNMAPI
@@ -76,16 +76,21 @@ class MCDODE():
     a.install_cc()
     a.install_cc_tree()
     a.run_whole()
+    print "Finish simulation", time.time()
     return a
 
   def get_dar(self, dta, f_car, f_truck):
-    raw_car_dar = dta.get_car_dar_matrix(np.arange(0, self.num_loading_interval, self.ass_freq), 
-                np.arange(0, self.num_loading_interval, self.ass_freq) + self.ass_freq)
-    # print "raw car dar", raw_car_dar
-    car_dar = self._massage_raw_dar(raw_car_dar, self.ass_freq, f_car, self.num_assign_interval)
-    raw_truck_dar = dta.get_truck_dar_matrix(np.arange(0, self.num_loading_interval, self.ass_freq), 
-                np.arange(0, self.num_loading_interval, self.ass_freq) + self.ass_freq)
-    truck_dar = self._massage_raw_dar(raw_truck_dar, self.ass_freq, f_truck, self.num_assign_interval)
+    car_dar = csr_matrix((self.num_assign_interval * len(self.observed_links), self.num_assign_interval * len(self.paths_list)))
+    truck_dar = csr_matrix((self.num_assign_interval * len(self.observed_links), self.num_assign_interval * len(self.paths_list)))
+    if self.config['use_car_link_flow'] or self.config['use_car_link_tt']:
+      raw_car_dar = dta.get_car_dar_matrix(np.arange(0, self.num_loading_interval, self.ass_freq), 
+                  np.arange(0, self.num_loading_interval, self.ass_freq) + self.ass_freq)
+      # print "raw car dar", raw_car_dar
+      car_dar = self._massage_raw_dar(raw_car_dar, self.ass_freq, f_car, self.num_assign_interval)
+    if self.config['use_truck_link_flow'] or self.config['use_truck_link_tt']:
+      raw_truck_dar = dta.get_truck_dar_matrix(np.arange(0, self.num_loading_interval, self.ass_freq), 
+                  np.arange(0, self.num_loading_interval, self.ass_freq) + self.ass_freq)
+      truck_dar = self._massage_raw_dar(raw_truck_dar, self.ass_freq, f_truck, self.num_assign_interval)
     # print "dar", car_dar, truck_dar
     return (car_dar, truck_dar)
 
@@ -98,9 +103,13 @@ class MCDODE():
     path_seq = (raw_dar[:, 0] + (raw_dar[:, 1] / small_assign_freq).astype(np.int) * num_e_path).astype(np.int)
     # print path_seq
     p = raw_dar[:, 4] / f[path_seq]
-
+    print "Creating the coo matrix", time.time()
     mat = coo_matrix((p, (link_seq, path_seq)), 
                    shape=(num_assign_interval * num_e_link, num_assign_interval * num_e_path))
+    # pickle.dump((p, link_seq, path_seq), open('test.pickle', 'wb'))
+    print 'converting the csr', time.time()
+    mat = mat.tocsr()
+    print 'finish converting', time.time()
     return mat    
 
   def init_path_flow(self, car_scale = 1, truck_scale = 0.1):
@@ -109,21 +118,21 @@ class MCDODE():
     return (f_car, f_truck)
 
   def compute_path_flow_grad_and_loss(self, one_data_dict, f_car, f_truck):
-    print "Running simulation"
+    print "Running simulation", time.time()
     dta = self._run_simulation(f_car, f_truck)
-    print "Getting DAR"
+    print "Getting DAR", time.time()
     (car_dar, truck_dar) = self.get_dar(dta, f_car, f_truck)
-    print "Evaluating grad"
+    print "Evaluating grad", time.time()
     car_grad = np.zeros(len(self.observed_links) * self.num_assign_interval)
     truck_grad = np.zeros(len(self.observed_links) * self.num_assign_interval)
     if self.config['use_car_link_flow']:
-      print "car link flow"
+      print "car link flow", time.time()
       car_grad += self.config['link_car_flow_weight'] * self._compute_grad_on_car_link_flow(dta, one_data_dict)
     if self.config['use_truck_link_flow']:
       truck_grad += self.config['link_truck_flow_weight'] * self._compute_grad_on_truck_link_flow(dta, one_data_dict)
     # if self.config['use_link_tt']:
     #   grad += self.config['link_tt_weight'] * self._compute_grad_on_link_tt(dta, one_data_dict['link_tt'])
-    print "Getting Loss"
+    print "Getting Loss", time.time()
     loss = self._get_loss(one_data_dict, dta)
     return  car_dar.T.dot(car_grad), truck_dar.T.dot(truck_grad), loss
 
@@ -199,6 +208,7 @@ class MCDODE():
     for i in range(max_epoch):
       seq = np.random.permutation(self.num_data)
       loss = np.float(0)
+      print "Start iteration", time.time()
       for j in seq:
         one_data_dict = self._get_one_data(j)
         car_grad, truck_grad, tmp_loss = self.compute_path_flow_grad_and_loss(one_data_dict, f_car, f_truck)
@@ -208,7 +218,7 @@ class MCDODE():
         f_car = np.maximum(f_car, 0)
         f_truck = np.maximum(f_truck, 0)
         loss += tmp_loss
-      print "Epoch:", i, "Loss:", loss / np.float(self.num_data)
+      print "Epoch:", i, "Loss:", loss / np.float(self.num_data), time.time()
       # print f_car, f_truck
       # break
       if store_folder is not None:
