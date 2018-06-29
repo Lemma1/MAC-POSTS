@@ -593,7 +593,7 @@ py::array_t<double> Mcdta_Api::get_car_dar_matrix(py::array_t<int>start_interval
   //   m_link_vec[i] -> m_N_in_tree -> print_out();
   // }
   for (int t = 0; t < l; ++t){
-    printf("Current processing time: %d\n", t);
+    // printf("Current processing time: %d\n", t);
     for (size_t i = 0; i<m_link_vec.size(); ++i){
       if (end_prt[t] < start_prt[t]){
         throw std::runtime_error("Error, Mcdta_Api::get_car_dar_matrix, end time smaller than start time");
