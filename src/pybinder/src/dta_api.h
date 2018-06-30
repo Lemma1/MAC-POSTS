@@ -59,6 +59,9 @@ public:
   py::array_t<double> get_car_link_tt(py::array_t<double>start_intervals);
   py::array_t<double> get_truck_link_tt(py::array_t<double>start_intervals);
   
+  py::array_t<double> get_car_link_speed(py::array_t<double>start_intervals);
+  py::array_t<double> get_truck_link_speed(py::array_t<double>start_intervals);
+  
   py::array_t<double> get_link_car_inflow(py::array_t<int>start_intervals, py::array_t<int>end_intervals);
   py::array_t<double> get_link_truck_inflow(py::array_t<int>start_intervals, py::array_t<int>end_intervals);
   
