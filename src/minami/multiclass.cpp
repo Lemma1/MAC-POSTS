@@ -72,9 +72,11 @@ int MNM_Dlink_Multiclass::install_cumulative_curve_tree_multiclass()
   	if (m_N_in_tree_car != NULL) delete m_N_in_tree_car;
   	if (m_N_out_tree_truck != NULL) delete m_N_out_tree_truck;
   	if (m_N_in_tree_truck != NULL) delete m_N_in_tree_truck;
-		m_N_in_tree_car = new MNM_Tree_Cumulative_Curve();
+
+  	// !!! Close all cc_tree if only doing loading to save a lot of memory !!!
+	// m_N_in_tree_car = new MNM_Tree_Cumulative_Curve();
   	// m_N_out_tree_car = new MNM_Tree_Cumulative_Curve();
-  	m_N_in_tree_truck = new MNM_Tree_Cumulative_Curve();
+  	// m_N_in_tree_truck = new MNM_Tree_Cumulative_Curve();
   	// m_N_out_tree_truck = new MNM_Tree_Cumulative_Curve();
   	return 0;
 }
@@ -1091,7 +1093,6 @@ void MNM_Dlink_Lq_Multiclass::print_info()
 
 TFlt MNM_Dlink_Lq_Multiclass::get_link_flow_car()
 {
-	
 	return TFlt(m_volume_car) / m_flow_scalar;
 }
 
@@ -1235,11 +1236,20 @@ int MNM_Dlink_Pq_Multiclass::evolve(TInt timestamp)
 	return 0;
 }
 
+TFlt MNM_Dlink_Pq_Multiclass::get_link_flow_car()
+{
+	return 0;
+}
+
+TFlt MNM_Dlink_Pq_Multiclass::get_link_flow_truck()
+{
+	return 0;
+}
+
 TFlt MNM_Dlink_Pq_Multiclass::get_link_flow()
 {
 	// For adaptive routing, need modidication for multiclass case
 	// return TFlt(m_volume_car + m_volume_truck) / m_flow_scalar;
-
 	return 0;
 }
 
@@ -2693,18 +2703,18 @@ MNM_Cumulative_Emission_Multiclass::~MNM_Cumulative_Emission_Multiclass()
 }
 
 // All convert_factors from MOVES
-// Reference: MOVES default database
+// Reference: MOVES default database - class 2b trucks with 4 tires
 TFlt MNM_Cumulative_Emission_Multiclass::calculate_fuel_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;
 	if (v < 25){
-		_convert_factor = 7.74;
+		_convert_factor = 1.53;
 	}
 	else if (v < 55){
-		_convert_factor = 6.76;
+		_convert_factor = 1.50;
 	}
 	else {
-		_convert_factor = 7.04;
+		_convert_factor = 1.55;
 	}
 	TFlt _fuel_rate_car = calculate_fuel_rate(v);
 	TFlt _fuel_rate_truck = _fuel_rate_car * _convert_factor;
@@ -2715,13 +2725,13 @@ TFlt MNM_Cumulative_Emission_Multiclass::calculate_CO2_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;
 	if (v < 25){
-		_convert_factor = 7.74;
+		_convert_factor = 1.53;
 	}
 	else if (v < 55){
-		_convert_factor = 6.76;
+		_convert_factor = 1.50;
 	}
 	else {
-		_convert_factor = 7.04;
+		_convert_factor = 1.55;
 	}
 	TFlt _CO2_rate_car = calculate_CO2_rate(v);
 	TFlt _CO2_rate_truck = _CO2_rate_car * _convert_factor;
@@ -2732,13 +2742,13 @@ TFlt MNM_Cumulative_Emission_Multiclass::calculate_HC_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;
 	if (v < 25){
-		_convert_factor = 62.8;
+		_convert_factor = 1.87;
 	}
 	else if (v < 55){
-		_convert_factor = 22.0;
+		_convert_factor = 2.41;
 	}
 	else {
-		_convert_factor = 8.90;
+		_convert_factor = 2.01;
 	}
 	TFlt _HC_rate_car = calculate_HC_rate(v);
 	TFlt _HC_rate_truck = _HC_rate_car * _convert_factor;
@@ -2749,15 +2759,15 @@ TFlt MNM_Cumulative_Emission_Multiclass::calculate_CO_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;
 	if (v < 25){
-		_convert_factor = 3.58;
+		_convert_factor = 3.97;
 	}
 	else if (v < 55){
-		_convert_factor = 5.20;
+		_convert_factor = 2.67;
 	}
 	else {
-		_convert_factor = 3.88;
+		_convert_factor = 5.01;
 	}
-	TFlt _CO_rate_car = calculate_CO2_rate(v);
+	TFlt _CO_rate_car = calculate_CO_rate(v);
 	TFlt _CO_rate_truck = _CO_rate_car * _convert_factor;
 	return _CO_rate_truck;
 }
@@ -2766,15 +2776,15 @@ TFlt MNM_Cumulative_Emission_Multiclass::calculate_NOX_rate_truck(TFlt v)
 {
 	TFlt _convert_factor = 1.0;
 	if (v < 25){
-		_convert_factor = 51.2;
+		_convert_factor = 7.32;
 	}
 	else if (v < 55){
-		_convert_factor = 31.6;
+		_convert_factor = 6.03;
 	}
 	else {
-		_convert_factor = 27.4;
+		_convert_factor = 5.75;
 	}
-	TFlt _NOX_rate_car = calculate_CO2_rate(v);
+	TFlt _NOX_rate_car = calculate_NOX_rate(v);
 	TFlt _NOX_rate_truck = _NOX_rate_car * _convert_factor;
 	return _NOX_rate_truck;
 }

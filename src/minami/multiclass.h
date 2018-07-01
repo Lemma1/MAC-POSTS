@@ -243,6 +243,9 @@ public:
 	TFlt virtual get_link_supply() override;
 	int virtual clear_incoming_array() override;
 	void virtual print_info() override;
+
+	TFlt virtual get_link_flow_car() override;
+	TFlt virtual get_link_flow_truck() override;
 	TFlt virtual get_link_flow() override;
 	TFlt virtual get_link_tt() override;
 

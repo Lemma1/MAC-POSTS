@@ -399,7 +399,9 @@ int Mcdta_Api::print_emission_stats()
             _tot_tt += (_veh -> m_finish_time - _veh -> m_start_time) * 5.0 / 3600.0;
         }
     }
-    printf("\n\nTotal car: %d, Total truck: %d, Total tt: %.2f hours\n\n", int(_count_car), int(_count_truck), float(_tot_tt));
+    printf("\n\nTotal car: %d, Total truck: %d, Total tt: %.2f hours\n\n", 
+           int(_count_car/m_mcdta -> m_flow_scalar), int(_count_truck/m_mcdta -> m_flow_scalar), 
+           float(_tot_tt/m_mcdta -> m_flow_scalar));
     m_mcdta -> m_emission -> output();
 }
 
