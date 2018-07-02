@@ -477,9 +477,13 @@ class MNM_config():
     tmp_str += '\n[STAT]\n'
     for name, value in self.config_dict['STAT'].iteritems():
       tmp_str += "{} = {}\n".format(str(name), str(value))    
-    if self.config_dict['DTA']['routing_type'] == 'Fixed':
+    if self.config_dict['DTA']['routing_type'] == 'Fixed' or self.config_dict['DTA']['routing_type'] == 'Hybrid':
       tmp_str += '\n[FIXED]\n'
       for name, value in self.config_dict['FIXED'].iteritems():
+        tmp_str += "{} = {}\n".format(str(name), str(value))  
+    if self.config_dict['DTA']['routing_type'] == 'Adaptive' or self.config_dict['DTA']['routing_type'] == 'Hybrid':
+      tmp_str += '\n[ADAPTIVE]\n'
+      for name, value in self.config_dict['ADAPTIVE'].iteritems():
         tmp_str += "{} = {}\n".format(str(name), str(value))  
     return tmp_str
 
