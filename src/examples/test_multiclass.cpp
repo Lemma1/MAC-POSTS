@@ -1,5 +1,6 @@
 #include "io.h"
 #include "multiclass.h"
+#include "Snap.h"
 
 #include <vector>
 
@@ -11,15 +12,17 @@ int main()
 	printf("BEGIN multiclass test!\n");
 
 	// On ubuntu (PC)
-	// std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_MckeesRocks_SPC";
+	std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_MckeesRocks_SPC";
+	// std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/a6e7b31067d2ead8d3725fc0ed587d06c958f63c";
 	// std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_7link_multiclass";
 
 	// on macOS (Mac air)
-	std::string folder = "/Users/alan-air/Dropbox/MAC-POSTS/data/input_files_MckeesRocks_SPC";
+	// std::string folder = "/Users/alan-air/Dropbox/MAC-POSTS/data/input_files_MckeesRocks_SPC";
 	// std::string folder = "/Users/alan-air/Dropbox/MAC-POSTS/data/input_files_7link_multiclass";
 
 
 	MNM_Dta_Multiclass *test_dta = new MNM_Dta_Multiclass(folder);
+
 	printf("================================ DTA set! =================================\n");
 	
 	test_dta -> build_from_files();
@@ -138,6 +141,9 @@ int main()
 		if (_vis_file2.is_open()) _vis_file2.close();
 	}
 
+	delete test_dta;
+	printf("Finished delete test_dta!\n\n\n");
+	
 	// output tt of some special links
 	// for (auto _link_it = test_dta -> m_link_factory -> m_link_map.begin(); _link_it != test_dta -> m_link_factory -> m_link_map.end(); _link_it++){
 	// 		_link = _link_it -> second;

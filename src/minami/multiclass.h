@@ -32,6 +32,9 @@ public:
 	// use this one instead of the one in Dlink class
 	int install_cumulative_curve_tree_multiclass();
 
+	TFlt virtual get_link_flow_car(){return 0;};
+	TFlt virtual get_link_flow_truck(){return 0;};
+
 	TFlt get_link_freeflow_tt_car();
 	TFlt get_link_freeflow_tt_truck();
 
@@ -77,8 +80,12 @@ public:
 	TFlt virtual get_link_supply() override;
 	int virtual clear_incoming_array() override;
 	void virtual print_info() override;
+	
+	TFlt virtual get_link_flow_car() override;
+	TFlt virtual get_link_flow_truck() override;
 	TFlt virtual get_link_flow() override;
 	TFlt virtual get_link_tt() override;
+
 	int virtual move_veh_queue(std::deque<MNM_Veh*> *from_queue, 
 						std::deque<MNM_Veh*> *to_queue, 
 						TInt number_tomove) override;
@@ -177,8 +184,12 @@ public:
 	TFlt virtual get_link_supply() override;
 	int virtual clear_incoming_array() override;
 	void virtual print_info() override;
+
+	TFlt virtual get_link_flow_car() override;
+	TFlt virtual get_link_flow_truck() override;
 	TFlt virtual get_link_flow() override;
 	TFlt virtual get_link_tt() override;
+
 	int update_perceived_density();
 
 	std::deque<MNM_Veh*> m_veh_queue_car;
@@ -232,6 +243,9 @@ public:
 	TFlt virtual get_link_supply() override;
 	int virtual clear_incoming_array() override;
 	void virtual print_info() override;
+
+	TFlt virtual get_link_flow_car() override;
+	TFlt virtual get_link_flow_truck() override;
 	TFlt virtual get_link_flow() override;
 	TFlt virtual get_link_tt() override;
 
@@ -468,12 +482,12 @@ public:
  											MNM_ConfReader *conf_reader, 
  											MNM_Link_Factory *link_factory, 
  											std::string file_name = "MNM_input_link");
- 	static int build_od_factory_multiclass(std::string file_folder, 
- 											MNM_ConfReader *conf_reader, 
- 											MNM_OD_Factory *od_factory, 
- 											MNM_Node_Factory *node_factory) {
- 		return build_od_factory(file_folder, conf_reader, od_factory, node_factory);
- 	};
+ 	// static int build_od_factory_multiclass(std::string file_folder, 
+ 	// 										MNM_ConfReader *conf_reader, 
+ 	// 										MNM_OD_Factory *od_factory, 
+ 	// 										MNM_Node_Factory *node_factory) {
+ 	// 	return build_od_factory(file_folder, conf_reader, od_factory, node_factory);
+ 	// };
  	static int build_demand_multiclass(std::string file_folder, 
  									MNM_ConfReader *conf_reader, 
  									MNM_OD_Factory *od_factory);
@@ -519,8 +533,10 @@ TFlt get_link_inflow_truck(MNM_Dlink_Multiclass* link,
 TFlt get_travel_time_car(MNM_Dlink_Multiclass* link, TFlt start_time);
 TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time);
 
-int get_dar_matrix_multiclass(double **output, std::vector<MNM_Dlink*> links, 
-                   			std::vector<MNM_Path*> paths, MNM_Veh_Factory *veh_factory);
+int add_dar_records_car(std::vector<dar_record*> &record, MNM_Dlink_Multiclass* link, 
+                    std::set<MNM_Path*> pathset, TFlt start_time, TFlt end_time);
+int add_dar_records_truck(std::vector<dar_record*> &record, MNM_Dlink_Multiclass* link, 
+                    std::set<MNM_Path*> pathset, TFlt start_time, TFlt end_time);
 };
 
 

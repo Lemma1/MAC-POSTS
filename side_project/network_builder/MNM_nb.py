@@ -27,6 +27,9 @@ class MNM_dlink():
     self.rhoj = rhoj      #v/miles
     self.lanes = lanes    #num of lanes
 
+  def get_fft(self):
+    return self.length / self.ffs * 3600
+
   def is_ok(self, unit_time = 5):
     assert(self.length > 0.0)
     assert(self.ffs > 0.0)
@@ -35,8 +38,8 @@ class MNM_dlink():
     assert(self.lanes > 0)
     assert(self.typ in DLINK_ENUM)
     assert(self.cap / self.ffs < self.rhoj)
-    if self.ffs < 9999:
-      assert(unit_time * self.ffs / 3600 <= self.length)
+    # if self.ffs < 9999:
+    #   assert(unit_time * self.ffs / 3600 <= self.length)
 
   def __str__(self):
     return "MNM_dlink, ID: {}, type: {}, length: {} miles, ffs: {} mi/h".format(self.ID, self.typ, self.length, self.ffs)
@@ -126,8 +129,8 @@ class MNM_od():
       self.D_dict[D] = Dnode_ID
 
   def build_from_file(self, file_name):
-    self.O_dict = dict()
-    self.D_dict = dict()
+    self.O_dict = bidict()
+    self.D_dict = bidict()
     flip = False
     f = file(file_name)
     log = f.readlines()[1:]
@@ -280,14 +283,17 @@ class MNM_pathset():
     else:
       self.path_list.append(path)
 
-  def normalize_route_portions(self):
+  def normalize_route_portions(self, sum_to_OD = False):
     for i in range(len(self.path_list) - 1):
       assert(self.path_list[i].route_portions.shape == self.path_list[i + 1].route_portions.shape)
     tmp_sum = np.zeros(self.path_list[0].route_portions.shape)
     for i in range(len(self.path_list)):
       tmp_sum += self.path_list[i].route_portions
     for i in range(len(self.path_list)):
-      self.path_list[i].route_portions = self.path_list[i].route_portions / tmp_sum
+      self.path_list[i].route_portions = self.path_list[i].route_portions / np.maximum(tmp_sum, 1e-6)
+    if sum_to_OD:
+      return tmp_sum
+
 
   def __str__(self):
     return "MNM_pathset, O node: {}, D node: {}, number_of_paths: {}".format(self.origin_node, self.destination_node, len(self.path_list))
@@ -347,7 +353,6 @@ class MNM_pathtable():
     for i in range(len(log)):
       tmp_portions = np.array(log[i].strip().split()).astype(np.float)
       self.ID2path[i].attach_route_choice_portions(tmp_portions)
-    
 
   def __str__(self):
     return "MNM_pathtable, number of paths:" + str(len(self.ID2path)) 
@@ -355,7 +360,7 @@ class MNM_pathtable():
   def __repr__(self):
     return self.__str__()
 
-  def generate_tabel_text(self):
+  def generate_table_text(self):
     tmp_str = ""
     for path_ID, path in self.ID2path.iteritems():
       tmp_str += path.generate_node_list_text() + '\n'
@@ -453,6 +458,13 @@ class MNM_network_builder():
     self.path_table = MNM_pathtable()
     self.route_choice_flag = False
 
+
+  def get_link(self, ID):
+    for link in self.link_list:
+      if link.ID == ID:
+        return link
+    return None
+
   def load_from_folder(self, path, config_file_name = 'config.conf',
                                     link_file_name = 'MNM_input_link', node_file_name = 'MNM_input_node',
                                     graph_file_name = 'Snap_graph', od_file_name = 'MNM_input_od',
@@ -529,7 +541,7 @@ class MNM_network_builder():
     f.close()
 
     f = open(os.path.join(path, pathtable_file_name), 'wb')
-    f.write(self.path_table.generate_tabel_text())
+    f.write(self.path_table.generate_table_text())
     f.close()
 
     if self.route_choice_flag:
@@ -588,5 +600,26 @@ class MNM_network_builder():
       tmp_str += node.generate_text() + '\n'
     return tmp_str
 
-  def set_network_nake(name):
+  def set_network_nake(self, name):
     self.network_name = name
+
+  def update_demand_path(self, f):
+    assert (len(f) == len(self.path_table.ID2path) * self.config.config_dict['DTA']['max_interval'])
+    f = f.reshape(self.config.config_dict['DTA']['max_interval'], len(self.path_table.ID2path))
+    for i, path_ID in enumerate(self.path_table.ID2path.keys()):
+      path = self.path_table.ID2path[path_ID]
+      path.attach_route_choice_portions(f[:, i])
+    self.demand.demand_dict = dict()
+    for O_node in self.path_table.path_dict.keys():
+      for D_node in self.path_table.path_dict[O_node].keys():
+        demand = self.path_table.path_dict[O_node][D_node].normalize_route_portions(sum_to_OD = True)
+        self.demand.add_demand(self.od.O_dict.inv[O_node], self.od.D_dict.inv[D_node], demand, overwriting = True)
+    self.route_choice_flag = True
+
+  def get_path_flow(self):
+    f = np.zeros((self.config.config_dict['DTA']['max_interval'], len(self.path_table.ID2path)))
+    for i, ID in enumerate(self.path_table.ID2path.keys()):
+      path = self.path_table.ID2path[ID]
+      # print path.route_portions
+      f[:, i] = path.route_portions * self.demand.demand_dict[self.od.O_dict.inv[path.origin_node]][self.od.D_dict.inv[path.destination_node]]
+    return f.flatten()

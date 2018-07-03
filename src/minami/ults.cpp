@@ -194,7 +194,7 @@ MNM_ConfReader::MNM_ConfReader (std::string filename, std::string confKey) {
 }
 
 MNM_ConfReader::~MNM_ConfReader () {
-  if (!m_configFile) {
+  if (m_configFile != NULL) {
     delete m_configFile;
   }
 }

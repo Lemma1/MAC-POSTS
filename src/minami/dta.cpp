@@ -5,20 +5,37 @@ MNM_Dta::MNM_Dta(std::string file_folder)
 {
   m_file_folder = file_folder;
   m_current_loading_interval = TInt(0);
+
+  m_queue_veh_num = std::deque<TInt>();
+  m_enroute_veh_num = std::deque<TInt>();
+  m_queue_veh_map = std::unordered_map<TInt, std::deque<TInt>*>();
+
   initialize();
 }
 
 MNM_Dta::~MNM_Dta()
 {
-  delete m_veh_factory;
-  delete m_node_factory;
-  delete m_link_factory;
-  delete m_od_factory;
-  delete m_config;
-  delete m_routing;
-  delete m_statistics;
-  delete m_workzone;
-  m_graph -> Clr();  
+  if (m_emission != NULL) delete m_emission;
+
+  if (m_routing != NULL) delete m_routing;
+  
+  if (m_veh_factory != NULL) delete m_veh_factory;
+  if (m_node_factory != NULL) delete m_node_factory;
+  if (m_link_factory != NULL) delete m_link_factory;
+  if (m_od_factory != NULL) delete m_od_factory;
+  if (m_config != NULL) delete m_config;
+  
+  if (m_statistics != NULL) delete m_statistics;
+  if (m_workzone != NULL) delete m_workzone;
+  m_graph -> Clr();
+
+  m_queue_veh_num.clear();
+  m_enroute_veh_num.clear();
+  for (auto _it = m_queue_veh_map.begin(); _it != m_queue_veh_map.end(); _it++){
+    _it -> second -> clear();
+    delete _it -> second;
+  }  
+  m_queue_veh_map.clear();
 }
 
 int MNM_Dta::initialize()
@@ -33,7 +50,6 @@ int MNM_Dta::initialize()
   m_assign_freq = m_config -> get_int("assign_frq");
   m_start_assign_interval = m_config -> get_int("start_assign_interval");
   m_total_assign_inter = m_config -> get_int("max_interval");
-
   return 0;
 }
 
@@ -73,9 +89,10 @@ int MNM_Dta::set_routing()
     }
     m_routing = new MNM_Routing_Fixed(m_graph, m_od_factory, m_node_factory, m_link_factory, _tmp_conf -> get_int("route_frq"));
     m_routing -> init_routing(_path_table);
+    delete _tmp_conf;
   }
   
-  else if (m_config ->get_string("routing_type") == "Due"){
+  else if (m_config -> get_string("routing_type") == "Due"){
     // Path_Table *_path_table = MNM::build_pathset(m_graph, m_od_factory, m_link_factory);
     m_routing = new MNM_Routing_Fixed(m_graph, m_od_factory, m_node_factory, m_link_factory, m_config -> get_int("assign_frq"));
     // m_routing -> init_routing(_path_table);
@@ -83,7 +100,7 @@ int MNM_Dta::set_routing()
 
   // m_routing = new MNM_Routing_Random(m_graph, m_statistics, m_od_factory, m_node_factory, m_link_factory);
 
-  else if (m_config ->get_string("routing_type") == "Hybrid"){
+  else if (m_config -> get_string("routing_type") == "Hybrid"){
     MNM_ConfReader* _tmp_conf = new MNM_ConfReader(m_file_folder + "/config.conf", "FIXED");
     Path_Table *_path_table;
     if (_tmp_conf -> get_string("choice_portion") == "Buffer"){
@@ -97,6 +114,7 @@ int MNM_Dta::set_routing()
     TInt _route_freq_fixed = _tmp_conf -> get_int("route_frq");
     m_routing = new MNM_Routing_Hybrid(m_file_folder, m_graph, m_statistics, m_od_factory, m_node_factory, m_link_factory, _route_freq_fixed);
     m_routing -> init_routing(_path_table);
+    delete _tmp_conf;
   }
   else {
     m_routing = new MNM_Routing_Random(m_graph, m_od_factory, m_node_factory, m_link_factory);
@@ -124,7 +142,7 @@ int MNM_Dta::build_from_files()
   // std::cout << test_dta -> m_od_factory -> m_destination_map.size() << "\n";
   m_graph = MNM_IO::build_graph(m_file_folder, m_config);
   MNM_IO::build_demand(m_file_folder, m_config, m_od_factory);
-  //build_workzone();
+  build_workzone();
   set_statistics();
   set_routing();
   return 0;  
@@ -222,6 +240,32 @@ bool MNM_Dta::is_ok()
   return _flag;
 }
 
+
+int MNM_Dta::check_origin_destination_connectivity()
+{
+  MNM_Destination *_dest;
+  TInt _dest_node_ID;
+  std::unordered_map<TInt, TInt> _shortest_path_tree = std::unordered_map<TInt, TInt>();
+  std::unordered_map<TInt, TFlt> _cost_map;
+  for (auto _map_it : m_link_factory -> m_link_map){
+    _cost_map.insert(std::pair<TInt, TFlt>(_map_it.first, TFlt(1)));
+  }
+  
+  for (auto _it = m_od_factory -> m_destination_map.begin(); _it != m_od_factory -> m_destination_map.end(); _it++){
+    _dest = _it -> second;
+    _dest_node_ID = _dest -> m_dest_node -> m_node_ID;
+    MNM_Shortest_Path::all_to_one_FIFO(_dest_node_ID, m_graph, _cost_map, _shortest_path_tree);
+    for (auto _map_it : m_od_factory -> m_origin_map){
+      if (_shortest_path_tree.find(_map_it.second -> m_origin_node -> m_node_ID)-> second == -1){
+        return false;
+      }
+    }
+// }
+  }
+  return true;
+}
+
+
 int MNM_Dta::pre_loading()
 {
   MNM_Dnode *_node;
@@ -239,9 +283,18 @@ int MNM_Dta::pre_loading()
   //   _link = _link_it -> second;
   //   _link -> install_cumulative_curve();
   // }
+
+  std::deque<TInt> *_rec;
+  for (auto _map_it : m_link_factory -> m_link_map)
+  {
+    _rec = new std::deque<TInt>();
+    m_queue_veh_map.insert({_map_it.second -> m_link_ID, _rec});
+  }
+
   printf("Exiting MNM: Prepare loading!\n");
   return 0;
 }
+
 
 int MNM_Dta::load_once(bool verbose, TInt load_int, TInt assign_int)
 {
@@ -295,6 +348,9 @@ int MNM_Dta::load_once(bool verbose, TInt load_int, TInt assign_int)
     _node -> evolve(load_int);
   }
 
+  // record queuing vehicles after node evolve, which is num of vehicles in finished array
+  record_queue_vehicles();
+
   if (verbose) printf("Moving through link\n");
   // step 4: move vehicles through link
   for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
@@ -321,6 +377,7 @@ int MNM_Dta::load_once(bool verbose, TInt load_int, TInt assign_int)
   // step 5: update record
   m_statistics -> update_record(load_int);
 
+  record_enroute_vehicles();
   MNM::print_vehicle_statistics(m_veh_factory);
   // test();  
   return 0;
@@ -336,7 +393,7 @@ int MNM_Dta::loading(bool verbose)
   MNM_Destination *_dest;
   TInt _assign_inter = m_start_assign_interval;
 
-  pre_loading();
+  // pre_loading();
   while (!finished_loading(_cur_int)){
     printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_cur_int);
     // step 1: Origin release vehicle
@@ -353,11 +410,17 @@ int MNM_Dta::loading(bool verbose)
         }
         else{
           if (m_config -> get_string("routing_type") == "Fixed"){
-            printf("Fixed Realsing.\n");
+            //printf("Fixed Realsing.\n");
             _origin -> release_one_interval(_cur_int, m_veh_factory, _assign_inter, TFlt(0));
           }
-          else if((m_config -> get_string("routing_type") == "Hybrid")){
+          else if((m_config -> get_string("routing_type") == "Adaptive")){
             _origin -> release_one_interval(_cur_int, m_veh_factory, _assign_inter, TFlt(1));
+          }
+          else if((m_config -> get_string("routing_type") == "Hybrid")){
+            TFlt _ad_ratio = m_config -> get_float("adaptive_ratio");
+            if (_ad_ratio > 1) _ad_ratio = 1;
+            if (_ad_ratio < 0) _ad_ratio = 0;
+            _origin -> release_one_interval(_cur_int, m_veh_factory, _assign_inter, _ad_ratio);
           }
           else{
             printf("WARNING:No assignemnt!\n");
@@ -380,6 +443,9 @@ int MNM_Dta::loading(bool verbose)
       _node -> evolve(_cur_int);
     }
 
+    // record queuing vehicles after node evolve, which is num of vehicles in finished array
+    record_queue_vehicles();
+
     if(verbose) printf("Moving through link\n");
     // step 4: move vehicles through link
     for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
@@ -395,6 +461,9 @@ int MNM_Dta::loading(bool verbose)
       // _link -> print_info();
     }
 
+    // only use in multiclass vehicle cases
+    if (m_emission != NULL) m_emission -> update();
+
     if(verbose) printf("Receiving!\n");
     // step 5: Destination receive vehicle  
     for (auto _dest_it = m_od_factory -> m_destination_map.begin(); _dest_it != m_od_factory -> m_destination_map.end(); _dest_it++){
@@ -406,7 +475,8 @@ int MNM_Dta::loading(bool verbose)
     // step 5: update record
     m_statistics -> update_record(_cur_int);
 
-    if(verbose) MNM::print_vehicle_statistics(m_veh_factory);
+    record_enroute_vehicles();
+    MNM::print_vehicle_statistics(m_veh_factory);
     // test();
     _cur_int ++;
   }
@@ -418,28 +488,30 @@ int MNM_Dta::loading(bool verbose)
 }
 
 
-int MNM_Dta::check_origin_destination_connectivity()
+int MNM_Dta::record_queue_vehicles()
 {
-  MNM_Destination *_dest;
-  TInt _dest_node_ID;
-  std::unordered_map<TInt, TInt> _shortest_path_tree = std::unordered_map<TInt, TInt>();
-  std::unordered_map<TInt, TFlt> _cost_map;
+  TInt _tot_queue_size = 0;
   for (auto _map_it : m_link_factory -> m_link_map){
-    _cost_map.insert(std::pair<TInt, TFlt>(_map_it.first, TFlt(1)));
+    TInt _queue_size = _map_it.second -> m_finished_array.size();
+    _tot_queue_size += _queue_size;
+    m_queue_veh_map[_map_it.second -> m_link_ID] -> push_back(_queue_size);
   }
-  
-  for (auto _it = m_od_factory -> m_destination_map.begin(); _it != m_od_factory -> m_destination_map.end(); _it++){
-    _dest = _it -> second;
-    _dest_node_ID = _dest -> m_dest_node -> m_node_ID;
-    MNM_Shortest_Path::all_to_one_FIFO(_dest_node_ID, m_graph, _cost_map, _shortest_path_tree);
-    for (auto _map_it : m_od_factory -> m_origin_map){
-      if (_shortest_path_tree.find(_map_it.second -> m_origin_node -> m_node_ID)-> second == -1){
-        return false;
-      }
-    }
-// }
+  m_queue_veh_num.push_back(_tot_queue_size);
+  return 0;
+}
+
+
+int MNM_Dta::record_enroute_vehicles()
+{
+  TInt _total_veh = TInt(m_veh_factory -> m_veh_map.size());
+  TInt _finished_veh = 0;
+  TInt _enroute_veh;
+  for (auto _map_it : m_veh_factory -> m_veh_map){
+    if (_map_it.second -> m_finish_time > 0) _finished_veh += 1;
   }
-  return true;
+  _enroute_veh = _total_veh - _finished_veh;
+  m_enroute_veh_num.push_back(_enroute_veh);
+  return 0;
 }
 
 bool MNM_Dta::finished_loading(int cur_int)

@@ -153,7 +153,3 @@ int MNM_Cumulative_Emission::output()
   printf("%d, %lf, %lf, %lf, %lf, %lf, %lf\n", m_link_vector[0] -> m_link_ID(), m_fuel(), m_CO2(), m_HC(), m_CO(), m_NOX(), m_VMT());
   return 0;
 }
-
-
-
-

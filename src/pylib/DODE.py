@@ -49,13 +49,13 @@ class DODE():
     if self.config['use_link_tt']:
       self._add_link_tt_data(data_dict['link_tt'])
 
-  def _run_simulation(self, f, nb):
+  def _run_simulation(self, f):
     hash1 = hashlib.sha1()
     hash1.update(str(time.time()))
     new_folder = str(hash1.hexdigest())
-    nb.update_demand_path(f)
-    nb.config.config_dict['DTA']['total_interval'] = self.num_loading_interval
-    nb.dump_to_folder(new_folder)
+    self.nb.update_demand_path(f)
+    self.nb.config.config_dict['DTA']['total_interval'] = self.num_loading_interval
+    self.nb.dump_to_folder(new_folder)
     a = MNMAPI.dta_api()
     a.initialize(new_folder)
     shutil.rmtree(new_folder)
@@ -89,7 +89,7 @@ class DODE():
 
   def compute_path_flow_grad_and_loss(self, one_data_dict, f):
     print "Running simulation"
-    dta = self._run_simulation(f, self.nb)
+    dta = self._run_simulation(f)
     print "Getting DAR"
     dar = self.get_dar(dta, f)
     print "Evaluating grad"
@@ -107,6 +107,13 @@ class DODE():
                   np.arange(0, self.num_loading_interval, self.ass_freq) + self.ass_freq).flatten(order = 'F')
     grad = -np.nan_to_num(link_flow_array - x_e)
     return grad
+
+  def _compute_grad_on_link_tt(self, dta, link_flow_array):
+    tt_e = dta.get_link_tt(np.arange(0, self.num_loading_interval, self.ass_freq))
+    tt_free = list(map(lambda x: self.nb.get_link(x).get_fft(), self.observed_links))
+    for i in range(tt_e.shape[0]):
+      pass
+
 
   def _get_one_data(self, j):
     assert (self.num_data > j)
@@ -126,8 +133,7 @@ class DODE():
       loss += self.config['link_flow_weight'] * np.linalg.norm(np.nan_to_num(x_e - one_data_dict['link_flow']))
     return loss
 
-  def _compute_grad_on_link_tt(self, picker, link_tt_data_mat):
-    pass
+
 
   def estimate_path_flow(self, step_size = 0.1, max_epoch = 1000):
     f_e = self.init_path_flow()
