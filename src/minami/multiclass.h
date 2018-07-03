@@ -32,6 +32,9 @@ public:
 	// use this one instead of the one in Dlink class
 	int install_cumulative_curve_tree_multiclass();
 
+	TFlt virtual get_link_flow_car(){return 0;};
+	TFlt virtual get_link_flow_truck(){return 0;};
+
 	TFlt get_link_freeflow_tt_car();
 	TFlt get_link_freeflow_tt_truck();
 
@@ -77,8 +80,12 @@ public:
 	TFlt virtual get_link_supply() override;
 	int virtual clear_incoming_array() override;
 	void virtual print_info() override;
+	
+	TFlt virtual get_link_flow_car() override;
+	TFlt virtual get_link_flow_truck() override;
 	TFlt virtual get_link_flow() override;
 	TFlt virtual get_link_tt() override;
+
 	int virtual move_veh_queue(std::deque<MNM_Veh*> *from_queue, 
 						std::deque<MNM_Veh*> *to_queue, 
 						TInt number_tomove) override;
@@ -177,8 +184,12 @@ public:
 	TFlt virtual get_link_supply() override;
 	int virtual clear_incoming_array() override;
 	void virtual print_info() override;
+
+	TFlt virtual get_link_flow_car() override;
+	TFlt virtual get_link_flow_truck() override;
 	TFlt virtual get_link_flow() override;
 	TFlt virtual get_link_tt() override;
+
 	int update_perceived_density();
 
 	std::deque<MNM_Veh*> m_veh_queue_car;
@@ -232,6 +243,9 @@ public:
 	TFlt virtual get_link_supply() override;
 	int virtual clear_incoming_array() override;
 	void virtual print_info() override;
+
+	TFlt virtual get_link_flow_car() override;
+	TFlt virtual get_link_flow_truck() override;
 	TFlt virtual get_link_flow() override;
 	TFlt virtual get_link_tt() override;
 

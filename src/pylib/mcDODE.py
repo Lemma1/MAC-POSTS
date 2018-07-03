@@ -207,7 +207,7 @@ class MCDODE():
     if use_file_as_init is None:
       (f_car, f_truck) = self.init_path_flow(car_scale = car_init_scale, truck_scale = truck_init_scale)
     else:
-      (f_car, f_truck) = pickle.load(open(use_file_as_init, 'rb'))
+      (f_car, f_truck, _) = pickle.load(open(use_file_as_init, 'rb'))
     for i in range(max_epoch):
       seq = np.random.permutation(self.num_data)
       loss = np.float(0)
@@ -218,8 +218,8 @@ class MCDODE():
         # print "gradient", car_grad, truck_grad
         f_car -= car_grad * step_size / np.sqrt(i+1)
         f_truck -= truck_grad * step_size / np.sqrt(i+1)
-        f_car = np.maximum(f_car, 0)
-        f_truck = np.maximum(f_truck, 0)
+        f_car = np.maximum(f_car, 1e-3)
+        f_truck = np.maximum(f_truck, 1e-3)
         loss += tmp_loss
       print "Epoch:", i, "Loss:", loss / np.float(self.num_data), time.time()
       # print f_car, f_truck
