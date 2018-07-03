@@ -493,7 +493,7 @@ int MNM_Dta::record_queue_vehicles()
   TInt _tot_queue_size = 0;
   for (auto _map_it : m_link_factory -> m_link_map){
     TInt _queue_size = _map_it.second -> m_finished_array.size();
-    _tot_queue_size += _queue_size;
+    if (_map_it.second -> m_ffs == 0) _tot_queue_size += _queue_size; // PQ not included
     m_queue_veh_map[_map_it.second -> m_link_ID] -> push_back(_queue_size);
   }
   m_queue_veh_num.push_back(_tot_queue_size);

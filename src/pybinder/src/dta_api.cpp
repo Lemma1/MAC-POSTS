@@ -636,10 +636,10 @@ py::array_t<double> Mcdta_Api::get_enroute_and_queue_veh_stats_agg()
     throw std::runtime_error("Error, Mcdta_Api::get_enroute_and_queue_veh_stats_agg, queuing vehicle missed for some intervals");
   }
   else{
-    for (size_t i = 0; i < get_cur_loading_interval(); ++i){ 
-      result_prt[i * 2] =  (m_mcdta -> m_enroute_veh_num[i]())/2; //flow-scalar = 2
-      result_prt[i * 2 + 1] =  (m_mcdta -> m_queue_veh_num[i]())/2;
-      result_prt[i * 2 + 2] =  (m_mcdta -> m_enroute_veh_num[i]() - m_mcdta -> m_queue_veh_num[i]())/2;
+    for (size_t i = 0; i < _tot_interval; ++i){
+      result_prt[i * 3] =  (m_mcdta -> m_enroute_veh_num[i]())/(m_mcdta -> m_flow_scalar);
+      result_prt[i * 3 + 1] =  (m_mcdta -> m_queue_veh_num[i]())/(m_mcdta -> m_flow_scalar);
+      result_prt[i * 3 + 2] =  (m_mcdta -> m_enroute_veh_num[i]() - m_mcdta -> m_queue_veh_num[i]())/(m_mcdta -> m_flow_scalar);
     }
   } 
   return result;
