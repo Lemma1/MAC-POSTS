@@ -15,16 +15,18 @@ MNM_Dta::MNM_Dta(std::string file_folder)
 
 MNM_Dta::~MNM_Dta()
 {
-  if(m_routing != NULL) delete m_routing;
+  if (m_emission != NULL) delete m_emission;
+
+  if (m_routing != NULL) delete m_routing;
   
-  if(m_veh_factory != NULL) delete m_veh_factory;
-  if(m_node_factory != NULL) delete m_node_factory;
-  if(m_link_factory != NULL) delete m_link_factory;
-  if(m_od_factory != NULL) delete m_od_factory;
-  if(m_config != NULL) delete m_config;
+  if (m_veh_factory != NULL) delete m_veh_factory;
+  if (m_node_factory != NULL) delete m_node_factory;
+  if (m_link_factory != NULL) delete m_link_factory;
+  if (m_od_factory != NULL) delete m_od_factory;
+  if (m_config != NULL) delete m_config;
   
-  if(m_statistics != NULL) delete m_statistics;
-  if(m_workzone != NULL) delete m_workzone;
+  if (m_statistics != NULL) delete m_statistics;
+  if (m_workzone != NULL) delete m_workzone;
   m_graph -> Clr();
 
   m_queue_veh_num.clear();
@@ -346,7 +348,7 @@ int MNM_Dta::load_once(bool verbose, TInt load_int, TInt assign_int)
     _node -> evolve(load_int);
   }
 
-  // record queued vehicles after node evolve, which is num of vehicles in finished array
+  // record queuing vehicles after node evolve, which is num of vehicles in finished array
   record_queue_vehicles();
 
   if (verbose) printf("Moving through link\n");
@@ -441,7 +443,7 @@ int MNM_Dta::loading(bool verbose)
       _node -> evolve(_cur_int);
     }
 
-    // record queued vehicles after node evolve, which is num of vehicles in finished array
+    // record queuing vehicles after node evolve, which is num of vehicles in finished array
     record_queue_vehicles();
 
     if(verbose) printf("Moving through link\n");
@@ -458,6 +460,9 @@ int MNM_Dta::loading(bool verbose)
       _link -> evolve(_cur_int);
       // _link -> print_info();
     }
+
+    // only use in multiclass vehicle cases
+    if (m_emission != NULL) m_emission -> update();
 
     if(verbose) printf("Receiving!\n");
     // step 5: Destination receive vehicle  
@@ -491,7 +496,7 @@ int MNM_Dta::record_queue_vehicles()
   TInt _tot_queue_size = 0;
   for (auto _map_it : m_link_factory -> m_link_map){
     TInt _queue_size = _map_it.second -> m_finished_array.size();
-    _tot_queue_size += _queue_size;
+    if (_map_it.second -> m_ffs == 0) _tot_queue_size += _queue_size; // PQ not included
     m_queue_veh_map[_map_it.second -> m_link_ID] -> push_back(_queue_size);
   }
   m_queue_veh_num.push_back(_tot_queue_size);
