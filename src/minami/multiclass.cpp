@@ -33,8 +33,8 @@ MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(TInt ID,
   	m_N_in_tree_truck = NULL;
   	m_N_out_tree_truck = NULL;
 
-  	install_cumulative_curve_multiclass();
-  	install_cumulative_curve_tree_multiclass();
+  	// install_cumulative_curve_multiclass();
+  	// install_cumulative_curve_tree_multiclass();
 }
 
 MNM_Dlink_Multiclass::~MNM_Dlink_Multiclass()
@@ -1910,6 +1910,7 @@ int MNM_Origin_Multiclass::release_one_interval(TInt current_interval,
 			}
 			_veh -> set_destination(_demand_it -> first);
 			_veh -> set_origin(this);
+			_veh -> m_assign_interval = assign_interval;
 			m_origin_node -> m_in_veh_queue.push_back(_veh);
 		}
 	}
@@ -1934,6 +1935,7 @@ int MNM_Origin_Multiclass::release_one_interval(TInt current_interval,
 			}
 			_veh -> set_destination(_demand_it -> first);
 			_veh -> set_origin(this);
+			_veh -> m_assign_interval = assign_interval;
 			m_origin_node -> m_in_veh_queue.push_back(_veh);
 		}
 	}

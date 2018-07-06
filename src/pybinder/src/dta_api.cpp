@@ -53,8 +53,14 @@ int Dta_Api::initialize(std::string folder)
   m_dta -> build_from_files();
   m_dta -> hook_up_node_and_link();
   m_dta -> is_ok();
+  // printf("start load ID path mapping 0\n");
   if (MNM_Routing_Fixed *_routing = dynamic_cast<MNM_Routing_Fixed *>(m_dta -> m_routing)){
     MNM::get_ID_path_mapping(m_ID_path_mapping, _routing -> m_path_table);
+  }
+  if (MNM_Routing_Hybrid *_routing = dynamic_cast<MNM_Routing_Hybrid *>(m_dta -> m_routing)){
+    // printf("start load ID path mapping\n");
+    MNM::get_ID_path_mapping(m_ID_path_mapping, _routing -> m_routing_fixed -> m_path_table);
+    // printf("mapping size %d\n", m_ID_path_mapping.size());
   }
   return 0;
 }
@@ -321,6 +327,11 @@ int Mcdta_Api::initialize(std::string folder)
   m_mcdta -> is_ok();
   if (MNM_Routing_Fixed *_routing = dynamic_cast<MNM_Routing_Fixed *>(m_mcdta -> m_routing)){
     MNM::get_ID_path_mapping(m_ID_path_mapping, _routing -> m_path_table);
+  }
+  if (MNM_Routing_Hybrid *_routing = dynamic_cast<MNM_Routing_Hybrid *>(m_mcdta -> m_routing)){
+    // printf("start load ID path mapping\n");
+    MNM::get_ID_path_mapping(m_ID_path_mapping, _routing -> m_routing_fixed -> m_path_table);
+    // printf("mapping size %d\n", m_ID_path_mapping.size());
   }
   return 0;
 }
@@ -720,7 +731,7 @@ py::array_t<double> Mcdta_Api::get_car_dar_matrix(py::array_t<int>start_interval
   //   m_link_vec[i] -> m_N_in_tree -> print_out();
   // }
   for (int t = 0; t < l; ++t){
-    printf("Current processing time: %d\n", t);
+    // printf("Current processing time: %d\n", t);
     for (size_t i = 0; i<m_link_vec.size(); ++i){
       if (end_prt[t] < start_prt[t]){
         throw std::runtime_error("Error, Mcdta_Api::get_car_dar_matrix, end time smaller than start time");
