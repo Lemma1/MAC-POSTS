@@ -33,7 +33,9 @@ MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(TInt ID,
   	m_N_in_tree_truck = NULL;
   	m_N_out_tree_truck = NULL;
 
-  	// install_cumulative_curve_multiclass();
+  	install_cumulative_curve_multiclass();
+
+  	// !!! Close cc_tree if only doing loading to save a lot of memory !!!
   	// install_cumulative_curve_tree_multiclass();
 }
 
@@ -73,11 +75,10 @@ int MNM_Dlink_Multiclass::install_cumulative_curve_tree_multiclass()
   	if (m_N_out_tree_truck != NULL) delete m_N_out_tree_truck;
   	if (m_N_in_tree_truck != NULL) delete m_N_in_tree_truck;
 
-  	// !!! Close all cc_tree if only doing loading to save a lot of memory !!!
-	// m_N_in_tree_car = new MNM_Tree_Cumulative_Curve();
-  	// m_N_out_tree_car = new MNM_Tree_Cumulative_Curve();
-  	// m_N_in_tree_truck = new MNM_Tree_Cumulative_Curve();
-  	// m_N_out_tree_truck = new MNM_Tree_Cumulative_Curve();
+	m_N_in_tree_car = new MNM_Tree_Cumulative_Curve();
+  	m_N_out_tree_car = new MNM_Tree_Cumulative_Curve();
+  	m_N_in_tree_truck = new MNM_Tree_Cumulative_Curve();
+  	m_N_out_tree_truck = new MNM_Tree_Cumulative_Curve();
   	return 0;
 }
 
