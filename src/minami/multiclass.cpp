@@ -2581,11 +2581,11 @@ TFlt get_travel_time_car(MNM_Dlink_Multiclass* link, TFlt start_time)
 	}
 	TFlt _cc_flow = link -> m_N_in_car -> get_result(start_time);
 	if (_cc_flow <= DBL_EPSILON){
-		return link -> get_link_freeflow_tt_car()/5.0;
+		return link -> get_link_freeflow_tt_car() / 5.0;
 	}
 	TFlt _end_time = link -> m_N_out_car -> get_time(_cc_flow);
 	if (_end_time() < 0 || (_end_time - start_time < 0)){
-		return link -> get_link_freeflow_tt_car()/5.0;
+		return link -> get_link_freeflow_tt_car() / 5.0;
 	}
 	else{
 		return (_end_time - start_time); // each interval is 5s
@@ -2603,11 +2603,11 @@ TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time)
 	}
 	TFlt _cc_flow = link -> m_N_in_truck -> get_result(start_time);
 	if (_cc_flow <= DBL_EPSILON){
-		return link -> get_link_freeflow_tt_truck() /5.0;
+		return link -> get_link_freeflow_tt_truck() / 5.0;
 	}
 	TFlt _end_time = link -> m_N_out_truck -> get_time(_cc_flow);
 	if (_end_time() < 0 || (_end_time - start_time < 0)){
-		return link -> get_link_freeflow_tt_truck() /5.0;
+		return link -> get_link_freeflow_tt_truck() / 5.0;
 	}
 	else{
 		return (_end_time - start_time); // each interval is 5s
