@@ -569,6 +569,9 @@ public:
   TFlt m_CO_truck;
   TFlt m_NOX_truck;
   TFlt m_VMT_truck;
+
+  TFlt m_VHT_truck;
+  TFlt m_VHT_car;
 };
 
 
