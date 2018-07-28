@@ -15,7 +15,7 @@
 
 MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(TInt ID,
 										TInt number_of_lane,
-										TFlt length,
+										TFlt length, // meters
 										TFlt ffs_car, // Free-flow speed (m/s)
 										TFlt ffs_truck)
 	: MNM_Dlink::MNM_Dlink(ID, number_of_lane, length, 0.0) // Note: m_ffs is not used in child class, so let it be 0.0
@@ -33,7 +33,9 @@ MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(TInt ID,
   	m_N_in_tree_truck = NULL;
   	m_N_out_tree_truck = NULL;
 
-  	// install_cumulative_curve_multiclass();
+  	install_cumulative_curve_multiclass();
+
+  	// !!! Close cc_tree if only doing loading to save a lot of memory !!!
   	// install_cumulative_curve_tree_multiclass();
 }
 
@@ -73,11 +75,10 @@ int MNM_Dlink_Multiclass::install_cumulative_curve_tree_multiclass()
   	if (m_N_out_tree_truck != NULL) delete m_N_out_tree_truck;
   	if (m_N_in_tree_truck != NULL) delete m_N_in_tree_truck;
 
-  	// !!! Close all cc_tree if only doing loading to save a lot of memory !!!
-	// m_N_in_tree_car = new MNM_Tree_Cumulative_Curve();
-  	// m_N_out_tree_car = new MNM_Tree_Cumulative_Curve();
-  	// m_N_in_tree_truck = new MNM_Tree_Cumulative_Curve();
-  	// m_N_out_tree_truck = new MNM_Tree_Cumulative_Curve();
+	m_N_in_tree_car = new MNM_Tree_Cumulative_Curve();
+  	m_N_out_tree_car = new MNM_Tree_Cumulative_Curve();
+  	m_N_in_tree_truck = new MNM_Tree_Cumulative_Curve();
+  	m_N_out_tree_truck = new MNM_Tree_Cumulative_Curve();
   	return 0;
 }
 
@@ -2499,12 +2500,22 @@ int MNM_Dta_Multiclass::pre_loading()
 		_node -> prepare_loading();
 	}
 
+	std::ifstream _emission_file(m_file_folder + "/MNM_input_emission_linkID");
+	int _link_ID;
+	std::unordered_map<int, int> _emission_links = {};
+	while (_emission_file >> _link_ID)
+	{
+	    _emission_links.insert({_link_ID, 0});
+	}
+	_emission_file.close();
+
 	std::deque<TInt> *_rec;
   	for (auto _map_it : m_link_factory -> m_link_map)
   	{
     	_rec = new std::deque<TInt>();
     	m_queue_veh_map.insert({_map_it.second -> m_link_ID, _rec});
-    	m_emission -> register_link(_map_it.second);
+    	if (_emission_links.find(int(_map_it.second -> m_link_ID)) != _emission_links.end()) 
+    		m_emission -> register_link(_map_it.second);
   	}
   	
 	printf("Exiting MNM: Prepare loading!\n");
@@ -2580,15 +2591,16 @@ TFlt get_travel_time_car(MNM_Dlink_Multiclass* link, TFlt start_time)
 	}
 	TFlt _cc_flow = link -> m_N_in_car -> get_result(start_time);
 	if (_cc_flow <= DBL_EPSILON){
-		return link -> get_link_freeflow_tt_car()/5.0;
+		return link -> get_link_freeflow_tt_car() / 5.0;
 	}
 	TFlt _end_time = link -> m_N_out_car -> get_time(_cc_flow);
 	if (_end_time() < 0 || (_end_time - start_time < 0)){
-		return link -> get_link_freeflow_tt_car()/5.0;
+		return link -> get_link_freeflow_tt_car() / 5.0;
 	}
 	else{
 		return (_end_time - start_time); // each interval is 5s
 	}
+	// return link -> get_link_tt() / 5.0;
 	return 0;
 }
 
@@ -2602,11 +2614,11 @@ TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time)
 	}
 	TFlt _cc_flow = link -> m_N_in_truck -> get_result(start_time);
 	if (_cc_flow <= DBL_EPSILON){
-		return link -> get_link_freeflow_tt_truck() /5.0;
+		return link -> get_link_freeflow_tt_truck() / 5.0;
 	}
 	TFlt _end_time = link -> m_N_out_truck -> get_time(_cc_flow);
 	if (_end_time() < 0 || (_end_time - start_time < 0)){
-		return link -> get_link_freeflow_tt_truck() /5.0;
+		return link -> get_link_freeflow_tt_truck() / 5.0;
 	}
 	else{
 		return (_end_time - start_time); // each interval is 5s
@@ -2697,6 +2709,9 @@ MNM_Cumulative_Emission_Multiclass::MNM_Cumulative_Emission_Multiclass(TFlt unit
 	m_CO_truck = TFlt(0);
 	m_NOX_truck = TFlt(0);
 	m_VMT_truck = TFlt(0);
+
+	m_VHT_car = TFlt(0);
+	m_VHT_truck = TFlt(0);
 }
 
 MNM_Cumulative_Emission_Multiclass::~MNM_Cumulative_Emission_Multiclass()
@@ -2819,6 +2834,10 @@ int MNM_Cumulative_Emission_Multiclass::update()
 		m_CO_truck += calculate_CO_rate_truck(_v_converted) * (_v * m_unit_time / TFlt(1600)) * _mlink -> get_link_flow_truck();
 		m_NOX_truck += calculate_NOX_rate_truck(_v_converted) * (_v * m_unit_time / TFlt(1600)) * _mlink -> get_link_flow_truck();
 		m_VMT_truck += (_v * m_unit_time / TFlt(1600)) * _mlink -> get_link_flow_truck();
+
+		// VHT (hours)
+		m_VHT_car += m_unit_time * _mlink -> get_link_flow_car() / 3600;
+		m_VHT_truck += m_unit_time * _mlink -> get_link_flow_truck() / 3600;
 	}
 	return 0;
 }
@@ -2826,10 +2845,11 @@ int MNM_Cumulative_Emission_Multiclass::update()
 int MNM_Cumulative_Emission_Multiclass::output()
 {
 	printf("The emission stats for cars are: ");
-	printf("fuel: %lf, CO2: %lf, HC: %lf, CO: %lf, NOX: %lf, VMT: %lf\n", m_fuel(), m_CO2(), m_HC(), m_CO(), m_NOX(), m_VMT());
+	printf("fuel: %lf gallons, CO2: %lf g, HC: %lf g, CO: %lf g, NOX: %lf g, VMT: %lf miles, VHT: %lf hours\n", 
+		   m_fuel(), m_CO2(), m_HC(), m_CO(), m_NOX(), m_VMT(), m_VHT_car());
 
 	printf("The emission stats for trucks are: ");
-	printf("fuel: %lf, CO2: %lf, HC: %lf, CO: %lf, NOX: %lf, VMT: %lf\n", 
-		   m_fuel_truck(), m_CO2_truck(), m_HC_truck(), m_CO_truck(), m_NOX_truck(), m_VMT_truck());
+	printf("fuel: %lf gallons, CO2: %lf g, HC: %lf g, CO: %lf g, NOX: %lf g, VMT: %lf miles, VHT: %lf hours\n", 
+		   m_fuel_truck(), m_CO2_truck(), m_HC_truck(), m_CO_truck(), m_NOX_truck(), m_VMT_truck(), m_VHT_truck());
 	return 0;
 }
