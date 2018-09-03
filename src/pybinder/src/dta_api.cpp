@@ -874,6 +874,9 @@ PYBIND11_MODULE(MNMAPI, m) {
             .def("register_paths", &Mcdta_Api::register_paths)
             .def("get_car_link_tt", &Mcdta_Api::get_car_link_tt)
             .def("get_truck_link_tt", &Mcdta_Api::get_truck_link_tt)
+            .def("get_car_link_out_num", &Mcdta_Api::get_car_link_out_num)
+            .def("get_truck_link_out_num", &Mcdta_Api::get_truck_link_out_num)
+            // .def("get_car_link_out_cc", &Mcdta_Api::get_car_link_out_cc);
             .def("get_car_link_speed", &Mcdta_Api::get_car_link_speed)
             .def("get_truck_link_speed", &Mcdta_Api::get_truck_link_speed)
             .def("get_link_car_inflow", &Mcdta_Api::get_link_car_inflow)
