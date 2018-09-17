@@ -41,6 +41,9 @@ public:
 	TFlt m_ffs_car;
 	TFlt m_ffs_truck;
 
+	TFlt m_tot_wait_time_at_intersection; // seconds
+	bool m_spill_back;
+
 	// Two seperate N-curves for private cars and trucks
 	MNM_Cumulative_Curve *m_N_in_car;
   	MNM_Cumulative_Curve *m_N_out_car;
@@ -94,7 +97,8 @@ public:
 	int init_cell_array(TFlt unit_time, TFlt std_cell_length, TFlt last_cell_length);
 	int update_out_veh();
 	int move_last_cell();
-
+	
+	TFlt m_unit_time;
 	TInt m_num_cells;
 	TFlt m_lane_hold_cap_car;
 	TFlt m_lane_hold_cap_truck;
@@ -529,6 +533,9 @@ TFlt get_link_inflow_truck(MNM_Dlink_Multiclass* link,
                     	TFlt start_time, TFlt end_time);
 TFlt get_link_inflow_truck(MNM_Dlink_Multiclass* link, 
                     	TInt start_time, TInt end_time);
+
+TFlt get_average_waiting_time_at_intersection(MNM_Dlink_Multiclass* link);
+TInt get_is_spillback(MNM_Dlink_Multiclass* link); // 0 - no spillback, 1 - spillback
 
 TFlt get_travel_time_car(MNM_Dlink_Multiclass* link, TFlt start_time);
 TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time);
