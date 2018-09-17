@@ -476,7 +476,11 @@ py::array_t<double> Mcdta_Api::get_path_tt_car(py::array_t<int>link_IDs, py::arr
     if (MNM_Dlink_Multiclass * _mclink = dynamic_cast<MNM_Dlink_Multiclass *>(_link)){
       double avg_tt = 0;
       for (int t = 0; t < num_int; ++t){
-          avg_tt += MNM_DTA_GRADIENT::get_travel_time_car(_mclink, TFlt(start_prt[t]))() * 5; // seconds
+          double _tmp = MNM_DTA_GRADIENT::get_travel_time_car(_mclink, TFlt(start_prt[t]))() * 5;
+          if (_tmp > 10 * (m_link_vec[i] -> m_length / m_link_vec[i] -> m_ffs_car)){
+              _tmp = m_link_vec[i] -> m_length / m_link_vec[i] -> m_ffs_car;
+          }
+          avg_tt += _tmp; // seconds
       }
       avg_tt /= num_int;
       result_prt[i] = avg_tt;
@@ -511,7 +515,11 @@ py::array_t<double> Mcdta_Api::get_path_tt_truck(py::array_t<int>link_IDs, py::a
     if (MNM_Dlink_Multiclass * _mclink = dynamic_cast<MNM_Dlink_Multiclass *>(_link)){
       double avg_tt = 0;
       for (int t = 0; t < num_int; ++t){
-          avg_tt += MNM_DTA_GRADIENT::get_travel_time_truck(_mclink, TFlt(start_prt[t]))() * 5; // seconds
+          double _tmp = MNM_DTA_GRADIENT::get_travel_time_truck(_mclink, TFlt(start_prt[t]))() * 5;
+          if (_tmp > 10 * (m_link_vec[i] -> m_length / m_link_vec[i] -> m_ffs_truck)){
+              _tmp = m_link_vec[i] -> m_length / m_link_vec[i] -> m_ffs_truck;
+          }
+          avg_tt += _tmp; // seconds
       }
       avg_tt /= num_int;
       result_prt[i] = avg_tt;
@@ -546,7 +554,7 @@ py::array_t<double> Mcdta_Api::get_car_link_tt(py::array_t<double>start_interval
     for (size_t i = 0; i < m_link_vec.size(); ++i){
       double _tmp = MNM_DTA_GRADIENT::get_travel_time_car(m_link_vec[i], TFlt(start_prt[t]))();
       if (_tmp * 5 > 10 * (m_link_vec[i] -> m_length / m_link_vec[i] -> m_ffs_car)){
-          _tmp = m_link_vec[i] -> m_length / m_link_vec[i] -> m_ffs_car;
+          _tmp = m_link_vec[i] -> m_length / m_link_vec[i] -> m_ffs_car / 5.0;
       }
       result_prt[i * l + t] = _tmp;
     }
@@ -575,7 +583,7 @@ py::array_t<double> Mcdta_Api::get_truck_link_tt(py::array_t<double>start_interv
     for (size_t i = 0; i < m_link_vec.size(); ++i){
       double _tmp = MNM_DTA_GRADIENT::get_travel_time_truck(m_link_vec[i], TFlt(start_prt[t]))();
       if (_tmp * 5 > 10 * (m_link_vec[i] -> m_length / m_link_vec[i] -> m_ffs_truck)){
-          _tmp = m_link_vec[i] -> m_length / m_link_vec[i] -> m_ffs_truck;
+          _tmp = m_link_vec[i] -> m_length / m_link_vec[i] -> m_ffs_truck / 5.0;
       }
       result_prt[i * l + t] = _tmp;
     }
