@@ -93,7 +93,8 @@ int add_dar_records(std::vector<dar_record*> &record, MNM_Dlink* link,
 int add_dar_records_eigen(std::vector<Eigen::Triplet<double>> &record, MNM_Dlink* link, 
                     std::unordered_map<MNM_Path*, int> path_map, 
                     TFlt start_time, TFlt end_time,
-                    int link_ind, int interval_ind, int num_e_link, int num_e_path)
+                    int link_ind, int interval_ind, int num_e_link, int num_e_path,
+                    double *f_ptr)
 {
   if (link == NULL){
     throw std::runtime_error("Error, add_dar_records link is null");
@@ -115,7 +116,7 @@ int add_dar_records_eigen(std::vector<Eigen::Triplet<double>> &record, MNM_Dlink
           _y = (*_path_iter).second + num_e_path * depart_it.first; 
           // printf("Adding record, %d, %d, %d, %f, %f\n", new_record -> path_ID(), new_record -> assign_int(), 
           //     new_record -> link_ID(), (float)new_record -> link_start_int(), (float) new_record -> flow());
-          record.push_back(Eigen::Triplet<double>((double)_x, (double) _y, tmp_flow()));
+          record.push_back(Eigen::Triplet<double>((double)_x, (double) _y, tmp_flow() / f_ptr[_y]));
         }
       }
     }

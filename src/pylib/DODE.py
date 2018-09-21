@@ -50,7 +50,7 @@ class DODE():
       self._add_link_tt_data(data_dict['link_tt'])
 
   def _run_simulation(self, f):
-    print "RUN"
+    # print "RUN"
     hash1 = hashlib.sha1()
     hash1.update(str(time.time()))
     new_folder = str(hash1.hexdigest())
@@ -73,6 +73,12 @@ class DODE():
     dar = self._massage_raw_dar(raw_dar, self.ass_freq, f, self.num_assign_interval)
     return dar
 
+  def get_dar2(self, dta, f):
+    dar = dta.get_complete_dar_matrix(np.arange(0, self.num_loading_interval, self.ass_freq), 
+                np.arange(0, self.num_loading_interval, self.ass_freq) + self.ass_freq, 
+                self.num_assign_interval, f)
+    return dar
+
   def _massage_raw_dar(self, raw_dar, ass_freq, f, num_assign_interval):
     num_e_path = len(self.paths_list)
     num_e_link = len(self.observed_links)
@@ -82,8 +88,8 @@ class DODE():
     p = raw_dar[:, 4] / f[path_seq]
 
     mat = coo_matrix((p, (link_seq, path_seq)), 
-                   shape=(num_assign_interval * num_e_link, num_assign_interval * num_e_path))
-    return mat    
+                   shape=(num_assign_interval * num_e_link, num_assign_interval * num_e_path)).tocsr()
+    return mat
 
   def init_path_flow(self):
     return np.random.rand(self.num_assign_interval * self.num_path)

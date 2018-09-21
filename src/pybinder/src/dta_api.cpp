@@ -165,7 +165,7 @@ int Dta_Api::install_cc_tree()
 int Dta_Api::run_whole()
 {
   m_dta -> pre_loading();
-  m_dta -> loading(true);
+  m_dta -> loading(false);
   return 0;
 }
 
@@ -371,22 +371,27 @@ py::array_t<double> Dta_Api::get_dar_matrix(py::array_t<int>start_intervals, py:
 }
 
 SparseMatrixR Dta_Api::get_complete_dar_matrix(py::array_t<int>start_intervals, py::array_t<int>end_intervals,
-                                                int num_intervals)
+                                                int num_intervals, py::array_t<double> f)
 {
   int _num_e_path = m_path_map.size();
   int _num_e_link = m_link_vec.size();
   auto start_buf = start_intervals.request();
   auto end_buf = end_intervals.request();
+  auto f_buf = f.request();
   if (start_buf.ndim != 1 || end_buf.ndim != 1){
     throw std::runtime_error("Error, Dta_Api::get_link_inflow, input dismension mismatch");
   }
   if (start_buf.shape[0] != end_buf.shape[0]){
     throw std::runtime_error("Error, Dta_Api::get_link_inflow, input length mismatch");
   }
+  if (f_buf.ndim != 1){
+    throw std::runtime_error("Error, Dta_Api::get_link_inflow, input path flow mismatch");
+  }
   int l = start_buf.shape[0];
   int *start_prt = (int *) start_buf.ptr;
   int *end_prt = (int *) end_buf.ptr;
-  
+  double *f_ptr = (double *) f_buf.ptr;
+
   std::vector<Eigen::Triplet<double>> _record;
   _record.reserve(100000);
   for (int t = 0; t < l; ++t){
@@ -399,7 +404,7 @@ SparseMatrixR Dta_Api::get_complete_dar_matrix(py::array_t<int>start_intervals, 
       }
         MNM_DTA_GRADIENT::add_dar_records_eigen(
                       _record, m_link_vec[i], m_path_map, TFlt(start_prt[t]), TFlt(end_prt[t]),
-                      i, t, _num_e_link, _num_e_path);
+                      i, t, _num_e_link, _num_e_path, f_ptr);
     }
   }
   SparseMatrixR mat(num_intervals * _num_e_link, num_intervals * _num_e_path);
@@ -974,7 +979,8 @@ PYBIND11_MODULE(MNMAPI, m) {
             .def("get_link_inflow", &Dta_Api::get_link_inflow)
             .def("get_link_in_cc", &Dta_Api::get_link_in_cc)
             .def("get_link_out_cc", &Dta_Api::get_link_out_cc)
-            .def("get_dar_matrix", &Dta_Api::get_dar_matrix);
+            .def("get_dar_matrix", &Dta_Api::get_dar_matrix)
+            .def("get_complete_dar_matrix", &Dta_Api::get_complete_dar_matrix);
 
     py::class_<Mcdta_Api> (m, "mcdta_api")
             .def(py::init<>())

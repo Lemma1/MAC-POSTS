@@ -32,6 +32,7 @@ int add_dar_records(std::vector<dar_record*> &record, MNM_Dlink* link,
                     std::unordered_map<MNM_Path*, int> path_map, TFlt start_time, TFlt end_time);
 int add_dar_records_eigen(std::vector<Eigen::Triplet<double>> &record, MNM_Dlink* link, 
                     std::unordered_map<MNM_Path*, int> path_map, TFlt start_time, TFlt end_time,
-                    int link_ind, int interval_ind, int num_e_link, int num_e_path);
+                    int link_ind, int interval_ind, int num_e_link, int num_e_path,
+                    double *f_ptr);
 };
 #endif
