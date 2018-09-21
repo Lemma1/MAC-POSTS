@@ -50,6 +50,7 @@ class DODE():
       self._add_link_tt_data(data_dict['link_tt'])
 
   def _run_simulation(self, f):
+    print "RUN"
     hash1 = hashlib.sha1()
     hash1.update(str(time.time()))
     new_folder = str(hash1.hexdigest())
@@ -113,6 +114,7 @@ class DODE():
     tt_free = list(map(lambda x: self.nb.get_link(x).get_fft(), self.observed_links))
     for i in range(tt_e.shape[0]):
       pass
+    return 0
 
 
   def _get_one_data(self, j):
@@ -136,7 +138,9 @@ class DODE():
 
 
   def estimate_path_flow(self, step_size = 0.1, max_epoch = 1000):
+    print "Init"
     f_e = self.init_path_flow()
+    print "Start loop"
     for i in range(max_epoch):
       seq = np.random.permutation(self.num_data)
       loss = np.float(0)

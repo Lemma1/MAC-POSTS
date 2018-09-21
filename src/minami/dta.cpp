@@ -5,7 +5,7 @@ MNM_Dta::MNM_Dta(std::string file_folder)
 {
   m_file_folder = file_folder;
   m_current_loading_interval = TInt(0);
-
+  m_emission = NULL;
   m_queue_veh_num = std::deque<TInt>();
   m_enroute_veh_num = std::deque<TInt>();
   m_queue_veh_map = std::unordered_map<TInt, std::deque<TInt>*>();
@@ -350,7 +350,6 @@ int MNM_Dta::load_once(bool verbose, TInt load_int, TInt assign_int)
 
   // record queuing vehicles after node evolve, which is num of vehicles in finished array
   record_queue_vehicles();
-
   if (verbose) printf("Moving through link\n");
   // step 4: move vehicles through link
   for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
@@ -440,6 +439,7 @@ int MNM_Dta::loading(bool verbose)
     // step 3: move vehicles through node
     for (auto _node_it = m_node_factory -> m_node_map.begin(); _node_it != m_node_factory -> m_node_map.end(); _node_it++){
       _node = _node_it -> second;
+      // printf("node ID is %d\n", _node -> m_node_ID());
       _node -> evolve(_cur_int);
     }
 
@@ -457,10 +457,11 @@ int MNM_Dta::loading(bool verbose)
       // }
       
       _link -> clear_incoming_array();
+      // printf("finished clear link\n");
       _link -> evolve(_cur_int);
       // _link -> print_info();
     }
-
+    // printf("m_emission update\n");
     // only use in multiclass vehicle cases
     if (m_emission != NULL) m_emission -> update();
 
@@ -496,7 +497,7 @@ int MNM_Dta::record_queue_vehicles()
   TInt _tot_queue_size = 0;
   for (auto _map_it : m_link_factory -> m_link_map){
     TInt _queue_size = _map_it.second -> m_finished_array.size();
-    if (_map_it.second -> m_ffs == 0) _tot_queue_size += _queue_size; // PQ not included
+    if (_map_it.second -> m_ffs == 0.0) _tot_queue_size += _queue_size; // PQ not included
     m_queue_veh_map[_map_it.second -> m_link_ID] -> push_back(_queue_size);
   }
   m_queue_veh_num.push_back(_tot_queue_size);

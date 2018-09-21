@@ -15,6 +15,8 @@ if (APPLE)
     set(CMAKE_MACOSX_RPATH ON)
 endif (APPLE)
 
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+
 add_subdirectory (glib-core)
 add_subdirectory (snap-core)
 add_subdirectory (3rdparty)
