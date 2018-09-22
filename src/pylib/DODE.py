@@ -5,6 +5,7 @@ import hashlib
 import time
 import shutil
 from scipy.sparse import coo_matrix
+import multiprocessing as mp
 
 import MNMAPI
 
@@ -49,10 +50,10 @@ class DODE():
     if self.config['use_link_tt']:
       self._add_link_tt_data(data_dict['link_tt'])
 
-  def _run_simulation(self, f):
+  def _run_simulation(self, f, counter):
     # print "RUN"
     hash1 = hashlib.sha1()
-    hash1.update(str(time.time()))
+    hash1.update(str(time.time()) + str(counter))
     new_folder = str(hash1.hexdigest())
     self.nb.update_demand_path(f)
     self.nb.config.config_dict['DTA']['total_interval'] = self.num_loading_interval
@@ -91,23 +92,32 @@ class DODE():
                    shape=(num_assign_interval * num_e_link, num_assign_interval * num_e_path)).tocsr()
     return mat
 
-  def init_path_flow(self):
-    return np.random.rand(self.num_assign_interval * self.num_path)
+  def init_path_flow(self, init_scale):
+    return np.random.rand(self.num_assign_interval * self.num_path) * init_scale
 
-  def compute_path_flow_grad_and_loss(self, one_data_dict, f):
-    print "Running simulation"
-    dta = self._run_simulation(f)
-    print "Getting DAR"
-    dar = self.get_dar(dta, f)
-    print "Evaluating grad"
+  def compute_path_flow_grad_and_loss(self, one_data_dict, f, counter = 0):
+    # print "Running simulation"
+    dta = self._run_simulation(f, counter)
+    # print "Getting DAR"
+    dar = self.get_dar2(dta, f)
+    # print "Evaluating grad"
     grad = np.zeros(len(self.observed_links) * self.num_assign_interval)
     if self.config['use_link_flow']:
       grad += self.config['link_flow_weight'] * self._compute_grad_on_link_flow(dta, one_data_dict['link_flow'])
     if self.config['use_link_tt']:
       grad += self.config['link_tt_weight'] * self._compute_grad_on_link_tt(dta, one_data_dict['link_tt'])
-    print "Getting Loss"
+    # print "Getting Loss"
     loss = self._get_loss(one_data_dict, dta)
     return  dar.T.dot(grad), loss
+
+
+  def compute_path_flow_grad_and_loss_mpwrapper(self, one_data_dict, f, j, output):
+    grad, tmp_loss = self.compute_path_flow_grad_and_loss(one_data_dict, f, counter = j)
+    # print "finished original grad loss"
+    output.put((grad, tmp_loss))
+    # output.put(grad)
+    # print "finished put"
+    return
 
   def _compute_grad_on_link_flow(self, dta, link_flow_array):
     x_e = dta.get_link_inflow(np.arange(0, self.num_loading_interval, self.ass_freq), 
@@ -143,21 +153,66 @@ class DODE():
 
 
 
-  def estimate_path_flow(self, step_size = 0.1, max_epoch = 1000):
-    print "Init"
-    f_e = self.init_path_flow()
-    print "Start loop"
+  def estimate_path_flow(self, init_scale = 0.1, step_size = 0.1, max_epoch = 100, adagrad = False):
+    # print "Init"
+    f_e = self.init_path_flow(init_scale)
+    # print "Start loop"
     for i in range(max_epoch):
+      if adagrad:
+        sum_g_square = 1e-6
       seq = np.random.permutation(self.num_data)
       loss = np.float(0)
       for j in seq:
+        print j
         one_data_dict = self._get_one_data(j)
         grad, tmp_loss = self.compute_path_flow_grad_and_loss(one_data_dict, f_e)
-        f_e -= grad * step_size / np.sqrt(i+1)
+        if adagrad:
+          sum_g_square = sum_g_square + np.power(grad, 2)
+          f_e -= step_size * grad / np.sqrt(sum_g_square)
+        else:
+          f_e -= grad * step_size / np.sqrt(i+1)
+        f_e = np.maximum(f_e, 1e-3)
         loss += tmp_loss
       print "Epoch:", i, "Loss:", loss / np.float(self.num_data)
     return f_e
 
+  def estimate_path_flow_mp(self, init_scale = 0.1, step_size = 0.1, 
+                              max_epoch = 100, adagrad = False, n_process = 4):
+    # print "Init"
+    f_e = self.init_path_flow(init_scale)
+    # print "Start loop"
+    for i in range(max_epoch):
+      if adagrad:
+        sum_g_square = 1e-6
+      seq = np.random.permutation(self.num_data)
+      split_seq = np.array_split(seq, np.maximum(1, int(self.num_data/n_process)))
+      loss = np.float(0)
+      for part_seq in split_seq:
+        output = mp.Queue()
+        processes = [mp.Process(target=self.compute_path_flow_grad_and_loss_mpwrapper, args=(self._get_one_data(j), f_e, j, output)) for j in part_seq]
+        for p in processes:
+          p.start()
+        results = list()
+        while 1:
+          running = any(p.is_alive() for p in processes)
+          while not output.empty():
+             results.append(output.get())
+          if not running:
+              break
+        for p in processes:
+          p.join()
+        # results = [output.get() for p in processes]
+        for res in results:
+          loss += res[1]
+          grad = res[0]
+          if adagrad:
+            sum_g_square = sum_g_square + np.power(grad, 2)
+            f_e -= step_size * grad / np.sqrt(sum_g_square)
+          else:
+            f_e -= grad * step_size / np.sqrt(i+1)          
+          f_e = np.maximum(f_e, 1e-3)
+      print "Epoch:", i, "Loss:", loss / np.float(self.num_data)
+    return f_e
 
   def generate_route_choice(self):
     pass
