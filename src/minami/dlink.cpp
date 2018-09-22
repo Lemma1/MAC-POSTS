@@ -771,10 +771,11 @@ TFlt MNM_Cumulative_Curve::get_time(TFlt result)
     return TFlt(-1);
   }
   for (size_t i = 1; i < m_recorder.size(); ++i){
-    if (m_recorder[i].second >= result){
-      return m_recorder[i].first 
-            - (m_recorder[i].first - m_recorder[i-1].first)
-            * (m_recorder[i].second - result) / (m_recorder[i].second - m_recorder[i - 1].second);
+    if (m_recorder[i].second > result){
+      return m_recorder[i - 1].first;
+    }
+    else if (m_recorder[i].second == result){
+      return m_recorder[i].first;
     }
   }
   return TFlt(-1);
