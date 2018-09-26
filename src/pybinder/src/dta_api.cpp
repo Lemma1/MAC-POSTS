@@ -514,26 +514,143 @@ int Mcdta_Api::get_cur_loading_interval()
 int Mcdta_Api::print_emission_stats()
 {
     TInt _count_car = 0, _count_truck = 0;
-    TFlt _tot_tt = 0.0;
+    TFlt _tot_tt_car = 0.0, _tot_tt_truck = 0.0;
     MNM_Veh_Multiclass* _veh;
+    int _end_time = get_cur_loading_interval();
     for (auto _map_it : m_mcdta -> m_veh_factory -> m_veh_map){
-        if (_map_it.second -> m_finish_time > 0) {
-            _veh = dynamic_cast<MNM_Veh_Multiclass *>(_map_it.second);
-            if (_veh -> m_class == 0){
-                _count_car += 1;
+        _veh = dynamic_cast<MNM_Veh_Multiclass *>(_map_it.second);
+        if (_veh -> m_class == 0){
+            _count_car += 1;
+            if (_veh -> m_finish_time > 0) {
+                _tot_tt_car += (_veh -> m_finish_time - _veh -> m_start_time) * 5.0 / 3600.0;
             }
             else {
-                _count_truck += 1;
+                _tot_tt_car += (_end_time - _veh -> m_start_time) * 5.0 / 3600.0;
             }
-            _tot_tt += (_veh -> m_finish_time - _veh -> m_start_time) * 5.0 / 3600.0;
+        }
+        else {
+            _count_truck += 1;
+            if (_veh -> m_finish_time > 0) {
+                _tot_tt_truck += (_veh -> m_finish_time - _veh -> m_start_time) * 5.0 / 3600.0;
+            }
+            else {
+                _tot_tt_truck += (_end_time - _veh -> m_start_time) * 5.0 / 3600.0;
+            }
         }
     }
-    printf("\n\nTotal car: %d, Total truck: %d, Total tt: %.2f hours\n\n", 
+    printf("\n\nTotal car: %d, Total truck: %d, Total car tt: %.2f hours, Total truck tt: %.2f hours\n\n", 
            int(_count_car/m_mcdta -> m_flow_scalar), int(_count_truck/m_mcdta -> m_flow_scalar), 
-           float(_tot_tt/m_mcdta -> m_flow_scalar));
+           float(_tot_tt_car/m_mcdta -> m_flow_scalar), float(_tot_tt_truck/m_mcdta -> m_flow_scalar));
     m_mcdta -> m_emission -> output();
     return 0;
 }
+
+
+py::array_t<double> Mcdta_Api::get_waiting_time_at_intersections()
+{
+  int new_shape [1] = { (int) m_link_vec.size()}; 
+  auto result = py::array_t<double>(new_shape);
+  auto result_buf = result.request();
+  double *result_prt = (double *) result_buf.ptr;
+  for (size_t i = 0; i < m_link_vec.size(); ++i){  
+    result_prt[i] = MNM_DTA_GRADIENT::get_average_waiting_time_at_intersection(m_link_vec[i])();
+  }
+    
+  return result;
+}
+  
+
+py::array_t<int> Mcdta_Api::get_link_spillback()
+{
+  int new_shape [1] = { (int) m_link_vec.size()}; 
+  auto result = py::array_t<int>(new_shape);
+  auto result_buf = result.request();
+  int *result_prt = (int *) result_buf.ptr;
+  for (size_t i = 0; i < m_link_vec.size(); ++i){  
+    result_prt[i] = MNM_DTA_GRADIENT::get_is_spillback(m_link_vec[i])();
+  }
+    
+  return result;
+}
+  
+
+py::array_t<double> Mcdta_Api::get_path_tt_car(py::array_t<int>link_IDs, py::array_t<double>start_intervals)
+{
+  auto start_buf = start_intervals.request();
+  int num_int = start_buf.shape[0];
+    
+  auto links_buf = link_IDs.request();
+  int num_link = links_buf.shape[0];
+    
+  int new_shape [1] = { num_link }; 
+  auto result = py::array_t<double>(new_shape);
+  auto result_buf = result.request();
+  double *result_prt = (double *) result_buf.ptr;
+  
+  double *start_prt = (double *) start_buf.ptr;
+  int *links_ptr = (int *) links_buf.ptr;
+  MNM_Dlink *_link;
+  for (int i = 0; i < links_buf.shape[0]; i++){
+    _link = m_mcdta -> m_link_factory -> get_link(TInt(links_ptr[i]));
+    if (MNM_Dlink_Multiclass * _mclink = dynamic_cast<MNM_Dlink_Multiclass *>(_link)){
+      double avg_tt = 0;
+      for (int t = 0; t < num_int; ++t){
+          double _tmp = MNM_DTA_GRADIENT::get_travel_time_car(_mclink, TFlt(start_prt[t]))() * 5;
+          if (_tmp > 10 * (_mclink -> m_length / _mclink -> m_ffs_car)){
+              _tmp = _mclink -> m_length / _mclink -> m_ffs_car;
+          }
+          avg_tt += _tmp; // seconds
+      }
+      avg_tt /= num_int;
+      result_prt[i] = avg_tt;
+    }
+    else{
+      throw std::runtime_error("Mcdta_Api::register_links: link type is not multiclass");
+    }
+  }
+  
+  return result;
+}
+
+
+py::array_t<double> Mcdta_Api::get_path_tt_truck(py::array_t<int>link_IDs, py::array_t<double>start_intervals)
+{
+  auto start_buf = start_intervals.request();
+  int num_int = start_buf.shape[0];
+    
+  auto links_buf = link_IDs.request();
+  int num_link = links_buf.shape[0];
+    
+  int new_shape [1] = { num_link }; 
+  auto result = py::array_t<double>(new_shape);
+  auto result_buf = result.request();
+  double *result_prt = (double *) result_buf.ptr;
+  
+  double *start_prt = (double *) start_buf.ptr;
+  int *links_ptr = (int *) links_buf.ptr;
+  MNM_Dlink *_link;
+  for (int i = 0; i < links_buf.shape[0]; i++){
+    _link = m_mcdta -> m_link_factory -> get_link(TInt(links_ptr[i]));
+    if (MNM_Dlink_Multiclass * _mclink = dynamic_cast<MNM_Dlink_Multiclass *>(_link)){
+      double avg_tt = 0;
+      for (int t = 0; t < num_int; ++t){
+          double _tmp = MNM_DTA_GRADIENT::get_travel_time_truck(_mclink, TFlt(start_prt[t]))() * 5;
+          if (_tmp > 10 * (_mclink -> m_length / _mclink -> m_ffs_truck)){
+              _tmp = _mclink -> m_length / _mclink -> m_ffs_truck;
+          }
+          avg_tt += _tmp; // seconds
+      }
+      avg_tt /= num_int;
+      result_prt[i] = avg_tt;
+    }
+    else{
+      throw std::runtime_error("Mcdta_Api::register_links: link type is not multiclass");
+    }
+  }
+    
+  return result;
+}
+
 
 // unit: m_mcdta -> m_unit_time (eg: 5 seconds)
 py::array_t<double> Mcdta_Api::get_car_link_tt(py::array_t<double>start_intervals)
@@ -553,8 +670,12 @@ py::array_t<double> Mcdta_Api::get_car_link_tt(py::array_t<double>start_interval
     if (start_prt[t] > get_cur_loading_interval()){
       throw std::runtime_error("Error, Mcdta_Api::get_car_link_tt, loaded data not enough");
     }
-    for (size_t i = 0; i < m_link_vec.size(); ++i){  
-      result_prt[i * l + t] = MNM_DTA_GRADIENT::get_travel_time_car(m_link_vec[i], TFlt(start_prt[t]))();
+    for (size_t i = 0; i < m_link_vec.size(); ++i){
+      double _tmp = MNM_DTA_GRADIENT::get_travel_time_car(m_link_vec[i], TFlt(start_prt[t]))();
+      if (_tmp * 5 > 10 * (m_link_vec[i] -> m_length / m_link_vec[i] -> m_ffs_car)){
+          _tmp = m_link_vec[i] -> m_length / m_link_vec[i] -> m_ffs_car / 5.0;
+      }
+      result_prt[i * l + t] = _tmp;
     }
   }
   return result;
@@ -578,14 +699,17 @@ py::array_t<double> Mcdta_Api::get_truck_link_tt(py::array_t<double>start_interv
     if (start_prt[t] > get_cur_loading_interval()){
       throw std::runtime_error("Error, Mcdta_Api::get_truck_link_tt, loaded data not enough");
     }
-    for (size_t i = 0; i < m_link_vec.size(); ++i){    
-      result_prt[i * l + t] = MNM_DTA_GRADIENT::get_travel_time_truck(m_link_vec[i], TFlt(start_prt[t]))();
+    for (size_t i = 0; i < m_link_vec.size(); ++i){
+      double _tmp = MNM_DTA_GRADIENT::get_travel_time_truck(m_link_vec[i], TFlt(start_prt[t]))();
+      if (_tmp * 5 > 10 * (m_link_vec[i] -> m_length / m_link_vec[i] -> m_ffs_truck)){
+          _tmp = m_link_vec[i] -> m_length / m_link_vec[i] -> m_ffs_truck / 5.0;
+      }
+      result_prt[i * l + t] = _tmp;
     }
   }
   return result;
 }
 
-// unit: mile per hour
 py::array_t<double> Mcdta_Api::get_car_link_speed(py::array_t<double>start_intervals)
 {
   auto start_buf = start_intervals.request();
@@ -605,13 +729,12 @@ py::array_t<double> Mcdta_Api::get_car_link_speed(py::array_t<double>start_inter
     }
     for (size_t i = 0; i < m_link_vec.size(); ++i){  
       int _tt = MNM_DTA_GRADIENT::get_travel_time_car(m_link_vec[i], TFlt(start_prt[t]))() * m_mcdta -> m_unit_time; //seconds
-      result_prt[i * l + t] = (m_link_vec[i] -> m_length) / _tt * 3600;
+      result_prt[i * l + t] = (m_link_vec[i] -> m_length) / _tt * 3600 / 1600; // mile per hour
     }
   }
   return result;
 }
 
-// unit: mile per hour
 py::array_t<double> Mcdta_Api::get_truck_link_speed(py::array_t<double>start_intervals)
 {
   auto start_buf = start_intervals.request();
@@ -630,8 +753,8 @@ py::array_t<double> Mcdta_Api::get_truck_link_speed(py::array_t<double>start_int
       throw std::runtime_error("Error, Mcdta_Api::get_truck_link_speed, loaded data not enough");
     }
     for (size_t i = 0; i < m_link_vec.size(); ++i){
-      int _tt = MNM_DTA_GRADIENT::get_travel_time_truck(m_link_vec[i], TFlt(start_prt[t]))() * m_mcdta -> m_unit_time; //seconds
-      result_prt[i * l + t] = (m_link_vec[i] -> m_length) / _tt * 3600;
+      int _tt = MNM_DTA_GRADIENT::get_travel_time_truck(m_link_vec[i], TFlt(start_prt[t]))() * m_mcdta -> m_unit_time; // seconds
+      result_prt[i * l + t] = (m_link_vec[i] -> m_length) / _tt * 3600 / 1600; // mile per hour
     }
   }
   return result;
@@ -1007,7 +1130,13 @@ PYBIND11_MODULE(MNMAPI, m) {
             .def("get_truck_link_out_num", &Mcdta_Api::get_truck_link_out_num)
             //.def("get_car_link_out_cc", &Mcdta_Api::get_car_link_out_cc)
             .def("get_car_dar_matrix", &Mcdta_Api::get_car_dar_matrix)
-            .def("get_truck_dar_matrix", &Mcdta_Api::get_truck_dar_matrix);
+            .def("get_truck_dar_matrix", &Mcdta_Api::get_truck_dar_matrix)
+            
+            //For scenarios in McKees Rocks project:
+            .def("get_waiting_time_at_intersections", &Mcdta_Api::get_waiting_time_at_intersections)
+            .def("get_link_spillback", &Mcdta_Api::get_link_spillback)
+            .def("get_path_tt_car", &Mcdta_Api::get_path_tt_car)
+            .def("get_path_tt_truck", &Mcdta_Api::get_path_tt_truck);
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
 #else

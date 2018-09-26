@@ -82,6 +82,11 @@ public:
 
   py::array_t<double> get_car_dar_matrix(py::array_t<int>start_intervals, py::array_t<int>end_intervals);
   py::array_t<double> get_truck_dar_matrix(py::array_t<int>start_intervals, py::array_t<int>end_intervals);
+  
+  py::array_t<double> get_waiting_time_at_intersections();
+  py::array_t<int> get_link_spillback();
+  py::array_t<double> get_path_tt_car(py::array_t<int>link_IDs, py::array_t<double>start_intervals);
+  py::array_t<double> get_path_tt_truck(py::array_t<int>link_IDs, py::array_t<double>start_intervals);
 
   MNM_Dta_Multiclass *m_mcdta;
   std::vector<MNM_Dlink_Multiclass*> m_link_vec;
