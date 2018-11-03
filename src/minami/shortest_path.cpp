@@ -495,17 +495,20 @@ int MNM_TDSP_Tree::update_tree(std::unordered_map<TInt, TFlt*>& cost_map)
   return 0;
 }
 
-int MNM_TDSP_Tree::get_tdsp(TInt src_node_ID, TInt time, MNM_Path* path)
+int MNM_TDSP_Tree::get_tdsp(TInt src_node_ID, TInt time, std::unordered_map<TInt, TFlt*>& cost_map, 
+                            MNM_Path* path)
 {
   TInt _cur_node_ID = src_node_ID;
   TInt _cur_link_ID;
+  TFlt _cur_time = TFlt(time);
   while (_cur_node_ID != m_dest_node_ID){
     path -> m_node_vec.push_back(_cur_node_ID);
-    _cur_link_ID = m_tree[_cur_node_ID][time];
+    _cur_link_ID = m_tree[_cur_node_ID][round_time(_cur_time)];
     path -> m_link_vec.push_back(_cur_link_ID);
+    _cur_time += cost_map[_cur_link_ID][round_time(_cur_time)];
     _cur_node_ID = m_graph -> GetEI(_cur_link_ID).GetDstNId();
   }
-  path -> m_node_vec.push_back(src_node_ID);  
+  path -> m_node_vec.push_back(m_dest_node_ID);  
   return 0;
 }
 
@@ -517,11 +520,19 @@ TFlt MNM_TDSP_Tree::get_distance_to_destination(TInt node_ID, TFlt time_stamp)
   IAssert(time_stamp >= 0);
   // printf("Current time stamp is %lf, %d\n", time_stamp, int(time_stamp)+ 1);
 
-  if (time_stamp >= TFlt(m_max_interval - 1)){
-    // printf("Enter if\n");
-    return m_dist[node_ID][m_max_interval - 1];
-  }
-  return m_dist[node_ID][int(time_stamp) + 1];
+  // if (time_stamp >= TFlt(m_max_interval - 1)){
+  //   // printf("Enter if\n");
+  //   return m_dist[node_ID][m_max_interval - 1];
+  // }
+  // return m_dist[node_ID][int(time_stamp)];
+  return m_dist[node_ID][round_time(time_stamp)];
 }
 
 
+int MNM_TDSP_Tree::round_time(TFlt time_stamp){
+  if (time_stamp >= TFlt(m_max_interval - 1)){
+    // printf("Enter if\n");
+    return int(m_max_interval - 1);
+  }
+  return int(time_stamp) + 1;
+}
