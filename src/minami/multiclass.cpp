@@ -981,7 +981,23 @@ int MNM_Dlink_Lq_Multiclass::evolve(TInt timestamp)
 	MNM_Veh *_v;
 	TInt _veh_to_move_car = MNM_Ults::round(_veh_to_move * (_demand_car / _demand));
 	_veh_to_move_car = std::min(_veh_to_move_car, TInt(m_veh_queue_car.size()));
+
+	// TFlt _raw = _veh_to_move * (m_veh_convert_factor * _demand_truck / _demand) / m_veh_convert_factor;
+	// TInt _tmp = std::floor(_raw);
+	// _raw = _raw - TFlt(_tmp);
+	// TInt _tmp2 = 0;
+	// if (_raw < 0.2){
+	// 	_tmp2 = 0;
+	// }
+	// else if (_raw > 0.8){
+	// 	_tmp2 = 1;
+	// }
+	// else {
+	// 	_tmp2 = MNM_Ults::round(_raw);
+	// }
+	// TInt _veh_to_move_truck = _tmp + _tmp2; 
 	TInt _veh_to_move_truck = MNM_Ults::round(_veh_to_move * (m_veh_convert_factor * _demand_truck / _demand) / m_veh_convert_factor);
+
 	_veh_to_move_truck = std::min(_veh_to_move_truck, TInt(m_veh_queue_truck.size()));
 	// printf("demand %f, Veh queue size %d, finished size %d, to move %d \n", (float) _demand(), (int) m_veh_queue.size(), (int)m_finished_array.size(), _veh_to_move());
 	for (int i = 0; i < _veh_to_move_car; ++i){
@@ -2659,18 +2675,25 @@ TFlt get_travel_time_car(MNM_Dlink_Multiclass* link, TFlt start_time)
 	if (link -> m_N_in_car == NULL){
 		throw std::runtime_error("Error, get_travel_time_car link cummulative curve is not installed");
 	}
+
 	TFlt _cc_flow = link -> m_N_in_car -> get_result(start_time);
 	if (_cc_flow <= DBL_EPSILON){
 		return link -> get_link_freeflow_tt_car() / 5.0;
 	}
+
+	// get the earliest time point in m_N_in_car that reach the inflow == _cc_flow as the true stat_time
+	TFlt _true_start_time = link -> m_N_in_car -> get_time(_cc_flow);
+
+	// get the earliest time point in m_N_out_car that reach the outflow == _cc_flow as the end_time
 	TFlt _end_time = link -> m_N_out_car -> get_time(_cc_flow);
-	if (_end_time() < 0 || (_end_time - start_time < 0)){
+
+	if (_end_time() < 0 || (_end_time - _true_start_time < 0)){
 		return link -> get_link_freeflow_tt_car() / 5.0;
 	}
 	else{
-		return (_end_time - start_time); // each interval is 5s
+		return (_end_time - _true_start_time); // each interval is 5s
 	}
-	// return link -> get_link_tt() / 5.0;
+
 	return 0;
 }
 
@@ -2682,16 +2705,24 @@ TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time)
 	if (link -> m_N_in_truck == NULL){
 		throw std::runtime_error("Error, get_travel_time_truck link cummulative curve is not installed");
 	}
+	// printf("%.2f\n", start_time);
+
 	TFlt _cc_flow = link -> m_N_in_truck -> get_result(start_time);
 	if (_cc_flow <= DBL_EPSILON){
 		return link -> get_link_freeflow_tt_truck() / 5.0;
 	}
+
+	// get the earliest time point in m_N_in_truck that reach the inflow == _cc_flow as the true stat_time
+	TFlt _true_start_time = link -> m_N_in_truck -> get_time(_cc_flow);
+
+	// get the earliest time point in m_N_out_truck that reach the outflow == _cc_flow as the end_time
 	TFlt _end_time = link -> m_N_out_truck -> get_time(_cc_flow);
-	if (_end_time() < 0 || (_end_time - start_time < 0)){
+
+	if (_end_time() < 0 || (_end_time - _true_start_time < 0)){
 		return link -> get_link_freeflow_tt_truck() / 5.0;
 	}
 	else{
-		return (_end_time - start_time); // each interval is 5s
+		return (_end_time - _true_start_time); // each interval is 5s
 	}
 	return 0;
 }
