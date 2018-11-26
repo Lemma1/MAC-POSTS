@@ -1,13 +1,78 @@
 #include <pybind11/pybind11.h>
 #include "dta_api.h"
-
+#include "typecast_ground.h"
 
 #include "dta_gradient_utls.h"
 #include "multiclass.h"
 
 #include <unordered_map>
+#include <vector>
 
 namespace py = pybind11;
+
+
+Test_Types::Test_Types()
+{
+
+}
+
+Test_Types::~Test_Types()
+{
+
+}
+
+
+py::list Test_Types::get_list()
+{
+  py::list v;
+  v.append(3);
+  v.append(2.2);
+  v.append("dfdf");
+  return v;
+}
+
+DenseMatrixR Test_Types::get_matrix(){
+  Eigen::MatrixXd mat(5, 6);
+  mat << 0,  3,  0,  0,  0, 11,
+           22, 0,  0,  0, 17, 11,
+           7,  5,  0,  1,  0, 11,
+           0,  0,  0,  0,  0, 11,
+           0,  0, 14,  0,  8, 11;
+  return DenseMatrixR(mat);
+}
+
+SparseMatrixR Test_Types::get_sparse_matrix(){
+  Eigen::MatrixXd mat(5, 6);
+  mat << 0,  3,  0,  0,  0, 11,
+           22, 0,  0,  0, 17, 11,
+           7,  5,  0,  1,  0, 11,
+           0,  0,  0,  0,  0, 11,
+           0,  0, 14,  0,  8, 11;
+  return Eigen::SparseView<Eigen::MatrixXd>(mat);
+}
+
+SparseMatrixR Test_Types::get_sparse_matrix2(int num){
+  int m = num;
+  std::vector<Eigen::Triplet<double>> tripletList;
+  tripletList.reserve(5000);
+  for(int i=1; i < m-1; ++i){
+    tripletList.push_back(Eigen::Triplet<double>(i,i,1));
+    tripletList.push_back(Eigen::Triplet<double>(i,i+1,1));
+    tripletList.push_back(Eigen::Triplet<double>(i-1,i,1));
+  }
+  SparseMatrixR mat(m, m);
+  mat.setFromTriplets(tripletList.begin(), tripletList.end());
+  return mat;
+}
+
+
+/**********************************************************************************************************
+***********************************************************************************************************
+                        run function
+***********************************************************************************************************
+***********************************************************************************************************/
+
+
 
 int run_dta(std::string folder) {
   printf("Current working directory is......\n");
@@ -28,13 +93,22 @@ int run_dta(std::string folder) {
 }
 
 
+
+/**********************************************************************************************************
+***********************************************************************************************************
+                        Singleclass
+***********************************************************************************************************
+***********************************************************************************************************/
+
+
 Dta_Api::Dta_Api()
 {
   m_dta = NULL;
   m_link_vec = std::vector<MNM_Dlink*>();
   m_path_vec = std::vector<MNM_Path*>();
-  m_path_set = std::set<MNM_Path*>(); 
+  m_path_map = std::unordered_map<MNM_Path*, int>(); 
   m_ID_path_mapping = std::unordered_map<TInt, MNM_Path*>();
+  // m_link_map = std::unordered_map<MNM_Dlink*, int>();
 }
 
 Dta_Api::~Dta_Api()
@@ -44,6 +118,8 @@ Dta_Api::~Dta_Api()
   }
   m_link_vec.clear();
   m_path_vec.clear();
+  // m_link_map.clear();
+  m_ID_path_mapping.clear();
   
 }
 
@@ -52,7 +128,7 @@ int Dta_Api::initialize(std::string folder)
   m_dta = new MNM_Dta(folder);
   m_dta -> build_from_files();
   m_dta -> hook_up_node_and_link();
-  m_dta -> is_ok();
+  // m_dta -> is_ok();
   // printf("start load ID path mapping 0\n");
   if (MNM_Routing_Fixed *_routing = dynamic_cast<MNM_Routing_Fixed *>(m_dta -> m_routing)){
     MNM::get_ID_path_mapping(m_ID_path_mapping, _routing -> m_path_table);
@@ -88,7 +164,7 @@ int Dta_Api::install_cc_tree()
 
 int Dta_Api::run_whole()
 {
-
+  m_dta -> pre_loading();
   m_dta -> loading(false);
   return 0;
 }
@@ -117,6 +193,7 @@ int Dta_Api::register_links(py::array_t<int> links)
     } 
     else {
       m_link_vec.push_back(_link);
+      // m_link_map.insert(std::make_pair(_link, i));
     }
   }
   return 0;
@@ -124,10 +201,10 @@ int Dta_Api::register_links(py::array_t<int> links)
 
 int Dta_Api::register_paths(py::array_t<int> paths)
 {
-  if (m_link_vec.size() > 0){
+  if (m_path_vec.size() > 0){
     printf("Warning, Dta_Api::register_paths, path exists\n");
     m_path_vec.clear();
-    m_path_set.clear();
+    m_path_map.clear();
   }
   auto paths_buf = paths.request();
   if (paths_buf.ndim != 1){
@@ -137,15 +214,16 @@ int Dta_Api::register_paths(py::array_t<int> paths)
   TInt _path_ID;
   for (int i = 0; i < paths_buf.shape[0]; i++){
     _path_ID = TInt(paths_ptr[i]);
-    printf("registering path %d, %d\n", _path_ID(), (int)m_ID_path_mapping.size());
+    // printf("registering path %d, %d\n", _path_ID(), (int)m_ID_path_mapping.size());
     if (m_ID_path_mapping.find(_path_ID) == m_ID_path_mapping.end()){
       throw std::runtime_error("register_paths: No such path");
     }
     else {
       m_path_vec.push_back(m_ID_path_mapping[_path_ID]);
+      m_path_map.insert(std::make_pair(m_ID_path_mapping[_path_ID], i));
     }
   }
-  m_path_set = std::set<MNM_Path*> (m_path_vec.begin(), m_path_vec.end());
+  // m_path_set = std::set<MNM_Path*> (m_path_vec.begin(), m_path_vec.end());
   return 0;
 }
 
@@ -268,7 +346,7 @@ py::array_t<double> Dta_Api::get_dar_matrix(py::array_t<int>start_intervals, py:
         throw std::runtime_error("Error, Dta_Api::get_dar_matrix, loaded data not enough");
       }
         MNM_DTA_GRADIENT::add_dar_records(
-                      _record, m_link_vec[i], m_path_set, TFlt(start_prt[t]), TFlt(end_prt[t]));
+                      _record, m_link_vec[i], m_path_map, TFlt(start_prt[t]), TFlt(end_prt[t]));
     }
   }
   // path_ID, assign_time, link_ID, start_int, flow
@@ -292,13 +370,53 @@ py::array_t<double> Dta_Api::get_dar_matrix(py::array_t<int>start_intervals, py:
   return result;
 }
 
+SparseMatrixR Dta_Api::get_complete_dar_matrix(py::array_t<int>start_intervals, py::array_t<int>end_intervals,
+                                                int num_intervals, py::array_t<double> f)
+{
+  int _num_e_path = m_path_map.size();
+  int _num_e_link = m_link_vec.size();
+  auto start_buf = start_intervals.request();
+  auto end_buf = end_intervals.request();
+  auto f_buf = f.request();
+  if (start_buf.ndim != 1 || end_buf.ndim != 1){
+    throw std::runtime_error("Error, Dta_Api::get_link_inflow, input dismension mismatch");
+  }
+  if (start_buf.shape[0] != end_buf.shape[0]){
+    throw std::runtime_error("Error, Dta_Api::get_link_inflow, input length mismatch");
+  }
+  if (f_buf.ndim != 1){
+    throw std::runtime_error("Error, Dta_Api::get_link_inflow, input path flow mismatch");
+  }
+  int l = start_buf.shape[0];
+  int *start_prt = (int *) start_buf.ptr;
+  int *end_prt = (int *) end_buf.ptr;
+  double *f_ptr = (double *) f_buf.ptr;
 
+  std::vector<Eigen::Triplet<double>> _record;
+  _record.reserve(100000);
+  for (int t = 0; t < l; ++t){
+    for (size_t i = 0; i<m_link_vec.size(); ++i){
+      if (end_prt[t] < start_prt[t]){
+        throw std::runtime_error("Error, Dta_Api::get_dar_matrix, end time smaller than start time");
+      }
+      if (end_prt[t] > get_cur_loading_interval()){
+        throw std::runtime_error("Error, Dta_Api::get_dar_matrix, loaded data not enough");
+      }
+        MNM_DTA_GRADIENT::add_dar_records_eigen(
+                      _record, m_link_vec[i], m_path_map, TFlt(start_prt[t]), TFlt(end_prt[t]),
+                      i, t, _num_e_link, _num_e_path, f_ptr);
+    }
+  }
+  SparseMatrixR mat(num_intervals * _num_e_link, num_intervals * _num_e_path);
+  mat.setFromTriplets(_record.begin(), _record.end());
+  return mat;
+}
 
-/***************************************************************
-***************************************************************
+/**********************************************************************************************************
+***********************************************************************************************************
                         Multiclass
-***************************************************************
-***************************************************************/
+***********************************************************************************************************
+***********************************************************************************************************/
 
 Mcdta_Api::Mcdta_Api()
 {
@@ -424,6 +542,7 @@ int Mcdta_Api::print_emission_stats()
            int(_count_car/m_mcdta -> m_flow_scalar), int(_count_truck/m_mcdta -> m_flow_scalar), 
            float(_tot_tt_car/m_mcdta -> m_flow_scalar), float(_tot_tt_truck/m_mcdta -> m_flow_scalar));
     m_mcdta -> m_emission -> output();
+    return 0;
 }
 
 
@@ -707,7 +826,7 @@ py::array_t<double> Mcdta_Api::get_link_truck_inflow(py::array_t<int>start_inter
 
 int Mcdta_Api::register_paths(py::array_t<int> paths)
 {
-  if (m_link_vec.size() > 0){
+  if (m_path_vec.size() > 0){
     printf("Warning, Mcdta_Api::register_paths, path exists\n");
     m_path_vec.clear();
     m_path_set.clear();
@@ -763,14 +882,14 @@ py::array_t<double> Mcdta_Api::get_enroute_and_queue_veh_stats_agg()
   auto result_buf = result.request();
   double *result_prt = (double *) result_buf.ptr;
 
-  if (m_mcdta -> m_enroute_veh_num.size() != get_cur_loading_interval()){
+  if ((int) m_mcdta -> m_enroute_veh_num.size() != get_cur_loading_interval()){
     throw std::runtime_error("Error, Mcdta_Api::get_enroute_and_queue_veh_stats_agg, enroute vehicle missed for some intervals");
   }
-  else if (m_mcdta -> m_queue_veh_num.size() != get_cur_loading_interval()){
+  else if ((int) m_mcdta -> m_queue_veh_num.size() != get_cur_loading_interval()){
     throw std::runtime_error("Error, Mcdta_Api::get_enroute_and_queue_veh_stats_agg, queuing vehicle missed for some intervals");
   }
   else{
-    for (size_t i = 0; i < _tot_interval; ++i){
+    for (int i = 0; i < _tot_interval; ++i){
       result_prt[i * 3] =  (m_mcdta -> m_enroute_veh_num[i]())/(m_mcdta -> m_flow_scalar);
       result_prt[i * 3 + 1] =  (m_mcdta -> m_queue_veh_num[i]())/(m_mcdta -> m_flow_scalar);
       result_prt[i * 3 + 2] =  (m_mcdta -> m_enroute_veh_num[i]() - m_mcdta -> m_queue_veh_num[i]())/(m_mcdta -> m_flow_scalar);
@@ -957,6 +1076,14 @@ PYBIND11_MODULE(MNMAPI, m) {
         Some other explanation about the add function.
     )pbdoc");
 
+
+
+    py::class_<Test_Types> (m, "test_types")
+            .def(py::init<>())
+            .def("get_list", &Test_Types::get_list, "test convesion")
+            .def("get_matrix", &Test_Types::get_matrix, "test convesion")
+            .def("get_sparse_matrix", &Test_Types::get_sparse_matrix, "test convesion")
+            .def("get_sparse_matrix2", &Test_Types::get_sparse_matrix2, "test convesion");
     // m.def("subtract", [](int i, int j) { return i - j; }, R"pbdoc(
     //     Subtract two numbers
 
@@ -975,7 +1102,8 @@ PYBIND11_MODULE(MNMAPI, m) {
             .def("get_link_inflow", &Dta_Api::get_link_inflow)
             .def("get_link_in_cc", &Dta_Api::get_link_in_cc)
             .def("get_link_out_cc", &Dta_Api::get_link_out_cc)
-            .def("get_dar_matrix", &Dta_Api::get_dar_matrix);
+            .def("get_dar_matrix", &Dta_Api::get_dar_matrix)
+            .def("get_complete_dar_matrix", &Dta_Api::get_complete_dar_matrix);
 
     py::class_<Mcdta_Api> (m, "mcdta_api")
             .def(py::init<>())
