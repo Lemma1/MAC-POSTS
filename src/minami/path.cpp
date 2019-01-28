@@ -49,6 +49,9 @@ std::string MNM_Path::buffer_to_string()
 
 int MNM_Path::allocate_buffer(TInt length){
   m_buffer = static_cast<TFlt*>(std::malloc(sizeof(TFlt) * length));
+  for (int i =0; i < length; ++i){
+    m_buffer[i] = 0.0;
+  }
   return 0;
 }
 
@@ -136,7 +139,7 @@ MNM_Path *extract_path(TInt origin_ID, TInt dest_ID, std::unordered_map<TInt, TI
 }
 
 
-Path_Table *build_shoartest_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_Factory *link_factory){
+Path_Table *build_shortest_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_Factory *link_factory){
   Path_Table *_path_table = new Path_Table();
   for (auto _o_it = od_factory -> m_origin_map.begin(); _o_it != od_factory -> m_origin_map.end(); _o_it++){
     std::unordered_map<TInt, MNM_Pathset*> *_new_map = new std::unordered_map<TInt, MNM_Pathset*>();
@@ -392,6 +395,19 @@ int get_ID_path_mapping(std::unordered_map<TInt, MNM_Path*> &dict, Path_Table *p
   return 0;  
 }
 
+
+MNM_Pathset* get_pathset(Path_Table *path_table, TInt origin_node_ID, TInt dest_node_ID)
+{
+  auto iter = path_table -> find(origin_node_ID);
+  if (iter == path_table -> end()){
+    throw std::runtime_error("MNM get_pathset ERROR: no origin node");
+  }
+  auto iterer = iter -> second -> find(dest_node_ID);
+  if (iterer == iter -> second -> end()){
+    throw std::runtime_error("MNM get_pathset ERROR: no dest node");
+  }
+  return iterer -> second;
+}
 
 }//end namespace MNM
 

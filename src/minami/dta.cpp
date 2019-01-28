@@ -394,7 +394,7 @@ int MNM_Dta::loading(bool verbose)
 
   // pre_loading();
   while (!finished_loading(_cur_int)){
-    printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_cur_int);
+    if(verbose) printf("-------------------------------    Interval %d   ------------------------------ \n", (int)_cur_int);
     // step 1: Origin release vehicle
     if(verbose) printf("Realsing!\n");
     // for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){
@@ -408,7 +408,8 @@ int MNM_Dta::loading(bool verbose)
           _origin -> release_one_interval(_cur_int, m_veh_factory, -1, TFlt(0));
         }
         else{
-          if (m_config -> get_string("routing_type") == "Fixed"){
+          if ((m_config -> get_string("routing_type") == "Fixed") 
+                || (m_config -> get_string("routing_type") == "Due")){
             // printf("Fixed Realsing.\n");
             _origin -> release_one_interval(_cur_int, m_veh_factory, _assign_inter, TFlt(0));
           }
@@ -477,7 +478,7 @@ int MNM_Dta::loading(bool verbose)
     m_statistics -> update_record(_cur_int);
 
 
-    MNM::print_vehicle_statistics(m_veh_factory);
+    if(verbose) MNM::print_vehicle_statistics(m_veh_factory);
     
     record_enroute_vehicles();
 

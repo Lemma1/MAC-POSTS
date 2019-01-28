@@ -456,7 +456,7 @@ int MNM_TDSP_Tree::initialize()
 
 int MNM_TDSP_Tree::update_tree(std::unordered_map<TInt, TFlt*>& cost_map)
 {
-  printf("Init in update tree\n");
+  // printf("Init in update tree\n");
   // init tree and cost
   TInt _node_ID;
   for (auto _node_it = m_graph->BegNI(); _node_it < m_graph->EndNI(); _node_it++) {
@@ -469,11 +469,11 @@ int MNM_TDSP_Tree::update_tree(std::unordered_map<TInt, TFlt*>& cost_map)
     }
   }
 
-  printf("SP in last t\n");
+  // printf("SP in last t\n");
   // run last time interval
   MNM_Shortest_Path::all_to_one_Dijkstra(m_dest_node_ID, m_graph, cost_map, m_dist, m_tree,
                                         m_max_interval-1, m_max_interval-1, m_max_interval-1);
-  printf("Process M-2 to 0\n");
+  // printf("Process M-2 to 0\n");
   // main loop for t = M-2 down to 0
   TFlt _temp_cost, _edge_cost;
   TInt _src_node, _dst_node;
@@ -491,7 +491,7 @@ int MNM_TDSP_Tree::update_tree(std::unordered_map<TInt, TFlt*>& cost_map)
       }
     }
   }
-  printf("Finished update tree\n");
+  // printf("Finished update tree\n");
   return 0;
 }
 
