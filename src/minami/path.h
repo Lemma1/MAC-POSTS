@@ -18,6 +18,7 @@ public:
   MNM_Path();
   ~MNM_Path();
   std::string node_vec_to_string();
+  std::string link_vec_to_string();
   std::string buffer_to_string();
   std::deque<TInt> m_link_vec;
   std::deque<TInt> m_node_vec;
@@ -55,6 +56,7 @@ namespace MNM {
   MNM_Path *extract_path(TInt origin_ID, TInt dest_ID, std::map<TInt, TInt> &output_map, PNEGraph &graph);
   Path_Table *build_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_Factory *link_factory);
   int save_path_table(Path_Table *path_table, MNM_OD_Factory *m_od_factory, bool w_buffer= false);
+  int print_path_table(Path_Table *path_table, MNM_OD_Factory *m_od_factory, bool w_buffer= false);
   Path_Table *build_shortest_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_Factory *link_factory);
   // int save_path_table_w_buffer(Path_Table *path_table, MNM_OD_Factory *od_factory);
   int allocate_path_table_buffer(Path_Table *path_table, TInt num);

@@ -6,6 +6,14 @@ MNM_Dta::MNM_Dta(std::string file_folder)
   m_file_folder = file_folder;
   m_current_loading_interval = TInt(0);
   m_emission = NULL;
+  m_routing = NULL;
+  m_statistics = NULL;
+  m_workzone = NULL;
+  m_veh_factory = NULL;
+  m_node_factory = NULL;
+  m_link_factory = NULL;
+  m_od_factory = NULL;
+  m_config = NULL;
   m_queue_veh_num = std::deque<TInt>();
   m_enroute_veh_num = std::deque<TInt>();
   m_queue_veh_map = std::unordered_map<TInt, std::deque<TInt>*>();
@@ -18,17 +26,17 @@ MNM_Dta::~MNM_Dta()
   if (m_emission != NULL) delete m_emission;
 
   if (m_routing != NULL) delete m_routing;
-  
+  // printf("1\n");
   if (m_veh_factory != NULL) delete m_veh_factory;
   if (m_node_factory != NULL) delete m_node_factory;
   if (m_link_factory != NULL) delete m_link_factory;
   if (m_od_factory != NULL) delete m_od_factory;
   if (m_config != NULL) delete m_config;
-  
+  // printf("2\n");
   if (m_statistics != NULL) delete m_statistics;
   if (m_workzone != NULL) delete m_workzone;
   m_graph -> Clr();
-
+  // printf("3\n");
   m_queue_veh_num.clear();
   m_enroute_veh_num.clear();
   for (auto _it = m_queue_veh_map.begin(); _it != m_queue_veh_map.end(); _it++){
@@ -36,6 +44,7 @@ MNM_Dta::~MNM_Dta()
     delete _it -> second;
   }  
   m_queue_veh_map.clear();
+  // printf("4\n");
 }
 
 int MNM_Dta::initialize()
@@ -291,7 +300,7 @@ int MNM_Dta::pre_loading()
     m_queue_veh_map.insert({_map_it.second -> m_link_ID, _rec});
   }
 
-  printf("Exiting MNM: Prepare loading!\n");
+  // printf("Exiting MNM: Prepare loading!\n");
   return 0;
 }
 
@@ -451,7 +460,7 @@ int MNM_Dta::loading(bool verbose)
     // step 4: move vehicles through link
     for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it++){
       _link = _link_it -> second;
-      // if (_link -> get_link_flow() > 0){
+      // if (_link -> get_link_flow() >= 0){
       //   printf("Current Link %d:, traffic flow %.4f, incomming %d, finished %d\n", 
       //       _link -> m_link_ID(), _link -> get_link_flow()(), (int)_link -> m_incoming_array.size(),  (int)_link -> m_finished_array.size());
       //   _link -> print_info();
