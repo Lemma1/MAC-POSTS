@@ -6,6 +6,7 @@ import time
 import shutil
 from scipy.sparse import coo_matrix, csr_matrix
 import pickle
+import multiprocessing as mp
 
 import MNMAPI
 
@@ -61,9 +62,9 @@ class MCDODE():
     if self.config['use_truck_link_tt']:
       self._add_truck_link_tt_data(data_dict['truck_link_tt'])
 
-  def _run_simulation(self, f_car, f_truck):
+  def _run_simulation(self, f_car, f_truck, counter = 0):
     hash1 = hashlib.sha1()
-    hash1.update(str(time.time()))
+    hash1.update(str(time.time()) + str(counter))
     new_folder = str(hash1.hexdigest())
     self.nb.update_demand_path2(f_car, f_truck)
     self.nb.config.config_dict['DTA']['total_interval'] = self.num_loading_interval
@@ -117,9 +118,9 @@ class MCDODE():
     f_truck =  np.random.rand(self.num_assign_interval * self.num_path) * truck_scale
     return (f_car, f_truck)
 
-  def compute_path_flow_grad_and_loss(self, one_data_dict, f_car, f_truck):
+  def compute_path_flow_grad_and_loss(self, one_data_dict, f_car, f_truck, counter = 0):
     # print "Running simulation", time.time()
-    dta = self._run_simulation(f_car, f_truck)
+    dta = self._run_simulation(f_car, f_truck, counter)
     # print "Getting DAR", time.time()
     (car_dar, truck_dar) = self.get_dar(dta, f_car, f_truck)
     # print "Evaluating grad", time.time()
@@ -273,8 +274,75 @@ class MCDODE():
       # break
       if store_folder is not None:
         pickle.dump((f_car, f_truck, loss), open(os.path.join(store_folder, str(i) + 'iteration.pickle'), 'wb'))
+      loss_list.append([loss, loss_dict])
     return (f_car, f_truck, loss_list)
 
+  def compute_path_flow_grad_and_loss_mpwrapper(self, one_data_dict, f_car, f_truck, j, output):
+    car_grad, truck_grad, tmp_loss, tmp_loss_dict = self.compute_path_flow_grad_and_loss(one_data_dict, f_car, f_truck, counter = j)
+    # print "finished original grad loss"
+    output.put([car_grad, truck_grad, tmp_loss, tmp_loss_dict])
+    # output.put(grad)
+    # print "finished put"
+    return
+
+  def estimate_path_flow_mp(self, step_size = 0.1, max_epoch = 10, car_init_scale = 10, 
+                              truck_init_scale = 1, store_folder = None, use_file_as_init = None,
+                              adagrad = False, n_process = 4):
+    if use_file_as_init is None:
+      (f_car, f_truck) = self.init_path_flow(car_scale = car_init_scale, truck_scale = truck_init_scale)
+    else:
+      (f_car, f_truck, _) = pickle.load(open(use_file_as_init, 'rb'))
+    loss_list = list()
+    # print "Start iteration", time.time()
+    for i in range(max_epoch):
+      if adagrad:
+        sum_g_square_car = 1e-6
+        sum_g_square_truck = 1e-6
+      seq = np.random.permutation(self.num_data)
+      split_seq = np.array_split(seq, np.maximum(1, int(self.num_data/n_process)))
+      loss = np.float(0)
+      loss_dict = {'car_count_loss':0.0, 'truck_count_loss':0.0, 'car_tt_loss':0.0, 'truck_tt_loss':0.0}
+      for part_seq in split_seq:
+        output = mp.Queue()
+        processes = [mp.Process(target=self.compute_path_flow_grad_and_loss_mpwrapper, args=(self._get_one_data(j), f_car, f_truck, j, output)) for j in part_seq]
+        for p in processes:
+          p.start()
+        results = list()
+        while 1:
+          running = any(p.is_alive() for p in processes)
+          while not output.empty():
+             results.append(output.get())
+          if not running:
+              break
+        for p in processes:
+          p.join()
+        # results = [output.get() for p in processes]
+        for res in results:
+          [car_grad, truck_grad, tmp_loss, tmp_loss_dict] = res
+          loss += tmp_loss
+          for loss_type, loss_value in tmp_loss_dict.items():
+            loss_dict[loss_type] += loss_value / np.float(self.num_data)
+          if adagrad:
+            sum_g_square_car = sum_g_square_car + np.power(car_grad, 2)
+            sum_g_square_truck = sum_g_square_truck + np.power(truck_grad, 2)
+            f_car = f_car - step_size * car_grad / np.sqrt(sum_g_square_car)
+            f_truck = f_truck - step_size * truck_grad / np.sqrt(sum_g_square_truck)
+          else:
+            f_car -= car_grad * step_size / np.sqrt(i+1)
+            f_truck -= truck_grad * step_size / np.sqrt(i+1)       
+          f_car = np.maximum(f_car, 1e-3)
+          f_truck = np.maximum(f_truck, 1e-3)
+        # f_truck = np.minimum(f_truck, 10)
+      print "Epoch:", i, "Loss:", loss / np.float(self.num_data)
+      if store_folder is not None:
+        pickle.dump((f_car, f_truck, loss), open(os.path.join(store_folder, str(i) + 'iteration.pickle'), 'wb'))
+      loss_list.append([loss, loss_dict])
+    return (f_car, f_truck, loss_list)
 
   def generate_route_choice(self):
+    pass
+
+
+def print_separate_accuracy(loss_dict):
+  for loss_type, loss_value in tmp_loss_dict.items():
     pass
