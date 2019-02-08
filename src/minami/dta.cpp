@@ -125,6 +125,37 @@ int MNM_Dta::set_routing()
     m_routing -> init_routing(_path_table);
     delete _tmp_conf;
   }
+
+  // Hybrid routing for bi-class vehicles.
+  // For Bi-class Fixed routing, just set both adaptive_ratio_car=0 & adaptive_ratio_truck=0 in "config.conf"
+  else if (m_config -> get_string("routing_type") == "Biclass_Hybrid"){
+    MNM_ConfReader* _tmp_conf = new MNM_ConfReader(m_file_folder + "/config.conf", "FIXED");
+    Path_Table *_path_table_car, *_path_table_truck;
+    if (_tmp_conf -> get_string("choice_portion_car") == "Buffer"){
+      _path_table_car = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf -> get_string("path_file_name_car"), 
+                      m_graph, _tmp_conf -> get_int("num_path_car"), true);
+    }
+    else{
+      _path_table_car = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf -> get_string("path_file_name_car"), 
+                      m_graph, _tmp_conf -> get_int("num_path_car"), false);
+    }
+    if (_tmp_conf -> get_string("choice_portion_truck") == "Buffer"){
+      _path_table_truck = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf -> get_string("path_file_name_truck"), 
+                      m_graph, _tmp_conf -> get_int("num_path_truck"), true);
+    }
+    else{
+      _path_table_truck = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf -> get_string("path_file_name_truck"), 
+                      m_graph, _tmp_conf -> get_int("num_path_truck"), false);
+    }
+
+    TInt _route_freq_fixed = _tmp_conf -> get_int("route_frq");
+    m_routing = new MNM_Routing_Biclass_Hybrid(m_file_folder, m_graph, m_statistics, m_od_factory, m_node_factory, m_link_factory, _route_freq_fixed);
+    MNM_Routing_Biclass_Hybrid *m_routing2 = dynamic_cast<MNM_Routing_Biclass_Hybrid *>(m_routing);
+    m_routing2 -> init_routing(_path_table_car, _path_table_truck);
+    delete _tmp_conf;
+  }
+
+
   else {
     m_routing = new MNM_Routing_Random(m_graph, m_od_factory, m_node_factory, m_link_factory);
     m_routing -> init_routing();
@@ -337,6 +368,17 @@ int MNM_Dta::load_once(bool verbose, TInt load_int, TInt assign_int)
           if (_ad_ratio > 1) _ad_ratio = 1;
           if (_ad_ratio < 0) _ad_ratio = 0;
           _origin -> release_one_interval(load_int, m_veh_factory, assign_int, _ad_ratio);
+        }
+        else if((m_config -> get_string("routing_type") == "Biclass_Hybrid")){
+          TFlt _ad_ratio_car = m_config -> get_float("adaptive_ratio_car");
+          if (_ad_ratio_car > 1) _ad_ratio_car = 1;
+          if (_ad_ratio_car < 0) _ad_ratio_car = 0;
+
+          TFlt _ad_ratio_truck = m_config -> get_float("adaptive_ratio_truck");
+          if (_ad_ratio_truck > 1) _ad_ratio_truck = 1;
+          if (_ad_ratio_truck < 0) _ad_ratio_truck = 0;
+          // NOTE: in this case the release function is different
+          _origin -> release_one_interval_biclass(load_int, m_veh_factory, assign_int, _ad_ratio_car, _ad_ratio_truck);
         }
         else{
           printf("WARNING:No assignemnt!\n");
