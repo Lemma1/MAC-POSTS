@@ -283,8 +283,10 @@ MNM_Routing_Fixed::~MNM_Routing_Fixed()
     delete _map_it.second;
   }
   m_tracker.clear();
-  
-  if (m_path_table != NULL){
+
+  if ((m_path_table != NULL) && (m_path_table -> size() > 0)){
+    // printf("Address of m_path_table is %p\n", (void *)m_path_table);
+    // printf("%d\n", m_path_table -> size());
     for (auto _it : *m_path_table){
       for (auto _it_it : *(_it.second)){
         delete _it_it.second;
@@ -498,28 +500,31 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
                           Bi-class Hybrid routing
 **************************************************************************/
 MNM_Routing_Biclass_Hybrid::MNM_Routing_Biclass_Hybrid(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, 
-  MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory, TInt route_frq_fixed)
+  MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory, TInt route_frq_fixed, TInt buffer_length)
   : MNM_Routing::MNM_Routing(graph, od_factory, node_factory, link_factory)
 {
   m_routing_adaptive = new MNM_Routing_Adaptive(file_folder, graph, statistics, od_factory, node_factory, link_factory);
-  m_routing_fixed_car = new MNM_Routing_Biclass_Fixed(graph, od_factory, node_factory, link_factory, route_frq_fixed);
-  m_routing_fixed_truck = new MNM_Routing_Biclass_Fixed(graph, od_factory, node_factory, link_factory, route_frq_fixed);
+  m_routing_fixed_car = new MNM_Routing_Biclass_Fixed(graph, od_factory, node_factory, link_factory, route_frq_fixed, buffer_length, TInt(0));
+  m_routing_fixed_truck = new MNM_Routing_Biclass_Fixed(graph, od_factory, node_factory, link_factory, route_frq_fixed, buffer_length, TInt(1));
 }
 
 MNM_Routing_Biclass_Hybrid::~MNM_Routing_Biclass_Hybrid()
 {
   delete m_routing_adaptive;
+  // printf("m_routing_adaptive\n");
   delete m_routing_fixed_car;
+  // printf("m_routing_fixed_car\n");
   delete m_routing_fixed_truck;
+  // printf("m_routing_fixed_truck\n");
 }
 
-int MNM_Routing_Biclass_Hybrid::init_routing(Path_Table *path_table_car, Path_Table *path_table_truck)
+int MNM_Routing_Biclass_Hybrid::init_routing(Path_Table *path_table)
 {
   m_routing_adaptive -> init_routing();
   // printf("Finished init all ADAPTIVE vehicles routing\n");
-  m_routing_fixed_car -> init_routing(path_table_car);
+  m_routing_fixed_car -> init_routing(path_table);
   // printf("Finished init STATIC cars routing\n");
-  m_routing_fixed_truck -> init_routing(path_table_truck);
+  m_routing_fixed_truck -> init_routing(path_table);
   // printf("Finished init STATIC trucks routing\n");
   return 0;
 }
@@ -528,9 +533,9 @@ int MNM_Routing_Biclass_Hybrid::update_routing(TInt timestamp)
 {
   m_routing_adaptive -> update_routing(timestamp);
   // printf("Finished update all ADAPTIVE vehicles routing\n");
-  m_routing_fixed_car -> update_routing(timestamp, TInt(0));
+  m_routing_fixed_car -> update_routing(timestamp);
   // printf("Finished update STATIC cars routing\n");
-  m_routing_fixed_truck -> update_routing(timestamp, TInt(1));
+  m_routing_fixed_truck -> update_routing(timestamp);
   // printf("Finished update STATIC trucks routing\n");
   return 0;
 }
@@ -540,10 +545,11 @@ int MNM_Routing_Biclass_Hybrid::update_routing(TInt timestamp)
 **************************************************************************/
 MNM_Routing_Biclass_Fixed::MNM_Routing_Biclass_Fixed(PNEGraph &graph,
               MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, 
-              MNM_Link_Factory *link_factory, TInt routing_frq)
+              MNM_Link_Factory *link_factory, TInt routing_frq, TInt buffer_length, TInt veh_class)
 :MNM_Routing_Fixed::MNM_Routing_Fixed(graph, od_factory, node_factory, link_factory, routing_frq)
 {
-  ;
+  m_buffer_length = buffer_length;
+  m_veh_class = veh_class;
 }
 
 MNM_Routing_Biclass_Fixed::~MNM_Routing_Biclass_Fixed()
@@ -551,7 +557,14 @@ MNM_Routing_Biclass_Fixed::~MNM_Routing_Biclass_Fixed()
   ;
 }
 
-int MNM_Routing_Biclass_Fixed::update_routing(TInt timestamp, TInt veh_class)
+int MNM_Routing_Biclass_Fixed::change_choice_portion(TInt routing_interval)
+{
+  MNM::copy_buffer_to_p(m_path_table, routing_interval + m_veh_class*m_buffer_length);
+  MNM::normalize_path_table_p(m_path_table);
+  return 0;
+}
+
+int MNM_Routing_Biclass_Fixed::update_routing(TInt timestamp)
 {
   MNM_Origin *_origin;
   MNM_DMOND *_origin_node;
@@ -572,9 +585,9 @@ int MNM_Routing_Biclass_Fixed::update_routing(TInt timestamp, TInt veh_class)
     for (auto _veh_it = _origin_node -> m_in_veh_queue.begin(); _veh_it != _origin_node -> m_in_veh_queue.end(); _veh_it++){
       _veh = *_veh_it;
       
-      // Here is the difference from single class fixed routing
-      if ((_veh -> m_type == MNM_TYPE_STATIC) && (_veh -> m_class == veh_class)) {
-      // Here is the difference from single class fixed routing
+      // Here is the difference from single-class fixed routing
+      if ((_veh -> m_type == MNM_TYPE_STATIC) && (_veh -> m_class == m_veh_class)) {
+      // Here is the difference from single-class fixed routing
 
         if (m_tracker.find(_veh) == m_tracker.end()){
           // printf("Registering!\n");
@@ -597,9 +610,9 @@ int MNM_Routing_Biclass_Fixed::update_routing(TInt timestamp, TInt veh_class)
     for (auto _veh_it = _link -> m_finished_array.begin(); _veh_it != _link -> m_finished_array.end(); _veh_it++){
       _veh = *_veh_it;
 
-      // Here is the difference from single class fixed routing
-      if ((_veh -> m_type == MNM_TYPE_STATIC) && (_veh -> m_class == veh_class)){
-      // Here is the difference from single class fixed routing
+      // Here is the difference from single-class fixed routing
+      if ((_veh -> m_type == MNM_TYPE_STATIC) && (_veh -> m_class == m_veh_class)){
+      // Here is the difference from single-class fixed routing
 
         _veh_dest = _veh -> get_destination();
         if (_veh_dest -> m_dest_node -> m_node_ID == _node_ID){
