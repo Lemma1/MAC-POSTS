@@ -252,7 +252,7 @@ class MNM_path():
     self.destination_node = None
     self.node_list = list()
     self.route_portions = None
-    self.truck_route_portions = None
+    # self.truck_route_portions = None
 
   def __init__(self, node_list, path_ID):
     self.path_ID = path_ID
@@ -278,13 +278,13 @@ class MNM_path():
 
   def create_route_choice_portions(self, num_intervals):
     self.route_portions = np.zeros(num_intervals)
-    self.truck_route_portions = np.zeros(num_intervals)
+    # self.truck_route_portions = np.zeros(num_intervals)
 
   def attach_route_choice_portions(self, portions):
     self.route_portions = portions
 
-  def attach_route_choice_portions_truck(self, portions):
-    self.truck_route_portions = portions
+  # def attach_route_choice_portions_truck(self, portions):
+  #   self.truck_route_portions = portions
 
   def __ne__(self, other):
     return not self.__eq__(other)
@@ -327,16 +327,16 @@ class MNM_pathset():
     if sum_to_OD:
       return tmp_sum
 
-  def normalize_truck_route_portions(self, sum_to_OD = False):
-    for i in range(len(self.path_list) - 1):
-      assert(self.path_list[i].truck_route_portions.shape == self.path_list[i + 1].truck_route_portions.shape)
-    tmp_sum = np.zeros(self.path_list[0].truck_route_portions.shape)
-    for i in range(len(self.path_list)):
-      tmp_sum += self.path_list[i].truck_route_portions
-    for i in range(len(self.path_list)):
-      self.path_list[i].truck_route_portions = self.path_list[i].truck_route_portions / np.maximum(tmp_sum, 1e-6)
-    if sum_to_OD:
-      return tmp_sum
+  # def normalize_truck_route_portions(self, sum_to_OD = False):
+  #   for i in range(len(self.path_list) - 1):
+  #     assert(self.path_list[i].truck_route_portions.shape == self.path_list[i + 1].truck_route_portions.shape)
+  #   tmp_sum = np.zeros(self.path_list[0].truck_route_portions.shape)
+  #   for i in range(len(self.path_list)):
+  #     tmp_sum += self.path_list[i].truck_route_portions
+  #   for i in range(len(self.path_list)):
+  #     self.path_list[i].truck_route_portions = self.path_list[i].truck_route_portions / np.maximum(tmp_sum, 1e-6)
+  #   if sum_to_OD:
+  #     return tmp_sum
 
   def __str__(self):
     return "MNM_pathset, O node: {}, D node: {}, number_of_paths: {}".format(self.origin_node, self.destination_node, len(self.path_list))
@@ -347,75 +347,127 @@ class MNM_pathset():
 class MNM_pathtable():
   def __init__(self):
     # print "MNM_pathtable"
-    self.path_dict = dict()
-    self.ID2path = OrderedDict()
+    self.car_path_dict = dict()
+    self.car_ID2path = OrderedDict()
+    self.truck_path_dict = dict()
+    self.truck_ID2path = OrderedDict()
 
-  def add_pathset(self, pathset, overwriting = False):
-    if pathset.origin_node not in self.path_dict.keys():
-      self.path_dict[pathset.origin_node] = dict()
+  def add_car_pathset(self, pathset, overwriting = False):
+    if pathset.origin_node not in self.car_path_dict.keys():
+      self.car_path_dict[pathset.origin_node] = dict()
     if (not overwriting) and (pathset.destination_node in 
-              self.path_dict[pathset.origin_node]):
-      raise ("Error: exists pathset in the pathtable")
+              self.car_path_dict[pathset.origin_node]):
+      raise ("Error add_car_pathset: exists pathset in the pathtable")
     else:
-      self.path_dict[pathset.origin_node][pathset.destination_node] = pathset
+      self.car_path_dict[pathset.origin_node][pathset.destination_node] = pathset
 
-  def build_from_file(self, file_name, w_ID = False):
+  def add_truck_pathset(self, pathset, overwriting = False):
+    if pathset.origin_node not in self.truck_path_dict.keys():
+      self.truck_path_dict[pathset.origin_node] = dict()
+    if (not overwriting) and (pathset.destination_node in 
+              self.truck_path_dict[pathset.origin_node]):
+      raise ("Error add_truck_pathset: exists pathset in the pathtable")
+    else:
+      self.truck_path_dict[pathset.origin_node][pathset.destination_node] = pathset
+
+  def build_from_file(self, car_file_name, truck_file_name, w_ID = False):
     if w_ID:
       raise ("Error, path table build_from_file no implemented")
-    self.path_dict = dict()
-    self.ID2path = OrderedDict()
-    f = file(file_name)
-    log = f.readlines()
-    f.close()
-    for i in range(len(log)):
-      tmp_str = log[i]
-      if tmp_str == '':
+    self.car_path_dict = dict()
+    self.car_ID2path = OrderedDict()
+    car_f = file(car_file_name)
+    car_log = car_f.readlines()
+    car_f.close()
+    for i in range(len(car_log)):
+      car_tmp_str = car_log[i]
+      if car_tmp_str == '':
         continue
-      words = tmp_str.split()
+      words = car_tmp_str.split()
       origin_node = np.int(words[0])
       destination_node = np.int(words[-1])
-      if origin_node not in self.path_dict.keys():
-        self.path_dict[origin_node] = dict()
-      if destination_node not in self.path_dict[origin_node].keys():
+      if origin_node not in self.car_path_dict.keys():
+        self.car_path_dict[origin_node] = dict()
+      if destination_node not in self.car_path_dict[origin_node].keys():
         tmp_path_set = MNM_pathset()
         tmp_path_set.origin_node = origin_node
         tmp_path_set.destination_node = destination_node
-        self.add_pathset(tmp_path_set)
+        self.add_car_pathset(tmp_path_set)
       tmp_node_list = list(map(lambda x : np.int(x), words))
       tmp_path = MNM_path(tmp_node_list, i)
-      self.path_dict[origin_node][destination_node].add_path(tmp_path)
-      self.ID2path[i] = tmp_path
+      self.car_path_dict[origin_node][destination_node].add_path(tmp_path)
+      self.car_ID2path[i] = tmp_path
 
-  def load_route_choice_from_file(self, file_name, w_ID = False):
+    self.truck_path_dict = dict()
+    self.truck_ID2path = OrderedDict()
+    truck_f = file(truck_file_name)
+    truck_log = truck_f.readlines()
+    truck_f.close()
+    for i in range(len(truck_log)):
+      truck_tmp_str = truck_log[i]
+      if truck_tmp_str == '':
+        continue
+      words = truck_tmp_str.split()
+      origin_node = np.int(words[0])
+      destination_node = np.int(words[-1])
+      if origin_node not in self.truck_path_dict.keys():
+        self.truck_path_dict[origin_node] = dict()
+      if destination_node not in self.truck_path_dict[origin_node].keys():
+        tmp_path_set = MNM_pathset()
+        tmp_path_set.origin_node = origin_node
+        tmp_path_set.destination_node = destination_node
+        self.add_truck_pathset(tmp_path_set)
+      tmp_node_list = list(map(lambda x : np.int(x), words))
+      tmp_path = MNM_path(tmp_node_list, i)
+      self.truck_path_dict[origin_node][destination_node].add_path(tmp_path)
+      self.truck_ID2path[i] = tmp_path
+
+  def load_route_choice_from_file(self, car_file_name, truck_file_name, w_ID = False):
     if w_ID:
       raise ("Error, pathtable load_route_choice_from_file not implemented")
-    f = file(file_name)
-    log = list(filter(lambda x: not x.strip() == '', f.readlines()))
-    f.close()
-    assert(len(log) == len(self.ID2path))
-    for i in range(len(log)):
-      tmp_portions = np.array(log[i].strip().split()).astype(np.float)
-      self.ID2path[i].attach_route_choice_portions(tmp_portions)
-      self.ID2path[i].attach_route_choice_portions_truck(tmp_portions)
+    car_f = file(car_file_name)
+    car_log = list(filter(lambda x: not x.strip() == '', car_f.readlines()))
+    car_f.close()
+    truck_f = file(truck_file_name)
+    truck_log = list(filter(lambda x: not x.strip() == '', truck_f.readlines()))
+    truck_f.close()
+    assert(len(car_log) == len(self.car_ID2path))
+    assert(len(truck_log) == len(self.truck_ID2path))
+    for i in range(len(car_log)):
+      car_tmp_portions = np.array(car_log[i].strip().split()).astype(np.float)
+      self.car_ID2path[i].attach_route_choice_portions(car_tmp_portions)
+    for i in range(len(truck_log)):
+      truck_tmp_portions = np.array(truck_log[i].strip().split()).astype(np.float)
+      self.truck_ID2path[i].attach_route_choice_portions(truck_tmp_portions)
 
   def __str__(self):
-    return "MNM_pathtable, number of paths:" + str(len(self.ID2path)) 
+    return "MNM_pathtable, number of car paths:" + str(len(self.car_ID2path)) + ", number of truck paths:" + str(len(self.truck_ID2path))
 
   def __repr__(self):
     return self.__str__()
 
-  def generate_table_text(self):
+  def generate_car_table_text(self):
     tmp_str = ""
-    for path_ID, path in self.ID2path.iteritems():
+    for path_ID, path in self.car_ID2path.iteritems():
       tmp_str += path.generate_node_list_text() + '\n'
     return tmp_str
 
-  def generate_portion_text(self):
+  def generate_car_portion_text(self):
     tmp_str = ""
-    for path_ID, path in self.ID2path.iteritems():
+    for path_ID, path in self.car_ID2path.iteritems():
       tmp_str += path.generate_portion_text() + '\n'
     return tmp_str    
 
+  def generate_truck_table_text(self):
+    tmp_str = ""
+    for path_ID, path in self.truck_ID2path.iteritems():
+      tmp_str += path.generate_node_list_text() + '\n'
+    return tmp_str
+
+  def generate_truck_portion_text(self):
+    tmp_str = ""
+    for path_ID, path in self.truck_ID2path.iteritems():
+      tmp_str += path.generate_portion_text() + '\n'
+    return tmp_str    
 # class MNM_routing():
 #   def __init__(self):
 #     print "MNM_routing"
@@ -451,7 +503,11 @@ class MNM_config():
                       'rec_volume': np.int, 'volume_load_automatic_rec': np.int, 'volume_record_automatic_rec': np.int,
                       'rec_tt': np.int, 'tt_load_automatic_rec':np.int, 'tt_record_automatic_rec':np.int,
                       'route_frq': np.int, 'path_file_name': str, 'num_path': np.int,
-                      'choice_portion': str, 'route_frq': np.int, 'adaptive_ratio':np.float}
+                      'choice_portion': str, 'route_frq': np.int, 'adaptive_ratio':np.float, 
+                      'adaptive_ratio_car':np.float, 'adaptive_ratio_truck':np.float, 
+                      'path_file_name_car': str, 'path_file_name_truck': str,
+                      'num_path_car': np.int, 'num_path_truck': np.int,
+                      'choice_portion_car': str, 'choice_portion_truck': str}
 
   def build_from_file(self, file_name):
     self.config_dict = OrderedDict()
@@ -516,7 +572,10 @@ class MNM_network_builder():
   def load_from_folder(self, path, config_file_name = 'config.conf',
                                     link_file_name = 'MNM_input_link', node_file_name = 'MNM_input_node',
                                     graph_file_name = 'Snap_graph', od_file_name = 'MNM_input_od',
-                                    pathtable_file_name = 'path_table', path_p_file_name = 'path_table_buffer',
+                                    car_pathtable_file_name = 'path_table_car', 
+                                    truck_pathtable_file_name = 'path_table_truck',
+                                    car_path_p_file_name = 'path_table_car_buffer', 
+                                    truck_path_p_file_name = 'path_table_truck_buffer',
                                     demand_file_name = 'MNM_input_demand'):
     if os.path.isfile(os.path.join(path, config_file_name)):
       self.config.build_from_file(os.path.join(path, config_file_name))
@@ -546,14 +605,14 @@ class MNM_network_builder():
       # print "No demand input"
       pass
 
-    if os.path.isfile(os.path.join(path, pathtable_file_name)):
-      self.path_table.build_from_file(os.path.join(path, pathtable_file_name))
-      if os.path.isfile(os.path.join(path, path_p_file_name)):
-        self.path_table.load_route_choice_from_file(os.path.join(path, path_p_file_name))
+    if os.path.isfile(os.path.join(path, car_pathtable_file_name)) and os.path.isfile(os.path.join(path, truck_pathtable_file_name)):
+      self.path_table.build_from_file(os.path.join(path, car_pathtable_file_name), os.path.join(path, truck_pathtable_file_name))
+      if os.path.isfile(os.path.join(path, car_path_p_file_name)) and os.path.isfile(os.path.join(path, truck_path_p_file_name)):
+        self.path_table.load_route_choice_from_file(os.path.join(path, car_path_p_file_name), os.path.join(path, truck_path_p_file_name))
         self.route_choice_flag = True
       else:
         self.route_choice_flag = False
-        # print "No route choice portition for path table"
+        print "No route choice portition for path table"
 
     else:
       print "No path table input"
@@ -562,7 +621,10 @@ class MNM_network_builder():
   def dump_to_folder(self, path, config_file_name = 'config.conf',
                                     link_file_name = 'MNM_input_link', node_file_name = 'MNM_input_node',
                                     graph_file_name = 'Snap_graph', od_file_name = 'MNM_input_od',
-                                    pathtable_file_name = 'path_table', path_p_file_name = 'path_table_buffer',
+                                    car_pathtable_file_name = 'path_table_car', 
+                                    truck_pathtable_file_name = 'path_table_truck',
+                                    car_path_p_file_name = 'path_table_car_buffer', 
+                                    truck_path_p_file_name = 'path_table_truck_buffer',
                                     demand_file_name = 'MNM_input_demand'):
     if not os.path.isdir(path):
       os.makedirs(path)
@@ -590,13 +652,20 @@ class MNM_network_builder():
     f.write(self.graph.generate_text())
     f.close()
 
-    f = open(os.path.join(path, pathtable_file_name), 'wb')
-    f.write(self.path_table.generate_table_text())
+    f = open(os.path.join(path, car_pathtable_file_name), 'wb')
+    f.write(self.path_table.generate_car_table_text())
+    f.close()
+
+    f = open(os.path.join(path, truck_pathtable_file_name), 'wb')
+    f.write(self.path_table.generate_truck_table_text())
     f.close()
 
     if self.route_choice_flag:
-      f = open(os.path.join(path, path_p_file_name), 'wb')
-      f.write(self.path_table.generate_portion_text())
+      f = open(os.path.join(path, car_path_p_file_name), 'wb')
+      f.write(self.path_table.generate_car_portion_text())
+      f.close()
+      f = open(os.path.join(path, truck_path_p_file_name), 'wb')
+      f.write(self.path_table.generate_truck_portion_text())
       f.close()
 
   def read_link_input(self, file_name):
