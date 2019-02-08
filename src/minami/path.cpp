@@ -33,6 +33,19 @@ std::string MNM_Path::node_vec_to_string()
   return _s;
 }
 
+
+std::string MNM_Path::link_vec_to_string()
+{
+  std::string _s;
+  for (TInt link_ID : m_link_vec){
+    _s += std::to_string(link_ID) + " ";
+  }
+  _s.pop_back();
+  _s += "\n";
+  return _s;
+}
+
+
 std::string MNM_Path::buffer_to_string()
 {
   std::string _s;
@@ -48,7 +61,14 @@ std::string MNM_Path::buffer_to_string()
 }
 
 int MNM_Path::allocate_buffer(TInt length){
+  if ((m_buffer_length > 0) || (m_buffer != NULL)){
+    throw std::runtime_error("Error: MNM_Path::allocate_buffer, double allocation.");
+  }
+  m_buffer_length = length;
   m_buffer = static_cast<TFlt*>(std::malloc(sizeof(TFlt) * length));
+  for (int i =0; i < length; ++i){
+    m_buffer[i] = 0.0;
+  }
   return 0;
 }
 
@@ -136,7 +156,7 @@ MNM_Path *extract_path(TInt origin_ID, TInt dest_ID, std::unordered_map<TInt, TI
 }
 
 
-Path_Table *build_shoartest_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_Factory *link_factory){
+Path_Table *build_shortest_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_Factory *link_factory){
   Path_Table *_path_table = new Path_Table();
   for (auto _o_it = od_factory -> m_origin_map.begin(); _o_it != od_factory -> m_origin_map.end(); _o_it++){
     std::unordered_map<TInt, MNM_Pathset*> *_new_map = new std::unordered_map<TInt, MNM_Pathset*>();
@@ -160,6 +180,9 @@ Path_Table *build_shoartest_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory,
       _origin_node_ID = _o_it -> second -> m_origin_node -> m_node_ID;
       _path = MNM::extract_path(_origin_node_ID, _dest_node_ID, _free_shortest_path_tree, graph);
       if (_path != NULL){
+        // printf("Adding to path table\n");
+        // std::cout << _path -> node_vec_to_string();
+        // std::cout << _path -> link_vec_to_string();
         _path_table -> find(_origin_node_ID) -> second -> find(_dest_node_ID) -> second -> m_path_vec.push_back(_path);
       }
     }
@@ -279,12 +302,18 @@ int save_path_table(Path_Table *path_table, MNM_OD_Factory *od_factory, bool w_b
     exit(-1);
   }
   TInt _dest_node_ID, _origin_node_ID;
+  // printf("ssssssma\n");
   for (auto _d_it = od_factory -> m_destination_map.begin(); _d_it != od_factory -> m_destination_map.end(); _d_it++){
+    // printf("---\n");
     _dest_node_ID = _d_it -> second -> m_dest_node -> m_node_ID;
     for (auto _o_it = od_factory -> m_origin_map.begin(); _o_it != od_factory -> m_origin_map.end(); _o_it++){
       _origin_node_ID = _o_it -> second -> m_origin_node -> m_node_ID;
+      // printf("----\n");
+      // printf("o node %d, d node %d\n", _origin_node_ID(), _dest_node_ID());
       for (auto &_path : path_table -> find(_origin_node_ID) -> second -> find(_dest_node_ID) -> second -> m_path_vec){
+        // printf("test\n");
         _path_table_file << _path -> node_vec_to_string();
+        // printf("test2\n");
         if (w_buffer){
           _path_buffer_file << _path -> buffer_to_string();
         }
@@ -298,6 +327,30 @@ int save_path_table(Path_Table *path_table, MNM_OD_Factory *od_factory, bool w_b
   return 0;
 }
 
+
+int print_path_table(Path_Table *path_table, MNM_OD_Factory *od_factory, bool w_buffer)
+{
+  TInt _dest_node_ID, _origin_node_ID;
+  // printf("ssssssma\n");
+  for (auto _d_it = od_factory -> m_destination_map.begin(); _d_it != od_factory -> m_destination_map.end(); _d_it++){
+    // printf("---\n");
+    _dest_node_ID = _d_it -> second -> m_dest_node -> m_node_ID;
+    for (auto _o_it = od_factory -> m_origin_map.begin(); _o_it != od_factory -> m_origin_map.end(); _o_it++){
+      _origin_node_ID = _o_it -> second -> m_origin_node -> m_node_ID;
+      // printf("----\n");
+      // printf("o node %d, d node %d\n", _origin_node_ID(), _dest_node_ID());
+      for (auto &_path : path_table -> find(_origin_node_ID) -> second -> find(_dest_node_ID) -> second -> m_path_vec){
+        // printf("test\n");
+        std::cout << "path" << _path -> node_vec_to_string();
+        // printf("test2\n");
+        if (w_buffer){
+          std::cout << "buffer" << _path -> buffer_to_string();
+        }
+      }
+    }
+  }
+  return 0;
+}
 
 // int save_path_table_w_buffer(Path_Table *path_table, MNM_OD_Factory *od_factory)
 // {
@@ -392,6 +445,19 @@ int get_ID_path_mapping(std::unordered_map<TInt, MNM_Path*> &dict, Path_Table *p
   return 0;  
 }
 
+
+MNM_Pathset* get_pathset(Path_Table *path_table, TInt origin_node_ID, TInt dest_node_ID)
+{
+  auto iter = path_table -> find(origin_node_ID);
+  if (iter == path_table -> end()){
+    throw std::runtime_error("MNM get_pathset ERROR: no origin node");
+  }
+  auto iterer = iter -> second -> find(dest_node_ID);
+  if (iterer == iter -> second -> end()){
+    throw std::runtime_error("MNM get_pathset ERROR: no dest node");
+  }
+  return iterer -> second;
+}
 
 }//end namespace MNM
 

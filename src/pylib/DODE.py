@@ -10,7 +10,7 @@ import multiprocessing as mp
 import MNMAPI
 
 
-class DODE():
+class DODE(object):
   def __init__(self, nb, config):
     self.config = config
     self.nb = nb
@@ -163,7 +163,7 @@ class DODE():
       seq = np.random.permutation(self.num_data)
       loss = np.float(0)
       for j in seq:
-        print j
+        # print j
         one_data_dict = self._get_one_data(j)
         grad, tmp_loss = self.compute_path_flow_grad_and_loss(one_data_dict, f_e)
         if adagrad:
@@ -216,3 +216,59 @@ class DODE():
 
   def generate_route_choice(self):
     pass
+
+
+class PDODE(DODE, object):
+  def __init__(self, nb, config):
+    super(PDODE, self).__init__(nb, config)
+    # self.k = config['k']
+
+
+  def init_path_distribution(self, flow_mean_scale = 1, flow_variance_scale = 1):
+    f_u = np.random.rand(self.num_assign_interval * self.num_path) * flow_mean_scale
+    f_sigma = np.random.rand(self.num_assign_interval * self.num_path) * flow_variance_scale
+    return (f_u, f_sigma)
+
+
+  def generate_standard_normal(self):
+    return np.random.randn(self.num_assign_interval * self.num_path)
+
+
+  def dod_forward(self, stdnorm, f_u, f_sigma):
+    return stdnorm * f_sigma + f_u
+
+  def dod_backward(self, stdnorm, f_u, f_sigma, g):
+    return (g, stdnorm * g)
+
+
+  def estimate_path_flow(self, init_scale = 0.1, step_size = 0.1, max_epoch = 100, adagrad = False):
+    # print "Init"
+    (f_u, f_sigma) = self.init_path_distribution(init_scale)
+    # print "Start loop"
+    for i in range(max_epoch):
+      if adagrad:
+        sum_g_u_square = 1e-6
+        sum_g_sigma_square = 1e-6
+      seq = np.random.permutation(self.num_data)
+      loss = np.float(0)
+      for j in seq:
+        # print j
+        stdnorm = self.generate_standard_normal()
+        f_e_one = self.dod_forward(stdnorm, f_u, f_sigma)
+        f_e_one = np.maximum(f_e_one, 1e-3)
+        one_data_dict = self._get_one_data(j)
+        grad, tmp_loss = self.compute_path_flow_grad_and_loss(one_data_dict, f_e_one)
+        (g_u, g_sigma) = self.dod_backward(stdnorm, f_u, f_sigma, grad)
+        if adagrad:
+          sum_g_u_square = sum_g_u_square + np.power(g_u, 2)
+          sum_g_sigma_square = sum_g_sigma_square + np.power(g_sigma, 2)
+          f_u -= step_size * g_u / np.sqrt(sum_g_u_square)
+          f_sigma -= step_size * g_sigma / np.sqrt(sum_g_sigma_square)
+        else:
+          f_u -= g_u * step_size / np.sqrt(i+1)
+          f_sigma -= g_sigma * step_size / np.sqrt(i+1)
+        f_u = np.maximum(f_u, 1e-3)
+        f_sigma = np.maximum(f_sigma, 1e-3)
+        loss += tmp_loss
+      print "Epoch:", i, "Loss:", loss / np.float(self.num_data)
+    return f_u, f_sigma

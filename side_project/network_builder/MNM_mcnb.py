@@ -36,8 +36,11 @@ class MNM_dlink():
     self.convert_factor = convert_factor
 
 
-  def get_fft(self):
-    return self.length / self.ffs * 3600
+  def get_car_fft(self):
+    return self.length / self.ffs_car * 3600
+
+  def get_truck_fft(self):
+    return self.length / self.ffs_truck * 3600
 
   def is_ok(self, unit_time = 5):
     assert(self.length > 0.0)
@@ -393,6 +396,7 @@ class MNM_pathtable():
     for i in range(len(log)):
       tmp_portions = np.array(log[i].strip().split()).astype(np.float)
       self.ID2path[i].attach_route_choice_portions(tmp_portions)
+      self.ID2path[i].attach_route_choice_portions_truck(tmp_portions)
 
   def __str__(self):
     return "MNM_pathtable, number of paths:" + str(len(self.ID2path)) 
@@ -698,10 +702,13 @@ class MNM_network_builder():
         truck_demand = self.path_table.path_dict[O_node][D_node].normalize_truck_route_portions(sum_to_OD = True)
         self.demand.add_demand(O, D, demand, truck_demand, overwriting = True)
     self.route_choice_flag = True
-  # def get_path_flow(self):
-  #   f = np.zeros((self.config.config_dict['DTA']['max_interval'], len(self.path_table.ID2path)))
-  #   for i, ID in enumerate(self.path_table.ID2path.keys()):
-  #     path = self.path_table.ID2path[ID]
-  #     # print path.route_portions
-  #     f[:, i] = path.route_portions * self.demand.demand_dict[self.od.O_dict.inv[path.origin_node]][self.od.D_dict.inv[path.destination_node]]
-  #   return f.flatten()
+
+  def get_path_flow(self):
+    f = np.zeros((self.config.config_dict['DTA']['max_interval'], len(self.path_table.ID2path)))
+    f_truck = np.zeros((self.config.config_dict['DTA']['max_interval'], len(self.path_table.ID2path)))
+    for i, ID in enumerate(self.path_table.ID2path.keys()):
+      path = self.path_table.ID2path[ID]
+      # print path.route_portions
+      f[:, i] = path.route_portions * self.demand.demand_dict[self.od.O_dict.inv[path.origin_node]][self.od.D_dict.inv[path.destination_node]][0]
+      f_truck[:, i] = path.truck_route_portions  * self.demand.demand_dict[self.od.O_dict.inv[path.origin_node]][self.od.D_dict.inv[path.destination_node]][1]
+    return f.flatten(), f_truck[:, i].flatten()

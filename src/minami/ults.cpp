@@ -15,10 +15,17 @@ TInt MNM_Ults::round(TFlt in)
     return TInt(floorN);
 }
 
+TInt MNM_Ults::min(TInt a, TInt b)
+{
+  return a<b? a:b;
+}
+
+
 TFlt MNM_Ults::min(TFlt a, TFlt b)
 {
   return a<b? a:b;
 }
+
 
 TFlt MNM_Ults::max(TFlt a, TFlt b)
 {

@@ -33,6 +33,7 @@ class MNM_Ults
 public:
   TInt static round(TFlt in);
   TFlt static min(TFlt a, TFlt b);
+  TInt static min(TInt a, TInt b);
   TFlt static max(TFlt a, TFlt b);
   TFlt static divide(TFlt a, TFlt b);
   TInt static mod(TInt a, TInt b);

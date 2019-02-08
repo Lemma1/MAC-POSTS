@@ -6,6 +6,7 @@ import time
 import shutil
 from scipy.sparse import coo_matrix, csr_matrix
 import pickle
+import multiprocessing as mp
 
 import MNMAPI
 
@@ -58,12 +59,12 @@ class MCDODE():
       self._add_truck_link_flow_data(data_dict['truck_link_flow'])
     if self.config['use_car_link_tt']:
       self._add_car_link_tt_data(data_dict['car_link_tt'])
-    if self.config['use_car_link_tt']:
+    if self.config['use_truck_link_tt']:
       self._add_truck_link_tt_data(data_dict['truck_link_tt'])
 
-  def _run_simulation(self, f_car, f_truck):
+  def _run_simulation(self, f_car, f_truck, counter = 0):
     hash1 = hashlib.sha1()
-    hash1.update(str(time.time()))
+    hash1.update(str(time.time()) + str(counter))
     new_folder = str(hash1.hexdigest())
     self.nb.update_demand_path2(f_car, f_truck)
     self.nb.config.config_dict['DTA']['total_interval'] = self.num_loading_interval
@@ -117,9 +118,9 @@ class MCDODE():
     f_truck =  np.random.rand(self.num_assign_interval * self.num_path) * truck_scale
     return (f_car, f_truck)
 
-  def compute_path_flow_grad_and_loss(self, one_data_dict, f_car, f_truck):
+  def compute_path_flow_grad_and_loss(self, one_data_dict, f_car, f_truck, counter = 0):
     # print "Running simulation", time.time()
-    dta = self._run_simulation(f_car, f_truck)
+    dta = self._run_simulation(f_car, f_truck, counter)
     # print "Getting DAR", time.time()
     (car_dar, truck_dar) = self.get_dar(dta, f_car, f_truck)
     # print "Evaluating grad", time.time()
@@ -130,11 +131,13 @@ class MCDODE():
       car_grad += self.config['link_car_flow_weight'] * self._compute_grad_on_car_link_flow(dta, one_data_dict)
     if self.config['use_truck_link_flow']:
       truck_grad += self.config['link_truck_flow_weight'] * self._compute_grad_on_truck_link_flow(dta, one_data_dict)
-    # if self.config['use_link_tt']:
-    #   grad += self.config['link_tt_weight'] * self._compute_grad_on_link_tt(dta, one_data_dict['link_tt'])
+    if self.config['use_car_link_tt']:
+      car_grad += self.config['link_car_tt_weight'] * self._compute_grad_on_car_link_tt(dta, one_data_dict)
+    if self.config['use_truck_link_tt']:
+      truck_grad += self.config['link_truck_tt_weight'] * self._compute_grad_on_truck_link_tt(dta, one_data_dict)
     # print "Getting Loss", time.time()
-    loss = self._get_loss(one_data_dict, dta)
-    return  car_dar.T.dot(car_grad), truck_dar.T.dot(truck_grad), loss
+    total_loss, loss_dict  = self._get_loss(one_data_dict, dta)
+    return  car_dar.T.dot(car_grad), truck_dar.T.dot(truck_grad), total_loss, loss_dict
 
   def _compute_grad_on_car_link_flow(self, dta, one_data_dict):
     link_flow_array = one_data_dict['car_link_flow']
@@ -156,16 +159,31 @@ class MCDODE():
     if self.config['truck_count_agg']:
         x_e = one_data_dict['truck_count_agg_L'].dot(x_e)
     grad = -np.nan_to_num(link_flow_array - x_e)
+    # if self.config['truck_count_agg']:
+    #   grad = one_data_dict['truck_count_agg_L'].T.dot(grad)
+    return grad
+
+  def _compute_grad_on_car_link_tt(self, dta, one_data_dict):
+    tt_e = dta.get_car_link_tt(np.arange(0, self.num_loading_interval, self.ass_freq)).flatten(order = 'F')
+    tt_free = np.tile(list(map(lambda x: self.nb.get_link(x).get_car_fft(), self.observed_links)), (self.num_assign_interval)) / self.nb.config.config_dict['DTA']['unit_time']
+    tt_e = np.maximum(tt_e, tt_free)
+    tt_o = np.maximum(one_data_dict['car_link_tt'], tt_free) 
+    # tt_o = one_data_dict['car_link_tt']
+    grad = -np.nan_to_num(tt_o - tt_e)
+    # if self.config['car_count_agg']:
+    #   grad = one_data_dict['car_count_agg_L'].T.dot(grad)
+    # print tt_e, tt_o
+    return grad
+
+  def _compute_grad_on_truck_link_tt(self, dta, one_data_dict):
+    tt_e = dta.get_truck_link_tt(np.arange(0, self.num_loading_interval, self.ass_freq)).flatten(order = 'F')
+    tt_free = np.tile(list(map(lambda x: self.nb.get_link(x).get_truck_fft(), self.observed_links)), (self.num_assign_interval))
+    tt_e = np.maximum(tt_e, tt_free)
+    tt_o = np.maximum(one_data_dict['truck_link_tt'], tt_free)
+    grad = -np.nan_to_num(tt_o - tt_e)
     if self.config['truck_count_agg']:
       grad = one_data_dict['truck_count_agg_L'].T.dot(grad)
     return grad
-
-  # def _compute_grad_on_link_tt(self, dta, link_flow_array):
-  #   tt_e = dta.get_link_tt(np.arange(0, self.num_loading_interval, self.ass_freq))
-  #   tt_free = list(map(lambda x: self.nb.get_link(x).get_fft(), self.observed_links))
-  #   for i in range(tt_e.shape[0]):
-  #     pass
-
 
   def _get_one_data(self, j):
     assert (self.num_data > j)
@@ -186,20 +204,34 @@ class MCDODE():
 
 
   def _get_loss(self, one_data_dict, dta):
-    loss = np.float(0)
+    loss_dict = dict()
     if self.config['use_car_link_flow']:
       x_e = dta.get_link_car_inflow(np.arange(0, self.num_loading_interval, self.ass_freq), 
                   np.arange(0, self.num_loading_interval, self.ass_freq) + self.ass_freq).flatten(order = 'F')
       if self.config['car_count_agg']:
         x_e = one_data_dict['car_count_agg_L'].dot(x_e)
-      loss += self.config['link_car_flow_weight'] * np.linalg.norm(np.nan_to_num(x_e - one_data_dict['car_link_flow']))
+      loss = self.config['link_car_flow_weight'] * np.linalg.norm(np.nan_to_num(x_e - one_data_dict['car_link_flow']))
+      loss_dict['car_count_loss'] = loss
     if self.config['use_truck_link_flow']:
       x_e = dta.get_link_truck_inflow(np.arange(0, self.num_loading_interval, self.ass_freq), 
                   np.arange(0, self.num_loading_interval, self.ass_freq) + self.ass_freq).flatten(order = 'F')
       if self.config['truck_count_agg']:
         x_e = one_data_dict['truck_count_agg_L'].dot(x_e)
-      loss += self.config['link_truck_flow_weight'] * np.linalg.norm(np.nan_to_num(x_e - one_data_dict['truck_link_flow']))
-    return loss
+      loss = self.config['link_truck_flow_weight'] * np.linalg.norm(np.nan_to_num(x_e - one_data_dict['truck_link_flow']))
+      loss_dict['truck_count_loss'] = loss
+    if self.config['use_car_link_tt']:
+      x_tt_e = dta.get_car_link_tt(np.arange(0, self.num_loading_interval, self.ass_freq)).flatten(order = 'F')
+      loss = self.config['link_car_tt_weight'] * np.linalg.norm(np.nan_to_num(x_tt_e - one_data_dict['car_link_tt']))
+      loss_dict['car_tt_loss'] = loss
+    if self.config['use_truck_link_tt']:
+      x_tt_e = dta.get_truck_link_tt(np.arange(0, self.num_loading_interval, self.ass_freq)).flatten(order = 'F')
+      loss = self.config['link_truck_tt_weight'] * np.linalg.norm(np.nan_to_num(x_tt_e - one_data_dict['truck_link_tt']))
+      loss_dict['truck_tt_loss'] = loss
+
+    total_loss = 0.0
+    for loss_type, loss_value in loss_dict.items():
+      total_loss += loss_value
+    return total_loss, loss_dict
 
 
 
@@ -218,9 +250,10 @@ class MCDODE():
       seq = np.random.permutation(self.num_data)
       loss = np.float(0)
       # print "Start iteration", time.time()
+      loss_dict = {'car_count_loss':0.0, 'truck_count_loss':0.0, 'car_tt_loss':0.0, 'truck_tt_loss':0.0}
       for j in seq:
         one_data_dict = self._get_one_data(j)
-        car_grad, truck_grad, tmp_loss = self.compute_path_flow_grad_and_loss(one_data_dict, f_car, f_truck)
+        car_grad, truck_grad, tmp_loss, tmp_loss_dict = self.compute_path_flow_grad_and_loss(one_data_dict, f_car, f_truck)
         # print "gradient", car_grad, truck_grad
         if adagrad:
           sum_g_square_car = sum_g_square_car + np.power(car_grad, 2)
@@ -234,14 +267,82 @@ class MCDODE():
         f_truck = np.maximum(f_truck, 1e-3)
         f_truck = np.minimum(f_truck, 10)
         loss += tmp_loss
-      loss_list.append(loss)
-      print "Epoch:", i, "Loss:", loss / np.float(self.num_data), time.time()
+        for loss_type, loss_value in tmp_loss_dict.items():
+          loss_dict[loss_type] += loss_value / np.float(self.num_data)
+      print "Epoch:", i, "Loss:", loss / np.float(self.num_data), loss_dict
       # print f_car, f_truck
       # break
       if store_folder is not None:
         pickle.dump((f_car, f_truck, loss), open(os.path.join(store_folder, str(i) + 'iteration.pickle'), 'wb'))
+      loss_list.append([loss, loss_dict])
     return (f_car, f_truck, loss_list)
 
+  def compute_path_flow_grad_and_loss_mpwrapper(self, one_data_dict, f_car, f_truck, j, output):
+    car_grad, truck_grad, tmp_loss, tmp_loss_dict = self.compute_path_flow_grad_and_loss(one_data_dict, f_car, f_truck, counter = j)
+    # print "finished original grad loss"
+    output.put([car_grad, truck_grad, tmp_loss, tmp_loss_dict])
+    # output.put(grad)
+    # print "finished put"
+    return
+
+  def estimate_path_flow_mp(self, step_size = 0.1, max_epoch = 10, car_init_scale = 10, 
+                              truck_init_scale = 1, store_folder = None, use_file_as_init = None,
+                              adagrad = False, n_process = 4):
+    if use_file_as_init is None:
+      (f_car, f_truck) = self.init_path_flow(car_scale = car_init_scale, truck_scale = truck_init_scale)
+    else:
+      (f_car, f_truck, _) = pickle.load(open(use_file_as_init, 'rb'))
+    loss_list = list()
+    # print "Start iteration", time.time()
+    for i in range(max_epoch):
+      if adagrad:
+        sum_g_square_car = 1e-6
+        sum_g_square_truck = 1e-6
+      seq = np.random.permutation(self.num_data)
+      split_seq = np.array_split(seq, np.maximum(1, int(self.num_data/n_process)))
+      loss = np.float(0)
+      loss_dict = {'car_count_loss':0.0, 'truck_count_loss':0.0, 'car_tt_loss':0.0, 'truck_tt_loss':0.0}
+      for part_seq in split_seq:
+        output = mp.Queue()
+        processes = [mp.Process(target=self.compute_path_flow_grad_and_loss_mpwrapper, args=(self._get_one_data(j), f_car, f_truck, j, output)) for j in part_seq]
+        for p in processes:
+          p.start()
+        results = list()
+        while 1:
+          running = any(p.is_alive() for p in processes)
+          while not output.empty():
+             results.append(output.get())
+          if not running:
+              break
+        for p in processes:
+          p.join()
+        # results = [output.get() for p in processes]
+        for res in results:
+          [car_grad, truck_grad, tmp_loss, tmp_loss_dict] = res
+          loss += tmp_loss
+          for loss_type, loss_value in tmp_loss_dict.items():
+            loss_dict[loss_type] += loss_value / np.float(self.num_data)
+          if adagrad:
+            sum_g_square_car = sum_g_square_car + np.power(car_grad, 2)
+            sum_g_square_truck = sum_g_square_truck + np.power(truck_grad, 2)
+            f_car = f_car - step_size * car_grad / np.sqrt(sum_g_square_car)
+            f_truck = f_truck - step_size * truck_grad / np.sqrt(sum_g_square_truck)
+          else:
+            f_car -= car_grad * step_size / np.sqrt(i+1)
+            f_truck -= truck_grad * step_size / np.sqrt(i+1)       
+          f_car = np.maximum(f_car, 1e-3)
+          f_truck = np.maximum(f_truck, 1e-3)
+        # f_truck = np.minimum(f_truck, 10)
+      print "Epoch:", i, "Loss:", loss / np.float(self.num_data)
+      if store_folder is not None:
+        pickle.dump((f_car, f_truck, loss), open(os.path.join(store_folder, str(i) + 'iteration.pickle'), 'wb'))
+      loss_list.append([loss, loss_dict])
+    return (f_car, f_truck, loss_list)
 
   def generate_route_choice(self):
+    pass
+
+
+def print_separate_accuracy(loss_dict):
+  for loss_type, loss_value in tmp_loss_dict.items():
     pass
