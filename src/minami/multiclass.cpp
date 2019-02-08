@@ -1998,6 +1998,72 @@ int MNM_Origin_Multiclass::release_one_interval(TInt current_interval,
  	return 0;
 }
 
+int MNM_Origin_Multiclass::release_one_interval_biclass(TInt current_interval, 
+														MNM_Veh_Factory* veh_factory, 
+														TInt assign_interval, 
+														TFlt adaptive_ratio_car,
+														TFlt adaptive_ratio_truck)
+{
+	if (assign_interval < 0) return 0;
+	TInt _veh_to_release;
+	MNM_Veh_Multiclass *_veh;
+	MNM_Veh_Factory_Multiclass *_vfactory = dynamic_cast<MNM_Veh_Factory_Multiclass *>(veh_factory);
+	// release all car
+	for (auto _demand_it = m_demand_car.begin(); _demand_it != m_demand_car.end(); _demand_it++) {
+		_veh_to_release = TInt(MNM_Ults::round((_demand_it -> second)[assign_interval] * m_flow_scalar));
+		for (int i = 0; i < _veh_to_release; ++i) {
+			if (adaptive_ratio_car == TFlt(0)){
+				_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_STATIC, TInt(0));
+			}
+			else if (adaptive_ratio_car == TFlt(1)){
+				_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(0));
+			}
+			else{
+				TFlt _r = MNM_Ults::rand_flt();
+				if (_r <= adaptive_ratio_car){
+					_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(0));
+				}
+				else{
+					_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_STATIC, TInt(0));
+				}
+			}
+			_veh -> set_destination(_demand_it -> first);
+			_veh -> set_origin(this);
+			_veh -> m_assign_interval = assign_interval;
+			m_origin_node -> m_in_veh_queue.push_back(_veh);
+		}
+	}
+	// release all truck
+	for (auto _demand_it = m_demand_truck.begin(); _demand_it != m_demand_truck.end(); _demand_it++) {
+		_veh_to_release = TInt(MNM_Ults::round((_demand_it -> second)[assign_interval] * m_flow_scalar));
+		for (int i = 0; i < _veh_to_release; ++i) {
+			if (adaptive_ratio_truck == TFlt(0)){
+				_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_STATIC, TInt(1));
+			}
+			else if (adaptive_ratio_truck == TFlt(1)){
+				_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(1));
+			}
+			else{
+				TFlt _r = MNM_Ults::rand_flt();
+				if (_r <= adaptive_ratio_truck){
+					_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_ADAPTIVE, TInt(1));
+				}
+				else{
+					_veh = _vfactory -> make_veh_multiclass(current_interval, MNM_TYPE_STATIC, TInt(1));
+				}
+			}
+			_veh -> set_destination(_demand_it -> first);
+			_veh -> set_origin(this);
+			_veh -> m_assign_interval = assign_interval;
+			m_origin_node -> m_in_veh_queue.push_back(_veh);
+		}
+	}
+	random_shuffle(m_origin_node -> m_in_veh_queue.begin(), m_origin_node -> m_in_veh_queue.end());
+ 	return 0;
+}
+
+
+
 /**************************************************************************
                           		Destination
 **************************************************************************/

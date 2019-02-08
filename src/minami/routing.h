@@ -96,6 +96,39 @@ public:
 
 
 
+// ============================ For seperate routing by vehicle class ============================
+// Fixed routing for cars and trucks.
+class MNM_Routing_Biclass_Fixed : public MNM_Routing_Fixed
+{
+public:
+  MNM_Routing_Biclass_Fixed(PNEGraph &graph,
+              MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, 
+              MNM_Link_Factory *link_factory, TInt route_frq = TInt(-1));
+  ~MNM_Routing_Biclass_Fixed();
+  int update_routing(TInt timestamp, TInt veh_class);
+};
+
+// Hybrid routing for cars and trucks.
+// For adaptive vehicles: cars and trucks route together
+// For static (fixed-route) vehicles: cars & trucks have different path_tables and buffers
+class MNM_Routing_Biclass_Hybrid : public MNM_Routing
+{
+public:
+  MNM_Routing_Biclass_Hybrid(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, MNM_OD_Factory *od_factory, 
+                    MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory, TInt route_frq_fixed = TInt(-1));
+  ~MNM_Routing_Biclass_Hybrid();
+  int init_routing(Path_Table *path_table_car=NULL, Path_Table *path_table_truck=NULL);
+  int virtual update_routing(TInt timestamp) override;
+
+  MNM_Routing_Adaptive* m_routing_adaptive;
+  MNM_Routing_Biclass_Fixed* m_routing_fixed_car;
+  MNM_Routing_Biclass_Fixed* m_routing_fixed_truck;
+};
+// ============================ For seperate routing by vehicle class ============================
+
+
+
+
 // ==================== For SO-DTA, by pinchao =========================//
 class MNM_Routing_Predetermined : public MNM_Routing
 {

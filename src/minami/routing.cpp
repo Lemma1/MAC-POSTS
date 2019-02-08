@@ -488,3 +488,148 @@ int MNM_Routing_Hybrid::update_routing(TInt timestamp)
   m_routing_fixed -> update_routing(timestamp);
   return 0;
 }
+
+
+
+
+
+
+/**************************************************************************
+                          Bi-class Hybrid routing
+**************************************************************************/
+MNM_Routing_Biclass_Hybrid::MNM_Routing_Biclass_Hybrid(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, 
+  MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory, TInt route_frq_fixed)
+  : MNM_Routing::MNM_Routing(graph, od_factory, node_factory, link_factory)
+{
+  m_routing_adaptive = new MNM_Routing_Adaptive(file_folder, graph, statistics, od_factory, node_factory, link_factory);
+  m_routing_fixed_car = new MNM_Routing_Biclass_Fixed(graph, od_factory, node_factory, link_factory, route_frq_fixed);
+  m_routing_fixed_truck = new MNM_Routing_Biclass_Fixed(graph, od_factory, node_factory, link_factory, route_frq_fixed);
+}
+
+MNM_Routing_Biclass_Hybrid::~MNM_Routing_Biclass_Hybrid()
+{
+  delete m_routing_adaptive;
+  delete m_routing_fixed_car;
+  delete m_routing_fixed_truck;
+}
+
+int MNM_Routing_Biclass_Hybrid::init_routing(Path_Table *path_table_car, Path_Table *path_table_truck)
+{
+  m_routing_adaptive -> init_routing();
+  // printf("Finished init all ADAPTIVE vehicles routing\n");
+  m_routing_fixed_car -> init_routing(path_table_car);
+  // printf("Finished init STATIC cars routing\n");
+  m_routing_fixed_truck -> init_routing(path_table_truck);
+  // printf("Finished init STATIC trucks routing\n");
+  return 0;
+}
+
+int MNM_Routing_Biclass_Hybrid::update_routing(TInt timestamp)
+{
+  m_routing_adaptive -> update_routing(timestamp);
+  // printf("Finished update all ADAPTIVE vehicles routing\n");
+  m_routing_fixed_car -> update_routing(timestamp, TInt(0));
+  // printf("Finished update STATIC cars routing\n");
+  m_routing_fixed_truck -> update_routing(timestamp, TInt(1));
+  // printf("Finished update STATIC trucks routing\n");
+  return 0;
+}
+
+/**************************************************************************
+                          Bi-class fixed routing
+**************************************************************************/
+MNM_Routing_Biclass_Fixed::MNM_Routing_Biclass_Fixed(PNEGraph &graph,
+              MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, 
+              MNM_Link_Factory *link_factory, TInt routing_frq)
+:MNM_Routing_Fixed::MNM_Routing_Fixed(graph, od_factory, node_factory, link_factory, routing_frq)
+{
+  ;
+}
+
+MNM_Routing_Biclass_Fixed::~MNM_Routing_Biclass_Fixed()
+{
+  ;
+}
+
+int MNM_Routing_Biclass_Fixed::update_routing(TInt timestamp, TInt veh_class)
+{
+  MNM_Origin *_origin;
+  MNM_DMOND *_origin_node;
+  TInt _node_ID, _next_link_ID;
+  MNM_Dlink *_next_link;
+  MNM_Veh *_veh;
+
+  if (m_buffer_as_p){
+    if (timestamp % m_routing_freq  == 0 || timestamp == 0) {
+      change_choice_portion(TInt(timestamp / m_routing_freq));
+    }
+  }
+
+  for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){
+    _origin = _origin_it -> second;
+    _origin_node = _origin -> m_origin_node;
+    _node_ID = _origin_node -> m_node_ID;
+    for (auto _veh_it = _origin_node -> m_in_veh_queue.begin(); _veh_it != _origin_node -> m_in_veh_queue.end(); _veh_it++){
+      _veh = *_veh_it;
+      
+      // Here is the difference from single class fixed routing
+      if ((_veh -> m_type == MNM_TYPE_STATIC) && (_veh -> m_class == veh_class)) {
+      // Here is the difference from single class fixed routing
+
+        if (m_tracker.find(_veh) == m_tracker.end()){
+          // printf("Registering!\n");
+          register_veh(_veh);
+          _next_link_ID = m_tracker.find(_veh) -> second -> front();
+          _next_link = m_link_factory -> get_link(_next_link_ID);
+          _veh -> set_next_link(_next_link);
+          m_tracker.find(_veh) -> second -> pop_front();
+        }
+      }
+    }
+  }
+  // printf("Finished route OD veh\n");
+
+  MNM_Destination *_veh_dest;
+  MNM_Dlink *_link;
+  for (auto _link_it = m_link_factory -> m_link_map.begin(); _link_it != m_link_factory -> m_link_map.end(); _link_it ++){
+    _link = _link_it -> second;
+    _node_ID = _link -> m_to_node -> m_node_ID;
+    for (auto _veh_it = _link -> m_finished_array.begin(); _veh_it != _link -> m_finished_array.end(); _veh_it++){
+      _veh = *_veh_it;
+
+      // Here is the difference from single class fixed routing
+      if ((_veh -> m_type == MNM_TYPE_STATIC) && (_veh -> m_class == veh_class)){
+      // Here is the difference from single class fixed routing
+
+        _veh_dest = _veh -> get_destination();
+        if (_veh_dest -> m_dest_node -> m_node_ID == _node_ID){
+          if (m_tracker.find(_veh) -> second -> size() != 0){
+            printf("Something wrong in fixed routing!\n");
+            exit(-1);
+          }
+          _veh -> set_next_link(NULL);
+        }
+        else{
+          if (m_tracker.find(_veh) == m_tracker.end()){
+            printf("Vehicle not registered in link, impossible!\n");
+            exit(-1);
+          }
+          if (_veh -> get_current_link() == _veh -> get_next_link()){
+            _next_link_ID = m_tracker.find(_veh) -> second -> front();
+            if (_next_link_ID == -1){
+              printf("Something wrong in routing, wrong next link 2\n");
+              printf("The node is %d, the vehicle should head to %d\n", (int)_node_ID, (int)_veh_dest -> m_dest_node -> m_node_ID);
+              exit(-1);
+            }
+            _next_link = m_link_factory -> get_link(_next_link_ID);
+            _veh -> set_next_link(_next_link);
+            m_tracker.find(_veh) -> second -> pop_front();
+          }
+        } //end if-else
+      } //end if veh->m_type
+    } //end for veh_it
+  } //end for link_it
+
+  return 0;
+}
+
