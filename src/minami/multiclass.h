@@ -371,6 +371,13 @@ public:
 									MNM_Veh_Factory* veh_factory, 
 									TInt assign_interval, 
 									TFlt adaptive_ratio) override;
+
+	int virtual release_one_interval_biclass(TInt current_interval, 
+									MNM_Veh_Factory* veh_factory, 
+									TInt assign_interval, 
+									TFlt adaptive_ratio_car,
+									TFlt adaptive_ratio_truck) override;
+
 	// use this one instead of add_dest_demand in the base class
 	int add_dest_demand_multiclass(MNM_Destination_Multiclass *dest, 
 								TFlt* demand_car, 

@@ -23,6 +23,13 @@ public:
   TInt m_Origin_ID;
   int virtual release(MNM_Veh_Factory* veh_factory, TInt current_interval);//TODO change to generalized version
   int virtual release_one_interval(TInt current_interval, MNM_Veh_Factory* veh_factory, TInt assign_interval, TFlt adaptive_ratio);
+
+  int virtual release_one_interval_biclass(TInt current_interval, 
+                                          MNM_Veh_Factory* veh_factory, 
+                                          TInt assign_interval, 
+                                          TFlt adaptive_ratio_car,
+                                          TFlt adaptive_ratio_truck){return 0;};
+
   int add_dest_demand(MNM_Destination *dest, TFlt* demand);
   MNM_DMOND *m_origin_node;
 // private:

@@ -7,6 +7,7 @@ MNM_Veh::MNM_Veh(TInt ID, TInt start_time) {
   m_start_time = start_time;
   m_finish_time = -1;
   m_assign_interval = -1;
+  m_class = TInt(0);
 }
 
 MNM_Veh::~MNM_Veh() {

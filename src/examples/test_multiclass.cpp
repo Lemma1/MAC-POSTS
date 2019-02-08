@@ -12,7 +12,7 @@ int main()
 	printf("BEGIN multiclass test!\n");
 
 	// On ubuntu (PC)
-	std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_MckeesRocks_SPC";
+	std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_SPC_seperate_Routing";
 	// std::string folder = "/home/lemma/Documents/MAC-POSTS/src/examples/mcDODE/a6e7b31067d2ead8d3725fc0ed587d06c958f63c";
 	// std::string folder = "/home/alanpi/Desktop/MAC-POSTS/data/input_files_7link_multiclass";
 
@@ -81,7 +81,7 @@ int main()
 			}
 		}
 		_current_inter += 1;
-		if (_current_inter > 600) break;
+		// if (_current_inter > 600) break;
 	}
 
 	// Output total travels and travel time, before divided by flow_scalar
