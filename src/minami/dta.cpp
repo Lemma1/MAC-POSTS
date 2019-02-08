@@ -16,17 +16,27 @@ MNM_Dta::MNM_Dta(std::string file_folder)
 MNM_Dta::~MNM_Dta()
 {
   if (m_emission != NULL) delete m_emission;
+  // printf("m_emission\n");
 
-  if (m_routing != NULL) delete m_routing;
+  if (m_routing != NULL) delete m_routing; 
+  // printf("m_routing\n");
   
   if (m_veh_factory != NULL) delete m_veh_factory;
+  // printf("m_veh_factory\n");
   if (m_node_factory != NULL) delete m_node_factory;
+  // printf("m_node_factory\n");
   if (m_link_factory != NULL) delete m_link_factory;
+  // printf("m_link_factory\n");
   if (m_od_factory != NULL) delete m_od_factory;
+  // printf("m_od_factory\n");
   if (m_config != NULL) delete m_config;
+  // printf("m_config\n");
   
   if (m_statistics != NULL) delete m_statistics;
+  // printf("m_statistics\n");
   if (m_workzone != NULL) delete m_workzone;
+  // printf("m_workzone\n");
+  
   m_graph -> Clr();
 
   m_queue_veh_num.clear();
@@ -118,31 +128,25 @@ int MNM_Dta::set_routing()
   }
 
   // Hybrid routing for bi-class vehicles.
+  // Note here still only one path_table and buffer, but in buffer file each row contains:
+  // Row #k : [probabilities choosing route k in all intervals for cars] [probabilities choosing route k in all intervals for trucks]
   // For Bi-class Fixed routing, just set both adaptive_ratio_car=0 & adaptive_ratio_truck=0 in "config.conf"
   else if (m_config -> get_string("routing_type") == "Biclass_Hybrid"){
     MNM_ConfReader* _tmp_conf = new MNM_ConfReader(m_file_folder + "/config.conf", "FIXED");
-    Path_Table *_path_table_car, *_path_table_truck;
-    if (_tmp_conf -> get_string("choice_portion_car") == "Buffer"){
-      _path_table_car = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf -> get_string("path_file_name_car"), 
-                      m_graph, _tmp_conf -> get_int("num_path_car"), true);
+    Path_Table *_path_table;
+    if (_tmp_conf -> get_string("choice_portion") == "Buffer"){
+      _path_table = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf -> get_string("path_file_name"), 
+                      m_graph, _tmp_conf -> get_int("num_path"), true);
     }
     else{
-      _path_table_car = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf -> get_string("path_file_name_car"), 
-                      m_graph, _tmp_conf -> get_int("num_path_car"), false);
+      _path_table = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf -> get_string("path_file_name"), 
+                      m_graph, _tmp_conf -> get_int("num_path"), false);
     }
-    if (_tmp_conf -> get_string("choice_portion_truck") == "Buffer"){
-      _path_table_truck = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf -> get_string("path_file_name_truck"), 
-                      m_graph, _tmp_conf -> get_int("num_path_truck"), true);
-    }
-    else{
-      _path_table_truck = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf -> get_string("path_file_name_truck"), 
-                      m_graph, _tmp_conf -> get_int("num_path_truck"), false);
-    }
-
+    TInt _buffer_len = _tmp_conf -> get_int("buffer_length");
     TInt _route_freq_fixed = _tmp_conf -> get_int("route_frq");
-    m_routing = new MNM_Routing_Biclass_Hybrid(m_file_folder, m_graph, m_statistics, m_od_factory, m_node_factory, m_link_factory, _route_freq_fixed);
-    MNM_Routing_Biclass_Hybrid *m_routing2 = dynamic_cast<MNM_Routing_Biclass_Hybrid *>(m_routing);
-    m_routing2 -> init_routing(_path_table_car, _path_table_truck);
+    m_routing = new MNM_Routing_Biclass_Hybrid(m_file_folder, m_graph, m_statistics, m_od_factory, 
+                                              m_node_factory, m_link_factory, _route_freq_fixed, _buffer_len);
+    m_routing -> init_routing(_path_table);
     delete _tmp_conf;
   }
 

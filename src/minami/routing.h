@@ -103,9 +103,13 @@ class MNM_Routing_Biclass_Fixed : public MNM_Routing_Fixed
 public:
   MNM_Routing_Biclass_Fixed(PNEGraph &graph,
               MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, 
-              MNM_Link_Factory *link_factory, TInt route_frq = TInt(-1));
+              MNM_Link_Factory *link_factory, TInt route_frq = TInt(-1), 
+              TInt buffer_length= TInt(-1), TInt veh_class = TInt(-1));
   ~MNM_Routing_Biclass_Fixed();
-  int update_routing(TInt timestamp, TInt veh_class);
+  int virtual update_routing(TInt timestamp) override;
+  int change_choice_portion(TInt interval);
+  TInt m_buffer_length;
+  TInt m_veh_class;
 };
 
 // Hybrid routing for cars and trucks.
@@ -115,9 +119,9 @@ class MNM_Routing_Biclass_Hybrid : public MNM_Routing
 {
 public:
   MNM_Routing_Biclass_Hybrid(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, MNM_OD_Factory *od_factory, 
-                    MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory, TInt route_frq_fixed = TInt(-1));
+    MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory, TInt route_frq_fixed = TInt(-1), TInt buffer_length = TInt(-1));
   ~MNM_Routing_Biclass_Hybrid();
-  int init_routing(Path_Table *path_table_car=NULL, Path_Table *path_table_truck=NULL);
+  int virtual init_routing(Path_Table *path_table=NULL) override;
   int virtual update_routing(TInt timestamp) override;
 
   MNM_Routing_Adaptive* m_routing_adaptive;
