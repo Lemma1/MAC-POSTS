@@ -9,12 +9,16 @@
 
 int main()
 {
-  std::string file_folder = "../../data/input_files_new_philly";
+  // std::string file_folder = "../../data/input_files_new_philly";
+  std::string file_folder = "../../data/input_files_SR41";
   MNM_ConfReader *conf_reader = new MNM_ConfReader(file_folder + "/config.conf", "DTA");
+  // printf("1\n");
   PNEGraph graph = MNM_IO::build_graph(file_folder, conf_reader);
+  // printf("2\n");
   // TInt dest_node_ID = graph -> GetRndNId();
-  TInt dest_node_ID = 151632;
-  TInt max_interval = 4000;
+  TInt dest_node_ID = 1603;
+  TInt ori_node_ID = 1124;
+  TInt max_interval = 10000;
 
   std::unordered_map<TInt, TFlt*> cost_map = std::unordered_map<TInt, TFlt*>();
   TFlt *tmp;
@@ -43,10 +47,16 @@ int main()
   printf("Update tree\n");
   tdst_tree -> update_tree(cost_map);
   TFlt tmp_tt;
+  MNM_Path *_path;
   for (int i=0; i<max_interval; ++i){
     printf("get distance to dest\n");
-    tmp_tt = tdst_tree -> get_distance_to_destination(101152, TFlt(i));
+    tmp_tt = tdst_tree -> get_distance_to_destination(ori_node_ID, TFlt(i));
     printf("At time %d, minimum tt is %f\n", i, tmp_tt());
+    _path = new MNM_Path();
+    tdst_tree -> get_tdsp(ori_node_ID, i, cost_map, 
+                            _path);
+    printf("Path length %d\n", int(_path -> m_node_vec.size()));
+    delete _path;
   }
   
   for (auto e = graph->BegEI(); e < graph->EndEI(); e++) {

@@ -80,7 +80,9 @@ public:
   int initialize();
   int update_tree(std::unordered_map<TInt, TFlt*>& cost_map);
   TFlt get_distance_to_destination(TInt node_ID, TFlt time_stamp);
-  int get_tdsp(TInt src_node_ID, TInt time, MNM_Path* path);
+  int get_tdsp(TInt src_node_ID, TInt time, 
+        std::unordered_map<TInt, TFlt*>& cost_map,MNM_Path* path);
+  int round_time(TFlt time_stamp);
   std::unordered_map<TInt, TFlt*> m_dist;
   std::unordered_map<TInt, TInt*> m_tree;
   TInt m_dest_node_ID;
