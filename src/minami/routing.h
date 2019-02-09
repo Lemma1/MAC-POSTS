@@ -63,7 +63,8 @@ class MNM_Routing_Fixed : public MNM_Routing
 public:
   MNM_Routing_Fixed(PNEGraph &graph,
               MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, 
-              MNM_Link_Factory *link_factory, TInt route_frq = TInt(-1));
+              MNM_Link_Factory *link_factory, 
+              TInt route_frq = TInt(-1), TInt buffer_len = TInt(-1));
   ~MNM_Routing_Fixed();
   int virtual init_routing(Path_Table *path_table=NULL) override;
   int virtual update_routing(TInt timestamp) override;
@@ -76,6 +77,7 @@ public:
   std::unordered_map<MNM_Veh*, std::deque<TInt>*> m_tracker;
   bool m_buffer_as_p;
   TInt m_routing_freq;
+  TInt m_buffer_length;
   // TInt m_cur_routing_interval;
 };
 
@@ -85,7 +87,8 @@ class MNM_Routing_Hybrid : public MNM_Routing
 {
 public:
   MNM_Routing_Hybrid(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, MNM_OD_Factory *od_factory, 
-                    MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory, TInt route_frq_fixed = TInt(-1));
+                    MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory,
+                     TInt route_frq_fixed = TInt(-1), TInt buffer_len = TInt(-1));
   ~MNM_Routing_Hybrid();
   int virtual init_routing(Path_Table *path_table=NULL) override;
   int virtual update_routing(TInt timestamp) override;

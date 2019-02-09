@@ -103,10 +103,10 @@ int MNM_Pathset::normalize_p()
   TFlt _tot_p = TFlt(0);
   TFlt _min_p = TFlt(0);
   for (MNM_Path *_path : m_path_vec){
-    // if (_path -> m_p < 0){
-    //   printf("Negative probability, impossible!\n");
-    //   exit(-1);
-    // }
+    if (_path -> m_p < 0){
+      printf("Negative probability, impossible!\n");
+      exit(-1);
+    }
     if (_path -> m_p < _min_p){
       _min_p = _path -> m_p;
     }
@@ -421,10 +421,11 @@ int copy_buffer_to_p(Path_Table *path_table, TInt col)
 {
   // printf("Entering MNM::copy_buffer_to_p\n");
   // printf("path table is %p\n", path_table);
-
+  IAssert(col >= 0); 
   for(auto _it : *path_table){
     for (auto _it_it : *(_it.second)){
       for (MNM_Path* _path : _it_it.second -> m_path_vec){
+        IAssert(_path -> m_buffer_length > col); 
         _path -> m_p = _path -> m_buffer[col];
       }
     }

@@ -106,7 +106,9 @@ int MNM_Dta::set_routing()
       _path_table = MNM_IO::load_path_table(m_file_folder + "/" + _tmp_conf -> get_string("path_file_name"), 
                       m_graph, _tmp_conf -> get_int("num_path"), false);
     }
-    m_routing = new MNM_Routing_Fixed(m_graph, m_od_factory, m_node_factory, m_link_factory, _tmp_conf -> get_int("route_frq"));
+    TInt _buffer_len = _tmp_conf -> get_int("buffer_length");
+    m_routing = new MNM_Routing_Fixed(m_graph, m_od_factory, m_node_factory, m_link_factory,
+               _tmp_conf -> get_int("route_frq"), _buffer_len);
     m_routing -> init_routing(_path_table);
     delete _tmp_conf;
   }
@@ -131,7 +133,9 @@ int MNM_Dta::set_routing()
                       m_graph, _tmp_conf -> get_int("num_path"), false);
     }
     TInt _route_freq_fixed = _tmp_conf -> get_int("route_frq");
-    m_routing = new MNM_Routing_Hybrid(m_file_folder, m_graph, m_statistics, m_od_factory, m_node_factory, m_link_factory, _route_freq_fixed);
+    TInt _buffer_len = _tmp_conf -> get_int("buffer_length");
+    m_routing = new MNM_Routing_Hybrid(m_file_folder, m_graph, m_statistics, m_od_factory, m_node_factory, 
+                            m_link_factory, _route_freq_fixed, _buffer_len);
     m_routing -> init_routing(_path_table);
     delete _tmp_conf;
   }
@@ -154,7 +158,8 @@ int MNM_Dta::set_routing()
     TInt _buffer_len = _tmp_conf -> get_int("buffer_length");
     TInt _route_freq_fixed = _tmp_conf -> get_int("route_frq");
     m_routing = new MNM_Routing_Biclass_Hybrid(m_file_folder, m_graph, m_statistics, m_od_factory, 
-                                              m_node_factory, m_link_factory, _route_freq_fixed, _buffer_len);
+                                              m_node_factory, m_link_factory, 
+                                              _route_freq_fixed, _buffer_len);
     m_routing -> init_routing(_path_table);
     delete _tmp_conf;
   }
@@ -476,6 +481,17 @@ int MNM_Dta::loading(bool verbose)
             if (_ad_ratio > 1) _ad_ratio = 1;
             if (_ad_ratio < 0) _ad_ratio = 0;
             _origin -> release_one_interval(_cur_int, m_veh_factory, _assign_inter, _ad_ratio);
+          }
+          else if((m_config -> get_string("routing_type") == "Biclass_Hybrid")){
+            TFlt _ad_ratio_car = m_config -> get_float("adaptive_ratio_car");
+            if (_ad_ratio_car > 1) _ad_ratio_car = 1;
+            if (_ad_ratio_car < 0) _ad_ratio_car = 0;
+
+            TFlt _ad_ratio_truck = m_config -> get_float("adaptive_ratio_truck");
+            if (_ad_ratio_truck > 1) _ad_ratio_truck = 1;
+            if (_ad_ratio_truck < 0) _ad_ratio_truck = 0;
+            // NOTE: in this case the release function is different
+            _origin -> release_one_interval_biclass(_cur_int, m_veh_factory, _assign_inter, _ad_ratio_car, _ad_ratio_truck);
           }
           else{
             printf("WARNING:No assignemnt!\n");

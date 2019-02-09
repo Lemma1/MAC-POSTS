@@ -1647,9 +1647,9 @@ int MNM_Dnode_Inout_Multiclass::move_vehicle(TInt timestamp)
 									// if (_olink -> m_N_out_tree_car != NULL) {
 									// 	_olink -> m_N_out_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
 									// }
-									// if (_ilink -> m_N_in_tree_car != NULL) {
-									// 	_ilink -> m_N_in_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
-									// }
+									if (_ilink -> m_N_in_tree_car != NULL) {
+										_ilink -> m_N_in_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+									}
 								}
 								else {
 									m_veh_moved_truck[i * _offset + j] += 1;
@@ -1658,9 +1658,9 @@ int MNM_Dnode_Inout_Multiclass::move_vehicle(TInt timestamp)
 									// if (_olink -> m_N_out_tree_truck != NULL) {
 									// 	_olink -> m_N_out_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
 									// }
-									// if (_ilink -> m_N_in_tree_truck != NULL) {
-									// 	_ilink -> m_N_in_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
-									// }
+									if (_ilink -> m_N_in_tree_truck != NULL) {
+										_ilink -> m_N_in_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+									}
 								}
 								_veh_it = _in_link -> m_finished_array.erase(_veh_it);
 							}
@@ -1675,9 +1675,9 @@ int MNM_Dnode_Inout_Multiclass::move_vehicle(TInt timestamp)
 								// if (_olink -> m_N_out_tree_car != NULL) {
 								// 	_olink -> m_N_out_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
 								// }
-								// if (_ilink -> m_N_in_tree_car != NULL) {
-								// 	_ilink -> m_N_in_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
-								// }
+								if (_ilink -> m_N_in_tree_car != NULL) {
+									_ilink -> m_N_in_tree_car -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+								}
 							}
 							else {
 								m_veh_moved_truck[i * _offset + j] += 1;
@@ -1686,9 +1686,9 @@ int MNM_Dnode_Inout_Multiclass::move_vehicle(TInt timestamp)
 								// if (_olink -> m_N_out_tree_truck != NULL) {
 								// 	_olink -> m_N_out_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
 								// }
-								// if (_ilink -> m_N_in_tree_truck != NULL) {
-								// 	_ilink -> m_N_in_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
-								// }
+								if (_ilink -> m_N_in_tree_truck != NULL) {
+									_ilink -> m_N_in_tree_truck -> add_flow(TFlt(timestamp), 1/m_flow_scalar, _veh -> m_path, _veh -> m_assign_interval);
+								}
 							}
 							_veh_it = _in_link -> m_finished_array.erase(_veh_it);
 						}
@@ -2831,7 +2831,7 @@ int add_dar_records_truck(std::vector<dar_record*> &record, MNM_Dlink_Multiclass
   if (link == NULL){
     throw std::runtime_error("Error, add_dar_records_truck link is null");
   }
-  if (link -> m_N_in_tree_car == NULL){
+  if (link -> m_N_in_tree_truck == NULL){
     throw std::runtime_error("Error, add_dar_records_truck link cummulative curve tree is not installed");
   }
   MNM_Path* _path;

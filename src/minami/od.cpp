@@ -51,7 +51,8 @@ int MNM_Origin::release(MNM_Veh_Factory* veh_factory, TInt current_interval)
   return 0;
 }
 
-int MNM_Origin::release_one_interval(TInt current_interval, MNM_Veh_Factory* veh_factory, TInt assign_interval, TFlt adaptive_ratio)
+int MNM_Origin::release_one_interval(TInt current_interval, MNM_Veh_Factory* veh_factory,
+                                    TInt assign_interval, TFlt adaptive_ratio)
 {
   if (assign_interval < 0) return 0;
   TInt _veh_to_release;
