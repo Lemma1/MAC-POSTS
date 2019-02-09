@@ -260,11 +260,11 @@ int MNM_Routing_Adaptive::update_routing(TInt timestamp)
 **************************************************************************/
 MNM_Routing_Fixed::MNM_Routing_Fixed(PNEGraph &graph,
               MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, 
-              MNM_Link_Factory *link_factory, TInt routing_frq)
+              MNM_Link_Factory *link_factory, TInt routing_frq, TInt buffer_len)
  : MNM_Routing::MNM_Routing(graph, od_factory, node_factory, link_factory)
 {
   m_tracker = std::unordered_map<MNM_Veh*, std::deque<TInt>*>();
-  if (routing_frq == -1){
+  if ((routing_frq == -1) || (buffer_len == -1)){
     m_buffer_as_p = false;
     m_routing_freq = -1;
     // m_cur_routing_interval = -1;
@@ -272,6 +272,7 @@ MNM_Routing_Fixed::MNM_Routing_Fixed(PNEGraph &graph,
   else {
     m_routing_freq = routing_frq;
     m_buffer_as_p = true;
+    m_buffer_length = buffer_len;
     // m_cur_routing_interval = 0;
   }
 }
@@ -334,10 +335,14 @@ int MNM_Routing_Fixed::update_routing(TInt timestamp)
   TInt _node_ID, _next_link_ID;
   MNM_Dlink *_next_link;
   MNM_Veh *_veh;
+  TInt _cur_ass_int;
 
   if (m_buffer_as_p){
-    if (timestamp % m_routing_freq  == 0 || timestamp == 0) {
-      change_choice_portion(TInt(timestamp / m_routing_freq));
+    if ((timestamp % m_routing_freq  == 0 || timestamp == 0)) {
+      _cur_ass_int = TInt(timestamp / m_routing_freq);
+      if (_cur_ass_int < m_buffer_length){
+        change_choice_portion(_cur_ass_int);
+      }
     }
   }
 
@@ -464,11 +469,12 @@ int MNM_Routing_Fixed::add_veh_path(MNM_Veh* veh, std::deque<TInt> *link_que)
                           Hybrid (Adaptive+Fixed) routing
 **************************************************************************/
 MNM_Routing_Hybrid::MNM_Routing_Hybrid(std::string file_folder, PNEGraph &graph, MNM_Statistics* statistics, 
-  MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory, TInt route_frq_fixed)
+  MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, MNM_Link_Factory *link_factory, 
+  TInt route_frq_fixed, TInt buffer_len)
   : MNM_Routing::MNM_Routing(graph, od_factory, node_factory, link_factory)
 {
   m_routing_adaptive = new MNM_Routing_Adaptive(file_folder, graph, statistics, od_factory, node_factory, link_factory);
-  m_routing_fixed = new MNM_Routing_Fixed(graph, od_factory, node_factory, link_factory, route_frq_fixed);
+  m_routing_fixed = new MNM_Routing_Fixed(graph, od_factory, node_factory, link_factory, route_frq_fixed, buffer_len);
 }
 
 MNM_Routing_Hybrid::~MNM_Routing_Hybrid()
@@ -546,7 +552,7 @@ int MNM_Routing_Biclass_Hybrid::update_routing(TInt timestamp)
 MNM_Routing_Biclass_Fixed::MNM_Routing_Biclass_Fixed(PNEGraph &graph,
               MNM_OD_Factory *od_factory, MNM_Node_Factory *node_factory, 
               MNM_Link_Factory *link_factory, TInt routing_frq, TInt buffer_length, TInt veh_class)
-:MNM_Routing_Fixed::MNM_Routing_Fixed(graph, od_factory, node_factory, link_factory, routing_frq)
+:MNM_Routing_Fixed::MNM_Routing_Fixed(graph, od_factory, node_factory, link_factory, routing_frq, buffer_length)
 {
   m_buffer_length = buffer_length;
   m_veh_class = veh_class;
@@ -571,10 +577,17 @@ int MNM_Routing_Biclass_Fixed::update_routing(TInt timestamp)
   TInt _node_ID, _next_link_ID;
   MNM_Dlink *_next_link;
   MNM_Veh *_veh;
+  TInt _cur_ass_int;
 
+  // printf("my bufffer lenght %d, %d\n", m_buffer_length(), m_routing_freq());
   if (m_buffer_as_p){
     if (timestamp % m_routing_freq  == 0 || timestamp == 0) {
-      change_choice_portion(TInt(timestamp / m_routing_freq));
+      // printf("11\n");
+      _cur_ass_int = TInt(timestamp / m_routing_freq);
+      if (_cur_ass_int < m_buffer_length){
+        // printf("Changing biclass fixed\n");
+        change_choice_portion(_cur_ass_int);
+      }
     }
   }
 
