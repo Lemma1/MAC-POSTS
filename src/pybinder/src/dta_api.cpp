@@ -132,13 +132,16 @@ int Dta_Api::initialize(std::string folder)
   // printf("start load ID path mapping 0\n");
   if (MNM_Routing_Fixed *_routing = dynamic_cast<MNM_Routing_Fixed *>(m_dta -> m_routing)){
     MNM::get_ID_path_mapping(m_ID_path_mapping, _routing -> m_path_table);
+    return 0;
   }
   if (MNM_Routing_Hybrid *_routing = dynamic_cast<MNM_Routing_Hybrid *>(m_dta -> m_routing)){
     // printf("start load ID path mapping\n");
     MNM::get_ID_path_mapping(m_ID_path_mapping, _routing -> m_routing_fixed -> m_path_table);
     // printf("mapping size %d\n", m_ID_path_mapping.size());
+    return 0;
   }
-  return 0;
+  std::runtime_error("Dta_Api:: Routing type not implemented in API");
+  return -1;
 }
 
 int Dta_Api::run_once()
@@ -445,13 +448,23 @@ int Mcdta_Api::initialize(std::string folder)
   m_mcdta -> is_ok();
   if (MNM_Routing_Fixed *_routing = dynamic_cast<MNM_Routing_Fixed *>(m_mcdta -> m_routing)){
     MNM::get_ID_path_mapping(m_ID_path_mapping, _routing -> m_path_table);
+    return 0;
   }
   if (MNM_Routing_Hybrid *_routing = dynamic_cast<MNM_Routing_Hybrid *>(m_mcdta -> m_routing)){
     // printf("start load ID path mapping\n");
     MNM::get_ID_path_mapping(m_ID_path_mapping, _routing -> m_routing_fixed -> m_path_table);
+    return 0;
     // printf("mapping size %d\n", m_ID_path_mapping.size());
   }
-  return 0;
+  if (MNM_Routing_Biclass_Hybrid *_routing = dynamic_cast<MNM_Routing_Biclass_Hybrid *>(m_mcdta -> m_routing)){
+    printf("MNM_Routing_Biclass_Hybrid start load ID path mapping\n");
+    MNM::get_ID_path_mapping(m_ID_path_mapping, _routing -> m_routing_fixed_car -> m_path_table);
+    printf("MNM_Routing_Biclass_Hybrid mapping size %d\n", m_ID_path_mapping.size());
+    return 0;
+  }
+  printf("xxx\n");
+  std::runtime_error("Mcdta_Api:: Routing type not implemented in API");
+  return -1;
 }
 
 int Mcdta_Api::install_cc()
