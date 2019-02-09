@@ -18,12 +18,20 @@ class MCDODE():
     self.num_assign_interval = nb.config.config_dict['DTA']['max_interval']
     self.ass_freq = nb.config.config_dict['DTA']['assign_frq']
     self.num_link = nb.config.config_dict['DTA']['num_of_link']
-    self.num_path = nb.config.config_dict['FIXED']['num_path']
+    self.num_path_car = nb.config.config_dict['FIXED']['num_path_car']
+    self.num_path_truck = nb.config.config_dict['FIXED']['num_path_truck']
+    assert(self.num_path_car == self.num_path_truck)
+    self.num_path = self.num_path_car
     self.num_loading_interval =  self.num_assign_interval * self.ass_freq
     self.data_dict = dict()
     self.num_data = self.config['num_data']
     self.observed_links = self.config['observed_links']
-    self.paths_list = self.config['paths_list']
+    self.car_paths_list = self.config['car_paths_list']
+    self.truck_paths_list = self.config['truck_paths_list']
+    assert(len(self.car_paths_list) == len(self.truck_paths_list))
+    for e in self.car_paths_list:
+      assert (e in self.truck_paths_list)
+    self.paths_list = self.car_paths_list
     self.car_count_agg_L_list = None
     self.truck_count_agg_L_list = None
     assert (len(self.paths_list) == self.num_path)
