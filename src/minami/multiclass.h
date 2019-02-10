@@ -545,6 +545,7 @@ TFlt get_average_waiting_time_at_intersection(MNM_Dlink_Multiclass* link);
 TInt get_is_spillback(MNM_Dlink_Multiclass* link); // 0 - no spillback, 1 - spillback
 
 TFlt get_travel_time_car(MNM_Dlink_Multiclass* link, TFlt start_time);
+TFlt get_travel_time_car_robust(MNM_Dlink_Multiclass* link, TFlt start_time, TFlt end_time, TInt num_trials = TInt(10));
 TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time);
 
 int add_dar_records_car(std::vector<dar_record*> &record, MNM_Dlink_Multiclass* link, 

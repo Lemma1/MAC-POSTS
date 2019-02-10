@@ -24,25 +24,25 @@ MNM_Dlink_Multiclass::MNM_Dlink_Multiclass(TInt ID,
 	m_ffs_truck = ffs_truck;
 
 	m_N_in_car = NULL;
-  	m_N_out_car = NULL;
-  	m_N_in_truck = NULL;
-  	m_N_out_truck = NULL;
+	m_N_out_car = NULL;
+	m_N_in_truck = NULL;
+	m_N_out_truck = NULL;
 
-  	m_N_in_tree_car = NULL;
-  	m_N_out_tree_car = NULL;
-  	m_N_in_tree_truck = NULL;
-  	m_N_out_tree_truck = NULL;
+	m_N_in_tree_car = NULL;
+	m_N_out_tree_car = NULL;
+	m_N_in_tree_truck = NULL;
+	m_N_out_tree_truck = NULL;
 
-  	// average waiting time per vehicle = tot_wait_time/(tot_num_car + tot_num_truck)
-  	m_tot_wait_time_at_intersection = 0; // seconds
+	// average waiting time per vehicle = tot_wait_time/(tot_num_car + tot_num_truck)
+	m_tot_wait_time_at_intersection = 0; // seconds
 
-  	// flag of spill back on this link
-  	m_spill_back = false; // if spill back happens during simulation, then set to true
+	// flag of spill back on this link
+	m_spill_back = false; // if spill back happens during simulation, then set to true
 
-  	install_cumulative_curve_multiclass();
+	install_cumulative_curve_multiclass();
 
-  	// !!! Close cc_tree if only doing loading to save a lot of memory !!!
-  	// install_cumulative_curve_tree_multiclass();
+	// !!! Close cc_tree if only doing loading to save a lot of memory !!!
+	// install_cumulative_curve_tree_multiclass();
 }
 
 MNM_Dlink_Multiclass::~MNM_Dlink_Multiclass()
@@ -2762,6 +2762,18 @@ TFlt get_travel_time_car(MNM_Dlink_Multiclass* link, TFlt start_time)
 
 	return 0;
 }
+
+
+TFlt get_travel_time_car_robust(MNM_Dlink_Multiclass* link, TFlt start_time, TFlt end_time, TInt num_trials)
+{
+	TFlt _delta = (end_time - start_time) / TFlt(num_trials);
+	TFlt _ave_tt = TFlt(0);
+	for (int i=0; i < num_trials(); ++i){
+		_ave_tt += get_travel_time_car(link, start_time + TFlt(i) * _delta);
+	}
+	return _ave_tt / TFlt(num_trials);
+}
+
 
 TFlt get_travel_time_truck(MNM_Dlink_Multiclass* link, TFlt start_time)
 {

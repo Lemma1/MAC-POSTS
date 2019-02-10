@@ -63,6 +63,7 @@ public:
   int print_emission_stats();
   
   py::array_t<double> get_car_link_tt(py::array_t<double>start_intervals);
+  py::array_t<double> get_car_link_tt_robust(py::array_t<double>start_intervals, py::array_t<double>end_intervals);
   py::array_t<double> get_truck_link_tt(py::array_t<double>start_intervals);
   
   py::array_t<double> get_car_link_speed(py::array_t<double>start_intervals);
