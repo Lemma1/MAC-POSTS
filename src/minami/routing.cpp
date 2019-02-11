@@ -581,14 +581,14 @@ int MNM_Routing_Biclass_Fixed::update_routing(TInt timestamp)
 
   // printf("my bufffer lenght %d, %d\n", m_buffer_length(), m_routing_freq());
   if (m_buffer_as_p){
-    if (timestamp % m_routing_freq  == 0 || timestamp == 0) {
+    // if (timestamp % m_routing_freq  == 0 || timestamp == 0) {
       // printf("11\n");
       _cur_ass_int = TInt(timestamp / m_routing_freq);
       if (_cur_ass_int < m_buffer_length){
         // printf("Changing biclass fixed\n");
         change_choice_portion(_cur_ass_int);
       }
-    }
+    // }
   }
 
   for (auto _origin_it = m_od_factory -> m_origin_map.begin(); _origin_it != m_od_factory -> m_origin_map.end(); _origin_it++){

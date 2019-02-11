@@ -29,22 +29,22 @@ class MCDODE():
     assert (len(self.paths_list) == self.num_path)
 
   def _add_car_link_flow_data(self, link_flow_df_list):
-    assert (self.config['use_car_link_flow'])
+    # assert (self.config['use_car_link_flow'])
     assert (self.num_data == len(link_flow_df_list))
     self.data_dict['car_link_flow'] = link_flow_df_list
 
   def _add_truck_link_flow_data(self, link_flow_df_list):
-    assert (self.config['use_truck_link_flow'])
+    # assert (self.config['use_truck_link_flow'])
     assert (self.num_data == len(link_flow_df_list))
     self.data_dict['truck_link_flow'] = link_flow_df_list
 
   def _add_car_link_tt_data(self, link_spd_df_list):
-    assert (self.config['use_car_link_tt'])
+    # assert (self.config['use_car_link_tt'])
     assert (self.num_data == len(link_spd_df_list))
     self.data_dict['car_link_tt'] = link_spd_df_list
 
   def _add_truck_link_tt_data(self, link_spd_df_list):
-    assert (self.config['use_truck_link_tt'])
+    # assert (self.config['use_truck_link_tt'])
     assert (self.num_data == len(link_spd_df_list))
     self.data_dict['truck_link_tt'] = link_spd_df_list
 
@@ -53,13 +53,13 @@ class MCDODE():
       self.car_count_agg_L_list = data_dict['car_count_agg_L_list']
     if self.config['truck_count_agg']:
       self.truck_count_agg_L_list = data_dict['truck_count_agg_L_list']
-    if self.config['use_car_link_flow']:
+    if self.config['use_car_link_flow'] or self.config['compute_car_link_flow_loss']:
       self._add_car_link_flow_data(data_dict['car_link_flow'])
-    if self.config['use_truck_link_flow']:
+    if self.config['use_truck_link_flow'] or self.config['compute_truck_link_flow_loss'] :
       self._add_truck_link_flow_data(data_dict['truck_link_flow'])
-    if self.config['use_car_link_tt']:
+    if self.config['use_car_link_tt'] or self.config['compute_car_link_tt_loss']:
       self._add_car_link_tt_data(data_dict['car_link_tt'])
-    if self.config['use_truck_link_tt']:
+    if self.config['use_truck_link_tt']or self.config['compute_car_link_tt_loss']:
       self._add_truck_link_tt_data(data_dict['truck_link_tt'])
 
   def _run_simulation(self, f_car, f_truck, counter = 0):
@@ -159,8 +159,8 @@ class MCDODE():
     if self.config['truck_count_agg']:
         x_e = one_data_dict['truck_count_agg_L'].dot(x_e)
     grad = -np.nan_to_num(link_flow_array - x_e)
-    # if self.config['truck_count_agg']:
-    #   grad = one_data_dict['truck_count_agg_L'].T.dot(grad)
+    if self.config['truck_count_agg']:
+      grad = one_data_dict['truck_count_agg_L'].T.dot(grad)
     return grad
 
   def _compute_grad_on_car_link_tt(self, dta, one_data_dict):
@@ -195,13 +195,13 @@ class MCDODE():
   def _get_one_data(self, j):
     assert (self.num_data > j)
     one_data_dict = dict()
-    if self.config['use_car_link_flow']:
+    if self.config['use_car_link_flow'] or self.config['compute_car_link_flow_loss']:
       one_data_dict['car_link_flow'] = self.data_dict['car_link_flow'][j]
-    if self.config['use_truck_link_flow']:
+    if self.config['use_truck_link_flow']or self.config['compute_truck_link_flow_loss']:
       one_data_dict['truck_link_flow'] = self.data_dict['truck_link_flow'][j]
-    if self.config['use_car_link_tt']:
+    if self.config['use_car_link_tt'] or self.config['compute_car_link_tt_loss']:
       one_data_dict['car_link_tt'] = self.data_dict['car_link_tt'][j]
-    if self.config['use_truck_link_tt']:
+    if self.config['use_truck_link_tt'] or self.config['compute_truck_link_tt_loss']:
       one_data_dict['truck_link_tt'] = self.data_dict['truck_link_tt'][j]
     if self.config['car_count_agg']:
       one_data_dict['car_count_agg_L'] = self.car_count_agg_L_list[j]
@@ -212,27 +212,27 @@ class MCDODE():
 
   def _get_loss(self, one_data_dict, dta):
     loss_dict = dict()
-    if self.config['use_car_link_flow']:
+    if self.config['use_car_link_flow'] or self.config['compute_car_link_flow_loss']:
       x_e = dta.get_link_car_inflow(np.arange(0, self.num_loading_interval, self.ass_freq), 
                   np.arange(0, self.num_loading_interval, self.ass_freq) + self.ass_freq).flatten(order = 'F')
       if self.config['car_count_agg']:
         x_e = one_data_dict['car_count_agg_L'].dot(x_e)
       loss = self.config['link_car_flow_weight'] * np.linalg.norm(np.nan_to_num(x_e - one_data_dict['car_link_flow']))
       loss_dict['car_count_loss'] = loss
-    if self.config['use_truck_link_flow']:
+    if self.config['use_truck_link_flow'] or self.config['compute_truck_link_flow_loss']:
       x_e = dta.get_link_truck_inflow(np.arange(0, self.num_loading_interval, self.ass_freq), 
                   np.arange(0, self.num_loading_interval, self.ass_freq) + self.ass_freq).flatten(order = 'F')
       if self.config['truck_count_agg']:
         x_e = one_data_dict['truck_count_agg_L'].dot(x_e)
       loss = self.config['link_truck_flow_weight'] * np.linalg.norm(np.nan_to_num(x_e - one_data_dict['truck_link_flow']))
       loss_dict['truck_count_loss'] = loss
-    if self.config['use_car_link_tt']:
+    if self.config['use_car_link_tt'] or self.config['compute_car_link_tt_loss']:
       x_tt_e = dta.get_car_link_tt(np.arange(0, self.num_loading_interval, self.ass_freq)).flatten(order = 'F')
       # x_tt_e = dta.get_car_link_tt_robust(np.arange(0, self.num_loading_interval, self.ass_freq),
       #       np.arange(0, self.num_loading_interval, self.ass_freq) + self.ass_freq).flatten(order = 'F')
       loss = self.config['link_car_tt_weight'] * np.linalg.norm(np.nan_to_num(x_tt_e - one_data_dict['car_link_tt']))
       loss_dict['car_tt_loss'] = loss
-    if self.config['use_truck_link_tt']:
+    if self.config['use_truck_link_tt'] or self.config['compute_truck_link_tt_loss']:
       x_tt_e = dta.get_truck_link_tt(np.arange(0, self.num_loading_interval, self.ass_freq)).flatten(order = 'F')
       loss = self.config['link_truck_tt_weight'] * np.linalg.norm(np.nan_to_num(x_tt_e - one_data_dict['truck_link_tt']))
       loss_dict['truck_tt_loss'] = loss
@@ -267,8 +267,8 @@ class MCDODE():
         if adagrad:
           sum_g_square_car = sum_g_square_car + np.power(car_grad, 2)
           sum_g_square_truck = sum_g_square_truck + np.power(truck_grad, 2)
-          f_car = f_car - car_step_size * car_grad / np.sqrt(sum_g_square_car) / np.sqrt(i+1)
-          f_truck = f_truck - truck_step_size * truck_grad / np.sqrt(sum_g_square_truck) / np.sqrt(i+1)
+          f_car = f_car - car_step_size * car_grad / np.sqrt(sum_g_square_car) 
+          f_truck = f_truck - truck_step_size * truck_grad / np.sqrt(sum_g_square_truck) 
         else:
           f_car -= car_grad * car_step_size / np.sqrt(i+1)
           f_truck -= truck_grad * truck_step_size / np.sqrt(i+1)

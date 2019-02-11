@@ -1652,6 +1652,7 @@ int MNM_Dnode_Inout_Multiclass::move_vehicle(TInt timestamp)
 									}
 								}
 								else {
+									IAssert(_veh -> m_class == 1);
 									m_veh_moved_truck[i * _offset + j] += 1;
 									_olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
 									_ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
@@ -1680,6 +1681,7 @@ int MNM_Dnode_Inout_Multiclass::move_vehicle(TInt timestamp)
 								}
 							}
 							else {
+								IAssert(_veh -> m_class == 1);
 								m_veh_moved_truck[i * _offset + j] += 1;
 								_olink = dynamic_cast<MNM_Dlink_Multiclass *>(_out_link);
 								_ilink = dynamic_cast<MNM_Dlink_Multiclass *>(_in_link);
