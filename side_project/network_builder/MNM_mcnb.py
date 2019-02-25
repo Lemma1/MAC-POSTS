@@ -301,7 +301,7 @@ class MNM_path():
   def generate_portion_text(self):
     assert(self.route_portions is not None)
     assert(self.truck_route_portions is not None)
-    return ' '.join([str(e) for e in np.concatenate([self.route_portions, self.truck_route_portions])])
+    return ' '.join([str(e) for e in np.append(self.route_portions, self.truck_route_portions)])
 
 class MNM_pathset():
   def __init__(self):
@@ -397,7 +397,7 @@ class MNM_pathtable():
     for i in range(len(log)):
       tmp_portions = np.array(log[i].strip().split()).astype(np.float)
       if buffer_length is not None:
-        assert(len(tmp_portions) % buffer_length == 0)
+        assert(len(tmp_portions) == buffer_length * 2)
         self.ID2path[i].attach_route_choice_portions(tmp_portions[:buffer_length])
         self.ID2path[i].attach_route_choice_portions_truck(tmp_portions[buffer_length:])
       else:
@@ -668,28 +668,28 @@ class MNM_network_builder():
   def set_network_nake(self, name):
     self.network_name = name
 
-  def update_demand_path(self, car_flow, truck_flow, choice_dict):
-    assert (len(car_flow) == len(self.path_table.ID2path) * self.config.config_dict['DTA']['max_interval'])
-    assert (len(truck_flow) == len(self.path_table.ID2path) * self.config.config_dict['DTA']['max_interval'])
-    max_interval = self.config.config_dict['DTA']['max_interval']
-    car_flow = car_flow.reshape(self.config.config_dict['DTA']['max_interval'], len(self.path_table.ID2path))
-    truck_flow = truck_flow.reshape(self.config.config_dict['DTA']['max_interval'], len(self.path_table.ID2path))
-    for i, path_ID in enumerate(self.path_table.ID2path.keys()):
-      path = self.path_table.ID2path[path_ID]
-      path.attach_route_choice_portions(car_flow[:, i] + truck_flow[:, i])
-    self.demand.demand_dict = dict()
-    for O_node in self.path_table.path_dict.keys():
-      O = self.od.O_dict.inv[O_node]
-      for D_node in self.path_table.path_dict[O_node].keys():
-        D = self.od.D_dict.inv[D_node]
-        demand = self.path_table.path_dict[O_node][D_node].normalize_route_portions(sum_to_OD = True)
-        if choice_dict[O][D] == 0:
-          self.demand.add_demand(O, D, demand, np.zeros(max_interval), overwriting = True)
-        elif choice_dict[O][D] == 1:
-          self.demand.add_demand(O, D, np.zeros(max_interval), demand, overwriting = True)
-        else:
-          raise("Error, wrong truck flow or car flow in update_demand_path") 
-    self.route_choice_flag = True
+  # def update_demand_path(self, car_flow, truck_flow, choice_dict):
+  #   assert (len(car_flow) == len(self.path_table.ID2path) * self.config.config_dict['DTA']['max_interval'])
+  #   assert (len(truck_flow) == len(self.path_table.ID2path) * self.config.config_dict['DTA']['max_interval'])
+  #   max_interval = self.config.config_dict['DTA']['max_interval']
+  #   car_flow = car_flow.reshape(self.config.config_dict['DTA']['max_interval'], len(self.path_table.ID2path))
+  #   truck_flow = truck_flow.reshape(self.config.config_dict['DTA']['max_interval'], len(self.path_table.ID2path))
+  #   for i, path_ID in enumerate(self.path_table.ID2path.keys()):
+  #     path = self.path_table.ID2path[path_ID]
+  #     path.attach_route_choice_portions(car_flow[:, i] + truck_flow[:, i])
+  #   self.demand.demand_dict = dict()
+  #   for O_node in self.path_table.path_dict.keys():
+  #     O = self.od.O_dict.inv[O_node]
+  #     for D_node in self.path_table.path_dict[O_node].keys():
+  #       D = self.od.D_dict.inv[D_node]
+  #       demand = self.path_table.path_dict[O_node][D_node].normalize_route_portions(sum_to_OD = True)
+  #       if choice_dict[O][D] == 0:
+  #         self.demand.add_demand(O, D, demand, np.zeros(max_interval), overwriting = True)
+  #       elif choice_dict[O][D] == 1:
+  #         self.demand.add_demand(O, D, np.zeros(max_interval), demand, overwriting = True)
+  #       else:
+  #         raise("Error, wrong truck flow or car flow in update_demand_path") 
+  #   self.route_choice_flag = True
 
 
 
