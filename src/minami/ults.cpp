@@ -175,7 +175,7 @@ Chameleon const& ConfigFile::Value(std::string const& section, std::string const
   std::map<std::string,Chameleon>::const_iterator ci = content_.find(section + '/' + entry);
 
   if (ci == content_.end()) throw "does not exist";
-
+  
   return ci->second;
 }
 
