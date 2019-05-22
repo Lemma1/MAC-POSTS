@@ -511,7 +511,7 @@ int Mcdta_Api::get_cur_loading_interval()
   return m_mcdta -> m_current_loading_interval();
 }
 
-int Mcdta_Api::print_emission_stats()
+py::array_t<double> Mcdta_Api::get_emission_stats()
 {
     TInt _count_car = 0, _count_truck = 0;
     TFlt _tot_tt_car = 0.0, _tot_tt_truck = 0.0;
@@ -538,11 +538,21 @@ int Mcdta_Api::print_emission_stats()
             }
         }
     }
-    printf("\n\nTotal car: %d, Total truck: %d, Total car tt: %.2f hours, Total truck tt: %.2f hours\n\n", 
-           int(_count_car/m_mcdta -> m_flow_scalar), int(_count_truck/m_mcdta -> m_flow_scalar), 
-           float(_tot_tt_car/m_mcdta -> m_flow_scalar), float(_tot_tt_truck/m_mcdta -> m_flow_scalar));
-    m_mcdta -> m_emission -> output();
-    return 0;
+//     printf("\n\nTotal car: %d, Total truck: %d, Total car tt: %.2f hours, Total truck tt: %.2f hours\n\n", 
+//            int(_count_car/m_mcdta -> m_flow_scalar), int(_count_truck/m_mcdta -> m_flow_scalar), 
+//            float(_tot_tt_car/m_mcdta -> m_flow_scalar), float(_tot_tt_truck/m_mcdta -> m_flow_scalar));
+//     m_mcdta -> m_emission -> output();
+    
+    int new_shape[1] = {4};
+    auto result = py::array_t<double>(new_shape);
+    auto result_buf = result.request();
+    double *result_ptr = (double *)result_buf.ptr;
+    result_ptr[0] = _count_car/m_mcdta -> m_flow_scalar;
+    result_ptr[1] = _count_truck/m_mcdta -> m_flow_scalar;
+    result_ptr[2] = _tot_tt_car/m_mcdta -> m_flow_scalar;
+    result_ptr[3] = _tot_tt_truck/m_mcdta -> m_flow_scalar;
+    
+    return result;
 }
 
 
@@ -1111,7 +1121,7 @@ PYBIND11_MODULE(MNMAPI, m) {
             .def("run_whole", &Mcdta_Api::run_whole)
             .def("install_cc", &Mcdta_Api::install_cc)
             .def("install_cc_tree", &Mcdta_Api::install_cc_tree)
-            .def("print_emission_stats", &Mcdta_Api::print_emission_stats)
+            .def("get_emission_stats", &Mcdta_Api::get_emission_stats)
             .def("get_cur_loading_interval", &Mcdta_Api::get_cur_loading_interval)
             .def("register_links", &Mcdta_Api::register_links)
             .def("register_paths", &Mcdta_Api::register_paths)
