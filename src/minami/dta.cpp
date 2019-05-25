@@ -556,7 +556,7 @@ int MNM_Dta::loading(bool verbose)
     // test();
     _cur_int ++;
   }
-  MNM::print_vehicle_statistics(m_veh_factory);
+  // MNM::print_vehicle_statistics(m_veh_factory);
   // MNM_IO::dump_cumulative_curve(m_file_folder, m_link_factory);
   m_statistics -> post_record();
   m_current_loading_interval = _cur_int;

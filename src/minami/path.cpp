@@ -197,7 +197,7 @@ Path_Table *build_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_
   size_t MaxIter = 10;
   TFlt Mid_Scale = 3;
   TFlt Heavy_Scale = 6;
-  printf("11\n");
+  // printf("11\n");
   /* initialize data structure */
   Path_Table *_path_table = new Path_Table();
   for (auto _o_it = od_factory -> m_origin_map.begin(); _o_it != od_factory -> m_origin_map.end(); _o_it++){
@@ -209,7 +209,7 @@ Path_Table *build_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_
     }
   }
 
-  printf("111\n");
+  // printf("111\n");
   std::unordered_map<TInt, TInt> _mid_shortest_path_tree = std::unordered_map<TInt, TInt>();
   std::unordered_map<TInt, TInt> _heavy_shortest_path_tree = std::unordered_map<TInt, TInt>();
   std::unordered_map<TInt, TFlt> _heavy_cost_map = std::unordered_map<TInt, TFlt>();
@@ -222,7 +222,7 @@ Path_Table *build_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_
   for (auto _link_it = link_factory -> m_link_map.begin(); _link_it!= link_factory -> m_link_map.end(); _link_it++){
     _free_cost_map.insert(std::pair<TInt, TFlt>(_link_it -> first, _link_it -> second -> get_link_tt()));
   }
-  printf("1111\n");
+  // printf("1111\n");
   for (auto _d_it = od_factory -> m_destination_map.begin(); _d_it != od_factory -> m_destination_map.end(); _d_it++){
     _dest_node_ID = _d_it -> second -> m_dest_node -> m_node_ID;
     MNM_Shortest_Path::all_to_one_FIFO(_dest_node_ID, graph, _free_cost_map, _free_shortest_path_tree);
@@ -234,7 +234,7 @@ Path_Table *build_pathset(PNEGraph &graph, MNM_OD_Factory *od_factory, MNM_Link_
       }
     }
   }
-  printf("22\n");
+  // printf("22\n");
   _mid_cost_map.insert(_free_cost_map.begin(), _free_cost_map.end());
   _heavy_cost_map.insert(_free_cost_map.begin(), _free_cost_map.end());
 

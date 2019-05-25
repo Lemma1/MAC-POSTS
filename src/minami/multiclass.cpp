@@ -2315,12 +2315,12 @@ int MNM_IO_Multiclass::build_node_factory_multiclass(std::string file_folder,
 	TFlt _veh_convert_factor;
 
 	MNM_Node_Factory_Multiclass* _node_factory = dynamic_cast<MNM_Node_Factory_Multiclass *>(node_factory);
-
 	if (_node_file.is_open())
 	{
 		std::getline(_node_file,_line); //skip the first line
 		for (int i = 0; i < _num_of_node; ++i){
 			std::getline(_node_file,_line);
+			// printf("%d\n", i);
 			_words = split(_line, ' ');
 			if (_words.size() == 3) {
 				_node_ID = TInt(std::stoi(_words[0]));
