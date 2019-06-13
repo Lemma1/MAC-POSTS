@@ -4,6 +4,8 @@ import networkx as nx
 from bidict import bidict
 from collections import OrderedDict
 
+from scipy.sparse import coo_matrix
+
 DLINK_ENUM = ['CTM', 'LQ', 'LTM', 'PQ']
 DNODE_ENUM = ['FWJ', 'GRJ', 'DMOND', 'DMDND']
 
@@ -72,6 +74,7 @@ class MNM_dnode():
 class MNM_demand():
   def __init__(self):
     self.demand_dict = dict()
+    self.demand_list = None
 
   def add_demand(self, O, D, demand, overwriting = False):
     assert(type(demand) is np.ndarray)
@@ -84,6 +87,7 @@ class MNM_demand():
       self.demand_dict[O][D] = demand
 
   def build_from_file(self, file_name):
+    self.demand_list = list()
     f = file(file_name)
     log = f.readlines()[1:]
     f.close()
@@ -96,9 +100,10 @@ class MNM_demand():
       D_ID = np.int(words[1])
       demand = np.array(words[2:]).astype(np.float)
       self.add_demand(O_ID, D_ID, demand)
+      self.demand_list.append((O_ID, D_ID))
 
   def __str__(self):
-    return "MNM_demand, number of O: {}".format(len(self.demand_dict))
+    return "MNM_demand, number of O: {}, number of OD: {}".format(len(self.demand_dict), len(self.demand_list))
 
   def __repr__(self):
     return self.__str__()
@@ -407,7 +412,7 @@ class MNM_config():
                       'rec_volume': np.int, 'volume_load_automatic_rec': np.int, 'volume_record_automatic_rec': np.int,
                       'rec_tt': np.int, 'tt_load_automatic_rec':np.int, 'tt_record_automatic_rec':np.int,
                       'route_frq': np.int, 'path_file_name': str, 'num_path': np.int,
-                      'choice_portion': str, 'route_frq': np.int}
+                      'choice_portion': str, 'route_frq': np.int, 'buffer_length':np.int}
 
   def build_from_file(self, file_name):
     self.config_dict = OrderedDict()
@@ -600,7 +605,7 @@ class MNM_network_builder():
       tmp_str += node.generate_text() + '\n'
     return tmp_str
 
-  def set_network_nake(self, name):
+  def set_network_name(self, name):
     self.network_name = name
 
   def update_demand_path(self, f):
@@ -623,3 +628,29 @@ class MNM_network_builder():
       # print path.route_portions
       f[:, i] = path.route_portions * self.demand.demand_dict[self.od.O_dict.inv[path.origin_node]][self.od.D_dict.inv[path.destination_node]]
     return f.flatten()
+
+
+  def get_route_portion_matrix(self):
+    num_intervals = self.config.config_dict['DTA']['max_interval']
+    for O_node in self.path_table.path_dict.keys():
+      for D_node in self.path_table.path_dict[O_node].keys():
+        self.path_table.path_dict[O_node][D_node].normalize_route_portions(sum_to_OD = False)
+    path_ID2idx = {ID:idx for idx, ID in enumerate(self.path_table.ID2path.keys())}
+    col = list()
+    row = list()
+    val = list()
+    num_one_OD = len(self.demand.demand_list)
+    num_one_path = len(self.path_table.ID2path)
+
+    for OD_idx, (O,D) in enumerate(self.demand.demand_list):
+      tmp_path_set = self.path_table.path_dict[self.od.O_dict[O]][self.od.D_dict[D]]
+      for tmp_path in tmp_path_set.path_list:
+        path_idx = path_ID2idx[tmp_path.path_ID]
+        for ti in range(num_intervals):
+          row.append(path_idx + ti * num_one_path)
+          col.append(OD_idx + ti * num_one_OD)
+          val.append(tmp_path.route_portions[ti])
+
+    P = coo_matrix((val, (row, col)), 
+          shape=(num_one_path * num_intervals, num_one_OD * num_intervals)).tocsr()
+    return P
