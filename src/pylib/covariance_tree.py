@@ -16,11 +16,13 @@ class OD_parameter_server():
     self.O2OD = None
     self.D2OD = None
     self.demand_mean_list = None
+    self.demand_std_list = None
     self.O_cov_list = None
     self.D_cov_list = None
     self.OD2idx_dict = None
 
     self.demand_mean_gradsum_list = None
+    self.demand_std_gradsum_list = None
     self.O_cov_para_gradsum_list = None
     self.D_cov_para_gradsum_list = None
 
@@ -64,26 +66,75 @@ class OD_parameter_server():
     return A
 
 
-  def initialize(mean_scale = 0.1, O_cov_scale = 0.1, D_cov_scale = 0.1):
+  def initialize(mean_scale = 0.1, std_scale= 0.01, O_cov_scale = 0.1, D_cov_scale = 0.1):
     self.demand_mean_list = list()
     for i in range(self.num_intervals):
       self.demand_mean_list.append(
           np.random.rand(self.num_intervals * len(self.OD_list)) * mean_scale)
+      self.demand_std_list.append(
+          np.random.rand(self.num_intervals * len(self.OD_list)) * std_scale)
       self.O_cov_list[i].init_paras(O_cov_scale)
       self.D_cov_list[i].init_paras(D_cov_scale)
+    self.demand_mean_gradsum_list = [1e-6 for i in range(self.num_intervals)]
+    self.demand_std_gradsum_list = [1e-6 for i in range(self.num_intervals)]
+    self.O_cov_para_gradsum_list = [1e-6 for i in range(self.num_intervals)]
+    self.D_cov_para_gradsum_list = [1e-6 for i in range(self.num_intervals)]
+
 
   def forward(self):
     O_cov_random_list = list()
     D_cov_random_list = list()
     demand_mean_random_list = list()
     tmp_q_list = list()
-    
+    for i in range(self.num_intervals):
+      O_cov_random = np.random.randn(self.O_dim * 2 - 1)
+      D_cov_random = np.random.randn(self.D_dim * 2 - 1)
+      demand_mean_random = np.random.randn(len(self.OD_list))
+      O_cov = self.O_cov_list[i]
+      D_cov = self.D_cov_list[i]
+      tmp_q = (self.demand_mean_list[i]                                               # mean
+                + demand_mean_random * self.demand_std_list[i]                       # variance per OD
+                + self.O2OD.dot(O_cov.A.dot(O_cov_random * O_cov.std_2parts))        # O-related variance
+                + self.D2OD.dot(D_cov.A.dot(D_cov_random * D_cov.std_2parts)))       # D-related variance
+      tmp_q_list.append(tmp_q)
+      O_cov_random_list.append(O_cov_random)
+      D_cov_random_list.append(D_cov_random)
+      demand_mean_random_list.append(demand_mean_random)
+    q = np.concatenate(tmp_q_list)
+    return q, [O_cov_random_list, D_cov_random_list]
 
-    return q, [O_cov_random_list, D_cov_random_list, demand_mean_random_list]
-
-  def backward(self, q_grad, random_list):
+  def backward(self, cur_iter, step_size, q_grad, random_list, adagrad = False):
     [O_cov_random_list, D_cov_random_list, demand_mean_random_list] = random_list
-    pass  
+    q_grad_reshaped = q_grad.reshape((self.num_intervals, len(self.OD_list)))
+    for i in range(self.num_intervals):
+      q_e = self.demand_mean_list[i]
+      q_std_e = self.demand_std_list[i]
+      O_cov_v = self.O_cov_list[i].std_2parts
+      D_cov_v = self.D_cov_list[i].std_2parts
+      if adagrad:
+        pass
+      else:
+        # update demand mean
+        q_e -= q_grad_reshaped[i] * step_size / np.sqrt(cur_iter+1)
+        q_e = np.maximum(q_e, 1e-6)
+        self.demand_mean_list[i] = q_e
+        # update demand std
+        q_std_grad = q_grad_reshaped[i] * demand_mean_random_list[i]
+        q_std_e -=   q_std_grad * step_size / np.sqrt(cur_iter+1)
+        q_std_e = np.maximum(q_std_e, 1e-6)
+        self.demand_std_list[i] = q_std_e
+        # update O cov
+        O_cov = self.O_cov_list[i]
+        O_cov_grad = O_cov.A.T.dot(self.O2OD.T.dot(q_grad_reshaped[i])) * O_cov_random_list[i]
+        O_cov_v -= O_cov_grad * step_size / np.sqrt(cur_iter+1)
+        O_cov_v = np.maximum(O_cov_v, 1e-6)
+        self.O_cov_list[i].std_2parts = O_cov_v
+        # update D cov
+        D_cov = self.D_cov_list[i]
+        D_cov_grad = D_cov.A.T.dot(self.D2OD.T.dot(q_grad_reshaped[i])) * D_cov_random_list[i]
+        D_cov_v -= D_cov_grad * step_size / np.sqrt(cur_iter+1)
+        D_cov_v = np.maximum(D_cov_v, 1e-6)
+        self.D_cov_list[i].std_2parts = D_cov_v
 
 
 class cov_tree():
@@ -92,11 +143,11 @@ class cov_tree():
     self.node_list = node_list
     assert (len(node_list) == 2 * len(source_list) - 1)
     self.dim = len(source_list)
-    self.var_2parts = None
+    self.std_2parts = None
     self.A = None
 
   def init_paras(self, scale = 0.1):
-    self.var_2parts = np.random.rand(self.dim - 1 + self.dim) * scale
+    self.std_2parts = np.random.rand(self.dim - 1 + self.dim) * scale
 
   def construct_A(self, root):
     G = get_digraph_from_tree(root)
@@ -106,7 +157,7 @@ class cov_tree():
     return self.A
 
   def get_cov(self):
-    return self.A.dot(scipy.sparse.diags(self.var_2parts)).dot(self.A.T)
+    return self.A.dot(scipy.sparse.diags(self.std_2parts)).dot(self.A.T)
 
 
 def get_digraph_from_tree(root):
