@@ -5,12 +5,85 @@ import scipy
 
 from scipy.sparse import coo_matrix
 
-class OD_cov():
-  def __init__(self, O_dim, D_dim):
-    self.O_dim = O_dim
-    self.D_dim = D_dim
-    self.O_cov = cov_tree()
-    self.D_cov = cov_tree()
+class OD_parameter_server():
+  def __init__(self, OD_list, num_intervals):
+    self.OD_list = OD_list
+    self.num_intervals = num_intervals
+    self.O_dim = None
+    self.D_dim = None
+    self.O_list = None
+    self.D_list = None
+    self.O2OD = None
+    self.D2OD = None
+    self.demand_mean_list = None
+    self.O_cov_list = None
+    self.D_cov_list = None
+    self.OD2idx_dict = None
+
+    self.demand_mean_gradsum_list = None
+    self.O_cov_para_gradsum_list = None
+    self.D_cov_para_gradsum_list = None
+
+  def construct(self):
+    self.OD2idx_dict = dict()
+    self.O_list = list()
+    self.D_list = list()
+    for odidx, (O,D) in enumerate(self.OD_list):
+      self.OD2idx_dict[(O,D)] = idx
+      self.O_list.append(O)
+      self.D_list.append(D)
+    self.O_list = list(set(self.O_list))
+    self.D_list = list(set(self.D_list))
+    self.O_dim = len(self.O_list)
+    self.D_dim = len(self.D_list)
+    self.O_cov_list = list()
+    self.D_cov_list = list()
+    for i in range(self.num_intervals):
+      self.O_cov_list.append(cov_tree(list(range(self.O_dim)), 
+                                        list(range(self.O_dim * 2 - 1))))
+      self.D_cov_list.append(cov_tree(list(range(self.D_dim)), 
+                                        list(range(self.D_dim * 2 - 1))))
+    self.O2OD = self._construct_X2XY(self.O_list, self.OD_list, 0)
+    self.D2OD = self._construct_X2XY(self.O_list, self.OD_list, 1)
+
+
+  def _construct_X2XY(self, X_list, XY_list, item_idx):
+    col = list()
+    row = list()
+    val = list()
+    
+    x2idx_dict = {idx:x for idx, x in enumerate(X_list)}
+
+    for XY_idx, XY in enumerate(XY_list):
+      X = XY[item_idx]
+      x_idx = x2idx_dict[X]
+      row.append(XY_idx)
+      col.append(x_idx)
+      val.append(1.0)
+    A = coo_matrix((val, (row, col)), shape=(len(XY_list), len(X_list))).tocsr()
+    return A
+
+
+  def initialize(mean_scale = 0.1, O_cov_scale = 0.1, D_cov_scale = 0.1):
+    self.demand_mean_list = list()
+    for i in range(self.num_intervals):
+      self.demand_mean_list.append(
+          np.random.rand(self.num_intervals * len(self.OD_list)) * mean_scale)
+      self.O_cov_list[i].init_paras(O_cov_scale)
+      self.D_cov_list[i].init_paras(D_cov_scale)
+
+  def forward(self):
+    O_cov_random_list = list()
+    D_cov_random_list = list()
+    demand_mean_random_list = list()
+    tmp_q_list = list()
+    
+
+    return q, [O_cov_random_list, D_cov_random_list, demand_mean_random_list]
+
+  def backward(self, q_grad, random_list):
+    [O_cov_random_list, D_cov_random_list, demand_mean_random_list] = random_list
+    pass  
 
 
 class cov_tree():
@@ -22,8 +95,8 @@ class cov_tree():
     self.var_2parts = None
     self.A = None
 
-  def init_paras(self):
-    self.var_2parts = np.random.rand(self.dim - 1 + self.dim)
+  def init_paras(self, scale = 0.1):
+    self.var_2parts = np.random.rand(self.dim - 1 + self.dim) * scale
 
   def construct_A(self, root):
     G = get_digraph_from_tree(root)

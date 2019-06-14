@@ -272,7 +272,7 @@ class MNM_path():
 
   def generate_portion_text(self):
     assert(self.route_portions is not None)
-    return ' '.join([str(e) for e in self.route_portions])
+    return ' '.join(['{:.12f}'.format(e) for e in self.route_portions])
 
 class MNM_pathset():
   def __init__(self):
