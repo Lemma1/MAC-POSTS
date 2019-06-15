@@ -9,7 +9,7 @@ import multiprocessing as mp
 
 import MNMAPI
 from DODE import *
-
+from covariance_tree import *
 
 class SDODE():
   def __init__(self, nb, config):
@@ -179,6 +179,34 @@ class SDODE():
     return q_e
 
 
+
+  def estimate_demand_cov(self, O_dist, D_dist, init_mean_scale = 0.1, 
+                      init_std_scale = 0.01, init_O_cov_scale = 0.1,
+                      init_D_cov_scale = 0.1, step_size = 0.1, 
+                      max_epoch = 100, adagrad = False,
+                      theta = 0.1):
+    q_para = OD_parameter_server(self.demand_list, self.num_assign_interval)
+    q_para.construct(O_dist, D_dist)
+    q_para.initialize(mean_scale = init_mean_scale, std_scale= init_std_scale, 
+                        O_cov_scale = init_O_cov_scale, D_cov_scale = init_D_cov_scale)
+    iter_counter = 0
+    for i in range(max_epoch):
+      seq = np.random.permutation(self.num_data)
+      loss = np.float(0)
+      for j in seq:
+        one_data_dict = self._get_one_data(j)
+        q_e, random_list = q_para.forward()
+        P = self.nb.get_route_portion_matrix()
+        # print q_e, q_e.shape
+        f_e = P.dot(q_e)
+        f_grad, tmp_loss, path_cost = self.compute_path_flow_grad_and_loss(one_data_dict, f_e)
+        q_grad = P.T.dot(f_grad)
+        q_para.backward(iter_counter, step_size, q_grad, random_list, adagrad = adagrad)
+        iter_counter += 1
+        loss += tmp_loss
+        self.assign_route_portions(path_cost, theta = theta)
+      print "Epoch:", i, "Loss:", loss / np.float(self.num_data)
+    return q_para
 
 
 ###  Behavior related function
