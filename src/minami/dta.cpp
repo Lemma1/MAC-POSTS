@@ -183,12 +183,12 @@ int MNM_Dta::build_workzone()
 int MNM_Dta::build_from_files()
 {
   MNM_IO::build_node_factory(m_file_folder, m_config, m_node_factory);
-  // std::cout << test_dta -> m_node_factory -> m_node_map.size() << "\n";
+  // std::cout << m_node_factory -> m_node_map.size() << "\n";
   MNM_IO::build_link_factory(m_file_folder, m_config, m_link_factory);
-  // std::cout << test_dta -> m_link_factory -> m_link_map.size() << "\n";
+  // std::cout << m_link_factory -> m_link_map.size() << "\n";
   MNM_IO::build_od_factory(m_file_folder, m_config, m_od_factory, m_node_factory);
-  // std::cout << test_dta -> m_od_factory -> m_origin_map.size() << "\n";
-  // std::cout << test_dta -> m_od_factory -> m_destination_map.size() << "\n";
+  // std::cout << m_od_factory -> m_origin_map.size() << "\n";
+  // std::cout << m_od_factory -> m_destination_map.size() << "\n";
   m_graph = MNM_IO::build_graph(m_file_folder, m_config);
   MNM_IO::build_demand(m_file_folder, m_config, m_od_factory);
   build_workzone();
@@ -325,6 +325,7 @@ int MNM_Dta::pre_loading()
     // printf("Node ID: %d\n", _node -> m_node_ID);
     _node -> prepare_loading();
   }
+  // printf("dsf\n");
   //m_workzone -> init_workzone();
 
   // MNM_Dlink *_link;
