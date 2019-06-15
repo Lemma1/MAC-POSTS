@@ -120,8 +120,12 @@ int MNM_Pathset::normalize_p()
     }    
   }
   else{
+    TFlt _true_total_p = TFlt(0);
     for (MNM_Path *_path : m_path_vec){
-      _path -> m_p = (_path -> m_p - _min_p) / _tot_p;
+      _true_total_p += _path -> m_p;
+    }
+    for (MNM_Path *_path : m_path_vec){
+      _path -> m_p = (_path -> m_p) / _true_total_p;
     } 
   }
   return 0;
