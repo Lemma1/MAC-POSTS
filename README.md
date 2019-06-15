@@ -1,5 +1,7 @@
 ## MAC-POSTS
 
+[![DOI](https://zenodo.org/badge/52655219.svg)](https://zenodo.org/badge/latestdoi/52655219)
+
 ### Mobility Data Analytics Center - Prediction, Optimization, and Simulation toolkit for Transportation Systems
 
 In the codes, we also note it as MINAMI (MNM), which represents Multi-functIonal dyNAmic network Modeling tookIt

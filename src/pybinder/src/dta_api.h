@@ -61,7 +61,7 @@ public:
   int run_whole();
   int register_links(py::array_t<int> links);
   int get_cur_loading_interval();
-  int print_emission_stats();
+  py::array_t<double> get_emission_stats();
   
   py::array_t<double> get_car_link_tt(py::array_t<double>start_intervals);
   py::array_t<double> get_car_link_tt_robust(py::array_t<double>start_intervals, py::array_t<double>end_intervals);
