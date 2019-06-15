@@ -281,11 +281,38 @@ py::array_t<double> Dta_Api::get_link_tt(py::array_t<int>start_intervals)
       if (start_prt[t] > get_cur_loading_interval()){
         throw std::runtime_error("Error, Dta_Api::get_link_tt, loaded data not enough");
       }
-      result_prt[i * l + t] = MNM_DTA_GRADIENT::get_travel_time(m_link_vec[i], TFlt(start_prt[t]))();
+      result_prt[i * l + t] = MNM_DTA_GRADIENT::get_travel_time(
+                m_link_vec[i], TFlt(start_prt[t]))();
     }
   }
   return result;
 }
+
+py::array_t<double> Dta_Api::get_path_tt(py::array_t<int>start_intervals)
+{
+  auto start_buf = start_intervals.request();
+  if (start_buf.ndim != 1){
+    throw std::runtime_error("Error, Dta_Api::get_path_tt, input dismension mismatch");
+  }
+  int l = start_buf.shape[0];
+  int new_shape [2] = { (int) m_path_vec.size(), l}; 
+  auto result = py::array_t<double>(new_shape);
+  auto result_buf = result.request();
+  double *result_prt = (double *) result_buf.ptr;
+  int *start_prt = (int *) start_buf.ptr;
+  for (int t = 0; t < l; ++t){
+    if (start_prt[t] > get_cur_loading_interval()){
+      throw std::runtime_error("Error, Dta_Api::get_path_tt, loaded data not enough");
+    }
+    for (size_t i = 0; i<m_path_vec.size(); ++i){
+      result_prt[i * l + t] = MNM_DTA_GRADIENT::get_path_travel_time(
+            m_path_vec[i], TFlt(start_prt[t]), m_dta -> m_link_factory)();
+    }
+  }
+  return result;
+}
+
+
 
 py::array_t<double> Dta_Api::get_link_in_cc(int link_ID)
 {
@@ -1156,6 +1183,7 @@ PYBIND11_MODULE(MNMAPI, m) {
             .def("register_links", &Dta_Api::register_links)
             .def("register_paths", &Dta_Api::register_paths)
             .def("get_link_tt", &Dta_Api::get_link_tt)
+            .def("get_path_tt", &Dta_Api::get_path_tt)
             .def("get_link_inflow", &Dta_Api::get_link_inflow)
             .def("get_link_in_cc", &Dta_Api::get_link_in_cc)
             .def("get_link_out_cc", &Dta_Api::get_link_out_cc)

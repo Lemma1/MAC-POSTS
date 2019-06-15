@@ -55,6 +55,24 @@ TFlt get_travel_time(MNM_Dlink* link, TFlt start_time)
 }
 
 
+TFlt get_path_travel_time(MNM_Path* path, TFlt start_time, MNM_Link_Factory* link_factory)
+{
+  if (path == NULL){
+    throw std::runtime_error("Error, get_path_travel_time path is null");
+  }
+  if (link_factory == NULL){
+    throw std::runtime_error("Error, get_path_travel_time link link_factory is null");
+  }
+  TFlt _end_time = start_time;
+  MNM_Dlink* _link;
+  for (auto _link_ID : path -> m_link_vec){
+    _link = link_factory -> get_link(_link_ID);
+    _end_time = _end_time + get_travel_time(_link, start_time);
+  }
+  return _end_time - start_time;
+}
+
+
 int add_dar_records(std::vector<dar_record*> &record, MNM_Dlink* link, 
                     std::unordered_map<MNM_Path*, int> path_map, TFlt start_time, TFlt end_time)
 {
